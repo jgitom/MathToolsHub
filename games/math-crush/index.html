@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#6c4cff" />
+  <meta name="description" content="CJMath EquaGems — match mathematical expressions with equal answers in this interactive puzzle game." />
+  <title>CJMath EquaGems</title>
+  <style>
+    :root {
+      --bg1: #5b39d6;
+      --bg2: #2a79d8;
+      --panel: rgba(255,255,255,.94);
+      --text: #182033;
+      --muted: #667085;
+      --primary: #6c4cff;
+      --danger: #e5484d;
+      --success: #18a957;
+      --tile-size: min(10.5vw, 68px);
+      --gap: 5px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-rounded, "SF Pro Rounded", "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(255,255,255,.22), transparent 28%),
+        radial-gradient(circle at 90% 15%, rgba(255,255,255,.16), transparent 26%),
+        linear-gradient(145deg, var(--bg1), var(--bg2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      user-select: none;
+      overflow-x: hidden;
+    }
+
+    .math-background { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+    .math-symbol { position: absolute; color: rgba(255,255,255,.15); font-weight: 900; text-shadow: 0 8px 22px rgba(21,25,80,.16); animation: floatSymbol 9s ease-in-out infinite; }
+    .math-symbol:nth-child(1) { left: 5%; top: 12%; font-size: 4rem; animation-delay: -2s; }
+    .math-symbol:nth-child(2) { right: 7%; top: 17%; font-size: 5rem; animation-delay: -6s; }
+    .math-symbol:nth-child(3) { left: 9%; bottom: 12%; font-size: 3.6rem; animation-delay: -4s; }
+    .math-symbol:nth-child(4) { right: 8%; bottom: 9%; font-size: 4.5rem; animation-delay: -7s; }
+    .math-symbol:nth-child(5) { left: 48%; top: 3%; font-size: 2.8rem; animation-delay: -1s; }
+
+    .game-shell {
+      width: min(100%, 900px);
+      background: var(--panel);
+      border-radius: 28px;
+      box-shadow: 0 24px 70px rgba(15, 23, 42, .28);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.5);
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar {
+      padding: 18px 20px 14px;
+      background: linear-gradient(135deg, #ffffff, #f2efff);
+      border-bottom: 1px solid #e8e4ff;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .title-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .back-link { display: inline-flex; align-items: center; min-height: 40px; padding: 0 12px; border: 1px solid #dcd5ff; border-radius: 13px; color: #4f32cb; background: #fff; font-size: .82rem; font-weight: 800; text-decoration: none; }
+    .back-link:hover, .back-link:focus-visible { background: #f2efff; outline: 3px solid #ddd6fe; outline-offset: 2px; }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.55rem, 4vw, 2.25rem);
+      letter-spacing: -0.04em;
+    }
+
+    .game-title { display: flex; align-items: center; gap: 13px; }
+    .game-logo { position: relative; width: 54px; height: 54px; flex: 0 0 54px; display: grid; place-items: center; border-radius: 17px; color: #fff; background: linear-gradient(145deg,#7c5cff,#4f32cb); box-shadow: inset 0 3px 0 rgba(255,255,255,.28),0 9px 18px rgba(79,50,203,.25); font: 900 1.65rem Georgia,serif; transform: rotate(-5deg); animation: logoPulse 3.2s ease-in-out infinite; }
+    .game-logo::after { content: "+"; position: absolute; width: 20px; height: 20px; right: -7px; bottom: -5px; display: grid; place-items: center; border: 3px solid #fff; border-radius: 50%; color: #4b3800; background: #ffd43b; font: 900 .8rem Arial,sans-serif; }
+    .title-copy { min-width: 0; }
+    .title-accent { color: #5b39d6; }
+
+    .tagline {
+      color: var(--muted);
+      margin: 5px 0 0;
+      font-size: .95rem;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(80px, 1fr));
+      gap: 9px;
+      width: min(100%, 560px);
+      margin: 15px auto 0;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+    .stat {
+      background: white;
+      border: 1px solid #e8e8f0;
+      border-radius: 15px;
+      padding: 10px 8px;
+      text-align: center;
+      box-shadow: 0 5px 14px rgba(33, 33, 66, .06);
+    }
+
+    .stat small {
+      display: block;
+      color: var(--muted);
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 3px;
+      font-size: 1.15rem;
+    }
+
+    .progress-wrap {
+      width: min(100%, 560px);
+      margin: 12px auto 0;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: .82rem;
+      font-weight: 700;
+      color: #4a4e69;
+      margin-bottom: 6px;
+    }
+
+    .progress {
+      height: 13px;
+      background: #e8e8f2;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress > div {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #20c997, #7ee787);
+      transition: width .35s ease;
+    }
+
+    .main {
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 1fr 190px;
+      gap: 17px;
+      align-items: start;
+    }
+
+    .board-wrap {
+      display: flex;
+      justify-content: center;
+      min-width: 0;
+    }
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(8, var(--tile-size));
+      grid-template-rows: repeat(8, var(--tile-size));
+      gap: var(--gap);
+      padding: 10px;
+      border-radius: 22px;
+      background: linear-gradient(145deg, #281d65, #3349a5);
+      box-shadow:
+        inset 0 0 0 2px rgba(255,255,255,.13),
+        0 18px 30px rgba(35, 42, 100, .24);
+      touch-action: manipulation;
+    }
+
+    .tile {
+      border: 0;
+      border-radius: 16px;
+      color: white;
+      font-weight: 900;
+      font-size: clamp(.68rem, 2vw, 1rem);
+      line-height: 1.05;
+      padding: 3px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      box-shadow:
+        inset 0 -5px 0 rgba(0,0,0,.14),
+        inset 0 3px 0 rgba(255,255,255,.28),
+        0 4px 7px rgba(0,0,0,.2);
+      transition: transform .13s ease, filter .13s ease, opacity .2s ease;
+      position: relative;
+      overflow: hidden;
+      min-width: 0;
+      animation: tileEnter .3s ease both;
+    }
+
+    .tile::after {
+      content: "";
+      position: absolute;
+      inset: 4px 7px auto;
+      height: 22%;
+      border-radius: 999px;
+      background: rgba(255,255,255,.2);
+      pointer-events: none;
+    }
+
+    .tile:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .tile.selected {
+      outline: 4px solid #fff;
+      transform: scale(.9);
+      filter: brightness(1.15);
+      z-index: 2;
+    }
+    .tile.invalid { animation: shake .28s ease; }
+    .tile.matched { animation: pop .3s ease forwards; }
+
+    .v2 { background: linear-gradient(145deg, #ff6b6b, #d84040); }
+    .v3 { background: linear-gradient(145deg, #ff9f43, #e26f16); }
+    .v4 { background: linear-gradient(145deg, #ffd43b, #e5a900); color: #3d3200; }
+    .v5 { background: linear-gradient(145deg, #51cf66, #14983a); }
+    .v6 { background: linear-gradient(145deg, #20c997, #087f5b); }
+    .v7 { background: linear-gradient(145deg, #22b8cf, #08799a); }
+    .v8 { background: linear-gradient(145deg, #4dabf7, #2066c2); }
+    .v9 { background: linear-gradient(145deg, #845ef7, #5f3dc4); }
+    .v10 { background: linear-gradient(145deg, #cc5de8, #9c36b5); }
+    .v11 { background: linear-gradient(145deg, #f06595, #c2255c); }
+    .v12 { background: linear-gradient(145deg, #795548, #4e342e); }
+
+    .side-panel {
+      background: #f8f7ff;
+      border: 1px solid #e5e1ff;
+      padding: 14px;
+      border-radius: 19px;
+    }
+
+    .side-panel h2 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+
+    .side-panel p,
+    .side-panel li {
+      font-size: .86rem;
+      line-height: 1.42;
+      color: #525866;
+    }
+
+    .side-panel ol {
+      margin: 8px 0 14px;
+      padding-left: 20px;
+    }
+
+    .controls {
+      display: grid;
+      gap: 9px;
+    }
+
+    button.action {
+      border: 0;
+      border-radius: 13px;
+      padding: 11px 12px;
+      font-weight: 800;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(135deg, #6c4cff, #4f32cb);
+      box-shadow: 0 8px 14px rgba(108,76,255,.22);
+    }
+
+    button.action.secondary {
+      color: #4f32cb;
+      background: white;
+      border: 1px solid #dcd5ff;
+      box-shadow: none;
+    }
+
+    button.action:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .message {
+      min-height: 24px;
+      text-align: center;
+      font-weight: 800;
+      color: #4f32cb;
+      padding: 1px 18px 15px;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(16, 18, 35, .64);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 99;
+    }
+
+    .modal.show { display: flex; }
+
+    .modal-card {
+      width: min(100%, 390px);
+      background: white;
+      border-radius: 24px;
+      padding: 25px;
+      text-align: center;
+      box-shadow: 0 25px 80px rgba(0,0,0,.35);
+      animation: modalIn .25s ease;
+    }
+
+    .modal-card .emoji { font-size: 3rem; }
+    .modal-card h2 { margin: 8px 0; }
+    .modal-card p { color: var(--muted); line-height: 1.5; }
+
+    @keyframes pop {
+      0% { transform: scale(1); opacity: 1; }
+      70% { transform: scale(1.25) rotate(7deg); opacity: .75; }
+      100% { transform: scale(.1); opacity: 0; }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    @keyframes modalIn {
+      from { transform: translateY(14px) scale(.96); opacity: 0; }
+      to { transform: none; opacity: 1; }
+    }
+
+    @keyframes floatSymbol {
+      0%,100% { transform: translate3d(0,0,0) rotate(-8deg); opacity: .1; }
+      50% { transform: translate3d(0,-22px,0) rotate(8deg); opacity: .2; }
+    }
+
+    @keyframes logoPulse {
+      0%,100% { transform: rotate(-5deg) scale(1); }
+      50% { transform: rotate(2deg) scale(1.05); }
+    }
+
+    @keyframes tileEnter {
+      from { opacity: 0; transform: translateY(-8px) scale(.9); }
+      to { opacity: 1; transform: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+    }
+
+    @media (max-width: 700px) {
+      :root { --tile-size: min(calc((100vw - 84px) / 8), 58px); --gap: 4px; }
+      body { padding: 8px; align-items: flex-start; }
+      .game-shell { border-radius: 20px; }
+      .main { grid-template-columns: 1fr; padding: 12px; }
+      .side-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .side-panel .controls { align-content: start; }
+      .stats { grid-template-columns: repeat(4, 1fr); }
+      .stat { min-width: 0; padding: 8px 3px; }
+    }
+
+    @media (max-width: 430px) {
+      :root { --tile-size: calc((100vw - 72px) / 8); --gap: 3px; }
+      .topbar { padding: 15px 13px 12px; }
+      .main { padding: 9px; }
+      #board { padding: 7px; border-radius: 16px; }
+      .tile { border-radius: 11px; font-size: .65rem; }
+      .side-panel { grid-template-columns: 1fr; }
+      .tagline { font-size: .85rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="math-background" aria-hidden="true"><span class="math-symbol">+</span><span class="math-symbol">÷</span><span class="math-symbol">×</span><span class="math-symbol">−</span><span class="math-symbol">=</span></div>
+  <main class="game-shell">
+    <header class="topbar">
+      <div class="title-row">
+        <div class="game-title">
+          <span class="game-logo" aria-hidden="true">Σ</span>
+          <div class="title-copy">
+            <h1>CJMath <span class="title-accent">EquaGems</span></h1>
+            <p class="tagline">Match 3 expressions that have the same answer.</p>
+          </div>
+        </div>
+        <div class="title-actions">
+          <a class="back-link" href="../../index.html">← Home</a>
+          <button id="soundBtn" class="action secondary" type="button">🔊 Sound On</button>
+        </div>
+      </div>
+
+      <section class="stats" aria-label="Game statistics">
+        <div class="stat"><small>Level</small><strong id="level">1</strong></div>
+        <div class="stat"><small>Score</small><strong id="score">0</strong></div>
+        <div class="stat"><small>Moves</small><strong id="moves">25</strong></div>
+        <div class="stat"><small>Target</small><strong id="target">900</strong></div>
+      </section>
+
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span>Level progress</span>
+          <span id="progressText">0 / 900</span>
+        </div>
+        <div class="progress"><div id="progressBar"></div></div>
+      </div>
+    </header>
+
+    <section class="main">
+      <div class="board-wrap">
+        <div id="board" role="grid" aria-label="CJMath EquaGems game board"></div>
+      </div>
+
+      <aside class="side-panel">
+        <div>
+          <h2>How to play</h2>
+          <ol>
+            <li>Tap one tile.</li>
+            <li>Tap an adjacent tile to swap.</li>
+            <li>Match 3 or more tiles with the same answer.</li>
+          </ol>
+          <p><strong>Example:</strong> 2+3, 10÷2 and 7−2 all equal 5.</p>
+        </div>
+
+        <div class="controls">
+          <button id="hintBtn" class="action" type="button">💡 Show Hint</button>
+          <button id="shuffleBtn" class="action secondary" type="button">🔀 Shuffle</button>
+          <button id="restartBtn" class="action secondary" type="button">↻ Restart Level</button>
+        </div>
+      </aside>
+    </section>
+
+    <div id="message" class="message" aria-live="polite">Select two adjacent tiles.</div>
+  </main>
+
+  <div id="modal" class="modal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div id="modalEmoji" class="emoji">🎉</div>
+      <h2 id="modalTitle">Level Complete!</h2>
+      <p id="modalText"></p>
+      <button id="modalBtn" class="action" type="button">Next Level</button>
+    </div>
+  </div>
+
+  <script>
+    "use strict";
+
+    const SIZE = 8;
+    const MIN_VALUE = 2;
+    const MAX_VALUE = 12;
+
+    const boardEl = document.getElementById("board");
+    const scoreEl = document.getElementById("score");
+    const movesEl = document.getElementById("moves");
+    const levelEl = document.getElementById("level");
+    const targetEl = document.getElementById("target");
+    const progressBar = document.getElementById("progressBar");
+    const progressText = document.getElementById("progressText");
+    const messageEl = document.getElementById("message");
+
+    const hintBtn = document.getElementById("hintBtn");
+    const shuffleBtn = document.getElementById("shuffleBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const soundBtn = document.getElementById("soundBtn");
+
+    const modal = document.getElementById("modal");
+    const modalEmoji = document.getElementById("modalEmoji");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalText = document.getElementById("modalText");
+    const modalBtn = document.getElementById("modalBtn");
+
+    let board = [];
+    let selected = null;
+    let score = 0;
+    let levelScore = 0;
+    let level = 1;
+    let moves = 25;
+    let target = 1000;
+    let busy = false;
+    let soundOn = true;
+    let tileId = 0;
+
+    function rand(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function beep(frequency = 440, duration = 0.08) {
+      if (!soundOn) return;
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioCtx();
+        const oscillator = ctx.createOscillator();
+        const gain = ctx.createGain();
+        oscillator.frequency.value = frequency;
+        oscillator.type = "sine";
+        gain.gain.setValueAtTime(0.05, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        oscillator.connect(gain);
+        gain.connect(ctx.destination);
+        oscillator.start();
+        oscillator.stop(ctx.currentTime + duration);
+        oscillator.addEventListener("ended", () => ctx.close());
+      } catch (_) {}
+    }
+
+    function expressionFor(value) {
+      const modes = level === 1
+        ? ["add", "sub", "plain"]
+        : level === 2
+          ? ["add", "sub", "mul"]
+          : level === 3
+            ? ["add", "sub", "mul", "div"]
+            : ["add", "sub", "mul", "div", "mixed"];
+
+      const mode = modes[rand(0, modes.length - 1)];
+
+      if (mode === "plain") return String(value);
+
+      if (mode === "add") {
+        const a = rand(0, value);
+        return `${a}+${value - a}`;
+      }
+
+      if (mode === "sub") {
+        const b = rand(1, 9);
+        return `${value + b}−${b}`;
+      }
+
+      if (mode === "mul") {
+        const factors = [];
+        for (let i = 2; i <= 6; i++) {
+          if (value % i === 0) factors.push(i);
+        }
+        if (factors.length) {
+          const a = factors[rand(0, factors.length - 1)];
+          return `${a}×${value / a}`;
+        }
+        const a = rand(1, Math.min(value, 9));
+        return `${a}+${value - a}`;
+      }
+
+      if (mode === "div") {
+        const divisor = rand(2, 6);
+        return `${value * divisor}÷${divisor}`;
+      }
+
+      const a = rand(1, Math.max(1, value - 1));
+      const b = rand(1, 4);
+      return `${a}+${value - a + b}−${b}`;
+    }
+
+    function evaluateExpression(expression) {
+      const normalized = String(expression)
+        .replaceAll("−", "-")
+        .replaceAll("×", "*")
+        .replaceAll("÷", "/");
+      const numbers = normalized.split(/[+\-*/]/).map(Number);
+      const operators = normalized.match(/[+\-*/]/g) || [];
+      let result = numbers[0];
+
+      for (let index = 0; index < operators.length; index++) {
+        const next = numbers[index + 1];
+        if (operators[index] === "+") result += next;
+        else if (operators[index] === "-") result -= next;
+        else if (operators[index] === "*") result *= next;
+        else if (operators[index] === "/") result /= next;
+      }
+      return result;
+    }
+
+    function makeTile(value = rand(MIN_VALUE, MAX_VALUE)) {
+      let expression = expressionFor(value);
+      let attempts = 0;
+      while (evaluateExpression(expression) !== value && attempts < 10) {
+        expression = expressionFor(value);
+        attempts++;
+      }
+      if (evaluateExpression(expression) !== value) expression = String(value);
+      return {
+        id: ++tileId,
+        value,
+        expression
+      };
+    }
+
+    function createsImmediateMatch(row, col, value) {
+      if (col >= 2 &&
+          board[row][col - 1]?.value === value &&
+          board[row][col - 2]?.value === value) return true;
+
+      if (row >= 2 &&
+          board[row - 1][col]?.value === value &&
+          board[row - 2][col]?.value === value) return true;
+
+      return false;
+    }
+
+    function createBoard() {
+      let attempts = 0;
+      do {
+        board = Array.from({ length: SIZE }, () => Array(SIZE).fill(null));
+
+        for (let row = 0; row < SIZE; row++) {
+          for (let col = 0; col < SIZE; col++) {
+            let value;
+            do {
+              value = rand(MIN_VALUE, MAX_VALUE);
+            } while (createsImmediateMatch(row, col, value));
+            board[row][col] = makeTile(value);
+          }
+        }
+        attempts++;
+      } while (!findPossibleMove() && attempts < 100);
+
+      if (!findPossibleMove()) ensurePlayableMove();
+    }
+
+    function ensurePlayableMove() {
+      const candidates = [];
+      for (let candidate = MIN_VALUE; candidate <= MAX_VALUE; candidate++) {
+        const makesVerticalMatch = [0, 1].some(col =>
+          board[1][col].value === candidate && board[2][col].value === candidate
+        );
+        if (!makesVerticalMatch) candidates.push(candidate);
+      }
+      const value = candidates[rand(0, candidates.length - 1)];
+      let blocker = value === MAX_VALUE ? MIN_VALUE : value + 1;
+      if (board[1][2].value === blocker && board[2][2].value === blocker) {
+        blocker = blocker === MAX_VALUE ? MIN_VALUE : blocker + 1;
+      }
+      board[0][0] = makeTile(value);
+      board[0][1] = makeTile(value);
+      board[0][2] = makeTile(blocker);
+      board[1][2] = makeTile(value);
+    }
+
+    function tileClass(value) {
+      return `v${value}`;
+    }
+
+    function renderBoard() {
+      boardEl.innerHTML = "";
+
+      for (let row = 0; row < SIZE; row++) {
+        for (let col = 0; col < SIZE; col++) {
+          const tile = board[row][col];
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = `tile ${tileClass(tile.value)}`;
+          button.dataset.row = row;
+          button.dataset.col = col;
+          button.dataset.id = tile.id;
+          button.style.animationDelay = `${(row * SIZE + col) * 7}ms`;
+          button.textContent = tile.expression;
+          button.setAttribute("role", "gridcell");
+          button.setAttribute("aria-label", `${tile.expression}, answer ${tile.value}`);
+          if (selected && selected.row === row && selected.col === col) {
+            button.classList.add("selected");
+          }
+          button.addEventListener("click", () => handleTileClick(row, col));
+          boardEl.appendChild(button);
+        }
+      }
+    }
+
+    function updateStats() {
+      scoreEl.textContent = score.toLocaleString();
+      movesEl.textContent = moves;
+      levelEl.textContent = level;
+      targetEl.textContent = target.toLocaleString();
+      progressText.textContent = `${levelScore.toLocaleString()} / ${target.toLocaleString()}`;
+      progressBar.style.width = `${Math.min(100, (levelScore / target) * 100)}%`;
+    }
+
+    function setMessage(text, type = "normal") {
+      messageEl.textContent = text;
+      messageEl.style.color =
+        type === "success" ? "var(--success)" :
+        type === "danger" ? "var(--danger)" :
+        "#4f32cb";
+    }
+
+    function isAdjacent(a, b) {
+      return Math.abs(a.row - b.row) + Math.abs(a.col - b.col) === 1;
+    }
+
+    function swap(a, b) {
+      [board[a.row][a.col], board[b.row][b.col]] =
+        [board[b.row][b.col], board[a.row][a.col]];
+    }
+
+    async function handleTileClick(row, col) {
+      if (busy || moves <= 0) return;
+
+      if (!selected) {
+        selected = { row, col };
+        renderBoard();
+        beep(520, .04);
+        return;
+      }
+
+      const next = { row, col };
+
+      if (selected.row === row && selected.col === col) {
+        selected = null;
+        renderBoard();
+        return;
+      }
+
+      if (!isAdjacent(selected, next)) {
+        selected = next;
+        setMessage("Choose a tile directly beside the selected tile.");
+        renderBoard();
+        return;
+      }
+
+      busy = true;
+      const first = selected;
+      selected = null;
+
+      swap(first, next);
+      renderBoard();
+      await sleep(160);
+
+      let matches = findMatches();
+
+      if (matches.size === 0) {
+        swap(first, next);
+        renderBoard();
+        markInvalid(first, next);
+        setMessage("No match. Try another swap.", "danger");
+        beep(180, .12);
+        await sleep(280);
+        busy = false;
+        return;
+      }
+
+      moves--;
+      await resolveMatches(matches);
+      updateStats();
+
+      if (levelScore >= target) {
+        showLevelComplete();
+      } else if (moves <= 0) {
+        showGameOver();
+      } else {
+        if (!findPossibleMove()) {
+          setMessage("No moves available — board shuffled automatically.");
+          shuffleBoard(false);
+        } else {
+          setMessage("Great match! Keep going.", "success");
+        }
+        busy = false;
+      }
+    }
+
+    function markInvalid(a, b) {
+      const selectors = [
+        `.tile[data-row="${a.row}"][data-col="${a.col}"]`,
+        `.tile[data-row="${b.row}"][data-col="${b.col}"]`
+      ];
+      selectors.forEach(selector => {
+        const el = boardEl.querySelector(selector);
+        if (el) el.classList.add("invalid");
+      });
+    }
+
+    function findMatches() {
+      const found = new Set();
+
+      for (let row = 0; row < SIZE; row++) {
+        let start = 0;
+        for (let col = 1; col <= SIZE; col++) {
+          const same = col < SIZE &&
+            board[row][col] &&
+            board[row][start] &&
+            board[row][col].value === board[row][start].value;
+
+          if (!same) {
+            const length = col - start;
+            if (length >= 3) {
+              for (let c = start; c < col; c++) found.add(`${row},${c}`);
+            }
+            start = col;
+          }
+        }
+      }
+
+      for (let col = 0; col < SIZE; col++) {
+        let start = 0;
+        for (let row = 1; row <= SIZE; row++) {
+          const same = row < SIZE &&
+            board[row][col] &&
+            board[start][col] &&
+            board[row][col].value === board[start][col].value;
+
+          if (!same) {
+            const length = row - start;
+            if (length >= 3) {
+              for (let r = start; r < row; r++) found.add(`${r},${col}`);
+            }
+            start = row;
+          }
+        }
+      }
+
+      return found;
+    }
+
+    async function resolveMatches(initialMatches) {
+      let matches = initialMatches;
+      let combo = 1;
+
+      while (matches.size > 0) {
+        animateMatches(matches);
+        beep(580 + combo * 70, .09);
+        await sleep(260);
+
+        const points = matches.size * 40 * combo;
+        score += points;
+        levelScore += points;
+        setMessage(`Combo ×${combo}! +${points} points`, "success");
+
+        matches.forEach(key => {
+          const [row, col] = key.split(",").map(Number);
+          board[row][col] = null;
+        });
+
+        collapseBoard();
+        refillBoard();
+        renderBoard();
+        updateStats();
+        await sleep(250);
+
+        matches = findMatches();
+        combo++;
+      }
+    }
+
+    function animateMatches(matches) {
+      matches.forEach(key => {
+        const [row, col] = key.split(",").map(Number);
+        const el = boardEl.querySelector(
+          `.tile[data-row="${row}"][data-col="${col}"]`
+        );
+        if (el) el.classList.add("matched");
+      });
+    }
+
+    function collapseBoard() {
+      for (let col = 0; col < SIZE; col++) {
+        let writeRow = SIZE - 1;
+
+        for (let row = SIZE - 1; row >= 0; row--) {
+          if (board[row][col]) {
+            board[writeRow][col] = board[row][col];
+            if (writeRow !== row) board[row][col] = null;
+            writeRow--;
+          }
+        }
+
+        while (writeRow >= 0) {
+          board[writeRow][col] = null;
+          writeRow--;
+        }
+      }
+    }
+
+    function refillBoard() {
+      for (let row = 0; row < SIZE; row++) {
+        for (let col = 0; col < SIZE; col++) {
+          if (!board[row][col]) board[row][col] = makeTile();
+        }
+      }
+    }
+
+    function allCoordinates() {
+      const coords = [];
+      for (let row = 0; row < SIZE; row++) {
+        for (let col = 0; col < SIZE; col++) coords.push({ row, col });
+      }
+      return coords;
+    }
+
+    function findPossibleMove() {
+      for (let row = 0; row < SIZE; row++) {
+        for (let col = 0; col < SIZE; col++) {
+          const current = { row, col };
+          const neighbors = [
+            { row, col: col + 1 },
+            { row: row + 1, col }
+          ];
+
+          for (const next of neighbors) {
+            if (next.row >= SIZE || next.col >= SIZE) continue;
+            swap(current, next);
+            const hasMatch = findMatches().size > 0;
+            swap(current, next);
+            if (hasMatch) return { a: current, b: next };
+          }
+        }
+      }
+      return null;
+    }
+
+    function shuffleBoard(costMove = true) {
+      if (busy && costMove) return;
+      if (costMove && moves <= 1) {
+        setMessage("You need at least 2 moves to shuffle.", "danger");
+        return;
+      }
+
+      if (costMove) moves -= 2;
+
+      const values = board.flat().map(tile => tile.value);
+      let attempts = 0;
+
+      do {
+        for (let i = values.length - 1; i > 0; i--) {
+          const j = rand(0, i);
+          [values[i], values[j]] = [values[j], values[i]];
+        }
+
+        let index = 0;
+        board = Array.from({ length: SIZE }, () =>
+          Array.from({ length: SIZE }, () => makeTile(values[index++]))
+        );
+
+        attempts++;
+        if (attempts > 80) {
+          createBoard();
+          break;
+        }
+      } while (findMatches().size > 0 || !findPossibleMove());
+
+      selected = null;
+      renderBoard();
+      updateStats();
+      setMessage(costMove ? "Board shuffled. Cost: 2 moves." : "Board shuffled.");
+    }
+
+    function showHint() {
+      if (busy || moves <= 0) return;
+      const move = findPossibleMove();
+
+      if (!move) {
+        shuffleBoard(false);
+        return;
+      }
+
+      const cells = [move.a, move.b];
+      cells.forEach(cell => {
+        const el = boardEl.querySelector(
+          `.tile[data-row="${cell.row}"][data-col="${cell.col}"]`
+        );
+        if (el) {
+          el.animate(
+            [
+              { transform: "scale(1)" },
+              { transform: "scale(.82)", filter: "brightness(1.35)" },
+              { transform: "scale(1)" }
+            ],
+            { duration: 700, iterations: 2 }
+          );
+        }
+      });
+
+      setMessage("Hint: swap the two flashing tiles.");
+      beep(760, .08);
+    }
+
+    function startLevel(resetTotalScore = false) {
+      if (resetTotalScore) score = 0;
+      levelScore = 0;
+      moves = 25 + Math.min(level - 1, 10);
+      target = 900 + (level - 1) * 500;
+      selected = null;
+      busy = false;
+      createBoard();
+      renderBoard();
+      updateStats();
+      setMessage(`Level ${level}: match equal answers.`);
+      modal.classList.remove("show");
+    }
+
+    function showLevelComplete() {
+      busy = true;
+      modalEmoji.textContent = "🎉";
+      modalTitle.textContent = "Level Complete!";
+      modalText.textContent =
+        `Excellent! You scored ${levelScore.toLocaleString()} points with ${moves} moves remaining.`;
+      modalBtn.textContent = "Next Level";
+      modalBtn.dataset.action = "next";
+      modal.classList.add("show");
+      beep(880, .18);
+    }
+
+    function showGameOver() {
+      busy = true;
+      modalEmoji.textContent = "🧠";
+      modalTitle.textContent = "Almost There!";
+      modalText.textContent =
+        `You reached ${levelScore.toLocaleString()} of ${target.toLocaleString()} points. Try this level again.`;
+      modalBtn.textContent = "Try Again";
+      modalBtn.dataset.action = "retry";
+      modal.classList.add("show");
+      beep(220, .18);
+    }
+
+    hintBtn.addEventListener("click", showHint);
+    shuffleBtn.addEventListener("click", () => shuffleBoard(true));
+    restartBtn.addEventListener("click", () => startLevel(false));
+
+    soundBtn.addEventListener("click", () => {
+      soundOn = !soundOn;
+      soundBtn.textContent = soundOn ? "🔊 Sound On" : "🔇 Sound Off";
+      if (soundOn) beep(620, .06);
+    });
+
+    modalBtn.addEventListener("click", () => {
+      const action = modalBtn.dataset.action;
+      if (action === "next") level++;
+      startLevel(false);
+    });
+
+    startLevel(true);
+  </script>
+<script src="../../site-language.js"></script>
+</body>
+</html>

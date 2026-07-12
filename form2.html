@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0f766e">
+<title>100 Kuiz Interaktif Matematik Tingkatan Dua</title>
+<style>
+:root{--p:#0f766e;--p2:#2563eb;--accent:#f59e0b;--ok:#15803d;--bad:#b91c1c;--ink:#172033;--muted:#64748b;--line:#e2e8f0;--shadow:0 18px 48px rgba(15,118,110,.15)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:radial-gradient(circle at 10% 10%,#fde68a66,transparent 24%),radial-gradient(circle at 90% 12%,#99f6e455,transparent 26%),linear-gradient(135deg,#ecfeff,#fff 48%,#eff6ff)}
+button,input{font:inherit}button{cursor:pointer}.app{width:min(1180px,calc(100% - 24px));margin:16px auto 38px}
+.top{position:sticky;top:8px;z-index:10;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;background:#fffffff0;backdrop-filter:blur(12px);border:1px solid #fff;border-radius:20px;box-shadow:var(--shadow)}
+.brand{display:flex;align-items:center;gap:11px;font-weight:950}.logo{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;font-size:24px;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff}.brand small{display:block;color:var(--muted);font-size:.75rem}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.mini{border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px 12px;font-weight:850}.mini:hover{transform:translateY(-1px);box-shadow:0 6px 14px #0f172a18}
+.panel{margin-top:20px;padding:clamp(18px,4vw,40px);background:#fffffff2;border:1px solid #fff;border-radius:24px;box-shadow:var(--shadow)}.hidden{display:none!important}
+.hero{text-align:center;overflow:hidden}.heroIcon{font-size:clamp(3rem,8vw,6rem)}h1{font-size:clamp(2rem,5vw,4rem);line-height:1.04;margin:12px 0}.grad{color:transparent;background:linear-gradient(100deg,var(--p),var(--p2),#7c3aed);-webkit-background-clip:text;background-clip:text}
+.subtitle{max-width:900px;margin:auto;color:var(--muted);font-size:clamp(1rem,2.2vw,1.22rem);line-height:1.65}.features{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:900px;margin:26px auto}.feature{padding:15px 10px;border:1px solid #99f6e4;border-radius:17px;background:#f6fffd;font-weight:900}
+.start{display:grid;grid-template-columns:1.2fr auto;gap:12px;max-width:690px;margin:22px auto 0}.name{width:100%;padding:15px 17px;border:2px solid var(--line);border-radius:16px;outline:none;font-weight:800}.name:focus{border-color:var(--p);box-shadow:0 0 0 4px #0f766e22}
+.btn{border:0;border-radius:16px;padding:14px 18px;font-weight:950;transition:.18s}.btn:hover:not(:disabled){transform:translateY(-2px)}.btn:disabled{opacity:.45}.primary{color:#fff;background:linear-gradient(135deg,var(--p),var(--p2));box-shadow:0 9px 22px #0f766e33}.secondary{color:#fff;background:linear-gradient(135deg,#7c3aed,#db2777)}.light{background:#fff;border:1px solid var(--line)}.success{color:#fff;background:linear-gradient(135deg,#15803d,#22c55e)}
+.checks{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:15px}.check{padding:9px 13px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-weight:800}
+.head{display:flex;justify-content:space-between;align-items:end;gap:16px;margin-bottom:20px}.head h2{margin:0;font-size:clamp(1.5rem,3vw,2.3rem)}.head p{margin:5px 0 0;color:var(--muted)}.overall{min-width:230px;background:#f0fdfa;padding:13px 15px;border-radius:16px}.track{height:10px;background:#99f6e4;border-radius:999px;overflow:hidden;margin-top:8px}.fill{height:100%;width:0;background:linear-gradient(90deg,var(--p),var(--p2));transition:.3s}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.card{min-height:185px;padding:17px;border:1px solid var(--line);border-radius:20px;background:#fff;text-align:left;transition:.18s}.card:hover{transform:translateY(-4px);border-color:#2dd4bf;box-shadow:0 12px 28px #0f766e20}.card.done{border-color:#86efac;background:linear-gradient(145deg,#fff,#f0fdf4)}.num{font-size:.78rem;color:var(--muted);font-weight:950}.icon{font-size:2.5rem;margin:9px 0}.card h3{margin:0 0 6px;font-size:1.05rem}.card p{margin:0;color:var(--muted);font-size:.87rem;line-height:1.4}.stars{margin-top:12px;letter-spacing:2px}.best{font-size:.78rem;color:var(--muted);margin-top:4px;font-weight:800}
+.quizHead{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;margin-bottom:18px}.label{color:var(--p);font-weight:950;margin-bottom:7px}.progress{height:13px;background:#e5e7eb;border-radius:999px;overflow:hidden}.progressBar{height:100%;width:0;background:linear-gradient(90deg,#f59e0b,#fb7185);transition:.3s}.score{padding:10px 14px;border-radius:999px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-weight:950}
+.qcard{padding:clamp(18px,4vw,34px);border:1px solid var(--line);border-radius:24px;background:linear-gradient(145deg,#fff,#f7fffd);text-align:center}.qnum{color:var(--muted);font-weight:850}.visual{min-height:110px;margin:8px 0;padding:14px;border-radius:20px;display:grid;place-items:center;white-space:pre-line;line-height:1.35;background:linear-gradient(135deg,#fefce8,#ecfeff);font-size:clamp(2rem,6vw,4rem);font-weight:950}.question{max-width:960px;margin:18px auto;font-size:clamp(1.2rem,3vw,2rem);line-height:1.35}.read{border:1px solid #99f6e4;border-radius:999px;padding:9px 13px;background:#f0fdfa;color:#0f766e;font-weight:900;margin-bottom:16px}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:970px;margin:auto}.opt{min-height:62px;padding:15px;border:2px solid var(--line);border-radius:18px;background:#fff;text-align:left;font-weight:900}.opt:hover:not(:disabled){transform:translateY(-2px);border-color:#2dd4bf}.opt.correct{border-color:#22c55e;background:#f0fdf4;color:#166534}.opt.wrong{border-color:#ef4444;background:#fef2f2;color:#991b1b}.letter{display:inline-grid;place-items:center;width:31px;height:31px;border-radius:10px;background:#f1f5f9;margin-right:9px}
+.feedback{max-width:970px;margin:16px auto 0;padding:14px 16px;border-radius:16px;font-weight:850;line-height:1.5}.good{background:#ecfdf5;color:#166534;border:1px solid #86efac}.bad{background:#fff7ed;color:#9a3412;border:1px solid #fdba74}.nav{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:17px}
+.result{text-align:center}.resultIcon{font-size:5rem}.big{font-size:clamp(3rem,9vw,6rem);font-weight:1000;color:var(--p);line-height:1}.result h2{font-size:clamp(1.8rem,4vw,3rem);margin:10px 0}.msg{color:var(--muted);font-size:1.15rem}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:720px;margin:24px auto}.stat{background:#f0fdfa;border-radius:18px;padding:17px}.stat strong{display:block;color:var(--p);font-size:1.8rem}.resultBtns{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}.review{max-width:920px;margin:24px auto 0;text-align:left}.reviewItem{margin:10px 0;padding:14px;border:1px solid var(--line);border-radius:15px;background:#fff}.reviewItem strong{display:block;margin-bottom:5px}
+footer{text-align:center;color:var(--muted);font-size:.82rem;margin:24px 8px}.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,120px);opacity:0;background:#172033;color:#fff;padding:12px 18px;border-radius:999px;font-weight:900;transition:.25s}.toast.show{transform:translate(-50%,0);opacity:1}
+@media(max-width:900px){.grid{grid-template-columns:repeat(3,1fr)}.features{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:680px){.brandText{display:none}.panel{padding:17px}.start{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr)}.options{grid-template-columns:1fr}.quizHead{grid-template-columns:1fr}.score{justify-self:start}.head{flex-direction:column;align-items:stretch}.stats{grid-template-columns:1fr}.overall{min-width:0}}
+@media(max-width:420px){.grid{grid-template-columns:1fr}.resetLabel{display:none}}
+@media print{body{background:#fff}.top,.nav,.resultBtns,.grid,.checks,footer{display:none!important}.panel{box-shadow:none;border:0}}
+</style>
+</head>
+<body>
+<main class="app">
+<header class="top">
+<div class="brand"><div class="logo">∑</div><div class="brandText">Math Juara F2<small>100 Kuiz Matematik Tingkatan Dua</small></div></div>
+<div class="actions"><button class="mini" type="button" onclick="window.location.href='quizzes.html'">← Kembali</button><button class="mini" id="homeBtn">🏠 Utama</button><button class="mini" id="soundBtn">🔊 Suara</button><button class="mini" id="resetBtn">↺ <span class="resetLabel">Set Semula</span></button></div>
+</header>
+
+<section class="panel hero" id="startScreen">
+<div class="heroIcon">🎓📘🧮</div>
+<h1><span class="grad">100 Kuiz Interaktif</span><br>Matematik Tingkatan Dua</h1>
+<p class="subtitle">20 tahap pembelajaran dengan 5 soalan aneka pilihan pada setiap tahap. Topik merangkumi pola dan jujukan, pemfaktoran dan pecahan algebra, rumus algebra, poligon, bulatan, bentuk 3D, koordinat, graf fungsi, kecerunan, kelajuan, pecutan, transformasi, data dan kebarangkalian.</p>
+<div class="features"><div class="feature">🎯 100 soalan</div><div class="feature">🪜 20 tahap</div><div class="feature">🔊 Bacaan suara</div><div class="feature">⭐ Rekod kemajuan</div></div>
+<div class="start"><input class="name" id="studentName" maxlength="40" placeholder="Masukkan nama murid"><button class="btn primary" id="startBtn">🚀 Pilih Tahap</button></div>
+<div class="checks"><label class="check"><input id="shuffleOptions" type="checkbox" checked> Rawakkan jawapan</label><label class="check"><input id="autoRead" type="checkbox"> Baca soalan automatik</label></div>
+</section>
+
+<section class="panel hidden" id="levelScreen">
+<div class="head"><div><h2>Pilih Tahap Pembelajaran</h2><p id="welcomeText"></p></div><div class="overall"><strong id="overallText"></strong><div class="track"><div class="fill" id="overallFill"></div></div></div></div>
+<div class="grid" id="levelGrid"></div>
+</section>
+
+<section class="panel hidden" id="quizScreen">
+<div class="quizHead"><div><div class="label" id="levelLabel"></div><div class="progress"><div class="progressBar" id="progressBar"></div></div></div><div class="score" id="scoreBadge"></div></div>
+<article class="qcard">
+<div class="qnum" id="questionCounter"></div><div class="visual" id="questionVisual"></div><h2 class="question" id="questionText"></h2>
+<button class="read" id="readBtn">🔊 Baca soalan</button><div class="options" id="options"></div><div class="feedback hidden" id="feedback"></div>
+</article>
+<div class="nav"><button class="btn light" id="backLevelsBtn">← Pilih Tahap</button><button class="btn primary" id="nextBtn" disabled>Soalan Seterusnya →</button></div>
+</section>
+
+<section class="panel result hidden" id="resultScreen">
+<div class="resultIcon" id="resultIcon">🏆</div><h2 id="resultTitle"></h2><div class="big" id="scoreBig"></div><div class="stars" id="resultStars"></div><p class="msg" id="resultMessage"></p>
+<div class="stats"><div class="stat"><strong id="correctStat"></strong>Jawapan betul</div><div class="stat"><strong id="bestStat"></strong>Markah terbaik</div><div class="stat"><strong id="completedStat"></strong>Tahap selesai</div></div>
+<div class="resultBtns"><button class="btn primary" id="retryBtn">🔄 Cuba Lagi</button><button class="btn secondary" id="nextLevelBtn">Tahap Seterusnya →</button><button class="btn light" id="allLevelsBtn">🪜 Semua Tahap</button><button class="btn success" id="printBtn">🖨️ Cetak</button></div>
+<div class="review" id="reviewList"></div>
+</section>
+
+<footer>Bahan sokongan pembelajaran Matematik Tingkatan Dua. Boleh digunakan secara luar talian pada komputer, tablet dan telefon. Bukan dokumen rasmi Kementerian Pendidikan Malaysia.</footer>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const LEVELS=[{"id": 1, "title": "Pola Nombor", "icon": "🔢", "skill": "Mengenal dan melengkapkan pola nombor", "questions": [{"visual": "3, 7, 11, 15, ...", "question": "Apakah nombor seterusnya?", "options": ["17", "18", "19", "20"], "answer": "19", "explanation": "Pola bertambah 4 setiap kali."}, {"visual": "50, 45, 40, 35, ...", "question": "Apakah nombor seterusnya?", "options": ["25", "30", "32", "34"], "answer": "30", "explanation": "Pola berkurang 5 setiap kali."}, {"visual": "2, 6, 18, 54, ...", "question": "Apakah nombor seterusnya?", "options": ["108", "162", "216", "324"], "answer": "162", "explanation": "Setiap sebutan didarab dengan 3."}, {"visual": "1, 4, 9, 16, ...", "question": "Apakah nombor seterusnya?", "options": ["20", "24", "25", "36"], "answer": "25", "explanation": "Ini ialah pola nombor kuasa dua: 1², 2², 3², 4², 5²."}, {"visual": "81, 27, 9, 3, ...", "question": "Apakah nombor seterusnya?", "options": ["0", "1", "2", "6"], "answer": "1", "explanation": "Setiap sebutan dibahagi dengan 3."}]}, {"id": 2, "title": "Jujukan", "icon": "🧩", "skill": "Menentukan sebutan dan peraturan jujukan", "questions": [{"visual": "5, 8, 11, 14, ...", "question": "Apakah sebutan ke-6?", "options": ["17", "18", "20", "23"], "answer": "20", "explanation": "Jujukan bertambah 3: sebutan ke-5 ialah 17 dan ke-6 ialah 20."}, {"visual": "2, 5, 8, 11, ...", "question": "Apakah peraturan sebutan ke-n?", "options": ["2n + 1", "3n − 1", "3n + 2", "n + 3"], "answer": "3n − 1", "explanation": "Apabila n = 1, 3(1) − 1 = 2; apabila n = 2, nilainya 5."}, {"visual": "20, 17, 14, 11, ...", "question": "Apakah beza sepunya?", "options": ["−4", "−3", "3", "4"], "answer": "−3", "explanation": "Setiap sebutan berkurang 3."}, {"visual": "4n + 1", "question": "Apakah sebutan ke-5?", "options": ["17", "19", "21", "25"], "answer": "21", "explanation": "4(5) + 1 = 21."}, {"visual": "7, 12, 17, 22, ...", "question": "Apakah sebutan ke-10?", "options": ["47", "52", "57", "62"], "answer": "52", "explanation": "Peraturan ialah 5n + 2. Maka 5(10) + 2 = 52."}]}, {"id": 3, "title": "Kembangan Algebra", "icon": "📦", "skill": "Mengembangkan ungkapan algebra", "questions": [{"visual": "3(x + 5)", "question": "Kembangkan ungkapan.", "options": ["3x + 5", "3x + 8", "3x + 15", "8x"], "answer": "3x + 15", "explanation": "3 didarab dengan x dan 5."}, {"visual": "−2(4y − 3)", "question": "Kembangkan ungkapan.", "options": ["−8y − 6", "−8y + 6", "8y − 6", "8y + 6"], "answer": "−8y + 6", "explanation": "−2 × 4y = −8y dan −2 × (−3) = 6."}, {"visual": "(x + 3)(x + 2)", "question": "Kembangkan ungkapan.", "options": ["x² + 5x + 6", "x² + 6x + 5", "x² + 5", "2x² + 6"], "answer": "x² + 5x + 6", "explanation": "x² + 2x + 3x + 6 = x² + 5x + 6."}, {"visual": "(a − 4)(a + 5)", "question": "Kembangkan ungkapan.", "options": ["a² + a − 20", "a² − a − 20", "a² + 9a + 20", "a² − 20"], "answer": "a² + a − 20", "explanation": "a² + 5a − 4a − 20 = a² + a − 20."}, {"visual": "2(3p − 1) + 4(p + 2)", "question": "Permudahkan ungkapan.", "options": ["10p + 6", "10p − 6", "7p + 7", "14p + 2"], "answer": "10p + 6", "explanation": "6p − 2 + 4p + 8 = 10p + 6."}]}, {"id": 4, "title": "Pemfaktoran Algebra", "icon": "🧱", "skill": "Memfaktorkan ungkapan algebra", "questions": [{"visual": "6x + 12", "question": "Faktorkan sepenuhnya.", "options": ["2(3x + 12)", "3(2x + 4)", "6(x + 2)", "12(x + 1)"], "answer": "6(x + 2)", "explanation": "Faktor sepunya terbesar ialah 6."}, {"visual": "8a − 20", "question": "Faktorkan sepenuhnya.", "options": ["2(4a − 10)", "4(2a − 5)", "8(a − 20)", "10(8a − 2)"], "answer": "4(2a − 5)", "explanation": "Faktor sepunya terbesar ialah 4."}, {"visual": "x² + 7x + 12", "question": "Faktorkan ungkapan.", "options": ["(x + 3)(x + 4)", "(x + 2)(x + 6)", "(x − 3)(x − 4)", "(x + 1)(x + 12)"], "answer": "(x + 3)(x + 4)", "explanation": "3 + 4 = 7 dan 3 × 4 = 12."}, {"visual": "x² − x − 12", "question": "Faktorkan ungkapan.", "options": ["(x − 4)(x + 3)", "(x + 4)(x − 3)", "(x − 6)(x + 2)", "(x − 12)(x + 1)"], "answer": "(x − 4)(x + 3)", "explanation": "−4 + 3 = −1 dan −4 × 3 = −12."}, {"visual": "9y² − 25", "question": "Faktorkan ungkapan.", "options": ["(3y − 5)(3y + 5)", "(9y − 5)(y + 5)", "(3y − 25)(3y + 1)", "(9y − 25)(y + 1)"], "answer": "(3y − 5)(3y + 5)", "explanation": "Ini ialah beza dua kuasa dua."}]}, {"id": 5, "title": "Pecahan Algebra", "icon": "➗", "skill": "Memudahkan operasi pecahan algebra", "questions": [{"visual": "6x / 9", "question": "Permudahkan pecahan.", "options": ["2x/3", "3x/2", "6x/3", "x/9"], "answer": "2x/3", "explanation": "6/9 dipermudah menjadi 2/3."}, {"visual": "(8a²) / (4a)", "question": "Permudahkan pecahan.", "options": ["2", "2a", "4a", "2a²"], "answer": "2a", "explanation": "8a² ÷ 4a = 2a."}, {"visual": "x/3 + x/6", "question": "Berapakah hasilnya?", "options": ["x/2", "2x/9", "x/9", "x/18"], "answer": "x/2", "explanation": "x/3 = 2x/6, jadi jumlahnya 3x/6 = x/2."}, {"visual": "5y/8 − y/4", "question": "Berapakah hasilnya?", "options": ["y/8", "3y/8", "4y/8", "y/2"], "answer": "3y/8", "explanation": "y/4 = 2y/8, jadi 5y/8 − 2y/8 = 3y/8."}, {"visual": "(3x/4) × (8/9)", "question": "Permudahkan hasil darab.", "options": ["2x/3", "3x/2", "8x/3", "6x"], "answer": "2x/3", "explanation": "24x/36 dipermudah menjadi 2x/3."}]}, {"id": 6, "title": "Rumus Algebra", "icon": "🧪", "skill": "Menukar perkara rumus dan membuat penggantian", "questions": [{"visual": "y = 3x + 2, x = 4", "question": "Berapakah nilai y?", "options": ["10", "12", "14", "18"], "answer": "14", "explanation": "y = 3(4) + 2 = 14."}, {"visual": "A = 1/2 bh, b = 8, h = 5", "question": "Berapakah nilai A?", "options": ["13", "20", "40", "80"], "answer": "20", "explanation": "A = 1/2 × 8 × 5 = 20."}, {"visual": "v = u + at", "question": "Jadikan a sebagai perkara rumus.", "options": ["a = (v − u)/t", "a = v − ut", "a = t/(v − u)", "a = (u − v)/t"], "answer": "a = (v − u)/t", "explanation": "Tolak u dan bahagi dengan t."}, {"visual": "P = 2l + 2w", "question": "Jadikan l sebagai perkara rumus.", "options": ["l = P − 2w", "l = (P − 2w)/2", "l = P/2 + w", "l = 2P − w"], "answer": "l = (P − 2w)/2", "explanation": "P − 2w = 2l, kemudian bahagi 2."}, {"visual": "C = 2πr", "question": "Jadikan r sebagai perkara rumus.", "options": ["r = C/(2π)", "r = 2π/C", "r = Cπ/2", "r = C − 2π"], "answer": "r = C/(2π)", "explanation": "Bahagi kedua-dua belah dengan 2π."}]}, {"id": 7, "title": "Persamaan Linear", "icon": "=", "skill": "Menyelesaikan persamaan linear", "questions": [{"visual": "3x + 5 = 20", "question": "Apakah nilai x?", "options": ["3", "5", "7", "15"], "answer": "5", "explanation": "3x = 15, maka x = 5."}, {"visual": "5y − 8 = 17", "question": "Apakah nilai y?", "options": ["3", "5", "7", "25"], "answer": "5", "explanation": "5y = 25, maka y = 5."}, {"visual": "2(x + 4) = 18", "question": "Apakah nilai x?", "options": ["3", "5", "7", "13"], "answer": "5", "explanation": "x + 4 = 9, maka x = 5."}, {"visual": "4x − 3 = 2x + 9", "question": "Apakah nilai x?", "options": ["3", "5", "6", "12"], "answer": "6", "explanation": "2x = 12, maka x = 6."}, {"visual": "x/3 + 2 = 7", "question": "Apakah nilai x?", "options": ["5", "9", "15", "21"], "answer": "15", "explanation": "x/3 = 5, maka x = 15."}]}, {"id": 8, "title": "Poligon", "icon": "🔷", "skill": "Mengira sudut pedalaman dan peluaran poligon", "questions": [{"visual": "Segi tujuh", "question": "Berapakah jumlah sudut pedalaman?", "options": ["720°", "900°", "1 080°", "1 260°"], "answer": "900°", "explanation": "(7 − 2) × 180° = 900°."}, {"visual": "Segi lapan sekata", "question": "Berapakah satu sudut peluaran?", "options": ["40°", "45°", "60°", "135°"], "answer": "45°", "explanation": "360° ÷ 8 = 45°."}, {"visual": "Segi lima sekata", "question": "Berapakah satu sudut pedalaman?", "options": ["72°", "90°", "108°", "120°"], "answer": "108°", "explanation": "Jumlah sudut pedalaman ialah 540°, dibahagi 5 menjadi 108°."}, {"visual": "Jumlah sudut pedalaman = 1 260°", "question": "Poligon itu mempunyai berapa sisi?", "options": ["7", "8", "9", "10"], "answer": "9", "explanation": "(n − 2)180 = 1 260, jadi n − 2 = 7 dan n = 9."}, {"visual": "Sudut peluaran poligon sekata = 30°", "question": "Berapakah bilangan sisi?", "options": ["10", "11", "12", "15"], "answer": "12", "explanation": "360° ÷ 30° = 12 sisi."}]}, {"id": 9, "title": "Bulatan: Asas", "icon": "⭕", "skill": "Mengenal bahagian dan sifat bulatan", "questions": [{"visual": "r = 7 cm", "question": "Berapakah diameter bulatan?", "options": ["3.5 cm", "7 cm", "14 cm", "49 cm"], "answer": "14 cm", "explanation": "Diameter = 2r = 14 cm."}, {"visual": "Diameter = 18 cm", "question": "Berapakah jejari?", "options": ["6 cm", "9 cm", "18 cm", "36 cm"], "answer": "9 cm", "explanation": "Jejari ialah separuh diameter."}, {"visual": "Garis melalui pusat dan menyambung dua titik pada lilitan", "question": "Garis ini dinamakan…", "options": ["Jejari", "Diameter", "Perentas", "Tangen"], "answer": "Diameter", "explanation": "Diameter melalui pusat bulatan."}, {"visual": "Garis yang menyentuh bulatan pada satu titik", "question": "Garis ini dinamakan…", "options": ["Perentas", "Jejari", "Tangen", "Diameter"], "answer": "Tangen", "explanation": "Tangen menyentuh bulatan pada satu titik sahaja."}, {"visual": "Sudut pada satu pusingan lengkap", "question": "Berapakah nilainya?", "options": ["90°", "180°", "270°", "360°"], "answer": "360°", "explanation": "Satu pusingan lengkap ialah 360°."}]}, {"id": 10, "title": "Lilitan dan Luas Bulatan", "icon": "🟠", "skill": "Mengira lilitan dan luas bulatan", "questions": [{"visual": "r = 7 cm, π = 22/7", "question": "Berapakah lilitan bulatan?", "options": ["22 cm", "44 cm", "77 cm", "154 cm"], "answer": "44 cm", "explanation": "Lilitan = 2πr = 2 × 22/7 × 7 = 44 cm."}, {"visual": "d = 14 cm, π = 22/7", "question": "Berapakah lilitan bulatan?", "options": ["22 cm", "44 cm", "88 cm", "154 cm"], "answer": "44 cm", "explanation": "Lilitan = πd = 22/7 × 14 = 44 cm."}, {"visual": "r = 7 cm, π = 22/7", "question": "Berapakah luas bulatan?", "options": ["44 cm²", "77 cm²", "154 cm²", "308 cm²"], "answer": "154 cm²", "explanation": "Luas = πr² = 22/7 × 49 = 154 cm²."}, {"visual": "r = 10 cm, π = 3.142", "question": "Berapakah luas bulatan?", "options": ["31.42 cm²", "62.84 cm²", "314.2 cm²", "628.4 cm²"], "answer": "314.2 cm²", "explanation": "Luas = 3.142 × 10² = 314.2 cm²."}, {"visual": "Lilitan = 62.84 cm, π = 3.142", "question": "Berapakah jejari bulatan?", "options": ["5 cm", "10 cm", "20 cm", "31.42 cm"], "answer": "10 cm", "explanation": "r = C/(2π) = 62.84/6.284 = 10 cm."}]}, {"id": 11, "title": "Bentuk Geometri Tiga Dimensi", "icon": "📦", "skill": "Mengenal ciri bentuk 3D dan mengira isi padu", "questions": [{"visual": "Kubus", "question": "Berapakah bilangan muka?", "options": ["4", "6", "8", "12"], "answer": "6", "explanation": "Kubus mempunyai 6 muka."}, {"visual": "Prisma segi tiga", "question": "Berapakah bilangan bucu?", "options": ["5", "6", "8", "9"], "answer": "6", "explanation": "Prisma segi tiga mempunyai 6 bucu."}, {"visual": "Silinder", "question": "Berapakah bilangan permukaan melengkung?", "options": ["0", "1", "2", "3"], "answer": "1", "explanation": "Silinder mempunyai satu permukaan melengkung."}, {"visual": "Kuboid: 8 cm × 5 cm × 3 cm", "question": "Berapakah isi padu?", "options": ["40 cm³", "80 cm³", "120 cm³", "240 cm³"], "answer": "120 cm³", "explanation": "Isi padu = 8 × 5 × 3 = 120 cm³."}, {"visual": "Kubus: sisi 6 cm", "question": "Berapakah jumlah luas permukaan?", "options": ["36 cm²", "72 cm²", "180 cm²", "216 cm²"], "answer": "216 cm²", "explanation": "Jumlah luas permukaan = 6 × 6² = 216 cm²."}]}, {"id": 12, "title": "Koordinat", "icon": "📍", "skill": "Menggunakan satah Cartes dan jarak antara titik", "questions": [{"visual": "A = (−3, 4)", "question": "Apakah koordinat-x bagi A?", "options": ["−3", "3", "4", "−4"], "answer": "−3", "explanation": "Koordinat-x ialah nombor pertama."}, {"visual": "B = (5, −2)", "question": "Apakah koordinat-y bagi B?", "options": ["−5", "−2", "2", "5"], "answer": "−2", "explanation": "Koordinat-y ialah nombor kedua."}, {"visual": "Titik (2, 3) bergerak 4 unit ke kiri", "question": "Apakah koordinat baharu?", "options": ["(−2, 3)", "(2, −1)", "(6, 3)", "(2, 7)"], "answer": "(−2, 3)", "explanation": "Koordinat-x berkurang 4: 2 − 4 = −2."}, {"visual": "A(2, 5), B(2, −3)", "question": "Berapakah jarak AB?", "options": ["2 unit", "5 unit", "8 unit", "10 unit"], "answer": "8 unit", "explanation": "Kedua-dua titik mempunyai x sama. Jarak = 5 − (−3) = 8."}, {"visual": "A(−4, 1), B(3, 1)", "question": "Berapakah jarak AB?", "options": ["3 unit", "4 unit", "7 unit", "8 unit"], "answer": "7 unit", "explanation": "Kedua-dua titik mempunyai y sama. Jarak = 3 − (−4) = 7."}]}, {"id": 13, "title": "Graf Fungsi", "icon": "📈", "skill": "Mengenal hubungan fungsi dan menentukan nilai", "questions": [{"visual": "y = 2x + 1, x = 3", "question": "Berapakah nilai y?", "options": ["5", "6", "7", "9"], "answer": "7", "explanation": "y = 2(3) + 1 = 7."}, {"visual": "y = −x + 4, x = 6", "question": "Berapakah nilai y?", "options": ["−2", "2", "4", "10"], "answer": "−2", "explanation": "y = −6 + 4 = −2."}, {"visual": "y = 3x − 2", "question": "Titik manakah terletak pada graf?", "options": ["(1, 1)", "(1, 2)", "(2, 3)", "(0, 2)"], "answer": "(1, 1)", "explanation": "Apabila x = 1, y = 3(1) − 2 = 1."}, {"visual": "x: 0,1,2 | y: 2,5,8", "question": "Apakah persamaan yang sepadan?", "options": ["y = 2x + 3", "y = 3x + 2", "y = x + 2", "y = 5x − 3"], "answer": "y = 3x + 2", "explanation": "Nilai y bertambah 3 dan apabila x = 0, y = 2."}, {"visual": "y = 5", "question": "Apakah bentuk grafnya?", "options": ["Garis mendatar", "Garis menegak", "Lengkung", "Bulatan"], "answer": "Garis mendatar", "explanation": "Nilai y tetap bagi semua x."}]}, {"id": 14, "title": "Kecerunan Garis Lurus", "icon": "📐", "skill": "Mengira dan mentafsir kecerunan", "questions": [{"visual": "A(1,2), B(5,10)", "question": "Berapakah kecerunan AB?", "options": ["1", "2", "3", "4"], "answer": "2", "explanation": "m = (10 − 2)/(5 − 1) = 8/4 = 2."}, {"visual": "A(−2,3), B(4,3)", "question": "Berapakah kecerunan AB?", "options": ["−1", "0", "1", "Tidak ditakrif"], "answer": "0", "explanation": "Garis mendatar mempunyai kecerunan 0."}, {"visual": "x = 4", "question": "Apakah kecerunan garis ini?", "options": ["0", "1", "4", "Tidak ditakrif"], "answer": "Tidak ditakrif", "explanation": "Garis menegak mempunyai kecerunan tidak ditakrif."}, {"visual": "y = 3x − 5", "question": "Apakah kecerunannya?", "options": ["−5", "−3", "3", "5"], "answer": "3", "explanation": "Dalam bentuk y = mx + c, m ialah kecerunan."}, {"visual": "Kecerunan = −2", "question": "Apakah maksudnya apabila x bertambah 1?", "options": ["y bertambah 2", "y berkurang 2", "y tidak berubah", "x berkurang 2"], "answer": "y berkurang 2", "explanation": "Kecerunan negatif menunjukkan y menurun apabila x meningkat."}]}, {"id": 15, "title": "Kelajuan", "icon": "🚗", "skill": "Mengira kelajuan, jarak dan masa", "questions": [{"visual": "Jarak 240 km, masa 4 jam", "question": "Berapakah kelajuan purata?", "options": ["40 km/j", "50 km/j", "60 km/j", "80 km/j"], "answer": "60 km/j", "explanation": "Kelajuan = 240 ÷ 4 = 60 km/j."}, {"visual": "Kelajuan 72 km/j selama 2.5 jam", "question": "Berapakah jarak?", "options": ["144 km", "160 km", "180 km", "200 km"], "answer": "180 km", "explanation": "Jarak = 72 × 2.5 = 180 km."}, {"visual": "Jarak 150 km pada 75 km/j", "question": "Berapakah masa?", "options": ["1 jam", "1.5 jam", "2 jam", "2.5 jam"], "answer": "2 jam", "explanation": "Masa = 150 ÷ 75 = 2 jam."}, {"visual": "90 km/j", "question": "Tukarkan kepada m/s.", "options": ["15 m/s", "20 m/s", "25 m/s", "30 m/s"], "answer": "25 m/s", "explanation": "90 ÷ 3.6 = 25 m/s."}, {"visual": "20 m/s", "question": "Tukarkan kepada km/j.", "options": ["54 km/j", "72 km/j", "80 km/j", "90 km/j"], "answer": "72 km/j", "explanation": "20 × 3.6 = 72 km/j."}]}, {"id": 16, "title": "Pecutan", "icon": "🏎️", "skill": "Mengira perubahan halaju dan pecutan", "questions": [{"visual": "Halaju berubah 10 m/s kepada 25 m/s dalam 5 s", "question": "Berapakah pecutan?", "options": ["2 m/s²", "3 m/s²", "5 m/s²", "7 m/s²"], "answer": "3 m/s²", "explanation": "a = (25 − 10)/5 = 3 m/s²."}, {"visual": "Halaju berubah 30 m/s kepada 10 m/s dalam 4 s", "question": "Berapakah pecutan?", "options": ["−5 m/s²", "−4 m/s²", "5 m/s²", "10 m/s²"], "answer": "−5 m/s²", "explanation": "a = (10 − 30)/4 = −5 m/s²."}, {"visual": "Pecutan 2 m/s² selama 6 s, halaju awal 5 m/s", "question": "Berapakah halaju akhir?", "options": ["7 m/s", "12 m/s", "17 m/s", "22 m/s"], "answer": "17 m/s", "explanation": "v = u + at = 5 + 2(6) = 17 m/s."}, {"visual": "Pecutan sifar", "question": "Apakah maksudnya?", "options": ["Objek mesti pegun", "Halaju objek tetap", "Jarak sifar", "Masa sifar"], "answer": "Halaju objek tetap", "explanation": "Pecutan sifar bermaksud tiada perubahan halaju."}, {"visual": "Halaju bertambah secara seragam", "question": "Jenis gerakan ini menunjukkan…", "options": ["Pecutan seragam", "Pecutan sifar", "Nyahpecutan rawak", "Jarak sifar"], "answer": "Pecutan seragam", "explanation": "Perubahan halaju yang seragam menunjukkan pecutan tetap."}]}, {"id": 17, "title": "Transformasi Isometri", "icon": "🔄", "skill": "Mengenal translasi, pantulan dan putaran", "questions": [{"visual": "Titik (2,3) ditranslasi oleh (4,−1)", "question": "Apakah imejnya?", "options": ["(6,2)", "(6,4)", "(−2,2)", "(2,6)"], "answer": "(6,2)", "explanation": "(2 + 4, 3 − 1) = (6,2)."}, {"visual": "Pantulan titik (5,−2) pada paksi-x", "question": "Apakah imejnya?", "options": ["(−5,−2)", "(5,2)", "(−5,2)", "(2,5)"], "answer": "(5,2)", "explanation": "Pantulan pada paksi-x menukar tanda koordinat-y."}, {"visual": "Pantulan titik (−3,4) pada paksi-y", "question": "Apakah imejnya?", "options": ["(3,4)", "(−3,−4)", "(3,−4)", "(4,−3)"], "answer": "(3,4)", "explanation": "Pantulan pada paksi-y menukar tanda koordinat-x."}, {"visual": "Putaran 180° berpusat di asalan bagi titik (2,−5)", "question": "Apakah imejnya?", "options": ["(−2,5)", "(5,−2)", "(−5,2)", "(2,5)"], "answer": "(−2,5)", "explanation": "Putaran 180° menukar (x,y) kepada (−x,−y)."}, {"visual": "Transformasi yang mengekalkan bentuk dan saiz", "question": "Transformasi ini dinamakan…", "options": ["Isometri", "Pembesaran sahaja", "Regangan", "Herotan"], "answer": "Isometri", "explanation": "Isometri mengekalkan bentuk dan saiz objek."}]}, {"id": 18, "title": "Ukuran Kecenderungan Memusat", "icon": "📊", "skill": "Mengira min, median dan mod", "questions": [{"visual": "Data: 4, 6, 8, 10, 12", "question": "Berapakah min?", "options": ["7", "8", "9", "10"], "answer": "8", "explanation": "Jumlah 40 dibahagi 5 = 8."}, {"visual": "Data: 2, 5, 7, 9, 12", "question": "Apakah median?", "options": ["5", "7", "8", "9"], "answer": "7", "explanation": "Nilai tengah ialah 7."}, {"visual": "Data: 3, 4, 4, 5, 6, 6, 6", "question": "Apakah mod?", "options": ["3", "4", "5", "6"], "answer": "6", "explanation": "6 muncul paling kerap."}, {"visual": "Min bagi 5 nombor ialah 12", "question": "Berapakah jumlah kelima-lima nombor?", "options": ["17", "50", "60", "120"], "answer": "60", "explanation": "Jumlah = min × bilangan data = 12 × 5 = 60."}, {"visual": "Data: 5, 7, x, 11, min = 8", "question": "Apakah nilai x?", "options": ["7", "8", "9", "10"], "answer": "9", "explanation": "Jumlah perlu 32. Maka x = 32 − (5 + 7 + 11) = 9."}]}, {"id": 19, "title": "Kebarangkalian Mudah", "icon": "🎲", "skill": "Menentukan kebarangkalian peristiwa mudah", "questions": [{"visual": "Sekeping syiling dilambung", "question": "Kebarangkalian mendapat kepala ialah…", "options": ["0", "1/4", "1/2", "1"], "answer": "1/2", "explanation": "Terdapat dua hasil sama mungkin: kepala atau ekor."}, {"visual": "Sebuah dadu adil dilambung", "question": "Kebarangkalian mendapat nombor 6 ialah…", "options": ["1/2", "1/3", "1/6", "5/6"], "answer": "1/6", "explanation": "Satu hasil yang dikehendaki daripada enam hasil."}, {"visual": "Beg mengandungi 3 bola merah dan 2 bola biru", "question": "Kebarangkalian memilih bola biru ialah…", "options": ["2/3", "2/5", "3/5", "1/2"], "answer": "2/5", "explanation": "Terdapat 2 bola biru daripada jumlah 5 bola."}, {"visual": "Kad bernombor 1 hingga 10", "question": "Kebarangkalian memilih nombor genap ialah…", "options": ["1/5", "2/5", "1/2", "3/4"], "answer": "1/2", "explanation": "Terdapat 5 nombor genap daripada 10 kad."}, {"visual": "Kebarangkalian suatu peristiwa ialah 0", "question": "Apakah maksudnya?", "options": ["Peristiwa pasti berlaku", "Peristiwa mustahil berlaku", "Peristiwa mungkin berlaku", "Peristiwa berlaku separuh masa"], "answer": "Peristiwa mustahil berlaku", "explanation": "Kebarangkalian 0 bermaksud peristiwa mustahil."}]}, {"id": 20, "title": "Cabaran Penyelesaian Masalah", "icon": "🏆", "skill": "Menyelesaikan masalah pelbagai konsep", "questions": [{"visual": "Sebuah jujukan bermula 7, 12, 17, ...", "question": "Apakah sebutan ke-20?", "options": ["97", "102", "107", "112"], "answer": "102", "explanation": "Peraturan ialah 5n + 2. Maka 5(20) + 2 = 102."}, {"visual": "Harga asal RM240, diskaun 15%", "question": "Berapakah harga selepas diskaun?", "options": ["RM196", "RM204", "RM216", "RM225"], "answer": "RM204", "explanation": "Diskaun = RM36. Harga selepas diskaun = RM204."}, {"visual": "Sebuah kereta bergerak 180 km dalam 2.5 jam", "question": "Berapakah kelajuan purata?", "options": ["60 km/j", "72 km/j", "75 km/j", "90 km/j"], "answer": "72 km/j", "explanation": "180 ÷ 2.5 = 72 km/j."}, {"visual": "Segi tiga bersudut 48° dan 67°", "question": "Berapakah sudut ketiga?", "options": ["55°", "65°", "75°", "85°"], "answer": "65°", "explanation": "180° − 48° − 67° = 65°."}, {"visual": "Min bagi 6 nombor ialah 14. Lima nombor ialah 10, 12, 13, 15, 16.", "question": "Apakah nombor keenam?", "options": ["16", "17", "18", "19"], "answer": "18", "explanation": "Jumlah keseluruhan = 84. Jumlah lima nombor = 66. Nombor keenam = 18."}]}];
+const STORAGE_KEY="mathJuaraForm2ProgressV1",NAME_KEY="mathJuaraForm2NameV1";
+const el=id=>document.getElementById(id),screens=["startScreen","levelScreen","quizScreen","resultScreen"];
+let state={levelIndex:0,questionIndex:0,score:0,answered:false,questions:[],answers:[],soundEnabled:true};
+
+function show(id){
+  screens.forEach(s=>el(s).classList.toggle("hidden",s!==id));
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function load(){
+  try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{}}
+  catch{return{}}
+}
+function save(x){localStorage.setItem(STORAGE_KEY,JSON.stringify(x))}
+function studentName(){return el("studentName").value.trim()||"Murid"}
+function shuffle(a){
+  a=[...a];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function starCount(s){return s===5?3:s===4?2:s===3?1:0}
+function starText(s){const n=starCount(s);return"⭐".repeat(n)+"☆".repeat(3-n)}
+
+function renderLevels(){
+  const p=load(),g=el("levelGrid");
+  g.innerHTML="";
+  LEVELS.forEach((l,i)=>{
+    const b=p[l.id]?.best||0,c=document.createElement("button");
+    c.className="card"+(b>=3?" done":"");
+    c.innerHTML=`<div class="num">TAHAP ${l.id}</div><div class="icon">${l.icon}</div><h3>${l.title}</h3><p>${l.skill}</p><div class="stars">${starText(b)}</div><div class="best">${b?`Markah terbaik: ${b}/5`:"Belum dicuba"}</div>`;
+    c.onclick=()=>startLevel(i);
+    g.appendChild(c);
+  });
+  const done=LEVELS.filter(l=>(p[l.id]?.best||0)>=3).length;
+  el("overallText").textContent=`${done} daripada ${LEVELS.length} tahap selesai`;
+  el("overallFill").style.width=`${done/LEVELS.length*100}%`;
+  el("welcomeText").textContent=`Hai ${studentName()}! Pilih tahap yang ingin dijawab.`;
+}
+
+function startLevel(i){
+  state={...state,levelIndex:i,questionIndex:0,score:0,answered:false,answers:[],questions:LEVELS[i].questions.map(q=>({...q}))};
+  show("quizScreen");
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const l=LEVELS[state.levelIndex],q=state.questions[state.questionIndex];
+  state.answered=false;
+  el("levelLabel").textContent=`Tahap ${l.id}: ${l.title}`;
+  el("scoreBadge").textContent=`⭐ Markah: ${state.score}/5`;
+  el("questionCounter").textContent=`Soalan ${state.questionIndex+1} daripada 5`;
+  el("progressBar").style.width=`${state.questionIndex/5*100}%`;
+  el("questionVisual").textContent=q.visual;
+  el("questionText").textContent=q.question;
+  el("feedback").className="feedback hidden";
+  el("nextBtn").disabled=true;
+  el("nextBtn").textContent=state.questionIndex===4?"Lihat Keputusan →":"Soalan Seterusnya →";
+
+  const letters=["A","B","C","D"];
+  const choices=el("shuffleOptions").checked?shuffle(q.options):[...q.options];
+  const box=el("options");
+  box.innerHTML="";
+  choices.forEach((choice,i)=>{
+    const b=document.createElement("button");
+    b.className="opt";
+    b.dataset.value=choice;
+    b.innerHTML=`<span class="letter">${letters[i]}</span>${choice}`;
+    b.onclick=()=>chooseAnswer(b,choice);
+    box.appendChild(b);
+  });
+  if(el("autoRead").checked)setTimeout(()=>speak(`${q.visual}. ${q.question}`),250);
+}
+
+function chooseAnswer(button,choice){
+  if(state.answered)return;
+  state.answered=true;
+  const q=state.questions[state.questionIndex],correct=choice===q.answer;
+  if(correct){state.score++;tone(true)}else tone(false);
+
+  [...el("options").children].forEach(b=>{
+    b.disabled=true;
+    if(b.dataset.value===q.answer)b.classList.add("correct");
+    else if(b===button&&!correct)b.classList.add("wrong");
+  });
+
+  state.answers.push({
+    visual:q.visual,question:q.question,chosen:choice,correct:q.answer,
+    isCorrect:correct,explanation:q.explanation
+  });
+
+  const f=el("feedback");
+  f.className=`feedback ${correct?"good":"bad"}`;
+  f.innerHTML=correct
+    ? `✅ Betul! ${q.explanation}`
+    : `💡 Jawapan betul ialah <strong>${q.answer}</strong>. ${q.explanation}`;
+
+  el("scoreBadge").textContent=`⭐ Markah: ${state.score}/5`;
+  el("progressBar").style.width=`${(state.questionIndex+1)/5*100}%`;
+  el("nextBtn").disabled=false;
+}
+
+function nextQuestion(){
+  if(!state.answered)return;
+  if(state.questionIndex<4){
+    state.questionIndex++;
+    renderQuestion();
+  }else finishLevel();
+}
+
+function finishLevel(){
+  const l=LEVELS[state.levelIndex],p=load(),old=p[l.id]?.best||0;
+  const best=Math.max(old,state.score);
+  p[l.id]={best,last:state.score,date:new Date().toISOString()};
+  save(p);
+
+  el("resultIcon").textContent=state.score===5?"🏆":state.score>=3?"🎉":"💪";
+  el("resultTitle").textContent=state.score===5?"Cemerlang!":state.score>=3?"Syabas!":"Teruskan usaha!";
+  el("scoreBig").textContent=`${state.score}/5`;
+  el("resultStars").textContent=starText(state.score);
+  el("resultMessage").textContent=
+    state.score===5?`${studentName()} menguasai tahap ini dengan sangat baik.`:
+    state.score>=3?`${studentName()} berjaya menamatkan tahap ini. Cuba lagi untuk 3 bintang.`:
+    `${studentName()} sedang membina kemahiran. Semak jawapan dan cuba sekali lagi.`;
+
+  el("correctStat").textContent=state.score;
+  el("bestStat").textContent=`${best}/5`;
+  const done=LEVELS.filter(x=>(p[x.id]?.best||0)>=3).length;
+  el("completedStat").textContent=`${done}/20`;
+  el("nextLevelBtn").classList.toggle("hidden",state.levelIndex===LEVELS.length-1);
+
+  el("reviewList").innerHTML="<h3>Semakan Jawapan</h3>"+
+    state.answers.map((a,i)=>`<div class="reviewItem"><strong>${a.isCorrect?"✅":"❌"} Soalan ${i+1}: ${a.visual} — ${a.question}</strong>Jawapan murid: ${a.chosen}<br>Jawapan betul: ${a.correct}<br><span style="color:var(--muted)">${a.explanation}</span></div>`).join("");
+
+  show("resultScreen");
+  if(starCount(state.score)>0)celebrate();
+}
+
+function speak(t){
+  if(!state.soundEnabled||!("speechSynthesis"in window))return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(t);
+  u.lang="ms-MY";
+  u.rate=.84;
+  u.pitch=1.02;
+  speechSynthesis.speak(u);
+}
+function tone(correct){
+  if(!state.soundEnabled)return;
+  try{
+    const C=window.AudioContext||window.webkitAudioContext,c=new C(),o=c.createOscillator(),g=c.createGain();
+    o.connect(g);g.connect(c.destination);
+    o.frequency.value=correct?660:220;
+    g.gain.setValueAtTime(.08,c.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.28);
+    o.start();o.stop(c.currentTime+.28);
+  }catch{}
+}
+function celebrate(){[0,120,240].forEach(d=>setTimeout(()=>tone(true),d))}
+function toast(t){
+  el("toast").textContent=t;
+  el("toast").classList.add("show");
+  setTimeout(()=>el("toast").classList.remove("show"),1800);
+}
+
+el("startBtn").onclick=()=>{
+  localStorage.setItem(NAME_KEY,studentName());
+  renderLevels();
+  show("levelScreen");
+};
+el("homeBtn").onclick=()=>show("startScreen");
+el("backLevelsBtn").onclick=el("allLevelsBtn").onclick=()=>{renderLevels();show("levelScreen")};
+el("nextBtn").onclick=nextQuestion;
+el("retryBtn").onclick=()=>startLevel(state.levelIndex);
+el("nextLevelBtn").onclick=()=>startLevel(state.levelIndex+1);
+el("readBtn").onclick=()=>{
+  const q=state.questions[state.questionIndex];
+  speak(`${q.visual}. ${q.question}`);
+};
+el("printBtn").onclick=()=>print();
+
+el("soundBtn").onclick=()=>{
+  state.soundEnabled=!state.soundEnabled;
+  el("soundBtn").textContent=state.soundEnabled?"🔊 Suara":"🔇 Senyap";
+  if(!state.soundEnabled&&"speechSynthesis"in window)speechSynthesis.cancel();
+  toast(state.soundEnabled?"Suara diaktifkan":"Suara dimatikan");
+};
+
+el("resetBtn").onclick=()=>{
+  if(confirm("Set semula semua markah dan kemajuan?")){
+    localStorage.removeItem(STORAGE_KEY);
+    renderLevels();
+    toast("Kemajuan telah diset semula");
+  }
+};
+
+const saved=localStorage.getItem(NAME_KEY);
+if(saved)el("studentName").value=saved;
+</script>
+<script src="quiz-content-translations.js"></script><script src="quiz-interface-language.js"></script>
+</body>
+</html>

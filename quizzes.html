@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f2747">
+    <title>Learning Catalogue | MathToolsHub</title>
+    <style>
+        :root {
+            --navy: #0f2747;
+            --blue: #1d4ed8;
+            --blue-soft: #eff6ff;
+            --ink: #172033;
+            --muted: #64748b;
+            --line: #dbe3ec;
+            --surface: #ffffff;
+            --background: #f4f7fa;
+            --shadow: 0 12px 32px rgba(15, 39, 71, 0.08);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            color: var(--ink);
+            background: var(--background);
+        }
+
+        a { color: inherit; }
+
+        .site-header {
+            background: var(--navy);
+            color: #fff;
+            border-bottom: 4px solid #3b82f6;
+        }
+
+        .header-inner,
+        main {
+            width: min(1120px, calc(100% - 40px));
+            margin: 0 auto;
+        }
+
+        .header-inner {
+            min-height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: .01em;
+        }
+
+        .brand-mark {
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            border-radius: 8px;
+            background: #fff;
+            color: var(--navy);
+            font: 800 1.25rem Georgia, serif;
+        }
+
+        .home-link {
+            color: #dbeafe;
+            text-decoration: none;
+            font-size: .9rem;
+            font-weight: 600;
+        }
+
+        .home-link:hover,
+        .home-link:focus-visible { color: #fff; text-decoration: underline; }
+        .header-actions { display: flex; align-items: center; gap: 15px; }
+        .site-language-slot { display: flex; align-items: center; }
+
+        main { padding: 56px 0 72px; }
+
+        .intro { max-width: 720px; margin-bottom: 42px; }
+
+        .eyebrow {
+            margin: 0 0 10px;
+            color: var(--blue);
+            font-size: .78rem;
+            font-weight: 800;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0 0 14px;
+            color: var(--navy);
+            font-size: clamp(2rem, 5vw, 3.25rem);
+            line-height: 1.08;
+            letter-spacing: -.035em;
+        }
+
+        .intro p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+
+        .catalogue-section {
+            margin-top: 28px;
+            padding: 30px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: var(--surface);
+            box-shadow: var(--shadow);
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 24px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .section-heading h2 { margin: 0 0 5px; color: var(--navy); font-size: 1.35rem; }
+        .section-heading p { margin: 0; color: var(--muted); font-size: .92rem; }
+        .count { color: var(--muted); font-size: .8rem; font-weight: 700; white-space: nowrap; }
+
+        .page-list {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .page-card {
+            min-height: 94px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 18px;
+            border: 1px solid var(--line);
+            border-radius: 9px;
+            background: #fff;
+            text-decoration: none;
+            transition: border-color .18s, box-shadow .18s, transform .18s;
+        }
+
+        .page-card:hover,
+        .page-card:focus-visible {
+            border-color: #93b4e8;
+            box-shadow: 0 8px 20px rgba(15, 39, 71, .09);
+            transform: translateY(-2px);
+            outline: none;
+        }
+
+        .card-number {
+            width: 42px;
+            height: 42px;
+            flex: 0 0 42px;
+            display: grid;
+            place-items: center;
+            border-radius: 8px;
+            background: var(--blue-soft);
+            color: var(--blue);
+            font-weight: 800;
+        }
+
+        .secondary .card-number { background: #f1f5f9; color: var(--navy); }
+        .card-copy { min-width: 0; }
+        .card-copy strong { display: block; margin-bottom: 4px; color: var(--navy); font-size: .98rem; }
+        .card-copy span { color: var(--muted); font-size: .8rem; }
+        .arrow { margin-left: auto; color: #94a3b8; font-size: 1.15rem; }
+
+        footer {
+            padding: 22px 20px;
+            border-top: 1px solid var(--line);
+            color: var(--muted);
+            background: #fff;
+            text-align: center;
+            font-size: .8rem;
+        }
+
+        @media (max-width: 800px) { .page-list { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 540px) {
+            .header-inner, main { width: min(100% - 24px, 1120px); }
+            .header-inner { min-height: 64px; }
+            main { padding: 38px 0 50px; }
+            .intro { margin-bottom: 30px; }
+            .catalogue-section { padding: 20px; }
+            .section-heading { align-items: start; flex-direction: column; gap: 8px; }
+            .page-list { grid-template-columns: 1fr; }
+            .home-link span { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="brand"><span class="brand-mark" aria-hidden="true">∑</span> MathToolsHub</div>
+            <div class="header-actions">
+                <div class="site-language-slot" id="siteLanguageSlot"></div>
+                <a class="home-link" href="index.html">← <span>Return to home</span></a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="intro" aria-labelledby="page-title">
+            <p class="eyebrow">Learning catalogue</p>
+            <h1 id="page-title">Mathematics programmes</h1>
+            <p>Select a learning level to access its interactive mathematics quizzes and course materials.</p>
+        </section>
+
+        <section class="catalogue-section" aria-labelledby="primary-title">
+            <div class="section-heading">
+                <div><h2 id="primary-title">Primary education</h2><p>Foundation and primary mathematics quizzes</p></div>
+                <span class="count">7 PROGRAMMES</span>
+            </div>
+            <div class="page-list">
+                <a class="page-card" href="preschool.html"><span class="card-number">P</span><span class="card-copy"><strong data-i18n="preschoolLabel">Preschool</strong><span data-i18n="foundationMath">Foundation mathematics</span></span><span class="arrow">›</span></a>
+                <a class="page-card" href="year1.html"><span class="card-number">01</span><span class="card-copy"><strong data-i18n="year1Label">Year 1</strong><span data-i18n="primaryProgramme">Primary programme</span></span><span class="arrow">›</span></a>
+                <a class="page-card" href="year2.html"><span class="card-number">02</span><span class="card-copy"><strong data-i18n="year2Label">Year 2</strong><span data-i18n="primaryProgramme">Primary programme</span></span><span class="arrow">›</span></a>
+                <a class="page-card" href="year3.html"><span class="card-number">03</span><span class="card-copy"><strong data-i18n="year3Label">Year 3</strong><span data-i18n="primaryProgramme">Primary programme</span></span><span class="arrow">›</span></a>
+                <a class="page-card" href="year4.html"><span class="card-number">04</span><span class="card-copy"><strong data-i18n="year4Label">Year 4</strong><span data-i18n="primaryProgramme">Primary programme</span></span><span class="arrow">›</span></a>
+                <a class="page-card" href="year5.html"><span class="card-number">05</span><span class="card-copy"><strong data-i18n="year5Label">Year 5</strong><span data-i18n="primaryProgramme">Primary programme</span></span><span class="arrow">›</span></a>
+                <a class="page-card" href="year6.html"><span class="card-number">06</span><span class="card-copy"><strong data-i18n="year6Label">Year 6</strong><span data-i18n="primaryProgramme">Primary programme</span></span><span class="arrow">›</span></a>
+            </div>
+        </section>
+
+        <section class="catalogue-section secondary" aria-labelledby="secondary-title">
+            <div class="section-heading">
+                <div><h2 id="secondary-title">Secondary education</h2><p>Secondary mathematics course materials</p></div>
+                <span class="count">5 PROGRAMMES</span>
+            </div>
+            <div class="page-list">
+                <a class="page-card" href="form1.html"><span class="card-number">01</span><span class="card-copy"><strong data-i18n="form1Label">Form 1</strong><span data-i18n="secondaryProgramme">Secondary programme</span></span><span class="arrow">›</span></a>
+                <a class="page-card" href="form2.html"><span class="card-number">02</span><span class="card-copy"><strong data-i18n="form2Label">Form 2</strong><span data-i18n="secondaryProgramme">Secondary programme</span></span><span class="arrow">›</span></a>
+                <a class="page-card" href="form3.html"><span class="card-number">03</span><span class="card-copy"><strong data-i18n="form3Label">Form 3</strong><span data-i18n="secondaryProgramme">Secondary programme</span></span><span class="arrow">›</span></a>
+                <a class="page-card" href="form4.html"><span class="card-number">04</span><span class="card-copy"><strong data-i18n="form4Label">Form 4</strong><span data-i18n="secondaryProgramme">Secondary programme</span></span><span class="arrow">›</span></a>
+                <a class="page-card" href="form5.html"><span class="card-number">05</span><span class="card-copy"><strong data-i18n="form5Label">Form 5</strong><span data-i18n="secondaryProgramme">Secondary programme</span></span><span class="arrow">›</span></a>
+            </div>
+        </section>
+    </main>
+
+    <footer>MathToolsHub · Mathematics learning resources</footer>
+<script src="site-language.js"></script>
+</body>
+</html>
