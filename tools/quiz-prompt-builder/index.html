@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CJ Quiz Prompt Builder</title>
+  <style>
+    :root{
+      --bg:#eef4ff;
+      --card:#ffffff;
+      --primary:#2457d6;
+      --primary-dark:#183f9f;
+      --accent:#16a085;
+      --text:#172033;
+      --muted:#667085;
+      --border:#d7dfef;
+      --danger:#c0392b;
+      --shadow:0 16px 40px rgba(27,55,110,.12);
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      background:linear-gradient(135deg,#edf3ff 0%,#f8fbff 55%,#edfdf8 100%);
+      color:var(--text);
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    body::before,body::after{
+      content:"";
+      position:fixed;
+      width:320px;
+      height:320px;
+      border-radius:50%;
+      filter:blur(8px);
+      opacity:.22;
+      z-index:-1;
+      pointer-events:none;
+    }
+    body::before{background:#6688ff;top:-120px;left:-110px}
+    body::after{background:#46d8b2;right:-130px;bottom:-130px}
+
+    .app{
+      max-width:1180px;
+      margin:0 auto;
+      padding:28px 18px 50px;
+    }
+
+    .hero{
+      background:linear-gradient(135deg,var(--primary),#5c7cff);
+      color:white;
+      padding:30px;
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      margin-bottom:22px;
+      position:relative;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:24px;
+    }
+
+    .hero-copy{position:relative;z-index:2}
+
+    .hero-language{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      margin-top:18px;
+      padding:8px 10px 8px 14px;
+      border:1px solid rgba(255,255,255,.28);
+      border-radius:14px;
+      background:rgba(255,255,255,.14);
+      backdrop-filter:blur(8px);
+    }
+    .hero-language label{white-space:nowrap;color:white}
+    .hero-language select{width:auto;min-width:160px;padding:9px 34px 9px 11px;border:0;box-shadow:none}
+
+    .hero::before{
+      content:"";
+      position:absolute;
+      width:260px;
+      height:260px;
+      border:48px solid rgba(255,255,255,.08);
+      border-radius:50%;
+      right:-100px;
+      top:-125px;
+    }
+
+    .hero-graphic{
+      position:relative;
+      width:210px;
+      min-width:210px;
+      height:150px;
+      z-index:1;
+    }
+
+    .quiz-sheet{
+      position:absolute;
+      inset:8px 28px 2px 18px;
+      padding:17px;
+      border-radius:18px;
+      background:rgba(255,255,255,.96);
+      box-shadow:0 18px 35px rgba(9,25,75,.25);
+      transform:rotate(-4deg);
+    }
+
+    .sheet-line{height:8px;border-radius:10px;background:#dfe7ff;margin-bottom:10px}
+    .sheet-line.short{width:55%;background:#8fa8ff}
+    .sheet-choice{display:flex;align-items:center;gap:7px;margin:8px 0;color:#506080;font-size:9px;font-weight:800}
+    .sheet-choice::before{content:"";width:10px;height:10px;border:2px solid #16a085;border-radius:50%}
+    .graphic-badge{position:absolute;display:grid;place-items:center;width:48px;height:48px;border-radius:15px;background:#ffd166;box-shadow:0 10px 22px rgba(24,40,100,.25);font-size:25px;animation:float 3.2s ease-in-out infinite}
+    .graphic-badge.one{right:2px;top:1px;transform:rotate(9deg)}
+    .graphic-badge.two{left:0;bottom:0;background:#73e2c3;animation-delay:-1.4s}
+    @keyframes float{0%,100%{translate:0 0}50%{translate:0 -8px}}
+    @media(prefers-reduced-motion:reduce){.graphic-badge{animation:none}button{transition:none}}
+
+    .hero h1{
+      margin:0 0 8px;
+      font-size:clamp(28px,4vw,44px);
+    }
+
+    .hero p{
+      margin:0;
+      max-width:800px;
+      line-height:1.6;
+      opacity:.95;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:22px;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:22px;
+      padding:24px;
+      box-shadow:var(--shadow);
+      position:relative;
+    }
+
+    .card::before{content:"";position:absolute;inset:0 0 auto;height:5px;border-radius:22px 22px 0 0;background:linear-gradient(90deg,var(--primary),#7e92ff,var(--accent))}
+
+    .card h2{
+      margin:0 0 18px;
+      font-size:22px;
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:15px;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:7px;
+    }
+
+    .field.full{grid-column:1/-1}
+
+    label{
+      font-weight:700;
+      font-size:14px;
+    }
+
+    input,select,textarea{
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:12px 13px;
+      font-size:15px;
+      color:var(--text);
+      background:white;
+      outline:none;
+      transition:.2s ease;
+    }
+
+    input:focus,select:focus,textarea:focus{
+      border-color:var(--primary);
+      box-shadow:0 0 0 4px rgba(36,87,214,.10);
+    }
+
+    textarea{
+      min-height:110px;
+      resize:vertical;
+      line-height:1.5;
+    }
+
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:18px;
+    }
+
+    button{
+      border:none;
+      border-radius:12px;
+      padding:12px 18px;
+      font-weight:800;
+      cursor:pointer;
+      font-size:15px;
+      transition:.2s ease;
+    }
+
+    button:hover{transform:translateY(-1px)}
+
+    .primary{
+      background:var(--primary);
+      color:white;
+    }
+
+    .primary:hover{background:var(--primary-dark)}
+
+    .secondary{
+      background:#edf2ff;
+      color:var(--primary-dark);
+    }
+
+    .success{
+      background:var(--accent);
+      color:white;
+    }
+
+    .danger{
+      background:#fff0ed;
+      color:var(--danger);
+    }
+
+    .output{
+      min-height:530px;
+      white-space:pre-wrap;
+      font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+      background:#111827;
+      color:#e5eefc;
+      border-radius:16px;
+      padding:18px;
+      overflow:auto;
+      line-height:1.55;
+      font-size:14px;
+      border:1px solid #263142;
+    }
+
+    .status{
+      margin-top:12px;
+      min-height:22px;
+      font-weight:700;
+      color:var(--accent);
+    }
+
+    .quiz-card{margin-top:22px}
+    .quiz-header{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}
+    .quiz-list{display:grid;gap:16px;margin-top:18px}
+    .question{border:1px solid var(--border);border-radius:16px;padding:18px;background:#fbfcff}
+    .question p{margin:0 0 12px;font-weight:800;line-height:1.5}
+    .question{position:relative;padding-left:68px}
+    .question::before{content:attr(data-number);position:absolute;left:17px;top:17px;width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:linear-gradient(135deg,var(--primary),#7288ff);color:white;font-weight:900;box-shadow:0 6px 14px rgba(36,87,214,.24)}
+    .choice{display:block;padding:9px 11px;margin:7px 0;border-radius:10px;background:white;border:1px solid var(--border);cursor:pointer}
+    .choice input{width:auto;margin-right:9px}
+    .choice.correct{background:#eafaf4;border-color:#16a085}
+    .choice.wrong{background:#fff0ed;border-color:#c0392b}
+    .explanation{margin-top:10px;color:var(--muted);font-size:14px;display:none}
+    .score{font-size:18px;font-weight:900;color:var(--primary)}
+
+    .certificate-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:16px;padding-top:16px;border-top:1px dashed var(--border)}
+    .certificate-controls input{max-width:290px}
+    .self-checking-option{display:flex;align-items:center;gap:7px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#f7f9ff;font-size:14px;cursor:pointer}
+    .self-checking-option input{width:auto;margin:0}
+    .certificate-controls input:disabled{background:#eef1f6;color:#8a93a3;cursor:not-allowed}
+    .certificate-card{margin-top:22px;padding:18px;border-radius:22px;background:linear-gradient(135deg,#f5d77b,#fff4bd,#d5b24c);box-shadow:var(--shadow)}
+    .certificate-paper{position:relative;overflow:hidden;text-align:center;padding:48px 32px;background:#fffdf5;border:8px double #ba8b20;border-radius:12px}
+    .certificate-paper::before,.certificate-paper::after{content:"★";position:absolute;color:#ddb84f;font-size:70px;opacity:.16}
+    .certificate-paper::before{left:18px;top:10px;transform:rotate(-15deg)}
+    .certificate-paper::after{right:18px;bottom:8px;transform:rotate(15deg)}
+    .certificate-seal{width:78px;height:78px;margin:0 auto 15px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(135deg,#f5cf55,#b98414);color:white;font-size:38px;box-shadow:0 8px 20px rgba(145,98,7,.25)}
+    .certificate-paper h2{margin:5px 0;color:#8b6514;font-family:Georgia,serif;font-size:clamp(28px,5vw,46px);letter-spacing:1px}
+    .certificate-name{margin:20px auto 8px;max-width:580px;padding-bottom:8px;border-bottom:2px solid #caa13a;font-family:Georgia,serif;font-size:clamp(25px,4vw,38px);font-weight:700;color:#17356f}
+    .certificate-detail{font-size:17px;line-height:1.7;color:#4c5260}
+    .certificate-footer{display:flex;justify-content:space-around;gap:30px;margin-top:36px}
+    .signature{min-width:170px;padding-top:7px;border-top:1px solid #777;font-size:13px;color:#555}
+
+    .preset-row{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+
+    .preset{
+      background:#f4f6fb;
+      color:#344054;
+      border:1px solid var(--border);
+      padding:9px 12px;
+      font-size:13px;
+    }
+
+    .hint{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.45;
+    }
+
+    footer{
+      text-align:center;
+      color:var(--muted);
+      margin-top:24px;
+      font-size:13px;
+    }
+
+    @media(max-width:850px){
+      .grid{grid-template-columns:1fr}
+      .form-grid{grid-template-columns:1fr}
+      .field.full{grid-column:auto}
+      .output{min-height:420px}
+      .hero-graphic{display:none}
+      .hero{display:block}
+      .hero-language{display:flex;max-width:330px}
+      .hero-language select{min-width:0;flex:1}
+      .question{padding-left:58px}
+      .certificate-paper{padding:35px 18px}
+      .certificate-footer{gap:14px}
+      .signature{min-width:0;flex:1}
+    }
+
+    @media print{
+      @page{size:A4;margin:16mm}
+      body{background:white;color:#111}
+      body::before,body::after{display:none}
+      .app{max-width:none;padding:0}
+      .hero,.grid,footer,.quiz-card .actions{display:none!important}
+      .certificate-card{display:none!important}
+      .quiz-card{display:block!important;margin:0;padding:0;border:0;box-shadow:none}
+      .quiz-header{border-bottom:2px solid #111;padding-bottom:12px;margin-bottom:18px}
+      .quiz-list{display:block}
+      .question{break-inside:avoid;margin:0 0 14px;padding:12px 12px 12px 55px;border:1px solid #bbb;background:white}
+      .choice{padding:5px 0;margin:2px 0;border:0;background:white}
+      .choice input{display:none}
+      .choice.correct,.choice.wrong{background:white;border:0}
+      .explanation{display:block!important;color:#333;border-top:1px dashed #aaa;padding-top:7px}
+      .score{display:none}
+      body.printing-certificate .quiz-card{display:none!important}
+      body.printing-certificate .certificate-card{display:block!important;margin:0;padding:0;background:white;box-shadow:none}
+      body.printing-certificate .certificate-card>.actions{display:none!important}
+      body.printing-certificate .certificate-paper{min-height:170mm;display:flex;flex-direction:column;justify-content:center}
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="hero">
+      <a href="../" style="position:absolute;left:18px;top:16px;z-index:5;padding:8px 12px;border-radius:999px;color:#183f9f;background:#fff;text-decoration:none;font-size:13px;font-weight:800;box-shadow:0 5px 14px #17203322">← Tools</a>
+      <div class="hero-copy" style="padding-top:28px">
+        <h1>🧠 CJ Quiz Prompt Builder</h1>
+        <p>Bina prompt kuiz yang lengkap untuk ChatGPT, Gemini, Claude atau model AI lain. Pilih tahap, topik, format dan aras kesukaran, kemudian salin prompt yang dijana.</p>
+        <div class="hero-language">
+          <label for="language">🌐 Bahasa Kuiz</label>
+          <select id="language">
+            <option>English</option>
+            <option selected>Bahasa Melayu</option>
+            <option>Mandarin</option>
+          </select>
+        </div>
+      </div>
+      <div class="hero-graphic" aria-hidden="true">
+        <div class="quiz-sheet">
+          <div class="sheet-line short"></div>
+          <div class="sheet-line"></div>
+          <div class="sheet-choice">PILIHAN A</div>
+          <div class="sheet-choice">PILIHAN B</div>
+          <div class="sheet-choice">PILIHAN C</div>
+        </div>
+        <div class="graphic-badge one">★</div>
+        <div class="graphic-badge two">✓</div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h2>⚙️ Tetapan Kuiz</h2>
+
+        <div class="preset-row">
+          <button class="preset" type="button" onclick="loadPreset('primary')">Sekolah Rendah</button>
+          <button class="preset" type="button" onclick="loadPreset('secondary')">Sekolah Menengah</button>
+          <button class="preset" type="button" onclick="loadPreset('preschool')">Prasekolah</button>
+          <button class="preset" type="button" onclick="loadPreset('teacher')">Latihan Guru</button>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label for="subject">Subjek</label>
+            <select id="subject" onchange="updateDskpProfile()">
+              <option>Bahasa Melayu</option>
+              <option>Bahasa Inggeris</option>
+              <option selected>Matematik</option>
+              <option>Sains</option>
+              <option>Pendidikan Islam</option>
+              <option>Pendidikan Moral</option>
+              <option>Sejarah</option>
+              <option>Reka Bentuk dan Teknologi</option>
+              <option>Pendidikan Jasmani dan Pendidikan Kesihatan</option>
+              <option>Pendidikan Seni Visual</option>
+              <option>Pendidikan Muzik</option>
+              <option>Bahasa Arab</option>
+              <option>Bahasa Cina</option>
+              <option>Bahasa Tamil</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="schoolType">Jenis Sekolah</label>
+            <select id="schoolType" onchange="updateClassOptions();updateSubjectOptions()">
+              <option value="primary" selected>Sekolah Rendah</option>
+              <option value="secondary">Sekolah Menengah</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="level">Kelas</label>
+            <select id="level" onchange="updateDskpProfile()">
+              <option>Prasekolah</option>
+              <option>Tahun 1</option>
+              <option>Tahun 2</option>
+              <option>Tahun 3</option>
+              <option selected>Tahun 4</option>
+              <option>Tahun 5</option>
+              <option>Tahun 6</option>
+            </select>
+          </div>
+
+          <div class="field full">
+            <label for="topic">Topik</label>
+            <input id="topic" value="Pecahan" placeholder="Contoh: Pecahan, Algebra, Sains Komputer" />
+          </div>
+
+          <div class="field">
+            <label for="curriculum">Kurikulum</label>
+            <input id="curriculum" value="KSSR Semakan 2017" placeholder="Contoh: KSSR Semakan 2017" />
+          </div>
+
+          <div class="field">
+            <label for="schoolStream">Aliran Sekolah</label>
+            <select id="schoolStream" onchange="updateDskpProfile()">
+              <option selected>SK</option>
+              <option>SJKC</option>
+              <option>SJKT</option>
+              <option>SMK</option>
+            </select>
+          </div>
+
+          <div class="field full">
+            <label for="curriculumField">Bidang</label>
+            <input id="curriculumField" value="Nombor dan Operasi" placeholder="Contoh: Nombor dan Operasi" />
+          </div>
+
+          <div class="field full">
+            <label for="dskpProfile">Pilihan DSKP</label>
+            <select id="dskpProfile" onchange="applyDskpProfile()"></select>
+          </div>
+
+          <div class="field">
+            <label for="contentStandard">Standard Kandungan</label>
+            <input id="contentStandard" value="2.1 Pecahan" placeholder="Contoh: 3.1 Pecahan wajar" />
+          </div>
+
+          <div class="field">
+            <label for="learningStandard">Standard Pembelajaran</label>
+            <textarea id="learningStandard" placeholder="Masukkan satu Standard Pembelajaran pada setiap baris">Mengenal pasti pecahan wajar
+Membandingkan nilai pecahan
+Menyelesaikan masalah pecahan</textarea>
+          </div>
+
+          <div class="field full">
+            <label for="curriculumSource">Sumber DSKP</label>
+            <input id="curriculumSource" value="DSKP KSSR Matematik Tahun 4, BPK KPM" placeholder="Nama dokumen rujukan rasmi" />
+          </div>
+
+          <div class="field full">
+            <p class="hint" style="margin:0">Masukkan nombor dan pernyataan standard tepat seperti dalam DSKP. Biarkan kosong jika tidak diberikan.</p>
+          </div>
+
+          <div class="field">
+            <label for="count">Bilangan Soalan</label>
+            <input id="count" type="number" min="1" max="100" value="10" />
+          </div>
+
+          <div class="field">
+            <label for="difficulty">Aras Kesukaran</label>
+            <select id="difficulty">
+              <option>Mudah</option>
+              <option selected>Sederhana</option>
+              <option>Sukar</option>
+              <option>Campuran</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="questionType">Jenis Soalan</label>
+            <select id="questionType">
+              <option selected>Aneka pilihan</option>
+              <option>Betul atau Salah</option>
+              <option>Isi tempat kosong</option>
+              <option>Jawapan pendek</option>
+              <option>Campuran</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="options">Bilangan Pilihan Jawapan</label>
+            <select id="options">
+              <option>3</option>
+              <option selected>4</option>
+              <option>5</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="taxonomy">Aras Kognitif</label>
+            <select id="taxonomy">
+              <option>Pengetahuan</option>
+              <option selected>Kefahaman dan aplikasi</option>
+              <option>Analisis</option>
+              <option>KBAT</option>
+              <option>Campuran Taksonomi Bloom</option>
+            </select>
+          </div>
+
+          <div class="field full">
+            <label for="context">Konteks / Tema Soalan</label>
+            <input id="context" value="Situasi harian murid di Sabah" placeholder="Contoh: Pasar tamu, sekolah, sukan, teknologi" />
+          </div>
+
+          <div class="field full">
+            <label for="requirements">Arahan Tambahan</label>
+            <textarea id="requirements" placeholder="Contoh: Elakkan soalan berulang. Gunakan angka yang mudah dikira.">Pastikan setiap soalan mempunyai satu jawapan yang tepat. Sertakan penerangan ringkas bagi jawapan.</textarea>
+          </div>
+
+          <div class="field full">
+            <label>
+              <input id="includeAnswer" type="checkbox" checked style="width:auto;margin-right:8px;" />
+              Sertakan skema jawapan
+            </label>
+          </div>
+
+          <div class="field full">
+            <label>
+              <input id="htmlOutput" type="checkbox" style="width:auto;margin-right:8px;" />
+              Minta output kuiz dalam format HTML interaktif
+            </label>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="primary" type="button" onclick="generatePrompt()">✨ Jana Prompt</button>
+          <button class="success" type="button" onclick="generateQuiz()">🎯 Jana Kuiz</button>
+          <button class="secondary" type="button" onclick="saveSettings()">💾 Simpan Tetapan</button>
+          <button class="danger" type="button" onclick="resetForm()">↺ Reset</button>
+        </div>
+
+        <p class="hint">Tetapan disimpan secara tempatan dalam browser menggunakan localStorage.</p>
+      </div>
+
+      <div class="card">
+        <h2>📋 Prompt Dijana</h2>
+        <div id="output" class="output">Klik “Jana Prompt” untuk menghasilkan prompt kuiz.</div>
+
+        <div class="actions">
+          <button class="success" type="button" onclick="copyPrompt()">📋 Salin Prompt</button>
+          <button class="secondary" type="button" onclick="downloadPrompt()">⬇️ Muat Turun TXT</button>
+        </div>
+
+        <div id="status" class="status"></div>
+      </div>
+    </section>
+
+    <section id="quizCard" class="card quiz-card" hidden>
+      <div class="quiz-header">
+        <div>
+          <h2 id="quizTitle">🎯 Kuiz Dijana</h2>
+          <span id="quizMeta" class="hint"></span>
+        </div>
+        <div id="score" class="score"></div>
+      </div>
+      <div id="quizList" class="quiz-list"></div>
+      <div class="actions">
+        <button class="primary" type="button" onclick="checkQuiz()">✅ Semak Jawapan</button>
+        <button class="secondary" type="button" onclick="generateQuiz()">🔀 Jana Semula</button>
+        <button class="secondary" type="button" onclick="downloadQuiz()">⬇️ Muat Turun Kuiz</button>
+        <button class="success" type="button" onclick="downloadQuizPdf()">📄 Muat Turun PDF</button>
+      </div>
+      <div class="certificate-controls">
+        <input id="studentName" type="text" placeholder="Nama murid untuk sijil" aria-label="Nama murid untuk sijil" />
+        <input id="teacherName" type="text" placeholder="Nama guru" aria-label="Nama guru" />
+        <label class="self-checking-option">
+          <input id="selfChecking" type="checkbox" onchange="toggleTeacherField()" />
+          Tiada guru — semakan kendiri
+        </label>
+        <button class="success" type="button" onclick="generateCertificate()">🏆 Jana Sijil</button>
+      </div>
+    </section>
+
+    <section id="certificateCard" class="certificate-card" hidden>
+      <div class="certificate-paper">
+        <div class="certificate-seal">🏆</div>
+        <h2>Sijil Pencapaian</h2>
+        <p>Dengan bangganya sijil ini dianugerahkan kepada</p>
+        <div id="certificateName" class="certificate-name"></div>
+        <div id="certificateDetail" class="certificate-detail"></div>
+        <div class="certificate-footer">
+          <div class="signature">Tarikh</div>
+          <div id="certificateTeacher" class="signature">Guru / Penyelaras</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="success" type="button" onclick="downloadCertificatePdf()">📄 Simpan Sijil PDF</button>
+        <button class="secondary" type="button" onclick="document.getElementById('certificateCard').hidden=true">Tutup</button>
+      </div>
+    </section>
+
+    <footer>
+      CJ Quiz Prompt Builder • Dibina untuk MathToolsHub • Creator: JUIL GITOM
+    </footer>
+  </main>
+
+  <script>
+    const fields = [
+      "subject","schoolType","level","topic","curriculum","schoolStream","curriculumField","dskpProfile","contentStandard","learningStandard","curriculumSource","count","difficulty","questionType",
+      "options","language","taxonomy","context","requirements",
+      "includeAnswer","htmlOutput","teacherName","selfChecking"
+    ];
+
+    function valueOf(id){
+      const el = document.getElementById(id);
+      return el.type === "checkbox" ? el.checked : el.value.trim();
+    }
+
+    const classOptions = {
+      primary:["Prasekolah","Tahun 1","Tahun 2","Tahun 3","Tahun 4","Tahun 5","Tahun 6"],
+      secondary:["Tingkatan 1","Tingkatan 2","Tingkatan 3","Tingkatan 4","Tingkatan 5"]
+    };
+
+    const subjectOptions = {
+      primary:[
+        "Bahasa Melayu","Bahasa Inggeris","Matematik","Sains","Pendidikan Islam",
+        "Pendidikan Moral","Sejarah","Reka Bentuk dan Teknologi",
+        "Pendidikan Jasmani dan Pendidikan Kesihatan","Pendidikan Seni Visual",
+        "Pendidikan Muzik","Bahasa Arab","Bahasa Cina","Bahasa Tamil"
+      ],
+      secondary:[
+        "Bahasa Melayu","Bahasa Inggeris","Matematik","Sains","Sejarah",
+        "Geografi","Pendidikan Islam","Pendidikan Moral","Reka Bentuk dan Teknologi",
+        "Asas Sains Komputer","Pendidikan Jasmani dan Pendidikan Kesihatan",
+        "Pendidikan Seni Visual","Pendidikan Muzik","Bahasa Arab","Bahasa Cina","Bahasa Tamil",
+        "Matematik Tambahan","Fizik","Kimia","Biologi","Sains Komputer",
+        "Prinsip Perakaunan","Ekonomi","Perniagaan","Pengajian Kejuruteraan",
+        "Pengurusan Pendidikan"
+      ]
+    };
+
+    function updateClassOptions(selectedLevel){
+      const schoolType = document.getElementById("schoolType").value;
+      const levelSelect = document.getElementById("level");
+      const previousLevel = selectedLevel || levelSelect.value;
+      levelSelect.innerHTML = classOptions[schoolType]
+        .map(level => `<option${level === previousLevel ? " selected" : ""}>${level}</option>`)
+        .join("");
+      updateDskpProfile();
+    }
+
+    function updateSubjectOptions(selectedSubject){
+      const schoolType = document.getElementById("schoolType").value;
+      const subjectSelect = document.getElementById("subject");
+      const streamSelect = document.getElementById("schoolStream");
+      if(schoolType === "secondary" && ["SK","SJKC","SJKT"].includes(streamSelect.value)) streamSelect.value = "SMK";
+      if(schoolType === "primary" && streamSelect.value === "SMK") streamSelect.value = "SK";
+      const previousSubject = selectedSubject || subjectSelect.value;
+      subjectSelect.innerHTML = subjectOptions[schoolType]
+        .map(subject => `<option${subject === previousSubject ? " selected" : ""}>${subject}</option>`)
+        .join("");
+      updateDskpProfile();
+    }
+
+    function updateDskpProfile(){
+      const schoolType = document.getElementById("schoolType").value;
+      const curriculum = schoolType === "primary" ? "KSSR Semakan 2017" : "KSSM";
+      const stream = valueOf("schoolStream") || (schoolType === "primary" ? "SK" : "SMK");
+      const currentSubject = valueOf("subject") || subjectOptions[schoolType][0];
+      const currentLevel = valueOf("level") || classOptions[schoolType][0];
+      const selectedValue = `${schoolType}|${currentLevel}|${currentSubject}`;
+      const select = document.getElementById("dskpProfile");
+
+      select.innerHTML = classOptions[schoolType].map(level => {
+        const options = subjectOptions[schoolType].map(subject => {
+          const value = `${schoolType}|${level}|${subject}`;
+          const label = `DSKP ${curriculum} ${subject} ${level}`;
+          return `<option value="${escapeHtml(value)}"${value === selectedValue ? " selected" : ""}>${escapeHtml(label)}</option>`;
+        }).join("");
+        return `<optgroup label="${escapeHtml(level)}">${options}</optgroup>`;
+      }).join("");
+
+      const profile = `DSKP ${curriculum} ${currentSubject} ${currentLevel} (${stream})`;
+      document.getElementById("curriculum").value = curriculum;
+      document.getElementById("curriculumSource").value = `${profile}, BPK KPM`;
+    }
+
+    function applyDskpProfile(){
+      const [schoolType,level,subject] = valueOf("dskpProfile").split("|");
+      if(!schoolType || !level || !subject) return;
+      document.getElementById("schoolType").value = schoolType;
+      updateClassOptions(level);
+      updateSubjectOptions(subject);
+      document.getElementById("level").value = level;
+      document.getElementById("subject").value = subject;
+      const curriculum = schoolType === "primary" ? "KSSR Semakan 2017" : "KSSM";
+      const stream = valueOf("schoolStream") || (schoolType === "primary" ? "SK" : "SMK");
+      document.getElementById("curriculum").value = curriculum;
+      document.getElementById("curriculumSource").value = `DSKP ${curriculum} ${subject} ${level} (${stream}), BPK KPM`;
+    }
+
+    function toggleTeacherField(){
+      const selfChecking = document.getElementById("selfChecking").checked;
+      const teacherField = document.getElementById("teacherName");
+      teacherField.disabled = selfChecking;
+      if(selfChecking) teacherField.value = "";
+      teacherField.placeholder = selfChecking ? "Tidak diperlukan" : "Nama guru";
+    }
+
+    function generatePrompt(){
+      const subject = valueOf("subject") || "subjek yang dipilih";
+      const level = valueOf("level") || "tahap yang dipilih";
+      const topic = valueOf("topic") || "topik yang dipilih";
+      const contentStandard = valueOf("contentStandard");
+      const learningStandard = valueOf("learningStandard");
+      const curriculum = valueOf("curriculum") || "Kurikulum KPM yang berkenaan";
+      const schoolStream = valueOf("schoolStream") || "Aliran sekolah yang berkenaan";
+      const curriculumField = valueOf("curriculumField");
+      const curriculumSource = valueOf("curriculumSource");
+      const count = Math.max(1, Number(valueOf("count")) || 10);
+      const difficulty = valueOf("difficulty");
+      const questionType = valueOf("questionType");
+      const options = valueOf("options");
+      const language = valueOf("language");
+      const taxonomy = valueOf("taxonomy");
+      const context = valueOf("context");
+      const requirements = valueOf("requirements");
+      const includeAnswer = valueOf("includeAnswer");
+      const htmlOutput = valueOf("htmlOutput");
+
+      let formatInstruction = "";
+      if(questionType === "Aneka pilihan"){
+        formatInstruction = `Setiap soalan mesti mempunyai ${options} pilihan jawapan berlabel A, B, C dan seterusnya.`;
+      } else {
+        formatInstruction = `Gunakan format soalan ${questionType.toLowerCase()}.`;
+      }
+
+      let answerInstruction = includeAnswer
+        ? "Sertakan skema jawapan lengkap dan penerangan ringkas selepas semua soalan."
+        : "Jangan sertakan jawapan dalam bahagian soalan.";
+
+      let outputInstruction = htmlOutput
+        ? `Hasilkan output sebagai satu fail HTML lengkap yang mempunyai:
+- reka bentuk responsif untuk telefon dan komputer;
+- satu soalan dipaparkan pada satu masa;
+- butang Seterusnya dan Sebelumnya;
+- pengiraan markah automatik;
+- maklum balas jawapan betul atau salah;
+- butang ulang semula kuiz;
+- CSS dan JavaScript berada dalam fail HTML yang sama.`
+        : `Susun hasil dalam format berikut:
+1. Tajuk kuiz
+2. Arahan kepada murid
+3. Senarai soalan
+4. Skema jawapan, jika diminta`;
+
+      const prompt = `Anda ialah seorang pakar pembinaan item pentaksiran dan guru berpengalaman.
+
+TUGAS:
+Bina ${count} soalan kuiz bagi subjek ${subject}, tahap ${level}, topik "${topic}".
+
+RUJUKAN KURIKULUM:
+- Kurikulum: ${curriculum}
+- Jenis/aliran sekolah: ${schoolStream}
+- Bidang: ${curriculumField || "Tidak diberikan"}
+- Sumber: ${curriculumSource || `DSKP bagi ${subject}, ${level}, terbitan BPK KPM`}
+
+Gunakan Dokumen Standard Kurikulum dan Pentaksiran (DSKP) bagi ${subject}, ${level}, terbitan Bahagian Pembangunan Kurikulum, Kementerian Pendidikan Malaysia.
+
+Selaraskan setiap soalan dengan:
+1. Standard Kandungan yang dipilih: ${contentStandard || "Tidak diberikan — jangan mereka-reka nombor atau pernyataan Standard Kandungan"};
+2. Standard Pembelajaran yang dipilih: ${learningStandard ? `\n${learningStandard.split("\n").filter(Boolean).map((standard,index) => `   ${index + 1}. ${standard.trim()}`).join("\n")}` : "Tidak diberikan — jangan mereka-reka nombor atau pernyataan Standard Pembelajaran"};
+3. tahap perkembangan murid;
+4. aras kognitif yang ditetapkan;
+5. istilah yang digunakan dalam buku teks KPM.
+
+Jangan mereka-reka nombor Standard Kandungan atau Standard Pembelajaran yang tidak diberikan. Jika standard tidak diberikan, nyatakan bahawa penjajaran khusus tidak dapat dibuat dan teruskan berdasarkan topik sahaja.
+
+SPESIFIKASI:
+- Bahasa: ${language}
+- Jenis soalan: ${questionType}
+- Aras kesukaran: ${difficulty}
+- Aras kognitif: ${taxonomy}
+- Konteks: ${context || "Konteks pembelajaran yang sesuai dengan murid"}
+- ${formatInstruction}
+- ${answerInstruction}
+- Pastikan kandungan sesuai dengan umur dan tahap murid.
+- Pastikan fakta, pengiraan dan jawapan adalah tepat.
+- Elakkan soalan yang kabur, berulang atau mempunyai lebih daripada satu jawapan munasabah.
+- Gunakan bahasa yang jelas, ringkas dan mesra murid.
+
+ARAHAN TAMBAHAN:
+${requirements || "Tiada arahan tambahan."}
+
+FORMAT OUTPUT:
+${outputInstruction}
+
+Sebelum memberikan jawapan akhir, semak semula semua soalan, pilihan jawapan, pengiraan dan skema jawapan untuk memastikan tiada kesilapan.`;
+
+      document.getElementById("output").textContent = prompt;
+      setStatus("Prompt berjaya dijana.");
+    }
+
+    let generatedQuiz = [];
+    let latestScore = null;
+
+    function shuffle(items){
+      const copy = [...items];
+      for(let i = copy.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function createMathQuestion(index, topic){
+      const lower = topic.toLowerCase();
+      let text, answer, explanation;
+      if(lower.includes("pecahan")){
+        const den = 3 + Math.floor(Math.random() * 7);
+        const a = 1 + Math.floor(Math.random() * (den - 1));
+        const b = 1 + Math.floor(Math.random() * (den - a));
+        text = `Berapakah ${a}/${den} + ${b}/${den}?`;
+        answer = `${a + b}/${den}`;
+        explanation = `Penyebut sama, jadi tambah pengangka: ${a} + ${b} = ${a + b}.`;
+      }else if(lower.includes("algebra")){
+        const x = 2 + Math.floor(Math.random() * 12);
+        const add = 1 + Math.floor(Math.random() * 10);
+        text = `Jika x + ${add} = ${x + add}, apakah nilai x?`;
+        answer = String(x);
+        explanation = `${x + add} − ${add} = ${x}.`;
+      }else{
+        const a = 2 + Math.floor(Math.random() * 20);
+        const b = 2 + Math.floor(Math.random() * 12);
+        text = `Berapakah ${a} × ${b}?`;
+        answer = String(a * b);
+        explanation = `${a} × ${b} = ${a * b}.`;
+      }
+      const numeric = Number(answer);
+      let distractors;
+      if(Number.isFinite(numeric)) distractors = [String(numeric + 1), String(Math.max(0,numeric - 1)), String(numeric + 2)];
+      else {
+        const [n,d] = answer.split("/").map(Number);
+        distractors = [`${Math.max(1,n-1)}/${d}`, `${n+1}/${d}`, `${n}/${d+1}`];
+      }
+      return {id:index, text, answer, explanation, choices:buildChoices(answer, distractors)};
+    }
+
+    function createGeneralQuestion(index, subject, topic){
+      const answer = topic;
+      return {
+        id:index,
+        text:`Soalan ${index + 1}: Pernyataan manakah paling berkaitan dengan topik “${topic}” dalam subjek ${subject}?`,
+        answer,
+        explanation:`Jawapan yang tepat ialah “${topic}” kerana itulah fokus kuiz ini.`,
+        choices:buildChoices(topic, [`Bukan ${topic}`, "Topik yang tidak berkaitan", "Tiada satu pun", "Maklumat tidak mencukupi"])
+      };
+    }
+
+    function buildChoices(answer, distractors){
+      const wanted = Number(valueOf("options")) || 4;
+      const uniqueDistractors = [...new Set(distractors.filter(item => item !== answer))];
+      while(uniqueDistractors.length < wanted - 1) uniqueDistractors.push(`Pilihan ${uniqueDistractors.length + 2}`);
+      return shuffle([answer, ...shuffle(uniqueDistractors).slice(0, wanted - 1)]);
+    }
+
+    function generateQuiz(){
+      const subject = valueOf("subject") || "Subjek";
+      const topic = valueOf("topic") || "Topik";
+      const count = Math.min(100, Math.max(1, Number(valueOf("count")) || 10));
+      const isMath = /matematik|math/i.test(subject);
+      generatedQuiz = Array.from({length:count}, (_,i) => isMath
+        ? createMathQuestion(i, topic)
+        : createGeneralQuestion(i, subject, topic));
+
+      document.getElementById("quizTitle").textContent = `🎯 Kuiz ${subject}: ${topic}`;
+      document.getElementById("quizMeta").textContent = `${valueOf("level")} • ${count} soalan • ${valueOf("difficulty")}`;
+      document.getElementById("score").textContent = "";
+      latestScore = null;
+      document.getElementById("certificateCard").hidden = true;
+      document.getElementById("quizList").innerHTML = generatedQuiz.map((q,i) => `
+        <article class="question" data-question="${i}" data-number="${i + 1}">
+          <p>${escapeHtml(q.text)}</p>
+          ${q.choices.map((choice,j) => `<label class="choice"><input type="radio" name="q${i}" value="${escapeHtml(choice)}">${String.fromCharCode(65+j)}. ${escapeHtml(choice)}</label>`).join("")}
+          <div class="explanation">${escapeHtml(q.explanation)}</div>
+        </article>`).join("");
+      document.getElementById("quizCard").hidden = false;
+      document.getElementById("quizCard").scrollIntoView({behavior:"smooth", block:"start"});
+      setStatus("Kuiz berjaya dijana.");
+    }
+
+    function checkQuiz(){
+      let score = 0;
+      generatedQuiz.forEach((q,i) => {
+        const card = document.querySelector(`[data-question="${i}"]`);
+        const selected = card.querySelector("input:checked");
+        card.querySelectorAll(".choice").forEach(label => {
+          label.classList.remove("correct","wrong");
+          const input = label.querySelector("input");
+          if(input.value === q.answer) label.classList.add("correct");
+          else if(input.checked) label.classList.add("wrong");
+        });
+        if(selected && selected.value === q.answer) score++;
+        card.querySelector(".explanation").style.display = "block";
+      });
+      document.getElementById("score").textContent = `Markah: ${score}/${generatedQuiz.length}`;
+      latestScore = score;
+      setStatus("Jawapan telah disemak.");
+    }
+
+    function generateCertificate(){
+      const name = document.getElementById("studentName").value.trim();
+      if(!name){
+        setStatus("Masukkan nama murid terlebih dahulu.", true);
+        document.getElementById("studentName").focus();
+        return;
+      }
+      const selfChecking = document.getElementById("selfChecking").checked;
+      const teacherName = document.getElementById("teacherName").value.trim();
+      if(!selfChecking && !teacherName){
+        setStatus("Masukkan nama guru atau pilih semakan kendiri.", true);
+        document.getElementById("teacherName").focus();
+        return;
+      }
+      if(latestScore === null){
+        setStatus("Semak jawapan kuiz sebelum menjana sijil.", true);
+        return;
+      }
+      const percentage = generatedQuiz.length ? Math.round(latestScore / generatedQuiz.length * 100) : 0;
+      const subject = valueOf("subject") || "Subjek";
+      const topic = valueOf("topic") || "Kuiz";
+      const today = new Intl.DateTimeFormat("ms-MY", {day:"numeric",month:"long",year:"numeric"}).format(new Date());
+      document.getElementById("certificateName").textContent = name;
+      document.getElementById("certificateDetail").innerHTML = `atas kejayaan menyelesaikan kuiz <strong>${escapeHtml(subject)}: ${escapeHtml(topic)}</strong><br>Markah: <strong>${latestScore}/${generatedQuiz.length} (${percentage}%)</strong><br>${today}`;
+      document.getElementById("certificateTeacher").innerHTML = selfChecking
+        ? `<strong>Semakan Kendiri</strong><br>Tiada guru`
+        : `<strong>${escapeHtml(teacherName)}</strong><br>Guru / Penyelaras`;
+      const card = document.getElementById("certificateCard");
+      card.hidden = false;
+      card.scrollIntoView({behavior:"smooth",block:"start"});
+      setStatus("Sijil berjaya dijana.");
+    }
+
+    function downloadCertificatePdf(){
+      const originalTitle = document.title;
+      const safeName = document.getElementById("certificateName").textContent || "Murid";
+      document.title = `Sijil Pencapaian - ${safeName}`;
+      document.body.classList.add("printing-certificate");
+      window.print();
+      document.body.classList.remove("printing-certificate");
+      document.title = originalTitle;
+    }
+
+    function downloadQuiz(){
+      if(!generatedQuiz.length) return;
+      const title = document.getElementById("quizTitle").textContent;
+      const text = `${title}\n\n` + generatedQuiz.map((q,i) => `${i+1}. ${q.text}\n${q.choices.map((c,j) => `${String.fromCharCode(65+j)}. ${c}`).join("\n")}\n\nJawapan: ${q.answer}\nPenerangan: ${q.explanation}`).join("\n\n");
+      const url = URL.createObjectURL(new Blob([text], {type:"text/plain;charset=utf-8"}));
+      const a = document.createElement("a"); a.href = url; a.download = "kuiz-dijana.txt"; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadQuizPdf(){
+      if(!generatedQuiz.length){
+        setStatus("Jana kuiz terlebih dahulu.", true);
+        return;
+      }
+
+      const originalTitle = document.title;
+      const subject = valueOf("subject") || "Subjek";
+      const topic = valueOf("topic") || "Kuiz";
+      document.title = `Kuiz ${subject} - ${topic}`;
+
+      // Paparkan skema jawapan dalam dokumen PDF.
+      document.querySelectorAll(".explanation").forEach(el => el.style.display = "block");
+      setStatus("Pilih ‘Save as PDF’ dalam dialog cetakan.");
+      window.print();
+      document.title = originalTitle;
+    }
+
+    function escapeHtml(value){
+      return String(value).replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[char]));
+    }
+
+    async function copyPrompt(){
+      const text = document.getElementById("output").textContent;
+      if(!text || text.startsWith("Klik")){
+        setStatus("Jana prompt terlebih dahulu.", true);
+        return;
+      }
+      try{
+        await navigator.clipboard.writeText(text);
+        setStatus("Prompt telah disalin ke clipboard.");
+      }catch(err){
+        const temp = document.createElement("textarea");
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        document.body.removeChild(temp);
+        setStatus("Prompt telah disalin.");
+      }
+    }
+
+    function downloadPrompt(){
+      const text = document.getElementById("output").textContent;
+      if(!text || text.startsWith("Klik")){
+        setStatus("Jana prompt terlebih dahulu.", true);
+        return;
+      }
+      const blob = new Blob([text], {type:"text/plain;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "quiz-prompt.txt";
+      a.click();
+      URL.revokeObjectURL(url);
+      setStatus("Fail prompt telah dimuat turun.");
+    }
+
+    function saveSettings(){
+      const data = {};
+      fields.forEach(id => data[id] = valueOf(id));
+      localStorage.setItem("cjQuizPromptSettings", JSON.stringify(data));
+      setStatus("Tetapan berjaya disimpan.");
+    }
+
+    function loadSettings(){
+      const raw = localStorage.getItem("cjQuizPromptSettings");
+      if(!raw) return;
+      try{
+        const data = JSON.parse(raw);
+        if(data.schoolType){
+          document.getElementById("schoolType").value = data.schoolType;
+          updateClassOptions(data.level);
+          updateSubjectOptions(data.subject);
+        }
+        fields.forEach(id => {
+          const el = document.getElementById(id);
+          if(data[id] === undefined) return;
+          if(el.type === "checkbox") el.checked = data[id];
+          else el.value = data[id];
+        });
+      }catch(e){}
+    }
+
+    function resetForm(){
+      localStorage.removeItem("cjQuizPromptSettings");
+      document.getElementById("subject").value = "Matematik";
+      document.getElementById("schoolType").value = "primary";
+      updateClassOptions("Tahun 4");
+      updateSubjectOptions("Matematik");
+      document.getElementById("topic").value = "Pecahan";
+      document.getElementById("curriculum").value = "KSSR Semakan 2017";
+      document.getElementById("schoolStream").value = "SK";
+      document.getElementById("curriculumField").value = "Nombor dan Operasi";
+      document.getElementById("contentStandard").value = "2.1 Pecahan";
+      document.getElementById("learningStandard").value = "Mengenal pasti pecahan wajar\nMembandingkan nilai pecahan\nMenyelesaikan masalah pecahan";
+      document.getElementById("curriculumSource").value = "DSKP KSSR Matematik Tahun 4, BPK KPM";
+      document.getElementById("count").value = 10;
+      document.getElementById("difficulty").value = "Sederhana";
+      document.getElementById("questionType").value = "Aneka pilihan";
+      document.getElementById("options").value = "4";
+      document.getElementById("language").value = "Bahasa Melayu";
+      document.getElementById("taxonomy").value = "Kefahaman dan aplikasi";
+      document.getElementById("context").value = "Situasi harian murid di Sabah";
+      document.getElementById("requirements").value = "Pastikan setiap soalan mempunyai satu jawapan yang tepat. Sertakan penerangan ringkas bagi jawapan.";
+      document.getElementById("includeAnswer").checked = true;
+      document.getElementById("htmlOutput").checked = false;
+      document.getElementById("teacherName").value = "";
+      document.getElementById("selfChecking").checked = false;
+      toggleTeacherField();
+      document.getElementById("output").textContent = "Klik “Jana Prompt” untuk menghasilkan prompt kuiz.";
+      setStatus("Borang telah direset.");
+    }
+
+    function loadPreset(type){
+      if(type === "primary"){
+        document.getElementById("schoolType").value = "primary";
+        updateClassOptions("Tahun 4");
+        updateSubjectOptions("Matematik");
+        document.getElementById("topic").value = "Pecahan";
+        document.getElementById("difficulty").value = "Sederhana";
+        document.getElementById("context").value = "Situasi harian murid di Sabah";
+      }
+      if(type === "secondary"){
+        document.getElementById("schoolType").value = "secondary";
+        updateClassOptions("Tingkatan 2");
+        updateSubjectOptions("Matematik");
+        document.getElementById("topic").value = "Algebra";
+        document.getElementById("difficulty").value = "Campuran";
+        document.getElementById("taxonomy").value = "Campuran Taksonomi Bloom";
+      }
+      if(type === "preschool"){
+        document.getElementById("schoolType").value = "primary";
+        updateClassOptions("Prasekolah");
+        updateSubjectOptions("Matematik");
+        document.getElementById("topic").value = "Nombor 1 hingga 10";
+        document.getElementById("difficulty").value = "Mudah";
+        document.getElementById("taxonomy").value = "Pengetahuan";
+        document.getElementById("count").value = 5;
+      }
+      if(type === "teacher"){
+        document.getElementById("schoolType").value = "secondary";
+        updateClassOptions("Tingkatan 5");
+        updateSubjectOptions("Pengurusan Pendidikan");
+        document.getElementById("topic").value = "Kecerdasan Buatan dalam Pendidikan";
+        document.getElementById("difficulty").value = "Campuran";
+        document.getElementById("taxonomy").value = "KBAT";
+        document.getElementById("context").value = "Amalan guru dan pemimpin sekolah";
+      }
+      if(type === "kssrMath4"){
+        document.getElementById("schoolType").value = "primary";
+        updateClassOptions("Tahun 4");
+        updateSubjectOptions("Matematik");
+        document.getElementById("topic").value = "Pecahan";
+        document.getElementById("curriculum").value = "KSSR Semakan 2017";
+        document.getElementById("schoolStream").value = "SK";
+        document.getElementById("curriculumField").value = "Nombor dan Operasi";
+        document.getElementById("contentStandard").value = "2.1 Pecahan";
+        document.getElementById("learningStandard").value = "Mengenal pasti pecahan wajar\nMembandingkan nilai pecahan\nMenyelesaikan masalah pecahan";
+        document.getElementById("curriculumSource").value = "DSKP KSSR Matematik Tahun 4, BPK KPM";
+      }
+      generatePrompt();
+    }
+
+    function setStatus(message, error=false){
+      const el = document.getElementById("status");
+      el.textContent = message;
+      el.style.color = error ? "var(--danger)" : "var(--accent)";
+      clearTimeout(window.statusTimer);
+      window.statusTimer = setTimeout(() => el.textContent = "", 3500);
+    }
+
+    loadSettings();
+    updateDskpProfile();
+    toggleTeacherField();
+  </script>
+</body>
+</html>

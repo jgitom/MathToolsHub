@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Crypt of Equation — Interactive Math RPG</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{
+  --bg:#f7f5f0; --panel:#fff; --ink:#2c2520; --muted:#6b5d54;
+  --accent:#6c2020; --accent2:#b36a19; --line:#d8cec4;
+  --good:#247a3d; --bad:#a72b2b;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Georgia,"Times New Roman",serif;background:linear-gradient(#f3efe7,#faf9f5);color:var(--ink)}
+header{background:linear-gradient(135deg,#481010,var(--accent) 55%,#8b3e16);color:#fff;padding:18px 20px;box-shadow:0 3px 12px #0003}
+header .header-inner{max-width:1280px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+header h1{margin:0;font-size:clamp(1.35rem,4vw,2.2rem);letter-spacing:1px}
+header p{margin:6px 0 0;opacity:.9}
+.container{max-width:1280px;margin:auto;padding:22px}
+.grid{display:grid;gap:16px}
+.stats{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:0 4px 12px #0000000c}
+.stat{text-align:center;border:2px solid var(--accent)}
+.stat small{display:block;text-transform:uppercase;font-weight:bold;color:var(--muted)}
+.stat strong{display:block;font-size:2rem;margin-top:6px}
+.stat span{display:block;color:var(--muted);font-size:.78rem;margin-top:2px}
+.main{grid-template-columns:minmax(0,1.65fr) minmax(260px,.55fr);margin-top:16px}
+h2{color:var(--accent);border-left:5px solid var(--accent);padding-left:10px;margin:0 0 14px}
+input,select,button{font:inherit}
+input,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:white}
+button{border:0;border-radius:10px;padding:11px 16px;background:linear-gradient(180deg,#842e2e,var(--accent));color:#fff;font-weight:bold;cursor:pointer;box-shadow:0 3px 0 #3d1010;transition:transform .15s,filter .15s,box-shadow .15s}
+button:hover{filter:brightness(1.1);transform:translateY(-1px)}
+button:active{transform:translateY(2px);box-shadow:0 1px 0 #3d1010}
+button.secondary{background:#6b625d}
+button.gold{background:var(--accent2)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.hero-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px}
+.question{font-size:2.2rem;text-align:center;padding:32px 14px;background:#fbf8f2;border:3px solid var(--accent2);border-radius:10px;margin:12px 0;font-weight:bold;color:var(--accent)}
+.battle-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.battle-meta{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.realm-pill{padding:7px 12px;border-radius:999px;background:#f4e0b5;color:#61340f;font-weight:bold;font-size:.85rem}
+.battle-timer{padding:7px 12px;border-radius:999px;background:#29231f;color:#fff;font-weight:bold;font-variant-numeric:tabular-nums;min-width:78px;text-align:center}
+.battle-timer.warning{background:#a72b2b;animation:timerPulse .8s infinite alternate}
+@keyframes timerPulse{to{transform:scale(1.06);box-shadow:0 0 0 4px #a72b2b26}}
+.battle-graphic-container{position:relative;min-height:330px;border-radius:16px;overflow:hidden;background:radial-gradient(circle at top, rgba(255,255,255,.8), rgba(240,233,218,.95) 45%, rgba(227,210,187,.9) 100%);margin:12px 0;border:2px solid #c7a56c;box-shadow:inset 0 0 45px #5b321b24}
+.battle-graphic-container canvas{position:absolute;inset:0;width:100%;height:100%}
+#canvas3d{position:absolute !important;inset:0;width:100% !important;height:100% !important}
+.graphic-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;padding:16px;pointer-events:none}
+#graphicStatus{background:rgba(21,19,18,.8);color:#fff;padding:8px 12px;border-radius:999px;font-size:.95rem;backdrop-filter:blur(6px)}
+.combat-hud{display:grid;grid-template-columns:1fr 1fr;gap:28px;position:absolute;left:16px;right:16px;top:14px;z-index:4;pointer-events:none}
+.fighter-label{background:#211b18d9;color:white;padding:8px 12px;border-radius:10px;font-size:.82rem;box-shadow:0 3px 10px #0003}
+.fighter-label:last-child{text-align:right}
+.mini-bar{height:7px;background:#0007;border-radius:99px;overflow:hidden;margin-top:5px}
+.mini-bar span{display:block;height:100%;width:100%;background:linear-gradient(90deg,#47b461,#8be46f);transition:width .25s}
+.fighter-label:last-child .mini-bar span{background:linear-gradient(90deg,#efb14c,#d64242)}
+.answer-row{display:flex;gap:12px;margin:16px 0}
+.answer-row input{flex:1;font-size:1.8rem;text-align:center;padding:16px;border:3px solid var(--accent);background:#fffbf5;font-weight:bold}
+.answer-row input:focus{outline:none;border-color:var(--accent2);box-shadow:0 0 0 4px rgba(179,106,25,.15)}
+.answer-row button{flex:0.6;font-size:1.3rem;padding:16px 12px;height:auto;font-weight:bold}
+.feedback{min-height:28px;font-weight:bold;margin-top:10px}
+.good{color:var(--good)} .bad{color:var(--bad)}
+.progress{height:14px;background:#e9e0d7;border-radius:99px;overflow:hidden}
+.progress > div{height:100%;background:var(--accent2);width:0%;transition:.3s}
+.shop-intro{color:var(--muted);margin:-4px 0 16px}
+.shop-item{display:grid;grid-template-columns:52px 1fr auto;align-items:center;gap:14px;border:1px solid var(--line);padding:16px;border-radius:12px;background:linear-gradient(135deg,#fff,#fbf5e9);margin-bottom:12px}
+.shop-icon{display:grid;place-items:center;width:52px;height:52px;border-radius:12px;background:#f2dfb7;font-size:1.65rem}
+.shop-item:last-child{border-bottom:0}
+.shop-item h3{margin:0;color:var(--accent);font-size:1rem}
+.shop-item p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+.badges{display:grid;gap:8px}
+.badge{padding:14px;border:1px solid var(--line);border-radius:11px;background:#f4f1ed;color:#756b64;display:grid;grid-template-columns:38px 1fr;gap:8px;align-items:center}
+.badge-icon{font-size:1.7rem;filter:grayscale(1);opacity:.55}
+.badge.unlocked{border-color:#d5a748;background:linear-gradient(135deg,#fff7d8,#fffdf5);color:var(--ink);box-shadow:0 3px 10px #b8892920}
+.badge.unlocked .badge-icon{filter:none;opacity:1}
+.log{max-height:380px;overflow:auto;font-size:.9rem;border:1px solid var(--line);padding:6px 14px;border-radius:11px;background:#faf8f5}
+.log div{padding:10px 0;border-bottom:1px dotted var(--line)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+.tab-btn.active{background:var(--accent2)}
+.panel{display:none}.panel.active{display:block}
+.boss{background:linear-gradient(145deg,#fff,#f6eaea)}
+.journey-art{margin:0 0 20px;border-radius:12px;overflow:hidden;border:3px solid #7d531d;background:#1d1710;box-shadow:0 8px 22px #0003}
+.journey-art img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:contain}
+.journey-progress-title{margin:4px 0 0;color:var(--accent);font-size:1.15rem;text-align:center}
+.journey-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 18px}
+.journey-summary div{padding:12px;border-radius:10px;background:#f7efe2;border:1px solid #dcc5a5;text-align:center}
+.journey-summary small{display:block;color:var(--muted);text-transform:uppercase;font-weight:bold;font-size:.7rem}
+.journey-summary strong{display:block;margin-top:5px;color:var(--accent)}
+.map-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:16px}
+.zone{padding:18px;border-radius:12px;border:2px solid var(--line);text-align:center;cursor:pointer;transition:all .3s;background:#fcfaf7;position:relative}
+.zone h3{margin:0 0 8px;font-size:1.1rem;color:var(--accent)}
+.zone .progress-txt{font-size:.85rem;color:var(--muted)}
+.zone.locked{opacity:0.5;cursor:not-allowed;background:#f0ebe5}
+.zone.locked::before{content:"🔒";display:block;font-size:1.8rem;margin-bottom:4px}
+.zone.active{border-color:var(--accent2);background:linear-gradient(135deg,#fff7df,#fffbf5);box-shadow:0 0 0 3px rgba(179,106,25,.2)}
+.zone.completed{border-color:var(--good);background:linear-gradient(135deg,#e8f5e9,#f1f8f6)}
+.zone .realm-progress{height:7px;background:#e7ddd2;border-radius:99px;overflow:hidden;margin:10px 0 6px}
+.zone .realm-progress span{display:block;height:100%;background:var(--accent2)}
+.zone .player-marker{position:absolute;right:8px;top:8px;font-size:1.3rem;animation:markerBounce .8s infinite alternate}
+@keyframes markerBounce{to{transform:translateY(-5px)}}
+.map-achievements{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+.map-achievements h3{margin:0 0 12px;color:var(--accent)}
+.achievement-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.achievement-chip{display:flex;align-items:center;gap:10px;padding:11px;border-radius:10px;border:1px solid var(--line);background:#f2efeb;color:#81766f}
+.achievement-chip.unlocked{background:linear-gradient(135deg,#fff1b8,#fffaf0);border-color:#d5a748;color:var(--ink)}
+.achievement-chip span{font-size:1.45rem}
+.zone:hover:not(.locked){transform:translateY(-4px);box-shadow:0 6px 16px #0000000d}
+footer{text-align:center;color:var(--muted);padding:20px;font-size:.85rem}
+@media(max-width:780px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .main{grid-template-columns:1fr}
+  .hero-row{grid-template-columns:1fr}
+  .answer-row{flex-direction:column}
+  .answer-row input{font-size:1.6rem;padding:14px}
+  .answer-row button{flex:1}
+  .battle-graphic-container{min-height:260px}
+  .combat-hud{gap:8px;left:8px;right:8px;top:8px}
+  .shop-item{grid-template-columns:44px 1fr}.shop-item button{grid-column:1/-1;width:100%}
+  .journey-summary{grid-template-columns:1fr}
+}
+@media(min-width:781px) and (max-width:1050px){.main{grid-template-columns:1fr}.battle-graphic-container{min-height:300px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div><h1>⚔️ Crypt of Equation</h1><p>Interactive Math RPG — defeat monsters by solving equations.</p></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><a href="../" style="display:inline-flex;align-items:center;justify-content:center;padding:11px 16px;border-radius:10px;background:#fff;color:#6c2020;text-decoration:none;font-weight:bold">🎮 Games</a><button id="muteBtn" class="secondary" aria-pressed="false">🔊 Sound On</button></div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="card">
+    <div class="hero-row">
+      <input id="heroName" placeholder="Hero name" />
+      <select id="heroClass">
+        <option>Alchemist</option><option>Cleric</option><option>Duelist</option><option>Ranger</option>
+      </select>
+      <select id="playerKind" aria-label="3D player kind">
+        <option value="knight">3D Knight</option>
+        <option value="mage">3D Mage</option>
+        <option value="ranger">3D Ranger</option>
+        <option value="golem">3D Golem</option>
+      </select>
+      <select id="difficulty">
+        <option value="1">Apprentice</option>
+        <option value="2">Adventurer</option>
+        <option value="3">Champion</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="grid stats">
+    <div class="card stat"><small>Level</small><strong id="level">1</strong><span id="levelNext">500 XP to next</span></div>
+    <div class="card stat"><small>Experience</small><strong id="xp">0</strong><span id="xpTotal">Lifetime XP</span></div>
+    <div class="card stat"><small>Gold</small><strong id="gold">0</strong><span>Spend in Bazaar</span></div>
+    <div class="card stat"><small>Boss Defeats</small><strong id="bosses">0</strong><span id="bossProgress">0 of 4 realms</span></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="battle">Battle</button>
+    <button class="tab-btn" data-tab="map">🗺️ Journey Map</button>
+    <button class="tab-btn" data-tab="shop">Grand Bazaar</button>
+    <button class="tab-btn" data-tab="record">Hero Record</button>
+  </div>
+
+  <section id="battle" class="panel active">
+    <div class="grid main">
+      <div class="card">
+        <div class="battle-heading"><h2 style="margin:0" id="realmTitle">Addition Caverns</h2><div class="battle-meta"><span class="realm-pill" id="realmPill">Realm 1</span><span class="battle-timer" id="battleTimer">⏱ --</span></div></div>
+        <div class="battle-graphic-container">
+          <div class="combat-hud">
+            <div class="fighter-label"><strong id="heroBattleName">Your Hero</strong><div class="mini-bar"><span id="heroBar"></span></div></div>
+            <div class="fighter-label"><strong id="enemyHudName">Waiting...</strong><div class="mini-bar"><span id="enemyHudBar"></span></div></div>
+          </div>
+          <canvas id="canvas3d"></canvas>
+          <canvas id="battleCanvas"></canvas>
+          <div class="graphic-overlay"><div id="graphicStatus">Ready for battle</div></div>
+        </div>
+        <h2 id="enemyTitle">Slime of Addition</h2>
+        <div>Enemy HP</div>
+        <div class="progress"><div id="enemyBar"></div></div>
+        <div class="question" id="question">Press “Start Battle”</div>
+        <div class="answer-row">
+          <input id="answer" inputmode="numeric" placeholder="Your answer" />
+          <button id="submitBtn" disabled>Attack</button>
+        </div>
+        <div id="feedback" class="feedback"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+          <button id="startBtn">Start Battle</button>
+          <button id="hintBtn" class="gold">Use Hint Scroll (0)</button>
+          <button id="resetBtn" class="secondary">Reset Progress</button>
+        </div>
+      </div>
+
+      <div class="card boss">
+        <h2>Quest Rules</h2>
+        <p>Correct answer: damage enemy, earn XP and Gold.</p>
+        <p>Wrong answer: lose one heart unless protected by a Shield.</p>
+        <p>Five realm victories summon that realm’s Boss.</p>
+        <div><strong>Total wins:</strong> <span id="wins">0</span></div>
+        <div><strong>Realm progress:</strong> <span id="realmWinsText">0 / 5</span></div>
+        <div><strong>Current streak:</strong> <span id="streak">0</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="map" class="panel">
+    <div class="card">
+      <h2>⚔️ The Crypt Journey</h2>
+      <p style="color:var(--muted);margin-bottom:16px">Explore zones by defeating monsters. Every 5 victories unlock a boss challenge!</p>
+      <div class="journey-summary">
+        <div><small>Current Location</small><strong id="mapCurrentRealm">Addition Caverns</strong></div>
+        <div><small>Realm Completion</small><strong id="mapCompletion">0%</strong></div>
+        <div><small>Next Objective</small><strong id="mapNextGoal">Win 5 battles</strong></div>
+      </div>
+      <figure class="journey-art">
+        <img src="image.png" alt="Illustrated Crypt of Equation journey map showing the quest path, battle stages, bosses, bazaar, rewards, and achievements" />
+      </figure>
+      <h3 class="journey-progress-title">Your Live Journey Progress</h3>
+      <div id="mapZones" class="map-grid"></div>
+      <div class="map-achievements">
+        <h3>🏆 Journey Achievements</h3>
+        <div id="mapAchievements" class="achievement-strip"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="shop" class="panel">
+    <div class="card">
+      <h2>The Grand Bazaar</h2>
+      <p class="shop-intro">Spend battle-earned Gold on useful supplies for the road ahead.</p>
+      <div id="shopList"></div>
+    </div>
+  </section>
+
+  <section id="record" class="panel">
+    <div class="grid main">
+      <div class="card">
+        <h2>Achievements</h2>
+        <div class="badges" id="badges"></div>
+      </div>
+      <div class="card">
+        <h2>Adventure Log</h2>
+        <div class="log" id="log"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>Crypt of Equation © 2026 — classroom prototype. Teacher approval applies to real-world rewards.</footer>
+
+<audio id="backgroundMusic" src="Math Kingdom March.mp3" loop preload="auto"></audio>
+<script>
+const defaultState = {
+  heroName:"", heroClass:"Alchemist", playerKind:"knight", difficulty:1,
+  level:1, xp:0, gold:0, bosses:0, wins:0, streak:0, currentRealm:"addition",
+  realmWins:{addition:0,subtraction:0,multiplication:0,division:0}, defeatedBosses:[],
+  hints:0, shields:0, secondChance:0, muted:false, log:[]
+};
+const savedState = JSON.parse(localStorage.getItem("cryptEquationSave") || "null");
+let state = savedState ? {...defaultState, ...savedState} : {...defaultState};
+state.realmWins = {...defaultState.realmWins, ...(state.realmWins || {})};
+state.defeatedBosses = Array.isArray(state.defeatedBosses) ? state.defeatedBosses : [];
+let currentAnswer = null, enemyHP = 0, enemyMax = 0, inBattle = false, isBoss = false, currentMonster = null;
+let heroHP = 3, battleDeadline = 0, battleCanvas, battleCtx, battleParticles = [], graphicState = {message:"Ready for battle", flash:0, pulse:0};
+
+const realms = {
+  addition:{name:"Addition Caverns",icon:"💎",order:0,unlock:0,op:"+",color:0x3287b7,boss:{name:"Sum Guardian",icon:"🗿",color:0x7452a8},enemies:[
+    {name:"Counting Slime",icon:"🟢",color:0x65a84c},{name:"Crystal Bat",icon:"🦇",color:0x3585ad},{name:"Plus Goblin",icon:"👺",color:0x8ea84c}]},
+  subtraction:{name:"Subtraction Ruins",icon:"🏛️",order:1,unlock:5,op:"-",color:0xa87838,boss:{name:"Difference Warden",icon:"💀",color:0x804b88},enemies:[
+    {name:"Minus Mummy",icon:"🧟",color:0xb18a55},{name:"Vanishing Wisp",icon:"👻",color:0x7888b8},{name:"Ruin Scarab",icon:"🪲",color:0x9a713b}]},
+  multiplication:{name:"Multiplication Forest",icon:"🌲",order:2,unlock:10,op:"×",color:0x39854d,boss:{name:"Product Treant",icon:"🌳",color:0x486b32},enemies:[
+    {name:"Times Spider",icon:"🕷️",color:0x4f6c3b},{name:"Forest Troll",icon:"🧌",color:0x617d40},{name:"Array Wyvern",icon:"🐲",color:0xb26b32}]},
+  division:{name:"Division Citadel",icon:"🏰",order:3,unlock:15,op:"÷",color:0x8a405e,boss:{name:"Quotient Archmage",icon:"🧙",color:0xa04475},enemies:[
+    {name:"Fraction Phantom",icon:"👻",color:0x756aa7},{name:"Divider Knight",icon:"♞",color:0x526b92},{name:"Remainder Wraith",icon:"☠️",color:0x594c78}]}
+};
+
+const $ = id => document.getElementById(id);
+const backgroundMusic=$("backgroundMusic");backgroundMusic.volume=.24;
+function syncBackgroundMusic(shouldPlay=false){
+  if(state.muted){backgroundMusic.pause();return}
+  if(shouldPlay) backgroundMusic.play().catch(()=>{});
+}
+const save = () => {
+  state.heroName = $("heroName").value.trim();
+  state.heroClass = $("heroClass").value;
+  state.playerKind = $("playerKind").value;
+  state.difficulty = Number($("difficulty").value);
+  localStorage.setItem("cryptEquationSave", JSON.stringify(state));
+};
+const addLog = msg => {
+  state.log.unshift(new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})+" — "+msg);
+  state.log = state.log.slice(0,40);
+};
+function recalcLevel(){
+  let level = 1;
+  while(state.xp >= 250*level*(level+1)) level++;
+  state.level = level;
+}
+function renderBattleTimer(){
+  const timer=$("battleTimer");
+  if(!inBattle || !battleDeadline){timer.textContent="⏱ --";timer.classList.remove("warning");return}
+  const seconds=Math.max(0,Math.ceil((battleDeadline-Date.now())/1000));
+  const minutes=Math.floor(seconds/60), remainder=String(seconds%60).padStart(2,"0");
+  timer.textContent=`⏱ ${minutes}:${remainder}`;
+  timer.classList.toggle("warning",seconds<=15);
+}
+function expireBattle(){
+  if(!inBattle) return;
+  inBattle=false; battleDeadline=0; heroHP=0; state.streak=0;
+  $("submitBtn").disabled=true;
+  $("question").textContent="Time expired — recover and try the battle again.";
+  $("feedback").className="feedback bad";
+  $("feedback").textContent="The enemy escaped before the final attack.";
+  graphicState.message="Time expired!";
+  addLog(`Ran out of time against ${currentMonster.icon} ${currentMonster.name}.`);
+  playSound("miss"); render();
+}
+function render(){
+  recalcLevel();
+  const realm = realms[state.currentRealm] || realms.addition;
+  state.bosses = state.defeatedBosses.length;
+  $("heroName").value = state.heroName;
+  $("heroClass").value = state.heroClass;
+  $("playerKind").value = state.playerKind;
+  $("difficulty").value = state.difficulty;
+  $("level").textContent = state.level;
+  $("xp").textContent = state.xp;
+  $("gold").textContent = state.gold;
+  $("bosses").textContent = state.bosses;
+  const nextLevelXP = 250*state.level*(state.level+1);
+  $("levelNext").textContent = `${Math.max(0,nextLevelXP-state.xp)} XP to next`;
+  $("xpTotal").textContent = `${state.xp} lifetime XP`;
+  $("bossProgress").textContent = `${state.bosses} of 4 realms`;
+  $("wins").textContent = state.wins;
+  $("realmWinsText").textContent = `${Math.min(5,state.realmWins[state.currentRealm] || 0)} / 5${state.defeatedBosses.includes(state.currentRealm)?" · Boss defeated":""}`;
+  $("streak").textContent = state.streak;
+  $("hintBtn").textContent = `Use Hint Scroll (${state.hints})`;
+  $("enemyBar").style.width = enemyMax ? `${Math.max(0,enemyHP)/enemyMax*100}%` : "0%";
+  $("enemyHudBar").style.width = enemyMax ? `${Math.max(0,enemyHP)/enemyMax*100}%` : "0%";
+  $("heroBar").style.width = `${Math.max(0,heroHP)/3*100}%`;
+  $("heroBattleName").textContent = state.heroName || "Your Hero";
+  $("enemyHudName").textContent = currentMonster ? `${currentMonster.icon} ${currentMonster.name}` : "Waiting...";
+  $("realmTitle").textContent = `${realm.icon} ${realm.name}`;
+  $("realmPill").textContent = `Realm ${realm.order+1} · ${realm.op}`;
+  $("muteBtn").textContent = state.muted ? "🔇 Sound Off" : "🔊 Sound On";
+  $("muteBtn").setAttribute("aria-pressed",String(state.muted));
+  renderBattleTimer();
+  $("graphicStatus").textContent = graphicState.message;
+  renderShop(); renderBadges(); renderLog(); renderMap(); save();
+}
+function makeQuestion(){
+  const d = state.difficulty;
+  const range = d===1 ? 12 : d===2 ? 30 : 60;
+  let a = Math.floor(Math.random()*range)+1;
+  let b = Math.floor(Math.random()*range)+1;
+  let op = (realms[state.currentRealm] || realms.addition).op;
+  if(op==="-" && b>a) [a,b]=[b,a];
+  if(op==="×"){ a=Math.ceil(a/(d===3?3:5)); b=Math.ceil(b/(d===3?3:5)); }
+  if(op==="÷"){
+    b = Math.max(2,Math.ceil(b/(d===3?4:6)));
+    const quotient = Math.max(1,Math.ceil(a/(d===3?4:6)));
+    a = b*quotient;
+  }
+  currentAnswer = op==="+"?a+b:op==="-"?a-b:op==="×"?a*b:a/b;
+  $("question").textContent = `${a} ${op} ${b} = ?`;
+}
+function startBattle(){
+  const realm = realms[state.currentRealm] || realms.addition;
+  const realmVictories = state.realmWins[state.currentRealm] || 0;
+  isBoss = realmVictories>=5 && !state.defeatedBosses.includes(state.currentRealm);
+  if(isBoss){
+    currentMonster = realm.boss;
+    enemyMax = 6;
+  } else {
+    currentMonster = realm.enemies[Math.floor(Math.random()*realm.enemies.length)];
+    enemyMax = 2 + state.difficulty;
+  }
+  enemyHP = enemyMax; heroHP = 3; inBattle = true;
+  const baseSeconds = 120-state.difficulty*20;
+  battleDeadline = Date.now()+(baseSeconds+(isBoss?30:0))*1000;
+  graphicState.message = isBoss ? "Boss battle engaged!" : "Battle started.";
+  graphicState.pulse = 30;
+  spawnParticles(isBoss ? "boss" : "start");
+  createEnemy3D();
+  playSound("start");
+  $("enemyTitle").textContent = `${currentMonster.icon} ${currentMonster.name}`;
+  $("submitBtn").disabled = false;
+  $("feedback").textContent = "";
+  makeQuestion(); render();
+  $("answer").focus();
+}
+function attack(){
+  if(!inBattle) return;
+  const value = Number($("answer").value);
+  if($("answer").value.trim()==="") return;
+  if(value === currentAnswer){
+    enemyHP--;
+    state.streak++;
+    animateHeroAttack(); playSound("hit");
+    graphicState.flash = 18;
+    graphicState.message = "Critical hit!";
+    spawnParticles("hit");
+    $("feedback").className="feedback good";
+    $("feedback").textContent="Correct! Your attack lands.";
+    if(enemyHP<=0){
+      const realmRank = (realms[state.currentRealm] || realms.addition).order;
+      const xpGain = isBoss ? 300+realmRank*100 : 75+state.difficulty*25+realmRank*25;
+      const goldGain = isBoss ? 300+realmRank*75 : 35+state.difficulty*15+realmRank*10;
+      state.xp += xpGain; state.gold += goldGain; state.wins++;
+      if(isBoss){
+        if(!state.defeatedBosses.includes(state.currentRealm)) state.defeatedBosses.push(state.currentRealm);
+      } else {
+        state.realmWins[state.currentRealm] = (state.realmWins[state.currentRealm] || 0) + 1;
+      }
+      addLog(`Defeated ${currentMonster.icon} ${currentMonster.name} (+${xpGain} XP, +${goldGain} GP).`);
+      inBattle=false; battleDeadline=0; $("submitBtn").disabled=true;
+      $("question").textContent="Victory! Start the next battle.";
+      graphicState.message = isBoss ? "Boss defeated!" : "Monster defeated!";
+      spawnParticles(isBoss ? "boss" : "hit");
+      playSound(isBoss ? "boss" : "victory");
+    } else makeQuestion();
+  } else {
+    graphicState.flash = 12;
+    graphicState.message = "Missed — try again.";
+    spawnParticles("miss");
+    animateEnemyAttack(); playSound("miss");
+    if(state.shields>0){
+      state.shields--;
+      $("feedback").textContent=`Incorrect, but your Shield protected you. Answer: ${currentAnswer}`;
+    } else {
+      state.streak=0;
+      heroHP--;
+      $("feedback").textContent=`Not quite. Correct answer: ${currentAnswer}`;
+    }
+    $("feedback").className="feedback bad";
+    if(heroHP<=0){
+      if(state.secondChance>0){
+        state.secondChance--; heroHP=1;
+        $("feedback").textContent += " Your Second Chance restored one heart!";
+      } else {
+        inBattle=false; battleDeadline=0; $("submitBtn").disabled=true;
+        $("question").textContent="Defeated — recover and start another battle.";
+        graphicState.message="The enemy won this round.";
+      }
+    }
+    if(inBattle) makeQuestion();
+  }
+  $("answer").value=""; render();
+}
+const shopItems = [
+  {key:"hints",icon:"📜",name:"Scroll of the Oracle",desc:"Reveal the answer to the current problem.",cost:100},
+  {key:"shields",icon:"🛡️",name:"Shield of Protection",desc:"Blocks damage from one wrong answer.",cost:150},
+  {key:"secondChance",icon:"🔮",name:"Amulet of Second Chance",desc:"Restores one heart when you would be defeated.",cost:500}
+];
+function buy(item){
+  if(state.gold < item.cost) return alert("Not enough Gold Pieces.");
+  state.gold -= item.cost; state[item.key]++; addLog(`Purchased ${item.name}.`); render();
+}
+function renderShop(){
+  $("shopList").innerHTML = shopItems.map((i,idx)=>`
+    <div class="shop-item">
+      <div class="shop-icon">${i.icon}</div>
+      <div><h3>${i.name}</h3><p>${i.desc} Owned: ${state[i.key]}</p></div>
+      <button onclick="buy(shopItems[${idx}])">${i.cost} GP</button>
+    </div>`).join("");
+}
+function getAchievements(){
+  return [
+    {name:"The Executioner",icon:"⚔️",unlocked:state.streak>=5,desc:"Achieve a 5-answer correct streak."},
+    {name:"The Alchemist",icon:"⚗️",unlocked:state.level>=3,desc:"Reach Level 3."},
+    {name:"The Cleric",icon:"✨",unlocked:state.wins>=10,desc:"Defeat 10 enemies."},
+    {name:"The Undying",icon:"💀",unlocked:state.bosses>=1,desc:"Defeat your first boss."},
+    {name:"Realm Walker",icon:"🗺️",unlocked:state.bosses>=2,desc:"Conquer two mathematics realms."},
+    {name:"Crypt Legend",icon:"👑",unlocked:state.bosses>=4,desc:"Defeat every realm boss."}
+  ];
+}
+function renderBadges(){
+  $("badges").innerHTML = getAchievements().map(a=>`<div class="badge ${a.unlocked?"unlocked":""}"><span class="badge-icon">${a.unlocked?a.icon:"🔒"}</span><div><strong>${a.name}</strong><br><small>${a.desc}</small></div></div>`).join("");
+}
+function renderLog(){
+  $("log").innerHTML = state.log.length ? state.log.map(x=>`<div>${x}</div>`).join("") : "<em>No adventures recorded yet.</em>";
+}
+function realmUnlocked(key){
+  const entries=Object.keys(realms), index=entries.indexOf(key);
+  return index===0 || state.defeatedBosses.includes(entries[index-1]);
+}
+function renderMap(){
+  const current=realms[state.currentRealm] || realms.addition;
+  const currentWins=Math.min(5,state.realmWins[state.currentRealm] || 0);
+  const milestones=Object.keys(realms).reduce((total,key)=>total+Math.min(5,state.realmWins[key] || 0)+(state.defeatedBosses.includes(key)?1:0),0);
+  $("mapCurrentRealm").textContent=`${current.icon} ${current.name}`;
+  $("mapCompletion").textContent=`${Math.round(milestones/24*100)}% · ${state.bosses}/4 bosses`;
+  $("mapNextGoal").textContent=state.defeatedBosses.length===4?"Become a Crypt Legend!":currentWins<5?`Win ${5-currentWins} more battle${5-currentWins===1?"":"s"}`:state.defeatedBosses.includes(state.currentRealm)?"Enter the next unlocked realm":"Defeat the realm boss";
+  $("mapZones").innerHTML = Object.entries(realms).map(([key,realm])=>{
+    const isUnlocked = realmUnlocked(key);
+    const isCompleted = state.defeatedBosses.includes(key);
+    const isActive = state.currentRealm === key;
+    const wins = Math.min(5,state.realmWins[key] || 0);
+    const status = !isUnlocked ? "locked" : isCompleted ? "completed" : isActive ? "active" : "visited";
+    return `<div class="zone ${status}" ${isUnlocked?`onclick="selectRealm('${key}')" onkeydown="if(event.key==='Enter'||event.key===' ')selectRealm('${key}')" role="button" tabindex="0"`:""} title="${isUnlocked?"Enter realm":"Defeat the previous realm boss to unlock"}">
+      ${isActive?'<span class="player-marker" title="You are here">🧙</span>':""}
+      <div style="font-size:2.2rem;margin-bottom:4px">${realm.icon}</div>
+      <h3>${realm.name}</h3>
+      <div class="realm-progress"><span style="width:${wins/5*100}%"></span></div>
+      <div class="progress-txt">${isCompleted?"✓ Boss defeated":isUnlocked?`${wins}/5 battles before boss`:"Defeat previous boss to unlock"}</div>
+    </div>`;
+  }).join("");
+  $("mapAchievements").innerHTML=getAchievements().map(a=>`<div class="achievement-chip ${a.unlocked?"unlocked":""}" title="${a.desc}"><span>${a.unlocked?a.icon:"🔒"}</span><div><strong>${a.name}</strong><br><small>${a.unlocked?"Unlocked":a.desc}</small></div></div>`).join("");
+}
+function selectRealm(key){
+  const realm = realms[key];
+  if(!realm || !realmUnlocked(key)) return;
+  if(inBattle && !confirm("Leave the current battle and travel to another realm?")) return;
+  state.currentRealm=key; inBattle=false; battleDeadline=0; currentMonster=null; enemyHP=enemyMax=0; heroHP=3;
+  $("question").textContent='Press “Start Battle”'; $("submitBtn").disabled=true;
+  graphicState.message=`Entered ${realm.name}.`;
+  createEnemy3D(); playSound("travel"); render();
+  document.querySelector('[data-tab="battle"]').click();
+}
+function createParticle(x,y,color){
+  return {x,y,vx:(Math.random()-0.5)*2.6,vy:(Math.random()-1.6)*2.6,alpha:1,rad:Math.random()*3+2,color};
+}
+function spawnParticles(type){
+  const rect = battleCanvas.getBoundingClientRect();
+  const centerX = rect.width*0.5; const centerY = rect.height*0.45;
+  const color = type==="hit" ? "#f5d96d" : type==="boss" ? "#f07c7c" : "#7cc1ff";
+  for(let i=0;i<20;i++) battleParticles.push(createParticle(centerX, centerY, color));
+}
+let audioCtx;
+function playSound(type){
+  if(state.muted) return;
+  try{
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const notes = {start:[220,330],hit:[520,760],miss:[150,95],victory:[440,660,880],boss:[220,440,660,880],travel:[300,450]}[type] || [300];
+    notes.forEach((frequency,index)=>{
+      const oscillator=audioCtx.createOscillator(), gain=audioCtx.createGain();
+      oscillator.type=type==="miss"?"sawtooth":"sine"; oscillator.frequency.value=frequency;
+      gain.gain.setValueAtTime(.0001,audioCtx.currentTime+index*.08);
+      gain.gain.exponentialRampToValueAtTime(.12,audioCtx.currentTime+index*.08+.015);
+      gain.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+index*.08+.16);
+      oscillator.connect(gain).connect(audioCtx.destination);
+      oscillator.start(audioCtx.currentTime+index*.08); oscillator.stop(audioCtx.currentTime+index*.08+.18);
+    });
+  }catch(e){}
+}
+const playerKindColors = {knight:0x4f78a8, mage:0x7952a8, ranger:0x397a4b, golem:0x9a653f};
+let scene, camera, renderer, enemy3d, player3d, playerAttack=0, enemyAttack=0, enemyDamage=0;
+function animateHeroAttack(){playerAttack=1;enemyDamage=1}
+function animateEnemyAttack(){enemyAttack=1}
+function init3DScene(){
+  const container = document.querySelector(".battle-graphic-container");
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+  
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xf5f1e8);
+  
+  camera = new THREE.PerspectiveCamera(60, width/height, 0.1, 1000);
+  camera.position.set(0, 0.15, 4.6);
+  
+  renderer = new THREE.WebGLRenderer({canvas: $("canvas3d"), antialias: true, alpha: true});
+  renderer.setSize(width, height);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  
+  const light1 = new THREE.DirectionalLight(0xffffff, 0.8);
+  light1.position.set(5, 5, 5);
+  scene.add(light1);
+  
+  const light2 = new THREE.DirectionalLight(0x8899ff, 0.5);
+  light2.position.set(-5, -5, 5);
+  scene.add(light2);
+  
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+  scene.add(ambientLight);
+  
+  createPlayer3D();
+  createEnemy3D();
+  
+  window.addEventListener("resize", () => {
+    const newWidth = container.clientWidth;
+    const newHeight = container.clientHeight;
+    camera.aspect = newWidth/newHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(newWidth, newHeight);
+  });
+  
+  function animate3D(){
+    requestAnimationFrame(animate3D);
+    if(enemy3d) {
+      enemy3d.rotation.y += 0.008;
+      enemy3d.position.x = 1.15 - Math.sin(enemyAttack*Math.PI)*.75;
+      enemy3d.position.y = Math.sin(Date.now()*0.002)*0.08 + Math.sin(enemyDamage*Math.PI*5)*.06;
+      enemy3d.scale.setScalar((isBoss ? .72 : .62)*(1-Math.sin(enemyDamage*Math.PI)*.18));
+      if(enemy3d.material && enemy3d.material.emissiveIntensity!==undefined) enemy3d.material.emissiveIntensity=1+enemyDamage*2.5;
+    }
+    if(player3d) {
+      player3d.rotation.y = -0.28 + Math.sin(Date.now()*0.0015)*0.08;
+      player3d.position.x = -1.15 + Math.sin(playerAttack*Math.PI)*.9;
+      player3d.position.y = -0.55 + Math.sin(Date.now()*0.0022)*0.025;
+    }
+    playerAttack=Math.max(0,playerAttack-.035); enemyAttack=Math.max(0,enemyAttack-.035); enemyDamage=Math.max(0,enemyDamage-.045);
+    renderer.render(scene, camera);
+  }
+  animate3D();
+}
+function createEnemy3D(){
+  if(enemy3d) scene.remove(enemy3d);
+  const realm = realms[state.currentRealm] || realms.addition;
+  scene.background = new THREE.Color(realm.color).lerp(new THREE.Color(0xf7f2e8),.82);
+  let geometry;
+  if(isBoss) geometry = new THREE.OctahedronGeometry(1.2,1);
+  else if(realm.op==="+") geometry = new THREE.SphereGeometry(.95,20,14);
+  else if(realm.op==="-") geometry = new THREE.ConeGeometry(.9,1.7,8);
+  else if(realm.op==="×") geometry = new THREE.DodecahedronGeometry(.95,0);
+  else geometry = new THREE.TorusKnotGeometry(.58,.22,64,10);
+  const material = new THREE.MeshPhongMaterial({
+    color: currentMonster ? currentMonster.color : (isBoss ? 0xd45f5f : 0x4c7a9b),
+    emissive: currentMonster ? (currentMonster.color * 0.5) : (isBoss ? 0x8a3a3a : 0x2a5a7b),
+    shininess: 100
+  });
+  
+  enemy3d = new THREE.Mesh(geometry, material);
+  enemy3d.scale.setScalar(isBoss ? 0.72 : 0.62);
+  enemy3d.position.set(1.15, 0, 0);
+  scene.add(enemy3d);
+}
+function part(geometry, material, x, y, z=0){
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(x,y,z);
+  mesh.castShadow = true;
+  return mesh;
+}
+function createPlayer3D(){
+  if(player3d) scene.remove(player3d);
+  const kind = state.playerKind || "knight";
+  const main = new THREE.MeshPhongMaterial({color:playerKindColors[kind], shininess:75});
+  const dark = new THREE.MeshPhongMaterial({color:0x29272b, shininess:35});
+  const skin = new THREE.MeshPhongMaterial({color:0xd8a074, shininess:25});
+  const gold = new THREE.MeshPhongMaterial({color:0xd2a633, shininess:110});
+  player3d = new THREE.Group();
+
+  if(kind === "golem"){
+    player3d.add(part(new THREE.BoxGeometry(.64,.72,.42),main,0,.52));
+    player3d.add(part(new THREE.BoxGeometry(.48,.44,.42),main,0,1.12));
+    player3d.add(part(new THREE.BoxGeometry(.22,.62,.24),dark,-.44,.5));
+    player3d.add(part(new THREE.BoxGeometry(.22,.62,.24),dark,.44,.5));
+  } else {
+    player3d.add(part(new THREE.CylinderGeometry(.24,.34,.72,10),main,0,.54));
+    player3d.add(part(new THREE.SphereGeometry(.23,16,12),skin,0,1.08));
+    player3d.add(part(new THREE.CylinderGeometry(.1,.12,.55,8),dark,-.18,.05));
+    player3d.add(part(new THREE.CylinderGeometry(.1,.12,.55,8),dark,.18,.05));
+    if(kind === "knight"){
+      player3d.add(part(new THREE.ConeGeometry(.29,.34,8),dark,0,1.3));
+      player3d.add(part(new THREE.BoxGeometry(.1,.75,.08),gold,.43,.6));
+    } else if(kind === "mage"){
+      player3d.add(part(new THREE.ConeGeometry(.38,.65,12),main,0,1.48));
+      player3d.add(part(new THREE.CylinderGeometry(.035,.045,1.15,8),gold,.42,.54));
+      player3d.add(part(new THREE.SphereGeometry(.1,12,8),gold,.42,1.14));
+    } else {
+      const bow = part(new THREE.TorusGeometry(.34,.035,8,18,Math.PI),gold,.39,.68);
+      bow.rotation.z = Math.PI/2;
+      player3d.add(bow);
+      player3d.add(part(new THREE.ConeGeometry(.25,.3,10),main,0,1.29));
+    }
+  }
+  player3d.position.set(-1.15,-.55,.05);
+  player3d.scale.setScalar(.86);
+  scene.add(player3d);
+}
+function initBattleCanvas(){
+  battleCanvas = $("battleCanvas");
+  battleCtx = battleCanvas.getContext("2d");
+  const resize = ()=>{
+    battleCanvas.width = battleCanvas.clientWidth * window.devicePixelRatio;
+    battleCanvas.height = battleCanvas.clientHeight * window.devicePixelRatio;
+    battleCtx.setTransform(window.devicePixelRatio,0,0,window.devicePixelRatio,0,0);
+  };
+  resize();
+  window.addEventListener("resize", resize);
+  const draw = ()=>{
+    const w = battleCanvas.clientWidth; const h = battleCanvas.clientHeight;
+    battleCtx.clearRect(0,0,w,h);
+    const gradient = battleCtx.createRadialGradient(w*0.5,h*0.2,10,w*0.5,h*0.5,Math.max(w,h)*0.8);
+    gradient.addColorStop(0,"rgba(255,255,255,0.45)");
+    gradient.addColorStop(1,"rgba(176,150,110,0.08)");
+    battleCtx.fillStyle = gradient;
+    battleCtx.fillRect(0,0,w,h);
+    const orbRadius = 30 + Math.sin(graphicState.pulse*0.2)*6;
+    battleCtx.save();
+    battleCtx.translate(w*0.22,h*0.5);
+    battleCtx.fillStyle = `#${playerKindColors[state.playerKind || "knight"].toString(16).padStart(6,"0")}30`;
+    battleCtx.beginPath(); battleCtx.arc(0,0,orbRadius,0,Math.PI*2); battleCtx.fill();
+    battleCtx.strokeStyle = "rgba(255,255,255,0.8)"; battleCtx.lineWidth=3;
+    battleCtx.stroke();
+    battleCtx.restore();
+    battleCtx.save();
+    battleCtx.translate(w*0.78,h*0.5);
+    battleCtx.fillStyle = isBoss ? "#9865aa30" : "#6e9f4b30";
+    battleCtx.beginPath(); battleCtx.ellipse(0,0,orbRadius*1.1,orbRadius*0.85,Math.sin(graphicState.pulse*0.16),0,Math.PI*2);
+    battleCtx.fill();
+    battleCtx.globalCompositeOperation = "lighter";
+    battleCtx.fillStyle = "rgba(255,255,255,0.16)";
+    battleCtx.beginPath(); battleCtx.arc(0,0,orbRadius*0.6,0,Math.PI*2); battleCtx.fill();
+    battleCtx.restore();
+    battleCtx.globalCompositeOperation = "source-over";
+    battleCtx.fillStyle = `rgba(255,255,255,${Math.max(0,Math.min(0.3, graphicState.flash/24))})`;
+    battleCtx.fillRect(0,0,w,h);
+    if(graphicState.pulse>0) graphicState.pulse = Math.max(0, graphicState.pulse-0.45);
+    if(graphicState.flash>0){
+      graphicState.flash -= 1.2;
+      if(graphicState.flash < 0) graphicState.flash = 0;
+    }
+    battleParticles = battleParticles.filter(p=>p.alpha>0);
+    battleParticles.forEach(p=>{
+      p.x += p.vx; p.y += p.vy; p.alpha -= 0.03;
+      battleCtx.globalAlpha = p.alpha;
+      battleCtx.fillStyle = p.color;
+      battleCtx.beginPath(); battleCtx.arc(p.x, p.y, p.rad, 0, Math.PI*2);
+      battleCtx.fill();
+      battleCtx.globalAlpha = 1;
+    });
+    requestAnimationFrame(draw);
+  };
+  requestAnimationFrame(draw);
+}
+
+$("startBtn").onclick=startBattle;
+$("submitBtn").onclick=attack;
+$("answer").addEventListener("keydown",e=>{if(e.key==="Enter") attack()});
+$("hintBtn").onclick=()=>{
+  if(!inBattle) return alert("Start a battle first.");
+  if(state.hints<1) return alert("Buy a Scroll of the Oracle in the Grand Bazaar.");
+  state.hints--; graphicState.message = "Oracle reveals the answer.";
+  $("feedback").className="feedback good";
+  $("feedback").textContent=`Oracle's hint: the answer is ${currentAnswer}.`; render();
+};
+$("resetBtn").onclick=()=>{
+  if(confirm("Reset all hero progress?")){
+    state={...defaultState,log:[]}; localStorage.removeItem("cryptEquationSave"); inBattle=false; battleDeadline=0;
+    graphicState.message = "Hero reborn.";
+    $("question").textContent='Press “Start Battle”'; $("submitBtn").disabled=true;
+    render(); createPlayer3D(); createEnemy3D();
+  }
+};
+$("heroName").addEventListener("input",save);
+["heroClass","difficulty"].forEach(id=>$(id).addEventListener("change",save));
+$("playerKind").addEventListener("change",()=>{
+  save();
+  createPlayer3D();
+  graphicState.message = `${$("playerKind").selectedOptions[0].text} selected.`;
+  render();
+});
+$("muteBtn").onclick=()=>{state.muted=!state.muted;render();if(!state.muted)playSound("travel")};
+$("startBtn").addEventListener("click",()=>syncBackgroundMusic(true));
+$("muteBtn").addEventListener("click",()=>syncBackgroundMusic(!state.muted));
+window.addEventListener("beforeunload",save);
+document.querySelectorAll(".tab-btn").forEach(btn=>btn.onclick=()=>{
+  document.querySelectorAll(".tab-btn,.panel").forEach(x=>x.classList.remove("active"));
+  btn.classList.add("active"); $(btn.dataset.tab).classList.add("active");
+});
+initBattleCanvas();
+init3DScene();
+render();
+setInterval(()=>{
+  if(inBattle && battleDeadline && Date.now()>=battleDeadline) expireBattle();
+  else renderBattleTimer();
+},250);
+</script>
+</body>
+</html>
