@@ -263,7 +263,7 @@
                 <a href="#programmes" data-i18n="navProgrammes">Programmes</a>
                 <a href="quizzes.html" data-i18n="navCatalogue">Learning catalogue</a>
                 <a href="ebook.html" data-i18n="navEbook">Ebook</a>
-                <a href="games/math-crush/">CJMath EquaGems</a>
+                <a href="games/">Games</a>
                 <select class="language-select" id="languageSelect" aria-label="Select language">
                     <option value="en">English</option>
                     <option value="ms">Bahasa Melayu</option>
@@ -331,6 +331,12 @@
                         <h3>CJMath EquaGems</h3>
                         <p data-i18n="gameText">Build speed and accuracy through an engaging interactive mathematics game.</p>
                         <span class="card-action"><span data-i18n="playGame">Play CJMath EquaGems</span> <span aria-hidden="true">→</span></span>
+                    </a>
+                    <a class="programme-card programme-card-link" href="games/math-kingdom-defender/">
+                        <div class="card-icon" aria-hidden="true">04</div>
+                        <h3>Math Kingdom Defender</h3>
+                        <p>Solve equations, power your towers, and defend the kingdom.</p>
+                        <span class="card-action">Play Math Kingdom Defender <span aria-hidden="true">→</span></span>
                     </a>
                 </div>
             </div>
@@ -428,10 +434,11 @@
 
         (() => {
             const display = document.getElementById("visitorCount");
-            const visitorKey = "mathToolsHubGlobalVisitorRecorded";
+            const sessionKey = "mathToolsHubVisitRecorded";
             const cachedKey = "mathToolsHubGlobalVisitorTotal";
             const baseUrl = "https://api.counterapi.dev/v1/mathtoolshub-public/total-visitors";
-            const endpoint = localStorage.getItem(visitorKey) ? baseUrl : `${baseUrl}/up`;
+            const isNewVisit = !sessionStorage.getItem(sessionKey);
+            const endpoint = isNewVisit ? `${baseUrl}/up` : baseUrl;
 
             const show = value => {
                 const count = Number(value);
@@ -440,8 +447,8 @@
                 localStorage.setItem(cachedKey, String(count));
             };
 
-            const cached = localStorage.getItem(cachedKey);
-            if (cached) show(cached);
+            const cached = Number(localStorage.getItem(cachedKey));
+            if (Number.isFinite(cached) && cached > 0) show(cached);
 
             fetch(endpoint, { headers: { "Accept": "application/json" } })
                 .then(response => {
@@ -450,10 +457,12 @@
                 })
                 .then(data => {
                     show(data.count ?? data.value);
-                    localStorage.setItem(visitorKey, "true");
+                    if (isNewVisit) sessionStorage.setItem(sessionKey, "true");
                 })
                 .catch(() => {
-                    if (!cached) display.textContent = "1";
+                    const fallback = Math.max(1, cached || 0) + (isNewVisit && cached > 0 ? 1 : 0);
+                    show(fallback);
+                    if (isNewVisit) sessionStorage.setItem(sessionKey, "true");
                 });
         })();
     </script>

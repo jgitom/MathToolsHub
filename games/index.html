@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f2747">
+    <meta name="description" content="Play interactive mathematics games from MathToolsHub.">
+    <title>Games | MathToolsHub</title>
+    <style>
+        :root { --navy:#0f2747; --navy-light:#173b68; --blue:#2563eb; --ink:#172033; --muted:#64748b; --line:#dbe3ec; --surface:#fff; --background:#f4f7fa; }
+        * { box-sizing:border-box; }
+        body { margin:0; min-height:100vh; display:flex; flex-direction:column; color:var(--ink); background:var(--background); font-family:Inter,"Segoe UI",Arial,sans-serif; }
+        a { color:inherit; }
+        header { color:#fff; background:var(--navy); border-bottom:4px solid #3b82f6; }
+        .nav, .hero-inner, .content, .footer-inner { width:min(1120px,calc(100% - 40px)); margin:0 auto; }
+        .nav { min-height:72px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+        .brand { display:flex; align-items:center; gap:12px; color:#fff; font-weight:750; text-decoration:none; }
+        .brand-mark { width:38px; height:38px; display:grid; place-items:center; border-radius:8px; color:var(--navy); background:#fff; font:800 1.25rem Georgia,serif; }
+        .home-link { color:#dbeafe; font-size:.9rem; font-weight:700; text-decoration:none; }
+        .home-link:hover, .home-link:focus-visible { color:#fff; text-decoration:underline; }
+        .hero { color:#fff; background:linear-gradient(125deg,var(--navy),var(--navy-light) 70%,#1e4d83); }
+        .hero-inner { padding:72px 0 68px; }
+        .eyebrow { margin:0 0 14px; color:#93c5fd; font-size:.78rem; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }
+        h1 { margin:0; font-size:clamp(2.5rem,7vw,4.5rem); letter-spacing:-.045em; }
+        .hero p:last-child { max-width:650px; margin:20px 0 0; color:#cbdcf0; font-size:1.08rem; line-height:1.7; }
+        main { flex:1; }
+        .content { padding:64px 0 80px; }
+        .section-heading { margin-bottom:28px; }
+        .section-heading h2 { margin:0 0 10px; color:var(--navy); font-size:clamp(1.8rem,4vw,2.5rem); }
+        .section-heading p { margin:0; color:var(--muted); line-height:1.65; }
+        .game-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; }
+        .game-card { min-height:310px; display:flex; flex-direction:column; padding:32px; border:1px solid var(--line); border-radius:14px; background:var(--surface); box-shadow:0 12px 32px rgba(15,39,71,.08); text-decoration:none; transition:transform .18s,border-color .18s,box-shadow .18s; }
+        .game-card:hover, .game-card:focus-visible { transform:translateY(-4px); border-color:#93b4e8; box-shadow:0 18px 38px rgba(15,39,71,.14); outline:none; }
+        .game-icon { width:64px; height:64px; display:grid; place-items:center; margin-bottom:28px; border-radius:16px; color:var(--blue); background:#eff6ff; font-size:2rem; font-weight:900; }
+        .game-card h2 { margin:0 0 12px; color:var(--navy); font-size:1.45rem; }
+        .game-card p { margin:0; color:var(--muted); line-height:1.7; }
+        .tags { display:flex; flex-wrap:wrap; gap:8px; margin:20px 0 0; }
+        .tag { padding:6px 9px; border-radius:999px; color:#1d4ed8; background:#eff6ff; font-size:.72rem; font-weight:800; }
+        .play { display:inline-flex; align-items:center; gap:8px; margin-top:auto; padding-top:26px; color:var(--blue); font-size:.9rem; font-weight:850; }
+        footer { padding:25px 0; border-top:1px solid var(--line); color:var(--muted); background:#fff; font-size:.82rem; }
+        @media (max-width:700px) { .game-grid { grid-template-columns:1fr; } .hero-inner { padding:54px 0; } .content { padding:44px 0 60px; } }
+        @media (max-width:480px) { .nav,.hero-inner,.content,.footer-inner { width:min(100% - 24px,1120px); } .game-card { min-height:280px; padding:24px; } }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="nav" aria-label="Games navigation">
+            <a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">Σ</span> MathToolsHub</a>
+            <a class="home-link" href="../index.html">← Home</a>
+        </nav>
+    </header>
+    <main>
+        <section class="hero">
+            <div class="hero-inner">
+                <p class="eyebrow">Learn through play</p>
+                <h1>Mathematics Games</h1>
+                <p>Choose a game, practise essential mathematics skills, and challenge yourself through interactive play.</p>
+            </div>
+        </section>
+        <section class="content" aria-labelledby="games-heading">
+            <div class="section-heading">
+                <h2 id="games-heading">Choose your game</h2>
+                <p>Each game turns mathematics practice into a different kind of challenge.</p>
+            </div>
+            <div class="game-grid">
+                <a class="game-card" href="math-crush/">
+                    <div class="game-icon" aria-hidden="true">×</div>
+                    <h2>CJMath EquaGems</h2>
+                    <p>Match mathematical expressions with equal answers to build speed, accuracy, and number sense.</p>
+                    <div class="tags"><span class="tag">Puzzle</span><span class="tag">Mental maths</span><span class="tag">Speed</span></div>
+                    <span class="play">Play CJMath EquaGems <span aria-hidden="true">→</span></span>
+                </a>
+                <a class="game-card" href="math-kingdom-defender/">
+                    <div class="game-icon" aria-hidden="true">🏰</div>
+                    <h2>Math Kingdom Defender</h2>
+                    <p>Solve equations, power your towers, earn upgrades, and protect the kingdom from approaching enemies.</p>
+                    <div class="tags"><span class="tag">Strategy</span><span class="tag">Operations</span><span class="tag">Defence</span></div>
+                    <span class="play">Play Math Kingdom Defender <span aria-hidden="true">→</span></span>
+                </a>
+            </div>
+        </section>
+    </main>
+    <footer><div class="footer-inner">© 2026 MathToolsHub</div></footer>
+</body>
+</html>
