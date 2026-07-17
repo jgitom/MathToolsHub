@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MathToolsHub Chess</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --light: #f0d9b5;
+      --dark: #b58863;
+      --selected: #facc15;
+      --legal: rgba(34, 197, 94, 0.78);
+      --capture: rgba(239, 68, 68, 0.85);
+      --check: #ef4444;
+      --accent: #38bdf8;
+    }
+
+    * { box-sizing: border-box; }
+
+    .back-link {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 10;
+      padding: 9px 14px;
+      border: 1px solid rgba(255, 255, 255, .25);
+      border-radius: 999px;
+      color: var(--text);
+      background: rgba(15, 23, 42, .88);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .back-link:hover,
+    .back-link:focus-visible { background: var(--panel-2); }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, rgba(56, 189, 248, 0.16), transparent 34%),
+        linear-gradient(135deg, #020617, var(--bg));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .app {
+      width: min(1120px, 100%);
+      display: grid;
+      grid-template-columns: minmax(300px, 720px) minmax(260px, 340px);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .game-card, .side-card {
+      background: rgba(17, 24, 39, 0.94);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 22px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.38);
+      overflow: hidden;
+    }
+
+    .header {
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.3rem, 3vw, 2rem);
+    }
+
+    .brand p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .status-badge {
+      min-width: 145px;
+      text-align: center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.14);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #bae6fd;
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    .board-wrap {
+      position: relative;
+      padding: 22px 22px 38px;
+      perspective: 1250px;
+      perspective-origin: 50% 38%;
+    }
+
+    .board {
+      width: 100%;
+      aspect-ratio: 1;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 7px solid #6b4226;
+      transform: rotateX(7deg);
+      transform-origin: center bottom;
+      box-shadow:
+        0 8px 0 #4a2b18,
+        0 14px 0 #321c10,
+        0 30px 42px rgba(0,0,0,.58),
+        inset 0 0 0 2px rgba(255,255,255,.16);
+      user-select: none;
+      touch-action: manipulation;
+      background: #6b4226;
+    }
+
+    .square {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      aspect-ratio: 1;
+      cursor: pointer;
+      font-size: clamp(2rem, 7vw, 4.8rem);
+      transition: filter 0.15s ease, transform 0.1s ease;
+    }
+
+    .square:hover { filter: brightness(1.08); }
+    .square:active { transform: scale(0.98); }
+    .square.light {
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.3),transparent 42%),
+        linear-gradient(315deg,rgba(91,54,30,.13),transparent 45%),
+        var(--light);
+      box-shadow: inset 1px 1px 1px rgba(255,255,255,.34), inset -2px -2px 3px rgba(91,54,30,.16);
+    }
+    .square.dark {
+      background:
+        linear-gradient(145deg,rgba(255,255,255,.16),transparent 40%),
+        linear-gradient(315deg,rgba(55,31,17,.2),transparent 48%),
+        var(--dark);
+      box-shadow: inset 1px 1px 1px rgba(255,255,255,.18), inset -2px -2px 3px rgba(55,31,17,.22);
+    }
+    .square.selected { box-shadow: inset 0 0 0 6px var(--selected); }
+    .square.in-check { box-shadow: inset 0 0 0 7px var(--check); }
+
+    .square.legal::after {
+      content: "";
+      width: 22%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: var(--legal);
+      position: absolute;
+      z-index: 1;
+      box-shadow: 0 0 0 5px rgba(255,255,255,0.2);
+    }
+
+    .square.capture::after {
+      content: "";
+      position: absolute;
+      inset: 7%;
+      border: 6px solid var(--capture);
+      border-radius: 50%;
+      z-index: 1;
+    }
+
+    .piece {
+      position: relative;
+      z-index: 2;
+      line-height: 1;
+      transform: translateY(-4%) scaleY(1.08);
+      transform-origin: center bottom;
+      filter: drop-shadow(0 3px 0 rgba(0,0,0,.38)) drop-shadow(0 8px 5px rgba(0,0,0,.28));
+      transition: transform .16s ease, filter .16s ease;
+    }
+
+    .square:hover .piece { transform: translateY(-10%) scaleY(1.1) scale(1.04); filter: drop-shadow(0 4px 0 rgba(0,0,0,.4)) drop-shadow(0 11px 7px rgba(0,0,0,.3)); }
+
+    .piece.white {
+      color: #fffdf4;
+      text-shadow:
+        0 1px 0 #d7d2c5,
+        0 2px 0 #b9b4a9,
+        0 3px 0 #817d75,
+        0 0 2px #151515;
+    }
+
+    .piece.black {
+      color: #18202d;
+      text-shadow:
+        0 1px 0 #4c596b,
+        0 2px 0 #0a0f18,
+        0 3px 0 #020409,
+        0 0 1px rgba(255,255,255,.35);
+    }
+
+    .coord {
+      position: absolute;
+      font-size: clamp(0.55rem, 1.8vw, 0.8rem);
+      font-weight: 800;
+      opacity: 0.74;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .rank { top: 3px; left: 5px; }
+    .file { bottom: 3px; right: 5px; }
+    .light .coord { color: #7c4a28; }
+    .dark .coord { color: #f8e6cf; }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0 18px 18px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 11px 15px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+
+    button:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+
+    .primary { background: var(--accent); color: #082f49; }
+    .secondary { background: #334155; color: white; }
+    .danger { background: #dc2626; color: white; }
+
+    .side-card { padding: 20px; }
+    .side-card h2 { margin: 0 0 16px; font-size: 1.18rem; }
+
+    .info-box {
+      background: var(--panel-2);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.12);
+    }
+
+    .info-label {
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 5px;
+    }
+
+    .info-value { font-weight: 850; font-size: 1.05rem; }
+
+    .game-select {
+      width: 100%;
+      margin-top: 6px;
+      padding: 10px 12px;
+      border: 1px solid rgba(148,163,184,.25);
+      border-radius: 10px;
+      color: var(--text);
+      background: #0f172a;
+      font: inherit;
+      font-weight: 750;
+      outline: none;
+    }
+    .game-select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(56,189,248,.14); }
+    .thinking { animation: thinkingPulse 1s ease-in-out infinite; }
+    @keyframes thinkingPulse { 50% { opacity: .55; } }
+
+    .captured-row {
+      min-height: 46px;
+      font-size: 1.8rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+      align-items: center;
+    }
+
+    .move-list {
+      max-height: 370px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .move-entry {
+      display: grid;
+      grid-template-columns: 36px 1fr 1fr;
+      gap: 6px;
+      padding: 8px 6px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.9rem;
+    }
+
+    .move-no { color: var(--muted); }
+
+    .empty-message {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .promotion-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(2, 6, 23, 0.76);
+      z-index: 20;
+      padding: 20px;
+    }
+
+    .promotion-modal.show { display: flex; }
+
+    .promotion-box {
+      width: min(420px, 100%);
+      background: #111827;
+      border-radius: 20px;
+      padding: 22px;
+      border: 1px solid rgba(148,163,184,0.25);
+      text-align: center;
+    }
+
+    .promotion-options {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .promotion-piece {
+      background: #334155;
+      color: white;
+      font-size: 2.6rem;
+      padding: 14px 6px;
+    }
+
+    @media (max-width: 900px) {
+      .app { grid-template-columns: 1fr; }
+      .side-card { order: 2; }
+      .move-list { max-height: 240px; }
+    }
+
+    @media (max-width: 520px) {
+      body { padding: 8px; }
+      .header { align-items: flex-start; flex-direction: column; }
+      .status-badge { min-width: 0; }
+      .board-wrap { padding: 10px 10px 25px; perspective: 900px; }
+      .board { transform: rotateX(4deg); border-width: 5px; box-shadow: 0 5px 0 #4a2b18,0 9px 0 #321c10,0 20px 28px rgba(0,0,0,.5); }
+      .controls { padding: 0 9px 12px; }
+      .square.capture::after { border-width: 4px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="../index.html">← MathToolsHub</a>
+  <main class="app">
+    <section class="game-card">
+      <header class="header">
+        <div class="brand">
+          <h1>♟️ MathToolsHub Chess</h1>
+          <p id="gameSubtitle">Play chess against the computer</p>
+        </div>
+        <div id="statusBadge" class="status-badge">White to move</div>
+      </header>
+
+      <div class="board-wrap">
+        <div id="board" class="board" aria-label="Chess board"></div>
+      </div>
+
+      <div class="controls">
+        <button class="primary" id="newGameBtn">New Game</button>
+        <button class="secondary" id="undoBtn">Undo Move</button>
+        <button class="secondary" id="flipBtn">Flip Board</button>
+        <button class="danger" id="resignBtn">Resign</button>
+      </div>
+    </section>
+
+    <aside class="side-card">
+      <h2>Game Information</h2>
+
+      <div class="info-box">
+        <div class="info-label">Game mode</div>
+        <select id="gameMode" class="game-select">
+          <option value="computer" selected>Human vs Computer</option>
+          <option value="human">Human vs Human</option>
+        </select>
+        <select id="difficulty" class="game-select" aria-label="Computer difficulty">
+          <option value="beginner">Beginner</option>
+          <option value="easy">Easy</option>
+          <option value="medium" selected>Medium</option>
+          <option value="hard">Hard</option>
+          <option value="expert">Expert</option>
+        </select>
+      </div>
+
+      <div class="info-box">
+        <div class="info-label">Chess piece style</div>
+        <select id="pieceStyle" class="game-select">
+          <option value="classic" selected>Classic</option>
+          <option value="solid">Solid 3D</option>
+          <option value="letters">Letters (K, Q, R…)</option>
+        </select>
+      </div>
+
+      <div class="info-box">
+        <div class="info-label">Current turn</div>
+        <div id="turnText" class="info-value">White</div>
+      </div>
+
+      <div class="info-box">
+        <div class="info-label">Captured by White</div>
+        <div id="capturedWhite" class="captured-row">—</div>
+      </div>
+
+      <div class="info-box">
+        <div class="info-label">Captured by Black</div>
+        <div id="capturedBlack" class="captured-row">—</div>
+      </div>
+
+      <div class="info-box">
+        <div class="info-label">Move history</div>
+        <div id="moveList" class="move-list">
+          <div class="empty-message">Select a piece, then choose a highlighted square.</div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <div id="promotionModal" class="promotion-modal">
+    <div class="promotion-box">
+      <h2>Promote pawn</h2>
+      <p>Choose the new piece.</p>
+      <div id="promotionOptions" class="promotion-options"></div>
+    </div>
+  </div>
+
+  <script>
+    const pieceStyles = {
+      classic: {
+        white: { king: '♔', queen: '♕', rook: '♖', bishop: '♗', knight: '♘', pawn: '♙' },
+        black: { king: '♚', queen: '♛', rook: '♜', bishop: '♝', knight: '♞', pawn: '♟' }
+      },
+      solid: {
+        white: { king: '♚', queen: '♛', rook: '♜', bishop: '♝', knight: '♞', pawn: '♟' },
+        black: { king: '♚', queen: '♛', rook: '♜', bishop: '♝', knight: '♞', pawn: '♟' }
+      },
+      letters: {
+        white: { king: 'K', queen: 'Q', rook: 'R', bishop: 'B', knight: 'N', pawn: 'P' },
+        black: { king: 'K', queen: 'Q', rook: 'R', bishop: 'B', knight: 'N', pawn: 'P' }
+      }
+    };
+    let symbols = pieceStyles.classic;
+
+    const pieceLetter = { king: 'K', queen: 'Q', rook: 'R', bishop: 'B', knight: 'N', pawn: '' };
+    const files = ['a','b','c','d','e','f','g','h'];
+
+    let board = [];
+    let turn = 'white';
+    let selected = null;
+    let legalTargets = [];
+    let moveHistory = [];
+    let stateHistory = [];
+    let captured = { white: [], black: [] };
+    let flipped = false;
+    let gameOver = false;
+    let pendingPromotion = null;
+    let gameMode = 'computer';
+    let computerColor = 'black';
+    let computerThinking = false;
+    let computerTimer = null;
+
+    const boardEl = document.getElementById('board');
+    const statusBadge = document.getElementById('statusBadge');
+    const turnText = document.getElementById('turnText');
+    const moveList = document.getElementById('moveList');
+    const capturedWhiteEl = document.getElementById('capturedWhite');
+    const capturedBlackEl = document.getElementById('capturedBlack');
+    const promotionModal = document.getElementById('promotionModal');
+    const promotionOptions = document.getElementById('promotionOptions');
+    const gameModeSelect = document.getElementById('gameMode');
+    const difficultySelect = document.getElementById('difficulty');
+    const gameSubtitle = document.getElementById('gameSubtitle');
+    const pieceStyleSelect = document.getElementById('pieceStyle');
+
+    function createPiece(type, color) {
+      return { type, color, moved: false };
+    }
+
+    function initialBoard() {
+      const empty = () => Array(8).fill(null);
+      const b = Array.from({ length: 8 }, empty);
+      const order = ['rook','knight','bishop','queen','king','bishop','knight','rook'];
+      b[0] = order.map(type => createPiece(type, 'black'));
+      b[1] = Array.from({ length: 8 }, () => createPiece('pawn', 'black'));
+      b[6] = Array.from({ length: 8 }, () => createPiece('pawn', 'white'));
+      b[7] = order.map(type => createPiece(type, 'white'));
+      return b;
+    }
+
+    function cloneBoard(source = board) {
+      return source.map(row => row.map(piece => piece ? { ...piece } : null));
+    }
+
+    function newGame() {
+      clearTimeout(computerTimer);
+      board = initialBoard();
+      turn = 'white';
+      selected = null;
+      legalTargets = [];
+      moveHistory = [];
+      stateHistory = [];
+      captured = { white: [], black: [] };
+      flipped = false;
+      gameOver = false;
+      pendingPromotion = null;
+      computerThinking = false;
+      statusBadge.classList.remove('thinking');
+      promotionModal.classList.remove('show');
+      render();
+    }
+
+    function isInside(r, c) {
+      return r >= 0 && r < 8 && c >= 0 && c < 8;
+    }
+
+    function opposite(color) {
+      return color === 'white' ? 'black' : 'white';
+    }
+
+    function squareName(r, c) {
+      return files[c] + (8 - r);
+    }
+
+    function findKing(color, state = board) {
+      for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+          const p = state[r][c];
+          if (p && p.color === color && p.type === 'king') return { r, c };
+        }
+      }
+      return null;
+    }
+
+    function isSquareAttacked(r, c, byColor, state = board) {
+      for (let rr = 0; rr < 8; rr++) {
+        for (let cc = 0; cc < 8; cc++) {
+          const p = state[rr][cc];
+          if (!p || p.color !== byColor) continue;
+          const attacks = pseudoMoves(rr, cc, state, true);
+          if (attacks.some(m => m.r === r && m.c === c)) return true;
+        }
+      }
+      return false;
+    }
+
+    function isInCheck(color, state = board) {
+      const king = findKing(color, state);
+      return king ? isSquareAttacked(king.r, king.c, opposite(color), state) : false;
+    }
+
+    function pseudoMoves(r, c, state = board, attacksOnly = false) {
+      const piece = state[r][c];
+      if (!piece) return [];
+      const moves = [];
+      const add = (rr, cc, extra = {}) => {
+        if (isInside(rr, cc)) moves.push({ r: rr, c: cc, ...extra });
+      };
+
+      if (piece.type === 'pawn') {
+        const dir = piece.color === 'white' ? -1 : 1;
+        const startRow = piece.color === 'white' ? 6 : 1;
+
+        for (const dc of [-1, 1]) {
+          const rr = r + dir, cc = c + dc;
+          if (!isInside(rr, cc)) continue;
+          if (attacksOnly) add(rr, cc);
+          else if (state[rr][cc] && state[rr][cc].color !== piece.color) add(rr, cc);
+        }
+
+        if (!attacksOnly && isInside(r + dir, c) && !state[r + dir][c]) {
+          add(r + dir, c);
+          if (r === startRow && !state[r + 2 * dir][c]) add(r + 2 * dir, c);
+        }
+      }
+
+      if (piece.type === 'knight') {
+        const offsets = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+        for (const [dr, dc] of offsets) {
+          const rr = r + dr, cc = c + dc;
+          if (!isInside(rr, cc)) continue;
+          if (!state[rr][cc] || state[rr][cc].color !== piece.color) add(rr, cc);
+        }
+      }
+
+      if (['bishop','rook','queen'].includes(piece.type)) {
+        const dirs = [];
+        if (['bishop','queen'].includes(piece.type)) dirs.push([-1,-1],[-1,1],[1,-1],[1,1]);
+        if (['rook','queen'].includes(piece.type)) dirs.push([-1,0],[1,0],[0,-1],[0,1]);
+        for (const [dr, dc] of dirs) {
+          let rr = r + dr, cc = c + dc;
+          while (isInside(rr, cc)) {
+            if (!state[rr][cc]) add(rr, cc);
+            else {
+              if (state[rr][cc].color !== piece.color) add(rr, cc);
+              break;
+            }
+            rr += dr; cc += dc;
+          }
+        }
+      }
+
+      if (piece.type === 'king') {
+        for (let dr = -1; dr <= 1; dr++) {
+          for (let dc = -1; dc <= 1; dc++) {
+            if (dr === 0 && dc === 0) continue;
+            const rr = r + dr, cc = c + dc;
+            if (isInside(rr, cc) && (!state[rr][cc] || state[rr][cc].color !== piece.color)) add(rr, cc);
+          }
+        }
+
+        if (!attacksOnly && !piece.moved && !isInCheck(piece.color, state)) {
+          for (const side of ['king','queen']) {
+            const rookCol = side === 'king' ? 7 : 0;
+            const rook = state[r][rookCol];
+            if (!rook || rook.type !== 'rook' || rook.color !== piece.color || rook.moved) continue;
+            const path = side === 'king' ? [5,6] : [1,2,3];
+            if (path.some(col => state[r][col])) continue;
+            const kingPath = side === 'king' ? [5,6] : [3,2];
+            if (kingPath.some(col => isSquareAttacked(r, col, opposite(piece.color), state))) continue;
+            add(r, side === 'king' ? 6 : 2, { castle: side });
+          }
+        }
+      }
+
+      return moves;
+    }
+
+    function legalMoves(r, c) {
+      const piece = board[r][c];
+      if (!piece) return [];
+      return pseudoMoves(r, c).filter(move => {
+        const test = cloneBoard();
+        applyMoveToBoard(test, r, c, move.r, move.c, move);
+        return !isInCheck(piece.color, test);
+      });
+    }
+
+    function applyMoveToBoard(state, fr, fc, tr, tc, moveMeta = {}) {
+      const piece = state[fr][fc];
+      state[tr][tc] = { ...piece, moved: true };
+      state[fr][fc] = null;
+
+      if (piece.type === 'king' && Math.abs(tc - fc) === 2) {
+        if (tc === 6) {
+          state[tr][5] = { ...state[tr][7], moved: true };
+          state[tr][7] = null;
+        } else if (tc === 2) {
+          state[tr][3] = { ...state[tr][0], moved: true };
+          state[tr][0] = null;
+        }
+      }
+    }
+
+    function allLegalMoves(color) {
+      const result = [];
+      for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+          const p = board[r][c];
+          if (p && p.color === color) {
+            for (const move of legalMoves(r, c)) result.push({ from: {r,c}, to: move });
+          }
+        }
+      }
+      return result;
+    }
+
+    function handleSquareClick(r, c) {
+      if (gameOver || pendingPromotion || computerThinking) return;
+      if (gameMode === 'computer' && turn === computerColor) return;
+      const piece = board[r][c];
+
+      if (selected) {
+        const target = legalTargets.find(m => m.r === r && m.c === c);
+        if (target) {
+          makeMove(selected.r, selected.c, r, c, target);
+          return;
+        }
+      }
+
+      if (piece && piece.color === turn) {
+        selected = { r, c };
+        legalTargets = legalMoves(r, c);
+      } else {
+        selected = null;
+        legalTargets = [];
+      }
+      render();
+    }
+
+    function makeMove(fr, fc, tr, tc, meta = {}) {
+      const moving = board[fr][fc];
+      const taken = board[tr][tc];
+
+      stateHistory.push({
+        board: cloneBoard(),
+        turn,
+        captured: { white: [...captured.white], black: [...captured.black] },
+        moveHistory: moveHistory.map(m => ({ ...m }))
+      });
+
+      if (taken) captured[moving.color].push(taken);
+
+      const notationBase = `${pieceLetter[moving.type]}${squareName(fr,fc)}-${squareName(tr,tc)}`;
+      applyMoveToBoard(board, fr, fc, tr, tc, meta);
+
+      const movedPiece = board[tr][tc];
+      if (movedPiece.type === 'pawn' && (tr === 0 || tr === 7)) {
+        if (gameMode === 'computer' && moving.color === computerColor) {
+          board[tr][tc].type = 'queen';
+          finishTurn(notationBase + '=Q');
+          return;
+        }
+        pendingPromotion = { tr, tc, notationBase, color: moving.color };
+        showPromotion(moving.color);
+        selected = null;
+        legalTargets = [];
+        render();
+        return;
+      }
+
+      finishTurn(notationBase);
+    }
+
+    function showPromotion(color) {
+      promotionOptions.innerHTML = '';
+      ['queen','rook','bishop','knight'].forEach(type => {
+        const btn = document.createElement('button');
+        btn.className = 'promotion-piece';
+        btn.textContent = symbols[color][type];
+        btn.title = type;
+        btn.addEventListener('click', () => promotePawn(type));
+        promotionOptions.appendChild(btn);
+      });
+      promotionModal.classList.add('show');
+    }
+
+    function promotePawn(type) {
+      if (!pendingPromotion) return;
+      board[pendingPromotion.tr][pendingPromotion.tc].type = type;
+      const notation = pendingPromotion.notationBase + '=' + pieceLetter[type];
+      pendingPromotion = null;
+      promotionModal.classList.remove('show');
+      finishTurn(notation);
+    }
+
+    function finishTurn(notationBase) {
+      turn = opposite(turn);
+      selected = null;
+      legalTargets = [];
+
+      const check = isInCheck(turn);
+      const noMoves = allLegalMoves(turn).length === 0;
+      let notation = notationBase + (check ? '+' : '');
+      moveHistory.push({ color: opposite(turn), notation });
+
+      if (noMoves) {
+        gameOver = true;
+        if (check) {
+          statusBadge.textContent = `${capitalize(opposite(turn))} wins by checkmate`;
+          moveHistory[moveHistory.length - 1].notation = notationBase + '#';
+        } else {
+          statusBadge.textContent = 'Draw by stalemate';
+        }
+      }
+      render();
+      if (!gameOver && gameMode === 'computer' && turn === computerColor) scheduleComputerMove();
+    }
+
+    const pieceValue = { pawn: 100, knight: 320, bishop: 330, rook: 500, queen: 900, king: 20000 };
+
+    function scoreComputerMove(candidate, difficulty = 'medium') {
+      const moving = board[candidate.from.r][candidate.from.c];
+      const target = board[candidate.to.r][candidate.to.c];
+      let score = Math.random() * 18;
+      if (target) score += pieceValue[target.type] - pieceValue[moving.type] * 0.08;
+
+      const test = cloneBoard();
+      applyMoveToBoard(test, candidate.from.r, candidate.from.c, candidate.to.r, candidate.to.c, candidate.to);
+      if (isInCheck(opposite(computerColor), test)) score += 55;
+      const centerDistance = Math.abs(3.5 - candidate.to.r) + Math.abs(3.5 - candidate.to.c);
+      score += (7 - centerDistance) * 3;
+      if (moving.type === 'pawn' && (candidate.to.r === 0 || candidate.to.r === 7)) score += 800;
+
+      if (difficulty === 'expert') {
+        if (isSquareAttacked(candidate.to.r, candidate.to.c, opposite(computerColor), test)) {
+          score -= pieceValue[moving.type] * 0.72;
+        }
+        const ownKing = findKing(computerColor, test);
+        if (ownKing && !isSquareAttacked(ownKing.r, ownKing.c, opposite(computerColor), test)) score += 12;
+        if (moving.type === 'king') score -= 10;
+      }
+      return score;
+    }
+
+    function chooseComputerMove() {
+      const moves = allLegalMoves(computerColor);
+      if (!moves.length) return null;
+      const difficulty = difficultySelect.value;
+      if (difficulty === 'beginner') return moves[Math.floor(Math.random() * moves.length)];
+      const ranked = moves.map(move => ({ move, score: scoreComputerMove(move, difficulty) })).sort((a,b) => b.score - a.score);
+      if (difficulty === 'easy') {
+        const poolSize = Math.max(1, Math.ceil(ranked.length * .55));
+        return ranked[Math.floor(Math.random() * poolSize)].move;
+      }
+      if (difficulty === 'medium') return ranked[Math.floor(Math.random() * Math.min(3, ranked.length))].move;
+      return ranked[0].move;
+    }
+
+    function scheduleComputerMove() {
+      clearTimeout(computerTimer);
+      computerThinking = true;
+      statusBadge.textContent = 'Computer is thinking…';
+      statusBadge.classList.add('thinking');
+      computerTimer = setTimeout(() => {
+        if (gameOver || gameMode !== 'computer' || turn !== computerColor) {
+          computerThinking = false;
+          statusBadge.classList.remove('thinking');
+          return;
+        }
+        const move = chooseComputerMove();
+        computerThinking = false;
+        statusBadge.classList.remove('thinking');
+        if (move) makeMove(move.from.r, move.from.c, move.to.r, move.to.c, move.to);
+      }, 550);
+    }
+
+    function undoMove() {
+      if (!stateHistory.length || pendingPromotion || computerThinking) return;
+      let previous = stateHistory.pop();
+      if (gameMode === 'computer' && previous.turn === computerColor && stateHistory.length) previous = stateHistory.pop();
+      board = previous.board;
+      turn = previous.turn;
+      captured = previous.captured;
+      moveHistory = previous.moveHistory;
+      selected = null;
+      legalTargets = [];
+      gameOver = false;
+      render();
+    }
+
+    function resign() {
+      if (gameOver) return;
+      gameOver = true;
+      selected = null;
+      legalTargets = [];
+      statusBadge.textContent = `${capitalize(opposite(turn))} wins by resignation`;
+      render();
+    }
+
+    function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+    function render() {
+      renderBoard();
+      renderSidePanel();
+      if (!gameOver) {
+        const inCheck = isInCheck(turn);
+        if (!computerThinking) statusBadge.textContent = inCheck ? `${capitalize(turn)} is in check` : `${capitalize(turn)} to move`;
+      }
+    }
+
+    function renderBoard() {
+      boardEl.innerHTML = '';
+      const rows = flipped ? [...Array(8).keys()] : [...Array(8).keys()].reverse();
+      const cols = flipped ? [...Array(8).keys()].reverse() : [...Array(8).keys()];
+      const checkKing = isInCheck(turn) ? findKing(turn) : null;
+
+      for (const displayRank of rows) {
+        const r = 7 - displayRank;
+        for (const c of cols) {
+          const square = document.createElement('div');
+          const light = (r + c) % 2 === 0;
+          square.className = `square ${light ? 'light' : 'dark'}`;
+          square.dataset.row = r;
+          square.dataset.col = c;
+
+          if (selected && selected.r === r && selected.c === c) square.classList.add('selected');
+          const target = legalTargets.find(m => m.r === r && m.c === c);
+          if (target) square.classList.add(board[r][c] ? 'capture' : 'legal');
+          if (checkKing && checkKing.r === r && checkKing.c === c) square.classList.add('in-check');
+
+          const piece = board[r][c];
+          if (piece) {
+            const span = document.createElement('span');
+            span.className = `piece ${piece.color}`;
+            span.textContent = symbols[piece.color][piece.type];
+            square.appendChild(span);
+          }
+
+          const rankLabelNeeded = (!flipped && c === 0) || (flipped && c === 7);
+          const fileLabelNeeded = (!flipped && r === 7) || (flipped && r === 0);
+          if (rankLabelNeeded) {
+            const rank = document.createElement('span');
+            rank.className = 'coord rank';
+            rank.textContent = 8 - r;
+            square.appendChild(rank);
+          }
+          if (fileLabelNeeded) {
+            const file = document.createElement('span');
+            file.className = 'coord file';
+            file.textContent = files[c];
+            square.appendChild(file);
+          }
+
+          square.addEventListener('click', () => handleSquareClick(r, c));
+          boardEl.appendChild(square);
+        }
+      }
+    }
+
+    function renderSidePanel() {
+      turnText.textContent = gameOver ? 'Game over' : capitalize(turn);
+
+      capturedWhiteEl.innerHTML = captured.white.length
+        ? captured.white.map(p => `<span title="${p.type}">${symbols[p.color][p.type]}</span>`).join('')
+        : '—';
+      capturedBlackEl.innerHTML = captured.black.length
+        ? captured.black.map(p => `<span title="${p.type}">${symbols[p.color][p.type]}</span>`).join('')
+        : '—';
+
+      if (!moveHistory.length) {
+        moveList.innerHTML = '<div class="empty-message">Select a piece, then choose a highlighted square.</div>';
+        return;
+      }
+
+      let html = '';
+      for (let i = 0; i < moveHistory.length; i += 2) {
+        const whiteMove = moveHistory[i]?.notation || '';
+        const blackMove = moveHistory[i + 1]?.notation || '';
+        html += `<div class="move-entry"><span class="move-no">${Math.floor(i / 2) + 1}.</span><span>${whiteMove}</span><span>${blackMove}</span></div>`;
+      }
+      moveList.innerHTML = html;
+      moveList.scrollTop = moveList.scrollHeight;
+    }
+
+    document.getElementById('newGameBtn').addEventListener('click', newGame);
+    document.getElementById('undoBtn').addEventListener('click', undoMove);
+    document.getElementById('flipBtn').addEventListener('click', () => { flipped = !flipped; render(); });
+    document.getElementById('resignBtn').addEventListener('click', resign);
+    gameModeSelect.addEventListener('change', () => {
+      gameMode = gameModeSelect.value;
+      difficultySelect.style.display = gameMode === 'computer' ? 'block' : 'none';
+      gameSubtitle.textContent = gameMode === 'computer' ? 'Play chess against the computer' : 'Two-player chess on one device';
+      newGame();
+    });
+    pieceStyleSelect.addEventListener('change', () => {
+      symbols = pieceStyles[pieceStyleSelect.value];
+      boardEl.dataset.pieceStyle = pieceStyleSelect.value;
+      render();
+    });
+
+    newGame();
+  </script>
+</body>
+</html>
