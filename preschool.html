@@ -554,9 +554,7 @@ el("startBtn").addEventListener("click",()=>{
   showScreen("levelScreen");
 });
 el("backBtn").addEventListener("click",()=>{
-  const cameFromAnotherPage=document.referrer && document.referrer!==window.location.href;
-  if(cameFromAnotherPage) window.history.back();
-  else window.location.href="quizzes.html";
+  window.location.href="quizzes.html";
 });
 el("homeBtn").addEventListener("click",()=>showScreen("startScreen"));
 el("backLevelsBtn").addEventListener("click",()=>{renderLevels();showScreen("levelScreen")});
