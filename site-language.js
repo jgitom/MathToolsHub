@@ -72,6 +72,8 @@
     }
     return source;
   }
+  Object.assign(translations.ms, { "Internet Speed Test":"Ujian Kelajuan Internet", "Measure connection latency, jitter, and download speed directly in your browser.":"Ukur kependaman sambungan, getaran dan kelajuan muat turun terus dalam pelayar anda.", "Internet":"Internet", "Download speed":"Kelajuan muat turun", "Privacy friendly":"Mesra privasi", "Open speed test":"Buka ujian kelajuan" });
+  Object.assign(translations.zh, { "Internet Speed Test":"网速测试", "Measure connection latency, jitter, and download speed directly in your browser.":"直接在浏览器中测量连接延迟、抖动和下载速度。", "Internet":"互联网", "Download speed":"下载速度", "Privacy friendly":"保护隐私", "Open speed test":"打开网速测试" });
   const originals = new WeakMap();
   function apply(language) {
     document.documentElement.lang = language === "zh" ? "zh-CN" : language;
