@@ -6,9 +6,9 @@ The public browser configuration is already stored in `supabase-config.js`. It c
 
 1. Open the Supabase project dashboard.
 2. Select **SQL Editor** and create a new query.
-3. Copy all SQL from `supabase/schema.sql` into the editor.
-4. Select **Run**.
-5. Open **Database > Tables** and confirm `profiles` and `learning_progress` exist with RLS enabled.
+3. Copy all SQL from `supabase/schema.sql` into the editor and select **Run**.
+4. Create another query using `supabase/catalogue.sql` and select **Run**.
+5. Open **Database > Tables** and confirm `profiles`, `learning_progress`, and `catalogue_items` exist with RLS enabled.
 
 ## Authentication URL setup
 
@@ -27,4 +27,8 @@ For local testing, also add `http://127.0.0.1:8000/account.html` or the exact lo
 - Per-user profiles protected by Row Level Security
 - Per-user learning progress table protected by Row Level Security
 
-Individual games and quizzes still use local storage. They can be migrated to `learning_progress` incrementally after the schema is installed.
+Games and quizzes keep fast local saves while `supabase-progress.js` synchronises connected activities to `learning_progress`.
+
+## Database-driven catalogue
+
+Run `supabase/catalogue.sql` once in the SQL Editor. Afterwards, manage catalogue rows in **Table Editor > catalogue_items**. The built-in HTML remains as an automatic fallback.
