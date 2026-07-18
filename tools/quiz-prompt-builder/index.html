@@ -353,8 +353,16 @@
       body.printing-certificate .certificate-paper{min-height:170mm;display:flex;flex-direction:column;justify-content:center}
     }
   </style>
+  <meta name="author" content="Juil Gitom">
+  <style id="creator-credit-style">
+    .creator-credit{position:fixed;left:12px;bottom:10px;z-index:9998;display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border:1px solid rgba(148,163,184,.38);border-radius:999px;color:#334155;background:rgba(255,255,255,.9);box-shadow:0 5px 16px rgba(15,23,42,.13);font:600 11px/1.2 Inter,"Segoe UI",Arial,sans-serif;letter-spacing:.01em;backdrop-filter:blur(8px);pointer-events:none}
+    .creator-credit strong{color:#0f2747;font-weight:800}
+    @media(max-width:480px){.creator-credit{left:8px;bottom:7px;padding:5px 8px;font-size:10px}}
+    @media print{.creator-credit{display:none!important}}
+  </style>
 </head>
 <body>
+<div class="creator-credit" role="contentinfo" aria-label="Created by Juil Gitom"><span>Created by</span><strong>Juil Gitom</strong></div>
   <main class="app">
     <section class="hero">
       <a href="../" style="position:absolute;left:18px;top:16px;z-index:5;padding:8px 12px;border-radius:999px;color:#183f9f;background:#fff;text-decoration:none;font-size:13px;font-weight:800;box-shadow:0 5px 14px #17203322">← Tools</a>

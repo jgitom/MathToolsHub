@@ -46,8 +46,16 @@ body{background:radial-gradient(circle at 50% -20%,#fff 0,#dff4ff 28%,#f8f1de 72
 .tower.firing{animation:towerFire .32s ease-out}@keyframes towerFire{0%{scale:1}45%{scale:1.25;filter:brightness(1.5) drop-shadow(0 0 14px #ffe45c)}100%{scale:1}}
 @media(max-width:900px){.map{height:500px}}@media(max-width:600px){.map{height:400px}.sun{width:45px;height:45px}.tree-line{font-size:1.5rem}.map-legend{display:none}.answer-row{grid-template-columns:1fr}.answer-row .primary{min-height:54px}}
 </style>
+  <meta name="author" content="Juil Gitom">
+  <style id="creator-credit-style">
+    .creator-credit{position:fixed;left:12px;bottom:10px;z-index:9998;display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border:1px solid rgba(148,163,184,.38);border-radius:999px;color:#334155;background:rgba(255,255,255,.9);box-shadow:0 5px 16px rgba(15,23,42,.13);font:600 11px/1.2 Inter,"Segoe UI",Arial,sans-serif;letter-spacing:.01em;backdrop-filter:blur(8px);pointer-events:none}
+    .creator-credit strong{color:#0f2747;font-weight:800}
+    @media(max-width:480px){.creator-credit{left:8px;bottom:7px;padding:5px 8px;font-size:10px}}
+    @media print{.creator-credit{display:none!important}}
+  </style>
 </head>
 <body>
+<div class="creator-credit" role="contentinfo" aria-label="Created by Juil Gitom"><span>Created by</span><strong>Juil Gitom</strong></div>
 <header><div class="header-inner"><div><h1>🏰 Math Kingdom Defender</h1><p>Solve equations, power your towers, and defend the kingdom.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><a href="../" style="display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:999px;background:#fff;color:#1f4d8e;text-decoration:none;font-weight:700">🎮 Games</a><button id="soundBtn" class="secondary">🔊 Sound On</button></div></div></header>
 <div class="container">
 <section class="toolbar"><div><label>Defender Name</label><input id="playerName" placeholder="Enter your name"></div><div><label>Math Topic</label><select id="topic"><option value="mixed">Mixed Operations</option><option value="addition">Addition</option><option value="subtraction">Subtraction</option><option value="multiplication">Multiplication</option><option value="division">Division</option></select></div><div><label>Difficulty</label><select id="difficulty"><option value="1">Apprentice</option><option value="2">Guardian</option><option value="3">Champion</option></select></div></section>
