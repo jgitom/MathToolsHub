@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="author" content="Juil Gitom" />
+  <title>School Management Simulator</title>
+  <style>
+    :root {
+      --bg: #eef5fb;
+      --panel: #ffffff;
+      --primary: #1d4ed8;
+      --primary-2: #2563eb;
+      --success: #15803d;
+      --warning: #d97706;
+      --danger: #b91c1c;
+      --text: #18324a;
+      --muted: #64748b;
+      --border: #dbe6f0;
+      --soft: #f6f9fc;
+      --shadow: 0 18px 45px rgba(30, 64, 175, 0.10);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(59,130,246,.15), transparent 28%),
+        linear-gradient(180deg, #f9fcff, var(--bg));
+    }
+
+    button, select, input { font: inherit; }
+
+    .app {
+      width: min(1550px, 100%);
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 20px;
+      background: rgba(255,255,255,.95);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 8px;
+      z-index: 30;
+      backdrop-filter: blur(12px);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.45rem, 3vw, 2.1rem);
+    }
+
+    .brand p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 900;
+      transition: .15s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { color: white; background: linear-gradient(135deg, var(--primary-2), var(--primary)); }
+    .btn-secondary { color: var(--text); background: #edf4ff; border: 1px solid var(--border); }
+    .btn-success { color: white; background: var(--success); }
+    .btn-danger { color: white; background: var(--danger); }
+    .btn-warning { color: white; background: var(--warning); }
+    .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(125px, 1fr));
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      padding: 13px;
+      box-shadow: 0 8px 22px rgba(15,23,42,.05);
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .stat-value {
+      margin-top: 5px;
+      font-size: 1.35rem;
+      font-weight: 950;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 290px minmax(0, 1fr) 310px;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(255,255,255,.97);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    .panel h2 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+    }
+
+    .menu {
+      display: grid;
+      gap: 9px;
+    }
+
+    .menu-btn {
+      width: 100%;
+      text-align: left;
+      border: 2px solid transparent;
+      border-radius: 14px;
+      background: var(--soft);
+      padding: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: .15s ease;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .menu-btn:hover,
+    .menu-btn.active {
+      border-color: #93c5fd;
+      background: #eaf2ff;
+    }
+
+    .menu-btn span:first-child { font-size: 1.4rem; }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--soft);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 8px 0;
+      font-size: .92rem;
+    }
+
+    .bar {
+      height: 12px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #e2e8f0;
+      margin-top: 5px;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #60a5fa, #2563eb);
+      transition: width .25s ease;
+    }
+
+    .list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .list-item {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 11px;
+    }
+
+    .item-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      font-weight: 900;
+    }
+
+    .item-meta {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: .83rem;
+      line-height: 1.4;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 8px;
+      background: #eaf2ff;
+      color: var(--primary);
+      font-size: .74rem;
+      font-weight: 900;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .mini-btn {
+      border: 0;
+      border-radius: 9px;
+      padding: 7px 10px;
+      cursor: pointer;
+      font-size: .8rem;
+      font-weight: 900;
+    }
+
+    .mission {
+      background: linear-gradient(135deg, #fff7ed, #fffbeb);
+      border: 1px solid #fed7aa;
+      border-radius: 16px;
+      padding: 13px;
+      margin-bottom: 14px;
+    }
+
+    .mission-title {
+      font-weight: 950;
+      margin-bottom: 6px;
+    }
+
+    .mission ul {
+      margin: 8px 0 0;
+      padding-left: 20px;
+      line-height: 1.55;
+      color: #7c2d12;
+      font-size: .88rem;
+    }
+
+    .log {
+      display: grid;
+      gap: 8px;
+      max-height: 470px;
+      overflow: auto;
+    }
+
+    .log-item {
+      border-left: 4px solid #94a3b8;
+      border-radius: 11px;
+      background: #f8fafc;
+      padding: 10px;
+      font-size: .84rem;
+      line-height: 1.4;
+    }
+
+    .log-item.good { border-left-color: var(--success); }
+    .log-item.bad { border-left-color: var(--danger); }
+    .log-item.info { border-left-color: var(--primary); }
+    .log-item.warn { border-left-color: var(--warning); }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .section-title h2 { margin: 0; }
+
+    .select {
+      border: 1px solid var(--border);
+      background: white;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .modal-wrap {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,.68);
+      display: none;
+      place-items: center;
+      z-index: 100;
+      padding: 18px;
+    }
+
+    .modal-wrap.show { display: grid; }
+
+    .modal {
+      width: min(560px, 100%);
+      max-height: 90vh;
+      overflow: auto;
+      background: white;
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: 0 30px 90px rgba(15,23,42,.35);
+    }
+
+    .modal h2 { margin-top: 0; }
+
+    .option-grid {
+      display: grid;
+      gap: 9px;
+      margin: 14px 0;
+    }
+
+    .option {
+      border: 2px solid var(--border);
+      background: var(--soft);
+      border-radius: 13px;
+      padding: 12px;
+      cursor: pointer;
+      text-align: left;
+      font-weight: 800;
+    }
+
+    .option:hover { border-color: #93c5fd; }
+
+    .notice {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 13px;
+      padding: 12px;
+      line-height: 1.45;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: .8rem;
+      padding: 14px;
+    }
+
+    @media (max-width: 1160px) {
+      .dashboard { grid-template-columns: repeat(4, 1fr); }
+      .layout { grid-template-columns: 250px minmax(0,1fr); }
+      .right { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 760px) {
+      .app { padding: 10px; }
+      .topbar { position: static; flex-direction: column; align-items: flex-start; }
+      .dashboard { grid-template-columns: repeat(2, 1fr); }
+      .layout { grid-template-columns: 1fr; }
+      .content-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>🏫 School Management Simulator</h1>
+        <p>Lead your school. Balance people, performance, and finance.</p>
+      </div>
+      <div class="actions">
+        <a class="btn btn-secondary" href="../" style="text-decoration:none">🎮 Games</a>
+        <button class="btn btn-primary" id="advanceBtn">📅 Advance Month</button>
+        <button class="btn btn-secondary" id="saveBtn">💾 Save</button>
+        <button class="btn btn-danger" id="resetBtn">↺ Reset</button>
+      </div>
+    </header>
+
+    <section class="dashboard">
+      <div class="stat">
+        <div class="stat-label">Budget</div>
+        <div class="stat-value" id="budgetStat">RM250,000</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Students</div>
+        <div class="stat-value" id="studentsStat">420</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Staff</div>
+        <div class="stat-value" id="staffStat">34</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Performance</div>
+        <div class="stat-value" id="performanceStat">68%</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Morale</div>
+        <div class="stat-value" id="moraleStat">72%</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Attendance</div>
+        <div class="stat-value" id="attendanceStat">91%</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Month</div>
+        <div class="stat-value" id="monthStat">Jan, Year 1</div>
+      </div>
+    </section>
+
+    <main class="layout">
+      <aside class="panel">
+        <h2>Management</h2>
+        <div class="menu" id="menu"></div>
+      </aside>
+
+      <section class="panel">
+        <div id="mainContent"></div>
+      </section>
+
+      <aside class="panel right">
+        <div class="mission">
+          <div class="mission-title">🎯 Headteacher Mission</div>
+          <div>Build a stable, high-performing school.</div>
+          <ul id="missionList"></ul>
+          <div class="bar"><div class="bar-fill" id="missionProgress"></div></div>
+        </div>
+
+        <h2>📢 School Updates</h2>
+        <div class="log" id="log"></div>
+      </aside>
+    </main>
+
+    <div class="footer">School Management Simulator MVP • Created by Juil Gitom for MathToolsHub</div>
+  </div>
+
+  <div class="modal-wrap" id="modalWrap">
+    <div class="modal">
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <script>
+    const SAVE_KEY = "schoolManagementSimulatorV1";
+    const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+    const roles = {
+      teacher: { name: "Teacher", salary: 4200, icon: "👩‍🏫", performance: 2.2, morale: 0.8 },
+      counselor: { name: "Counselor", salary: 3800, icon: "🧑‍⚕️", performance: 0.6, morale: 2.2 },
+      admin: { name: "Administrative Officer", salary: 3400, icon: "🗂️", performance: 0.3, morale: 0.8 },
+      technician: { name: "ICT Technician", salary: 3600, icon: "💻", performance: 1.0, morale: 0.6 },
+      cleaner: { name: "Support Staff", salary: 2600, icon: "🧹", performance: 0.2, morale: 1.0 }
+    };
+
+    const facilities = {
+      classroom: { name: "Upgrade Classroom", cost: 18000, icon: "🪑", performance: 2.5, morale: 1, condition: 4 },
+      lab: { name: "Science Laboratory", cost: 42000, icon: "🧪", performance: 5, morale: 1, condition: 2 },
+      ict: { name: "Digital Learning Lab", cost: 50000, icon: "🖥️", performance: 5.5, morale: 2, condition: 2 },
+      library: { name: "Library Upgrade", cost: 30000, icon: "📚", performance: 4, morale: 2, condition: 3 },
+      sports: { name: "Sports Facilities", cost: 25000, icon: "⚽", performance: 1, morale: 5, condition: 3 },
+      maintenance: { name: "Major Maintenance", cost: 20000, icon: "🔧", performance: 0.5, morale: 2, condition: 12 }
+    };
+
+    const programs = {
+      tutoring: { name: "After-School Tutoring", cost: 12000, performance: 4, morale: -1, attendance: 1, icon: "📖" },
+      wellbeing: { name: "Student Wellbeing Month", cost: 10000, performance: 0.5, morale: 5, attendance: 3, icon: "💚" },
+      teacherTraining: { name: "Teacher Professional Development", cost: 15000, performance: 3.5, morale: 3, attendance: 0, icon: "🎓" },
+      attendance: { name: "Attendance Campaign", cost: 8000, performance: 1, morale: 1, attendance: 4, icon: "✅" }
+    };
+
+    const state = {
+      budget: 250000,
+      students: 420,
+      performance: 68,
+      morale: 72,
+      attendance: 91,
+      reputation: 65,
+      facilityCondition: 72,
+      month: 0,
+      year: 1,
+      activeView: "overview",
+      staff: {
+        teacher: 24,
+        counselor: 1,
+        admin: 4,
+        technician: 1,
+        cleaner: 4
+      },
+      facilityCounts: {
+        classroom: 0,
+        lab: 0,
+        ict: 0,
+        library: 0,
+        sports: 0
+      },
+      completedPrograms: {},
+      log: [
+        { text: "Welcome, Headteacher. Your school year begins with RM250,000.", type: "info" }
+      ],
+      missionRewarded: false
+    };
+
+    const el = {
+      menu: document.getElementById("menu"),
+      mainContent: document.getElementById("mainContent"),
+      budget: document.getElementById("budgetStat"),
+      students: document.getElementById("studentsStat"),
+      staff: document.getElementById("staffStat"),
+      performance: document.getElementById("performanceStat"),
+      morale: document.getElementById("moraleStat"),
+      attendance: document.getElementById("attendanceStat"),
+      month: document.getElementById("monthStat"),
+      missionList: document.getElementById("missionList"),
+      missionProgress: document.getElementById("missionProgress"),
+      log: document.getElementById("log"),
+      modalWrap: document.getElementById("modalWrap"),
+      modalContent: document.getElementById("modalContent"),
+      advanceBtn: document.getElementById("advanceBtn"),
+      saveBtn: document.getElementById("saveBtn"),
+      resetBtn: document.getElementById("resetBtn")
+    };
+
+    const views = [
+      ["overview", "📊", "Overview"],
+      ["staff", "👥", "Staff Management"],
+      ["students", "🎒", "Student Performance"],
+      ["budget", "💰", "Budget & Finance"],
+      ["facilities", "🏢", "Facilities"],
+      ["programs", "📘", "School Programs"]
+    ];
+
+    function money(v) {
+      return "RM" + Math.round(v).toLocaleString("en-MY");
+    }
+
+    function clamp(v, min=0, max=100) {
+      return Math.max(min, Math.min(max, v));
+    }
+
+    function totalStaff() {
+      return Object.values(state.staff).reduce((a,b) => a+b, 0);
+    }
+
+    function monthlyPayroll() {
+      return Object.entries(state.staff).reduce((sum, [key,count]) => sum + roles[key].salary * count, 0);
+    }
+
+    function monthlyGrant() {
+      return state.students * 210 + Math.round(state.reputation * 250);
+    }
+
+    function operatingCost() {
+      const base = 32000;
+      const facilityLoad = Object.values(state.facilityCounts).reduce((a,b)=>a+b,0) * 900;
+      return base + facilityLoad;
+    }
+
+    function netMonthly() {
+      return monthlyGrant() - monthlyPayroll() - operatingCost();
+    }
+
+    function teacherStudentRatio() {
+      return state.students / Math.max(1, state.staff.teacher);
+    }
+
+    function renderMenu() {
+      el.menu.innerHTML = "";
+      views.forEach(([key, icon, label]) => {
+        const btn = document.createElement("button");
+        btn.className = "menu-btn" + (state.activeView === key ? " active" : "");
+        btn.innerHTML = `<span>${icon}</span><span>${label}</span>`;
+        btn.onclick = () => {
+          state.activeView = key;
+          render();
+        };
+        el.menu.appendChild(btn);
+      });
+    }
+
+    function renderDashboard() {
+      el.budget.textContent = money(state.budget);
+      el.students.textContent = state.students.toLocaleString();
+      el.staff.textContent = totalStaff();
+      el.performance.textContent = Math.round(state.performance) + "%";
+      el.morale.textContent = Math.round(state.morale) + "%";
+      el.attendance.textContent = Math.round(state.attendance) + "%";
+      el.month.textContent = `${MONTHS[state.month]}, Year ${state.year}`;
+
+      el.budget.style.color = state.budget >= 0 ? "var(--text)" : "var(--danger)";
+      el.performance.style.color = state.performance >= 75 ? "var(--success)" : state.performance >= 55 ? "var(--warning)" : "var(--danger)";
+      el.morale.style.color = state.morale >= 70 ? "var(--success)" : state.morale >= 45 ? "var(--warning)" : "var(--danger)";
+      el.attendance.style.color = state.attendance >= 90 ? "var(--success)" : state.attendance >= 80 ? "var(--warning)" : "var(--danger)";
+    }
+
+    function progressCard(title, value, note) {
+      return `
+        <div class="card">
+          <h3>${title}</h3>
+          <div class="metric"><span>${note}</span><strong>${Math.round(value)}%</strong></div>
+          <div class="bar"><div class="bar-fill" style="width:${clamp(value)}%"></div></div>
+        </div>`;
+    }
+
+    function renderOverview() {
+      const ratio = teacherStudentRatio();
+      const finance = netMonthly();
+      el.mainContent.innerHTML = `
+        <div class="section-title">
+          <h2>📊 School Overview</h2>
+          <span class="tag">${finance >= 0 ? "Stable Finances" : "Budget Pressure"}</span>
+        </div>
+        <div class="content-grid">
+          ${progressCard("Academic Performance", state.performance, "Average school result")}
+          ${progressCard("Staff Morale", state.morale, "Workforce wellbeing")}
+          ${progressCard("Student Attendance", state.attendance, "Monthly attendance")}
+          ${progressCard("Facility Condition", state.facilityCondition, "Buildings and equipment")}
+          <div class="card">
+            <h3>👩‍🏫 Teacher–Student Ratio</h3>
+            <div class="metric"><span>Current ratio</span><strong>1 : ${ratio.toFixed(1)}</strong></div>
+            <div class="item-meta">${ratio <= 20 ? "Excellent staffing level." : ratio <= 25 ? "Acceptable, but workload is rising." : "High workload may reduce performance."}</div>
+          </div>
+          <div class="card">
+            <h3>💰 Monthly Projection</h3>
+            <div class="metric"><span>Expected net</span><strong>${money(finance)}</strong></div>
+            <div class="item-meta">Grant ${money(monthlyGrant())} − payroll ${money(monthlyPayroll())} − operations ${money(operatingCost())}</div>
+          </div>
+        </div>`;
+    }
+
+    function renderStaff() {
+      el.mainContent.innerHTML = `
+        <div class="section-title">
+          <h2>👥 Staff Management</h2>
+          <span class="tag">Payroll ${money(monthlyPayroll())}/month</span>
+        </div>
+        <div class="list">
+          ${Object.entries(roles).map(([key,r]) => `
+            <div class="list-item">
+              <div class="item-head">
+                <span>${r.icon} ${r.name}</span>
+                <span>${state.staff[key]} staff</span>
+              </div>
+              <div class="item-meta">Monthly salary per staff: ${money(r.salary)}</div>
+              <div class="controls">
+                <button class="mini-btn btn-success" onclick="hireStaff('${key}')">Hire</button>
+                <button class="mini-btn btn-danger" onclick="dismissStaff('${key}')">Dismiss</button>
+              </div>
+            </div>`).join("")}
+        </div>`;
+    }
+
+    function renderStudents() {
+      const ratio = teacherStudentRatio();
+      el.mainContent.innerHTML = `
+        <div class="section-title">
+          <h2>🎒 Student Performance</h2>
+          <span class="tag">${state.students} enrolled</span>
+        </div>
+        <div class="content-grid">
+          ${progressCard("Academic Achievement", state.performance, "School average")}
+          ${progressCard("Attendance", state.attendance, "Student presence")}
+          ${progressCard("School Reputation", state.reputation, "Community confidence")}
+          <div class="card">
+            <h3>📚 Learning Capacity</h3>
+            <div class="metric"><span>Students per teacher</span><strong>${ratio.toFixed(1)}</strong></div>
+            <div class="item-meta">Target ratio: 20–25 students per teacher.</div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:12px;">
+          <h3>School Improvement Advice</h3>
+          <div class="item-meta">${studentAdvice()}</div>
+        </div>`;
+    }
+
+    function studentAdvice() {
+      const tips = [];
+      if (teacherStudentRatio() > 25) tips.push("Hire more teachers to reduce class workload.");
+      if (state.attendance < 90) tips.push("Run an attendance campaign or wellbeing programme.");
+      if (state.performance < 75) tips.push("Invest in tutoring, teacher training, a library, or digital learning.");
+      if (state.morale < 65) tips.push("Improve staff morale before demanding further performance gains.");
+      if (!tips.length) tips.push("The school is performing strongly. Maintain financial reserves and continue gradual improvement.");
+      return tips.join(" ");
+    }
+
+    function renderBudget() {
+      el.mainContent.innerHTML = `
+        <div class="section-title">
+          <h2>💰 Budget & Finance</h2>
+          <span class="tag">${netMonthly() >= 0 ? "Projected Surplus" : "Projected Deficit"}</span>
+        </div>
+        <div class="content-grid">
+          <div class="card">
+            <h3>Monthly Income</h3>
+            <div class="metric"><span>Government grant</span><strong>${money(monthlyGrant())}</strong></div>
+          </div>
+          <div class="card">
+            <h3>Monthly Expenses</h3>
+            <div class="metric"><span>Staff payroll</span><strong>${money(monthlyPayroll())}</strong></div>
+            <div class="metric"><span>Operations</span><strong>${money(operatingCost())}</strong></div>
+          </div>
+          <div class="card">
+            <h3>Net Position</h3>
+            <div class="metric"><span>Monthly net</span><strong>${money(netMonthly())}</strong></div>
+            <div class="item-meta">A positive net position protects the school against emergencies.</div>
+          </div>
+          <div class="card">
+            <h3>Financial Health</h3>
+            <div class="metric"><span>Reserve coverage</span><strong>${(state.budget / Math.max(1, monthlyPayroll()+operatingCost())).toFixed(1)} months</strong></div>
+          </div>
+        </div>`;
+    }
+
+    function renderFacilities() {
+      el.mainContent.innerHTML = `
+        <div class="section-title">
+          <h2>🏢 Facilities</h2>
+          <span class="tag">Condition ${Math.round(state.facilityCondition)}%</span>
+        </div>
+        <div class="list">
+          ${Object.entries(facilities).map(([key,f]) => `
+            <div class="list-item">
+              <div class="item-head">
+                <span>${f.icon} ${f.name}</span>
+                <span>${money(f.cost)}</span>
+              </div>
+              <div class="item-meta">
+                Academic +${f.performance}, morale +${f.morale}, facility condition +${f.condition}.
+                ${key !== "maintenance" ? `Completed: ${state.facilityCounts[key] || 0}` : ""}
+              </div>
+              <div class="controls">
+                <button class="mini-btn btn-primary" onclick="buildFacility('${key}')">Approve</button>
+              </div>
+            </div>`).join("")}
+        </div>`;
+    }
+
+    function renderPrograms() {
+      el.mainContent.innerHTML = `
+        <div class="section-title">
+          <h2>📘 School Programmes</h2>
+          <span class="tag">One-time initiatives</span>
+        </div>
+        <div class="list">
+          ${Object.entries(programs).map(([key,p]) => `
+            <div class="list-item">
+              <div class="item-head">
+                <span>${p.icon} ${p.name}</span>
+                <span>${money(p.cost)}</span>
+              </div>
+              <div class="item-meta">Performance ${signed(p.performance)}, morale ${signed(p.morale)}, attendance ${signed(p.attendance)}.</div>
+              <div class="controls">
+                <button class="mini-btn btn-primary" onclick="runProgram('${key}')">Run Programme</button>
+              </div>
+            </div>`).join("")}
+        </div>`;
+    }
+
+    function signed(v) { return v >= 0 ? `+${v}` : `${v}`; }
+
+    function renderMain() {
+      const map = {
+        overview: renderOverview,
+        staff: renderStaff,
+        students: renderStudents,
+        budget: renderBudget,
+        facilities: renderFacilities,
+        programs: renderPrograms
+      };
+      map[state.activeView]();
+    }
+
+    function renderLog() {
+      el.log.innerHTML = state.log.slice(0,18).map(item =>
+        `<div class="log-item ${item.type || "info"}">${item.text}</div>`
+      ).join("");
+    }
+
+    function renderMission() {
+      const objectives = [
+        { label: "Reach 75% academic performance", done: state.performance >= 75 },
+        { label: "Maintain staff morale above 70%", done: state.morale >= 70 },
+        { label: "Maintain attendance above 92%", done: state.attendance >= 92 },
+        { label: "Keep at least RM100,000 reserve", done: state.budget >= 100000 },
+        { label: "Teacher ratio below 1:25", done: teacherStudentRatio() < 25 }
+      ];
+
+      el.missionList.innerHTML = objectives.map(o => `<li>${o.done ? "✅" : "⬜"} ${o.label}</li>`).join("");
+      const complete = objectives.filter(o => o.done).length;
+      el.missionProgress.style.width = `${complete/objectives.length*100}%`;
+
+      if (complete === objectives.length && !state.missionRewarded) {
+        state.missionRewarded = true;
+        state.budget += 50000;
+        state.reputation = clamp(state.reputation + 5);
+        addLog("Mission completed! The school received a RM50,000 excellence grant.", "good");
+      }
+    }
+
+    function render() {
+      renderMenu();
+      renderDashboard();
+      renderMain();
+      renderMission();
+      renderLog();
+    }
+
+    function addLog(text, type="info") {
+      state.log.unshift({text, type});
+      state.log = state.log.slice(0,35);
+    }
+
+    window.hireStaff = function(key) {
+      const role = roles[key];
+      const recruitmentCost = role.salary * 1.5;
+      if (state.budget < recruitmentCost) {
+        addLog(`Insufficient budget to recruit a ${role.name}.`, "bad");
+        render();
+        return;
+      }
+      state.budget -= recruitmentCost;
+      state.staff[key]++;
+      state.morale = clamp(state.morale + role.morale);
+      state.performance = clamp(state.performance + role.performance * 0.25);
+      addLog(`${role.name} hired. Recruitment cost ${money(recruitmentCost)}.`, "good");
+      render();
+    }
+
+    window.dismissStaff = function(key) {
+      const role = roles[key];
+      const minimum = key === "teacher" ? 1 : 0;
+      if (state.staff[key] <= minimum) {
+        addLog(`You cannot reduce ${role.name} below the minimum level.`, "bad");
+        render();
+        return;
+      }
+      state.staff[key]--;
+      state.morale = clamp(state.morale - 2);
+      if (key === "teacher") state.performance = clamp(state.performance - 1.5);
+      addLog(`${role.name} position removed. Staff morale decreased.`, "warn");
+      render();
+    }
+
+    window.buildFacility = function(key) {
+      const f = facilities[key];
+      if (state.budget < f.cost) {
+        addLog(`Insufficient budget for ${f.name}.`, "bad");
+        render();
+        return;
+      }
+      state.budget -= f.cost;
+      state.performance = clamp(state.performance + f.performance);
+      state.morale = clamp(state.morale + f.morale);
+      state.facilityCondition = clamp(state.facilityCondition + f.condition);
+      if (key !== "maintenance") state.facilityCounts[key] = (state.facilityCounts[key] || 0) + 1;
+      addLog(`${f.name} approved for ${money(f.cost)}.`, "good");
+      render();
+    }
+
+    window.runProgram = function(key) {
+      const p = programs[key];
+      if (state.budget < p.cost) {
+        addLog(`Insufficient budget for ${p.name}.`, "bad");
+        render();
+        return;
+      }
+      state.budget -= p.cost;
+      state.performance = clamp(state.performance + p.performance);
+      state.morale = clamp(state.morale + p.morale);
+      state.attendance = clamp(state.attendance + p.attendance);
+      state.completedPrograms[key] = (state.completedPrograms[key] || 0) + 1;
+      addLog(`${p.name} completed successfully.`, "good");
+      render();
+    }
+
+    function showDecisionEvent() {
+      const events = [
+        {
+          title: "Unexpected Roof Repair",
+          text: "Heavy rain has damaged part of the school roof.",
+          options: [
+            { label: "Repair immediately (RM18,000)", action: () => { state.budget -= 18000; state.facilityCondition = clamp(state.facilityCondition + 6); addLog("Roof repaired before further damage occurred.", "good"); }},
+            { label: "Temporary repair (RM6,000)", action: () => { state.budget -= 6000; state.facilityCondition = clamp(state.facilityCondition - 2); addLog("Temporary roof repair completed, but the building remains vulnerable.", "warn"); }}
+          ]
+        },
+        {
+          title: "Teacher Burnout",
+          text: "Several teachers report excessive workload and stress.",
+          options: [
+            { label: "Fund a wellbeing retreat (RM10,000)", action: () => { state.budget -= 10000; state.morale = clamp(state.morale + 7); addLog("The staff wellbeing retreat improved morale.", "good"); }},
+            { label: "Reorganise duties", action: () => { state.morale = clamp(state.morale + 2); state.performance = clamp(state.performance - 1); addLog("Duties were reorganised with mixed results.", "info"); }}
+          ]
+        },
+        {
+          title: "Community Sponsorship",
+          text: "A local company offers support for a school innovation programme.",
+          options: [
+            { label: "Accept sponsorship", action: () => { state.budget += 25000; state.reputation = clamp(state.reputation + 3); addLog("The school received RM25,000 community sponsorship.", "good"); }},
+            { label: "Decline to remain independent", action: () => { state.reputation = clamp(state.reputation + 1); addLog("The school declined the sponsorship.", "info"); }}
+          ]
+        },
+        {
+          title: "Attendance Concern",
+          text: "Student absenteeism has increased in several classes.",
+          options: [
+            { label: "Launch intervention (RM8,000)", action: () => { state.budget -= 8000; state.attendance = clamp(state.attendance + 4); addLog("Targeted intervention improved attendance.", "good"); }},
+            { label: "Issue warning letters", action: () => { state.attendance = clamp(state.attendance + 1); state.morale = clamp(state.morale - 1); addLog("Warning letters produced a small attendance improvement.", "warn"); }}
+          ]
+        }
+      ];
+
+      const event = events[Math.floor(Math.random() * events.length)];
+      el.modalContent.innerHTML = `
+        <h2>⚠️ ${event.title}</h2>
+        <div class="notice">${event.text}</div>
+        <div class="option-grid">
+          ${event.options.map((o,i)=>`<button class="option" data-index="${i}">${o.label}</button>`).join("")}
+        </div>`;
+      el.modalWrap.classList.add("show");
+      [...el.modalContent.querySelectorAll(".option")].forEach(btn => {
+        btn.onclick = () => {
+          const idx = Number(btn.dataset.index);
+          event.options[idx].action();
+          el.modalWrap.classList.remove("show");
+          render();
+        };
+      });
+    }
+
+    function advanceMonth() {
+      const payroll = monthlyPayroll();
+      const operations = operatingCost();
+      const grant = monthlyGrant();
+      const net = grant - payroll - operations;
+      state.budget += net;
+
+      const ratio = teacherStudentRatio();
+      let performanceChange = (state.staff.teacher * 0.03) + (state.attendance - 88) * 0.04;
+      if (ratio > 25) performanceChange -= (ratio - 25) * 0.12;
+      if (state.morale < 60) performanceChange -= 1.2;
+      if (state.facilityCondition < 60) performanceChange -= 1;
+
+      state.performance = clamp(state.performance + performanceChange);
+      state.facilityCondition = clamp(state.facilityCondition - 1.2);
+      state.morale = clamp(state.morale - 0.4 + (state.staff.counselor * 0.08));
+      state.attendance = clamp(state.attendance + (state.morale - 65) * 0.015);
+
+      const studentChange = Math.round((state.reputation - 60) / 8 + (Math.random() * 8 - 4));
+      state.students = Math.max(100, state.students + studentChange);
+
+      if (state.budget < 0) {
+        state.morale = clamp(state.morale - 4);
+        state.reputation = clamp(state.reputation - 3);
+        addLog("The school entered deficit. Staff confidence and reputation declined.", "bad");
+      } else if (net > 0) {
+        state.reputation = clamp(state.reputation + 0.5);
+      }
+
+      state.month++;
+      if (state.month > 11) {
+        state.month = 0;
+        state.year++;
+        const annualBonus = Math.round(state.performance * 700);
+        state.budget += annualBonus;
+        addLog(`Year ${state.year - 1} completed. Performance grant received: ${money(annualBonus)}.`, "good");
+      }
+
+      addLog(`${MONTHS[state.month]}, Year ${state.year}: income ${money(grant)}, payroll ${money(payroll)}, operations ${money(operations)}, net ${money(net)}.`, net >= 0 ? "good" : "bad");
+
+      if (Math.random() < 0.55) {
+        showDecisionEvent();
+      }
+      render();
+    }
+
+    function saveGame() {
+      localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+      addLog("Game saved on this device.", "good");
+      render();
+    }
+
+    function loadGame() {
+      const saved = localStorage.getItem(SAVE_KEY);
+      if (!saved) return;
+      try {
+        const data = JSON.parse(saved);
+        Object.assign(state, data);
+        addLog("Saved school loaded.", "info");
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function resetGame() {
+      if (!confirm("Reset the entire school simulation?")) return;
+      localStorage.removeItem(SAVE_KEY);
+      location.reload();
+    }
+
+    el.advanceBtn.onclick = advanceMonth;
+    el.saveBtn.onclick = saveGame;
+    el.resetBtn.onclick = resetGame;
+    el.modalWrap.onclick = e => {
+      if (e.target === el.modalWrap) el.modalWrap.classList.remove("show");
+    };
+
+    loadGame();
+    render();
+  </script>
+  <script src="../../supabase-config.js"></script>
+  <script type="module" src="../../supabase-progress.js" data-activity-id="game/school-management-simulator" data-activity-type="game" data-progress-keys="schoolManagementSimulatorV1"></script>
+</body>
+</html>
