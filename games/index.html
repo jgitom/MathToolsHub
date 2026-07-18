@@ -45,8 +45,16 @@
         @media (max-width:700px) { .game-card, .game-card:nth-child(n+5) { grid-column:1/-1; min-height:0; margin-top:0; } .game-card h2 { min-height:0; } .hero-inner { padding:54px 0; } .content { padding:44px 0 60px; } }
         @media (max-width:480px) { .nav,.hero-inner,.content,.footer-inner { width:min(100% - 24px,1120px); } .game-card { padding:24px; } }
     </style>
+  <meta name="author" content="Juil Gitom">
+  <style id="creator-credit-style">
+    .creator-credit{position:fixed;left:12px;bottom:10px;z-index:9998;display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border:1px solid rgba(148,163,184,.38);border-radius:999px;color:#334155;background:rgba(255,255,255,.9);box-shadow:0 5px 16px rgba(15,23,42,.13);font:600 11px/1.2 Inter,"Segoe UI",Arial,sans-serif;letter-spacing:.01em;backdrop-filter:blur(8px);pointer-events:none}
+    .creator-credit strong{color:#0f2747;font-weight:800}
+    @media(max-width:480px){.creator-credit{left:8px;bottom:7px;padding:5px 8px;font-size:10px}}
+    @media print{.creator-credit{display:none!important}}
+  </style>
 </head>
 <body>
+<div class="creator-credit" role="contentinfo" aria-label="Created by Juil Gitom"><span>Created by</span><strong>Juil Gitom</strong></div>
     <header>
         <nav class="nav" aria-label="Games navigation">
             <a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">Σ</span> MathToolsHub</a>
