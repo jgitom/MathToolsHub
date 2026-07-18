@@ -326,7 +326,7 @@
                 <a href="ebook.html" data-i18n="navEbook">Ebook</a>
                 <a href="games/" data-i18n="navGames">Games</a>
                 <a href="tools/" data-i18n="navTools">Tools</a>
-                <a href="account.html" data-i18n="navAccount">Account</a>
+                <a href="account.html" data-i18n="navAccount" data-user-account>Account</a>
                 <select class="language-select" id="languageSelect" aria-label="Select language">
                     <option value="en">English</option>
                     <option value="ms">Bahasa Malaysia</option>
@@ -563,5 +563,7 @@
                 });
         })();
     </script>
+    <script src="supabase-config.js"></script>
+    <script type="module" src="supabase-user.js"></script>
 </body>
 </html>
