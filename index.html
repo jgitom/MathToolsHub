@@ -241,6 +241,14 @@
         .mascot-welcome img { width:120px; height:170px; object-fit:cover; object-position:center 18%; border-radius:20px; border:2px solid rgba(255,255,255,.28); box-shadow:0 12px 28px rgba(0,0,0,.22); }
         .mascot-speech { position:relative; margin:0; padding:16px 18px; border-radius:18px; color:var(--navy); background:#fff; font-size:.96rem; font-weight:800; line-height:1.5; box-shadow:0 12px 28px rgba(0,0,0,.16); }
         .mascot-speech::before { content:""; position:absolute; left:-12px; top:50%; width:0; height:0; border-top:10px solid transparent; border-bottom:10px solid transparent; border-right:14px solid #fff; transform:translateY(-50%); }
+        .mascot-message { display:grid; gap:10px; }
+        .mascot-voice { justify-self:start; min-height:38px; padding:8px 13px; border:1px solid #93c5fd; border-radius:999px; color:#fff; background:#1d4ed8; font:800 .78rem/1 Inter,"Segoe UI",Arial,sans-serif; cursor:pointer; box-shadow:0 8px 18px rgba(0,0,0,.18); }
+        .mascot-voice:hover, .mascot-voice:focus-visible { background:#2563eb; outline:3px solid #bfdbfe; outline-offset:2px; }
+        .mascot-welcome.is-speaking img { animation:mascotTalk .7s ease-in-out infinite alternate; }
+        .mascot-welcome.is-speaking .mascot-speech { animation:speechPulse .7s ease-in-out infinite alternate; }
+        @keyframes mascotTalk { from { transform:translateY(0) rotate(-1deg); } to { transform:translateY(-7px) rotate(1deg); } }
+        @keyframes speechPulse { from { box-shadow:0 12px 28px rgba(0,0,0,.16); } to { box-shadow:0 12px 32px rgba(96,165,250,.48); } }
+        @media (prefers-reduced-motion:reduce) { .mascot-welcome.is-speaking img, .mascot-welcome.is-speaking .mascot-speech { animation:none; } }
         .stat { margin-top: 10px; padding: 17px 18px; border: 1px solid rgba(255,255,255,.12); border-radius: 16px; background: rgba(255,255,255,.06); }
         .stat:first-of-type { margin-top: 20px; }
         .stat strong { font-size: 2rem; }
@@ -336,6 +344,7 @@
             .hero-panel { padding: 22px; }
             .mascot-welcome { grid-template-columns:1fr; text-align:center; }
             .mascot-welcome img { justify-self:center; }
+            .mascot-voice { justify-self:center; }
             .mascot-speech::before { left:50%; top:-12px; border-right:10px solid transparent; border-left:10px solid transparent; border-bottom:14px solid #fff; border-top:0; transform:translateX(-50%); }
             .programmes { padding: 60px 0; }
             .programme-grid { grid-template-columns: 1fr; }
@@ -400,7 +409,7 @@
                 <aside class="hero-panel" aria-label="Platform overview">
                     <div class="mascot-welcome">
                         <img src="assets/mathtoolshub-3d-student.png" alt="Friendly 3D MathToolsHub student mascot" width="120" height="170">
-                        <p class="mascot-speech" data-i18n="mascotWelcome">Welcome to MathToolsHub. Your Structured Mathematics Learning</p>
+                        <div class="mascot-message"><p class="mascot-speech" data-i18n="mascotWelcome">Welcome to MathToolsHub. Your Structured Mathematics Learning</p><button class="mascot-voice" id="mascotVoice" type="button" data-i18n="mascotListen">🔊 Hear welcome</button></div>
                     </div>
                     <p class="panel-label" data-i18n="coverage">Learning coverage</p>
                     <div class="stat"><strong>12</strong><span data-i18n="statProgrammes">Programmes across preschool, primary and secondary levels</span></div>
@@ -485,9 +494,9 @@
     </a>
     <script>
         const TRANSLATIONS = {
-            en: {mascotWelcome:"Welcome to MathToolsHub. Your Structured Mathematics Learning",navProgrammes:"Programmes",navCatalogue:"Learning catalogue",navEbook:"Ebook",navGames:"Games",navTools:"Tools",navAccount:"Account",heroEyebrow:"Structured mathematics learning",heroTitle:"Build stronger mathematics skills.",heroLead:"Interactive, curriculum-focused resources designed to support confident learning from preschool through secondary education.",explore:"Explore programmes",overview:"View platform overview",coverage:"Learning coverage",statProgrammes:"Programmes across preschool, primary and secondary levels",statPrimary:"Primary year levels with focused mathematics practice",statSecondary:"Secondary form levels for continued progression",capabilities:"Platform capabilities",resourcesTitle:"Learning resources for every stage",resourcesLead:"MathToolsHub organises mathematics content by education level, helping students move directly to appropriate exercises and course materials.",foundationTitle:"Foundation learning",foundationText:"Accessible early-learning activities that introduce numbers, patterns and core mathematical concepts.",primaryTitle:"Primary mathematics",primaryText:"Structured quizzes for Years 1 through 6, organised around progressive curriculum skills.",secondaryTitle:"Secondary courses",secondaryText:"Dedicated programme access for Forms 1 through 5 to support continued academic development.",gameText:"Build speed and accuracy through an engaging interactive mathematics game.",playGame:"Play CJMath EquaGems",ctaTitle:"Ready to begin learning?",ctaText:"Choose your education level from the complete programme catalogue.",openCatalogue:"Open catalogue",visitors:"total visitors",askTutor:"Ask Math Tutor",powered:"Powered by ChatGPT"},
-            ms: {mascotWelcome:"Selamat datang ke MathToolsHub. Pembelajaran Matematik Berstruktur Anda",navProgrammes:"Program",navCatalogue:"Katalog pembelajaran",navEbook:"E-buku",navGames:"Permainan",navTools:"Alatan",navAccount:"Akaun",heroEyebrow:"Pembelajaran matematik berstruktur",heroTitle:"Bina kemahiran matematik yang lebih kukuh.",heroLead:"Sumber interaktif berfokuskan kurikulum untuk menyokong pembelajaran yakin dari prasekolah hingga pendidikan menengah.",explore:"Terokai program",overview:"Lihat gambaran platform",coverage:"Liputan pembelajaran",statProgrammes:"Program merangkumi peringkat prasekolah, rendah dan menengah",statPrimary:"Tahun sekolah rendah dengan latihan matematik berfokus",statSecondary:"Tingkatan sekolah menengah untuk kemajuan berterusan",capabilities:"Keupayaan platform",resourcesTitle:"Sumber pembelajaran untuk setiap peringkat",resourcesLead:"MathToolsHub menyusun kandungan matematik mengikut tahap pendidikan supaya murid boleh terus mengakses latihan dan bahan kursus yang sesuai.",foundationTitle:"Pembelajaran asas",foundationText:"Aktiviti awal yang mudah diakses untuk memperkenalkan nombor, pola dan konsep asas matematik.",primaryTitle:"Matematik sekolah rendah",primaryText:"Kuiz berstruktur untuk Tahun 1 hingga 6 berdasarkan kemahiran kurikulum yang progresif.",secondaryTitle:"Matematik Sekolah Menengah",secondaryText:"Akses program khusus untuk Tingkatan 1 hingga 5 bagi menyokong perkembangan akademik.",gameText:"Tingkatkan kelajuan dan ketepatan melalui permainan matematik interaktif yang menarik.",playGame:"Main CJMath EquaGems",ctaTitle:"Bersedia untuk mula belajar?",ctaText:"Pilih tahap pendidikan anda daripada katalog program lengkap.",openCatalogue:"Buka katalog",visitors:"jumlah pelawat",askTutor:"Tanya Tutor Matematik",powered:"Dikuasakan oleh ChatGPT"},
-            zh: {mascotWelcome:"欢迎来到 MathToolsHub，您的结构化数学学习平台",navProgrammes:"课程",navCatalogue:"学习目录",navEbook:"电子书",navGames:"游戏",navTools:"工具",navAccount:"账户",heroEyebrow:"系统化数学学习",heroTitle:"培养更扎实的数学能力。",heroLead:"以课程为核心的互动资源，帮助学生从学前班到中学阶段自信学习。",explore:"浏览课程",overview:"查看平台概览",coverage:"学习范围",statProgrammes:"涵盖学前、小学和中学阶段的课程",statPrimary:"个小学年级的重点数学练习",statSecondary:"个中学年级的进阶学习",capabilities:"平台功能",resourcesTitle:"适合每个阶段的学习资源",resourcesLead:"MathToolsHub 按教育阶段整理数学内容，帮助学生快速找到合适的练习和课程材料。",foundationTitle:"基础学习",foundationText:"通过简单易懂的启蒙活动介绍数字、规律和核心数学概念。",primaryTitle:"小学数学",primaryText:"为小学一年级至六年级提供循序渐进的课程技能测验。",secondaryTitle:"中学课程",secondaryText:"为中一至中五提供专门课程，支持持续的学业发展。",gameText:"通过有趣的互动数学游戏提高速度和准确性。",playGame:"玩 CJMath EquaGems",ctaTitle:"准备开始学习了吗？",ctaText:"从完整课程目录中选择您的教育阶段。",openCatalogue:"打开目录",visitors:"访客总数",askTutor:"询问数学导师",powered:"由 ChatGPT 提供支持"}
+            en: {mascotWelcome:"Welcome to MathToolsHub. Your Structured Mathematics Learning",mascotListen:"🔊 Hear welcome",navProgrammes:"Programmes",navCatalogue:"Learning catalogue",navEbook:"Ebook",navGames:"Games",navTools:"Tools",navAccount:"Account",heroEyebrow:"Structured mathematics learning",heroTitle:"Build stronger mathematics skills.",heroLead:"Interactive, curriculum-focused resources designed to support confident learning from preschool through secondary education.",explore:"Explore programmes",overview:"View platform overview",coverage:"Learning coverage",statProgrammes:"Programmes across preschool, primary and secondary levels",statPrimary:"Primary year levels with focused mathematics practice",statSecondary:"Secondary form levels for continued progression",capabilities:"Platform capabilities",resourcesTitle:"Learning resources for every stage",resourcesLead:"MathToolsHub organises mathematics content by education level, helping students move directly to appropriate exercises and course materials.",foundationTitle:"Foundation learning",foundationText:"Accessible early-learning activities that introduce numbers, patterns and core mathematical concepts.",primaryTitle:"Primary mathematics",primaryText:"Structured quizzes for Years 1 through 6, organised around progressive curriculum skills.",secondaryTitle:"Secondary courses",secondaryText:"Dedicated programme access for Forms 1 through 5 to support continued academic development.",gameText:"Build speed and accuracy through an engaging interactive mathematics game.",playGame:"Play CJMath EquaGems",ctaTitle:"Ready to begin learning?",ctaText:"Choose your education level from the complete programme catalogue.",openCatalogue:"Open catalogue",visitors:"total visitors",askTutor:"Ask Math Tutor",powered:"Powered by ChatGPT"},
+            ms: {mascotWelcome:"Selamat datang ke MathToolsHub. Pembelajaran Matematik Berstruktur Anda",mascotListen:"🔊 Dengar ucapan",navProgrammes:"Program",navCatalogue:"Katalog pembelajaran",navEbook:"E-buku",navGames:"Permainan",navTools:"Alatan",navAccount:"Akaun",heroEyebrow:"Pembelajaran matematik berstruktur",heroTitle:"Bina kemahiran matematik yang lebih kukuh.",heroLead:"Sumber interaktif berfokuskan kurikulum untuk menyokong pembelajaran yakin dari prasekolah hingga pendidikan menengah.",explore:"Terokai program",overview:"Lihat gambaran platform",coverage:"Liputan pembelajaran",statProgrammes:"Program merangkumi peringkat prasekolah, rendah dan menengah",statPrimary:"Tahun sekolah rendah dengan latihan matematik berfokus",statSecondary:"Tingkatan sekolah menengah untuk kemajuan berterusan",capabilities:"Keupayaan platform",resourcesTitle:"Sumber pembelajaran untuk setiap peringkat",resourcesLead:"MathToolsHub menyusun kandungan matematik mengikut tahap pendidikan supaya murid boleh terus mengakses latihan dan bahan kursus yang sesuai.",foundationTitle:"Pembelajaran asas",foundationText:"Aktiviti awal yang mudah diakses untuk memperkenalkan nombor, pola dan konsep asas matematik.",primaryTitle:"Matematik sekolah rendah",primaryText:"Kuiz berstruktur untuk Tahun 1 hingga 6 berdasarkan kemahiran kurikulum yang progresif.",secondaryTitle:"Matematik Sekolah Menengah",secondaryText:"Akses program khusus untuk Tingkatan 1 hingga 5 bagi menyokong perkembangan akademik.",gameText:"Tingkatkan kelajuan dan ketepatan melalui permainan matematik interaktif yang menarik.",playGame:"Main CJMath EquaGems",ctaTitle:"Bersedia untuk mula belajar?",ctaText:"Pilih tahap pendidikan anda daripada katalog program lengkap.",openCatalogue:"Buka katalog",visitors:"jumlah pelawat",askTutor:"Tanya Tutor Matematik",powered:"Dikuasakan oleh ChatGPT"},
+            zh: {mascotWelcome:"欢迎来到 MathToolsHub，您的结构化数学学习平台",mascotListen:"🔊 播放欢迎语",navProgrammes:"课程",navCatalogue:"学习目录",navEbook:"电子书",navGames:"游戏",navTools:"工具",navAccount:"账户",heroEyebrow:"系统化数学学习",heroTitle:"培养更扎实的数学能力。",heroLead:"以课程为核心的互动资源，帮助学生从学前班到中学阶段自信学习。",explore:"浏览课程",overview:"查看平台概览",coverage:"学习范围",statProgrammes:"涵盖学前、小学和中学阶段的课程",statPrimary:"个小学年级的重点数学练习",statSecondary:"个中学年级的进阶学习",capabilities:"平台功能",resourcesTitle:"适合每个阶段的学习资源",resourcesLead:"MathToolsHub 按教育阶段整理数学内容，帮助学生快速找到合适的练习和课程材料。",foundationTitle:"基础学习",foundationText:"通过简单易懂的启蒙活动介绍数字、规律和核心数学概念。",primaryTitle:"小学数学",primaryText:"为小学一年级至六年级提供循序渐进的课程技能测验。",secondaryTitle:"中学课程",secondaryText:"为中一至中五提供专门课程，支持持续的学业发展。",gameText:"通过有趣的互动数学游戏提高速度和准确性。",playGame:"玩 CJMath EquaGems",ctaTitle:"准备开始学习了吗？",ctaText:"从完整课程目录中选择您的教育阶段。",openCatalogue:"打开目录",visitors:"访客总数",askTutor:"询问数学导师",powered:"由 ChatGPT 提供支持"}
         };
         const LANGUAGE_LOCALES = {en:"en-GB",ms:"ms-MY",zh:"zh-CN"};
         const languageSelect = document.getElementById("languageSelect");
@@ -533,6 +542,33 @@
         }
 
         languageSelect.addEventListener("change", event => applyLanguage(event.target.value));
+        const mascotVoice = document.getElementById("mascotVoice");
+        const mascotWelcomeCard = document.querySelector(".mascot-welcome");
+        function stopMascotSpeech() {
+            mascotWelcomeCard.classList.remove("is-speaking");
+            mascotVoice.setAttribute("aria-pressed", "false");
+        }
+        if ("speechSynthesis" in window) {
+            mascotVoice.addEventListener("click", () => {
+                window.speechSynthesis.cancel();
+                const selected = TRANSLATIONS[languageSelect.value] ? languageSelect.value : "en";
+                const utterance = new SpeechSynthesisUtterance(TRANSLATIONS[selected].mascotWelcome);
+                utterance.lang = LANGUAGE_LOCALES[selected];
+                utterance.rate = .9;
+                utterance.pitch = 1.08;
+                const languagePrefix = utterance.lang.slice(0,2).toLowerCase();
+                const matchingVoice = window.speechSynthesis.getVoices().find(voice => voice.lang.toLowerCase().startsWith(languagePrefix));
+                if (matchingVoice) utterance.voice = matchingVoice;
+                utterance.onstart = () => { mascotWelcomeCard.classList.add("is-speaking"); mascotVoice.setAttribute("aria-pressed", "true"); };
+                utterance.onend = stopMascotSpeech;
+                utterance.onerror = stopMascotSpeech;
+                window.speechSynthesis.speak(utterance);
+            });
+            languageSelect.addEventListener("change", () => { window.speechSynthesis.cancel(); stopMascotSpeech(); });
+        } else {
+            mascotVoice.disabled = true;
+            mascotVoice.title = "Browser voice is not supported on this device.";
+        }
         window.siteLocale = LANGUAGE_LOCALES[localStorage.getItem("mathToolsHubLanguage") || "en"];
 
         (() => {
