@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="author" content="Juil Gitom" />
+  <title>MathCity Builder</title>
+  <style>
+    :root {
+      --bg: #eef6ff;
+      --panel: #ffffff;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --accent: #f59e0b;
+      --danger: #dc2626;
+      --success: #16a34a;
+      --text: #17324d;
+      --muted: #64748b;
+      --border: #dbe7f3;
+      --shadow: 0 14px 35px rgba(30, 64, 175, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(96, 165, 250, 0.18), transparent 30%),
+        linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .app {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 16px 20px;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 10px;
+      z-index: 20;
+      backdrop-filter: blur(12px);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.45rem, 3vw, 2.15rem);
+    }
+
+    .brand p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .music-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 9px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #f8fbff;
+    }
+
+    .music-control input[type="range"] {
+      width: 78px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .country-select {
+      max-width: 175px;
+      padding: 10px 11px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      background: #f8fbff;
+      font-weight: 800;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .country-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.16);
+    }
+
+    .btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-primary {
+      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    }
+
+    .btn-secondary {
+      color: var(--text);
+      background: #edf4ff;
+      border: 1px solid var(--border);
+    }
+
+    .btn-danger {
+      color: white;
+      background: var(--danger);
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(130px, 1fr));
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .stat-value {
+      margin-top: 5px;
+      font-size: 1.4rem;
+      font-weight: 900;
+    }
+
+    .main-layout {
+      display: grid;
+      grid-template-columns: 285px minmax(0, 1fr) 300px;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    .panel h2 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+    }
+
+    .build-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .build-card {
+      width: 100%;
+      border: 2px solid transparent;
+      background: #f8fbff;
+      border-radius: 15px;
+      padding: 12px;
+      cursor: pointer;
+      text-align: left;
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 10px;
+      align-items: center;
+      transition: 0.15s ease;
+    }
+
+    .build-card:hover {
+      border-color: #93c5fd;
+      transform: translateY(-1px);
+    }
+
+    .build-card.selected {
+      border-color: var(--primary);
+      background: #eaf2ff;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+    }
+
+    .build-icon {
+      font-size: 1.8rem;
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: white;
+    }
+
+    .build-name {
+      font-weight: 900;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .build-meta {
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-top: 3px;
+      line-height: 1.35;
+    }
+
+    .map-panel {
+      overflow: hidden;
+    }
+
+    .map-toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .selected-tool {
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .city-map-wrapper {
+      overflow: auto;
+      padding: 4px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #b7e4c7, #d8f3dc);
+      border: 1px solid #a7d7b4;
+      min-height: 540px;
+    }
+
+    .city-map {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(46px, 1fr));
+      gap: 4px;
+      min-width: 680px;
+    }
+
+    .tile {
+      aspect-ratio: 1;
+      border: 0;
+      border-radius: 10px;
+      cursor: pointer;
+      position: relative;
+      display: grid;
+      place-items: center;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.25), rgba(255,255,255,0)),
+        #86cf85;
+      font-size: 1.7rem;
+      transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+    }
+
+    .tile:hover {
+      transform: scale(1.04);
+      z-index: 2;
+      filter: brightness(1.06);
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.16);
+    }
+
+    .tile small {
+      position: absolute;
+      right: 4px;
+      bottom: 3px;
+      font-size: .58rem;
+      font-weight: 900;
+      color: rgba(15, 23, 42, .68);
+      background: rgba(255,255,255,.72);
+      border-radius: 5px;
+      padding: 1px 3px;
+    }
+
+    .tile.road { background: #7c8795; }
+    .tile.house { background: #b7e4c7; }
+    .tile.school { background: #bfdbfe; }
+    .tile.factory { background: #cbd5e1; }
+    .tile.park { background: #86efac; }
+    .tile.hospital { background: #fecaca; }
+    .tile.shop { background: #fde68a; }
+    .tile.power { background: #ddd6fe; }
+
+    .mission {
+      background: linear-gradient(135deg, #fff7ed, #fffbeb);
+      border: 1px solid #fed7aa;
+      border-radius: 16px;
+      padding: 13px;
+      margin-bottom: 13px;
+    }
+
+    .mission-title {
+      font-weight: 900;
+      margin-bottom: 7px;
+    }
+
+    .mission ul {
+      padding-left: 20px;
+      margin: 8px 0 0;
+      color: #7c2d12;
+      font-size: .9rem;
+      line-height: 1.55;
+    }
+
+    .progress-bar {
+      height: 12px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #22c55e, #16a34a);
+      transition: width .3s ease;
+    }
+
+    .log {
+      display: grid;
+      gap: 8px;
+      max-height: 370px;
+      overflow: auto;
+    }
+
+    .log-item {
+      padding: 10px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border-left: 4px solid #94a3b8;
+      font-size: .86rem;
+      line-height: 1.35;
+    }
+
+    .log-item.good { border-left-color: var(--success); }
+    .log-item.bad { border-left-color: var(--danger); }
+    .log-item.info { border-left-color: var(--primary); }
+
+    .hint {
+      font-size: .84rem;
+      color: var(--muted);
+      line-height: 1.45;
+      margin-top: 12px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, .68);
+      display: none;
+      place-items: center;
+      z-index: 100;
+      padding: 18px;
+    }
+
+    .modal-backdrop.show {
+      display: grid;
+    }
+
+    .modal {
+      width: min(510px, 100%);
+      background: white;
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 30px 80px rgba(15, 23, 42, .35);
+      animation: pop .18s ease-out;
+    }
+
+    @keyframes pop {
+      from { transform: scale(.96); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal h2 {
+      margin-top: 0;
+      font-size: 1.35rem;
+    }
+
+    .question {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 16px;
+      padding: 18px;
+      font-size: 1.25rem;
+      font-weight: 900;
+      text-align: center;
+      margin: 14px 0;
+    }
+
+    .answer-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .answer-row input {
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      outline: none;
+      font-weight: 800;
+    }
+
+    .answer-row input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, .08);
+    }
+
+    .feedback {
+      min-height: 24px;
+      margin-top: 10px;
+      font-weight: 800;
+    }
+
+    .calculator-display {
+      width: 100%;
+      margin: 10px 0 14px;
+      padding: 16px;
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      background: #f8fafc;
+      color: var(--text);
+      text-align: right;
+      font-size: 2rem;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .calculator-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 9px;
+    }
+
+    .calculator-key {
+      border: 0;
+      border-radius: 13px;
+      padding: 15px 8px;
+      background: #edf4ff;
+      color: var(--text);
+      font-size: 1.1rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .calculator-key:hover { filter: brightness(.97); transform: translateY(-1px); }
+    .calculator-key.operator { background: #dbeafe; color: #1d4ed8; }
+    .calculator-key.clear { background: #fee2e2; color: #b91c1c; }
+    .calculator-key.equals { background: var(--primary); color: white; grid-row: span 2; }
+    .calculator-key.zero { grid-column: span 2; }
+
+    .footer-note {
+      margin-top: 14px;
+      text-align: center;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    @media (max-width: 1120px) {
+      .dashboard {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .main-layout {
+        grid-template-columns: 250px minmax(0, 1fr);
+      }
+
+      .right-panel {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .app {
+        padding: 10px;
+      }
+
+      .topbar {
+        position: static;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .dashboard {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .build-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .build-card {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .build-name {
+        display: block;
+      }
+
+      .build-icon {
+        margin: 0 auto;
+      }
+
+      .city-map-wrapper {
+        min-height: 450px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>🏙️ MathCity Builder</h1>
+        <p>Solve. Build. Grow.</p>
+      </div>
+      <div class="actions">
+        <a class="btn btn-secondary" href="../" style="text-decoration:none">🎮 Games</a>
+        <button class="btn btn-secondary" id="calculatorBtn" type="button">🧮 Calculator</button>
+        <select id="countrySelect" class="country-select" aria-label="Country and currency" title="Choose country and online currency">
+          <option value="MY" selected>🇲🇾 Malaysia — MYR</option>
+          <option value="BN">🇧🇳 Brunei — BND</option>
+          <option value="SG">🇸🇬 Singapore — SGD</option>
+          <option value="ID">🇮🇩 Indonesia — IDR</option>
+          <option value="TH">🇹🇭 Thailand — THB</option>
+          <option value="PH">🇵🇭 Philippines — PHP</option>
+          <option value="CN">🇨🇳 China — CNY</option>
+          <option value="JP">🇯🇵 Japan — JPY</option>
+          <option value="KR">🇰🇷 South Korea — KRW</option>
+          <option value="IN">🇮🇳 India — INR</option>
+          <option value="AU">🇦🇺 Australia — AUD</option>
+          <option value="NZ">🇳🇿 New Zealand — NZD</option>
+          <option value="GB">🇬🇧 United Kingdom — GBP</option>
+          <option value="US">🇺🇸 United States — USD</option>
+          <option value="CA">🇨🇦 Canada — CAD</option>
+          <option value="DE">🇪🇺 Euro Area — EUR</option>
+          <option value="SA">🇸🇦 Saudi Arabia — SAR</option>
+          <option value="AE">🇦🇪 UAE — AED</option>
+        </select>
+        <div class="music-control" title="Background music controls">
+          <button class="btn btn-secondary" id="musicBtn" type="button" aria-pressed="false">🔇 Music</button>
+          <input id="musicVolume" type="range" min="0" max="100" value="35" aria-label="Music volume" />
+        </div>
+        <button class="btn btn-secondary" id="nextDayBtn">⏭ Next Day</button>
+        <button class="btn btn-secondary" id="saveBtn">💾 Save</button>
+        <button class="btn btn-danger" id="resetBtn">↺ Reset</button>
+      </div>
+    </header>
+
+    <section class="dashboard">
+      <div class="stat">
+        <div class="stat-label">City Funds</div>
+        <div class="stat-value" id="fundsStat">RM20,000</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Population</div>
+        <div class="stat-value" id="populationStat">50</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Happiness</div>
+        <div class="stat-value" id="happinessStat">70%</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Pollution</div>
+        <div class="stat-value" id="pollutionStat">0%</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Electricity</div>
+        <div class="stat-value" id="powerStat">0 / 50</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Day</div>
+        <div class="stat-value" id="dayStat">1</div>
+      </div>
+    </section>
+
+    <main class="main-layout">
+      <aside class="panel">
+        <h2>🏗 Build Menu</h2>
+        <div class="build-list" id="buildList"></div>
+        <p class="hint">
+          Select a building, then click an empty tile. You must answer a mathematics question correctly before construction begins.
+        </p>
+      </aside>
+
+      <section class="panel map-panel">
+        <div class="map-toolbar">
+          <div>
+            <strong>City Map</strong>
+            <div class="selected-tool" id="selectedToolText">Selected: House</div>
+          </div>
+          <button class="btn btn-secondary" id="bulldozeBtn">🧹 Bulldoze Mode</button>
+        </div>
+        <div class="city-map-wrapper">
+          <div class="city-map" id="cityMap"></div>
+        </div>
+      </section>
+
+      <aside class="panel right-panel">
+        <div class="mission">
+          <div class="mission-title">🎯 Mission: Growing Community</div>
+          <div>Build a balanced city and complete all objectives.</div>
+          <ul id="missionList"></ul>
+          <div class="progress-bar">
+            <div class="progress-fill" id="missionProgress"></div>
+          </div>
+        </div>
+
+        <h2>📢 City News</h2>
+        <div class="log" id="cityLog"></div>
+      </aside>
+    </main>
+
+    <div class="footer-note">
+      MathCity Builder MVP • Created by Juil Gitom for MathToolsHub
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="questionModal">
+    <div class="modal">
+      <h2 id="questionTitle">Math Challenge</h2>
+      <div id="questionContext"></div>
+      <div class="question" id="questionText"></div>
+      <div class="answer-row">
+        <input id="answerInput" type="number" inputmode="decimal" placeholder="Enter your answer" />
+        <button class="btn btn-primary" id="submitAnswerBtn">Check</button>
+      </div>
+      <div class="feedback" id="feedback"></div>
+      <div class="actions" style="margin-top: 10px;">
+        <button class="btn btn-secondary" id="cancelQuestionBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="calculatorModal">
+    <div class="modal" style="width:min(390px,100%)">
+      <h2>🧮 City Calculator</h2>
+      <input id="calculatorDisplay" class="calculator-display" value="0" readonly aria-label="Calculator display" />
+      <div class="calculator-grid" id="calculatorGrid">
+        <button class="calculator-key clear" data-action="clear">AC</button>
+        <button class="calculator-key" data-action="backspace">⌫</button>
+        <button class="calculator-key operator" data-action="operator" data-value="÷">÷</button>
+        <button class="calculator-key operator" data-action="operator" data-value="×">×</button>
+        <button class="calculator-key" data-action="number" data-value="7">7</button>
+        <button class="calculator-key" data-action="number" data-value="8">8</button>
+        <button class="calculator-key" data-action="number" data-value="9">9</button>
+        <button class="calculator-key operator" data-action="operator" data-value="−">−</button>
+        <button class="calculator-key" data-action="number" data-value="4">4</button>
+        <button class="calculator-key" data-action="number" data-value="5">5</button>
+        <button class="calculator-key" data-action="number" data-value="6">6</button>
+        <button class="calculator-key operator" data-action="operator" data-value="+">+</button>
+        <button class="calculator-key" data-action="number" data-value="1">1</button>
+        <button class="calculator-key" data-action="number" data-value="2">2</button>
+        <button class="calculator-key" data-action="number" data-value="3">3</button>
+        <button class="calculator-key equals" data-action="equals">=</button>
+        <button class="calculator-key zero" data-action="number" data-value="0">0</button>
+        <button class="calculator-key" data-action="decimal">.</button>
+      </div>
+      <div class="actions" style="margin-top:14px">
+        <button class="btn btn-secondary" id="closeCalculatorBtn" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const GRID_SIZE = 12;
+    const SAVE_KEY = "mathCityBuilderSaveV1";
+
+    const BUILDINGS = {
+      house: {
+        name: "House",
+        icon: "🏠",
+        cost: 500,
+        maintenance: 20,
+        population: 10,
+        happiness: 1,
+        pollution: 0,
+        powerUse: 2,
+        income: 45,
+        description: "+10 population"
+      },
+      road: {
+        name: "Road",
+        icon: "🛣️",
+        cost: 200,
+        maintenance: 8,
+        population: 0,
+        happiness: 0,
+        pollution: 0,
+        powerUse: 0,
+        income: 0,
+        description: "Connect your city"
+      },
+      school: {
+        name: "School",
+        icon: "🏫",
+        cost: 3000,
+        maintenance: 120,
+        population: 0,
+        happiness: 8,
+        pollution: 0,
+        powerUse: 8,
+        income: 0,
+        description: "+8 happiness"
+      },
+      park: {
+        name: "Park",
+        icon: "🌳",
+        cost: 1000,
+        maintenance: 35,
+        population: 0,
+        happiness: 6,
+        pollution: -4,
+        powerUse: 0,
+        income: 0,
+        description: "+6 happiness, -4 pollution"
+      },
+      factory: {
+        name: "Factory",
+        icon: "🏭",
+        cost: 5000,
+        maintenance: 180,
+        population: 0,
+        happiness: -3,
+        pollution: 9,
+        powerUse: 12,
+        income: 650,
+        description: "+RM650/day"
+      },
+      shop: {
+        name: "Shop",
+        icon: "🏪",
+        cost: 2500,
+        maintenance: 90,
+        population: 0,
+        happiness: 4,
+        pollution: 1,
+        powerUse: 6,
+        income: 300,
+        description: "+RM300/day"
+      },
+      hospital: {
+        name: "Hospital",
+        icon: "🏥",
+        cost: 4000,
+        maintenance: 170,
+        population: 0,
+        happiness: 10,
+        pollution: 0,
+        powerUse: 10,
+        income: 0,
+        description: "+10 happiness"
+      },
+      power: {
+        name: "Power Plant",
+        icon: "⚡",
+        cost: 8000,
+        maintenance: 250,
+        population: 0,
+        happiness: -2,
+        pollution: 7,
+        powerUse: -100,
+        income: 0,
+        description: "+100 electricity"
+      }
+    };
+
+    const state = {
+      funds: 20000,
+      basePopulation: 50,
+      happiness: 70,
+      pollution: 0,
+      day: 1,
+      selectedBuilding: "house",
+      bulldozeMode: false,
+      grid: Array(GRID_SIZE * GRID_SIZE).fill(null),
+      log: [
+        { text: "Welcome, Mayor! Build your first neighbourhood.", type: "info" }
+      ],
+      pendingBuild: null,
+      currentQuestion: null,
+      missionRewarded: false
+    };
+
+    const el = {
+      buildList: document.getElementById("buildList"),
+      cityMap: document.getElementById("cityMap"),
+      funds: document.getElementById("fundsStat"),
+      population: document.getElementById("populationStat"),
+      happiness: document.getElementById("happinessStat"),
+      pollution: document.getElementById("pollutionStat"),
+      power: document.getElementById("powerStat"),
+      day: document.getElementById("dayStat"),
+      selectedToolText: document.getElementById("selectedToolText"),
+      cityLog: document.getElementById("cityLog"),
+      missionList: document.getElementById("missionList"),
+      missionProgress: document.getElementById("missionProgress"),
+      modal: document.getElementById("questionModal"),
+      questionTitle: document.getElementById("questionTitle"),
+      questionContext: document.getElementById("questionContext"),
+      questionText: document.getElementById("questionText"),
+      answerInput: document.getElementById("answerInput"),
+      feedback: document.getElementById("feedback"),
+      submitAnswerBtn: document.getElementById("submitAnswerBtn"),
+      cancelQuestionBtn: document.getElementById("cancelQuestionBtn"),
+      bulldozeBtn: document.getElementById("bulldozeBtn"),
+      nextDayBtn: document.getElementById("nextDayBtn"),
+      saveBtn: document.getElementById("saveBtn"),
+      resetBtn: document.getElementById("resetBtn")
+    };
+
+    el.musicBtn = document.getElementById("musicBtn");
+    el.musicVolume = document.getElementById("musicVolume");
+    el.countrySelect = document.getElementById("countrySelect");
+    el.calculatorBtn = document.getElementById("calculatorBtn");
+    el.calculatorModal = document.getElementById("calculatorModal");
+    el.calculatorDisplay = document.getElementById("calculatorDisplay");
+    el.calculatorGrid = document.getElementById("calculatorGrid");
+    el.closeCalculatorBtn = document.getElementById("closeCalculatorBtn");
+
+    let calculatorValue = "0";
+    let calculatorStoredValue = null;
+    let calculatorOperator = null;
+    let calculatorWaiting = false;
+
+    function updateCalculatorDisplay() {
+      el.calculatorDisplay.value = calculatorValue;
+    }
+
+    function calculateResult(a, b, operator) {
+      if (operator === "+") return a + b;
+      if (operator === "−") return a - b;
+      if (operator === "×") return a * b;
+      if (operator === "÷") return b === 0 ? NaN : a / b;
+      return b;
+    }
+
+    function calculatorInput(action, value = "") {
+      if (action === "number") {
+        calculatorValue = calculatorWaiting || calculatorValue === "0" ? value : calculatorValue + value;
+        calculatorWaiting = false;
+      } else if (action === "decimal") {
+        if (calculatorWaiting) { calculatorValue = "0."; calculatorWaiting = false; }
+        else if (!calculatorValue.includes(".")) calculatorValue += ".";
+      } else if (action === "clear") {
+        calculatorValue = "0"; calculatorStoredValue = null; calculatorOperator = null; calculatorWaiting = false;
+      } else if (action === "backspace") {
+        if (!calculatorWaiting) calculatorValue = calculatorValue.length > 1 ? calculatorValue.slice(0,-1) : "0";
+      } else if (action === "operator") {
+        const current = Number(calculatorValue);
+        if (calculatorStoredValue !== null && calculatorOperator && !calculatorWaiting) {
+          const result = calculateResult(calculatorStoredValue, current, calculatorOperator);
+          calculatorValue = Number.isFinite(result) ? String(Number(result.toFixed(10))) : "Error";
+          calculatorStoredValue = Number.isFinite(result) ? result : null;
+        } else calculatorStoredValue = current;
+        calculatorOperator = value;
+        calculatorWaiting = true;
+      } else if (action === "equals" && calculatorOperator && calculatorStoredValue !== null) {
+        const result = calculateResult(calculatorStoredValue, Number(calculatorValue), calculatorOperator);
+        calculatorValue = Number.isFinite(result) ? String(Number(result.toFixed(10))) : "Error";
+        calculatorStoredValue = null; calculatorOperator = null; calculatorWaiting = true;
+      }
+      updateCalculatorDisplay();
+    }
+
+    const COUNTRY_CURRENCIES = {
+      MY:{currency:"MYR",locale:"ms-MY"}, BN:{currency:"BND",locale:"ms-BN"},
+      SG:{currency:"SGD",locale:"en-SG"}, ID:{currency:"IDR",locale:"id-ID"},
+      TH:{currency:"THB",locale:"th-TH"}, PH:{currency:"PHP",locale:"en-PH"},
+      CN:{currency:"CNY",locale:"zh-CN"}, JP:{currency:"JPY",locale:"ja-JP"},
+      KR:{currency:"KRW",locale:"ko-KR"}, IN:{currency:"INR",locale:"en-IN"},
+      AU:{currency:"AUD",locale:"en-AU"}, NZ:{currency:"NZD",locale:"en-NZ"},
+      GB:{currency:"GBP",locale:"en-GB"}, US:{currency:"USD",locale:"en-US"},
+      CA:{currency:"CAD",locale:"en-CA"}, DE:{currency:"EUR",locale:"de-DE"},
+      SA:{currency:"SAR",locale:"ar-SA"}, AE:{currency:"AED",locale:"en-AE"}
+    };
+    let selectedCountry = "MY";
+    let selectedCurrency = "MYR";
+    let currencyLocale = "ms-MY";
+    let exchangeRate = 1;
+
+    let audioContext = null;
+    let musicGain = null;
+    let musicTimer = null;
+    let musicPlaying = false;
+
+    const melody = [261.63, 329.63, 392, 329.63, 293.66, 349.23, 440, 392];
+    const bassLine = [130.81, 146.83, 174.61, 196];
+
+    function playTone(frequency, start, duration, volume, wave = "sine") {
+      if (!audioContext || !musicGain) return;
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      oscillator.type = wave;
+      oscillator.frequency.value = frequency;
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(volume, start + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+      oscillator.connect(gain);
+      gain.connect(musicGain);
+      oscillator.start(start);
+      oscillator.stop(start + duration + 0.05);
+    }
+
+    function scheduleMusicCycle() {
+      if (!musicPlaying || !audioContext) return;
+      const start = audioContext.currentTime + 0.08;
+      melody.forEach((note, index) => {
+        playTone(note, start + index * 0.48, 0.4, 0.12, "triangle");
+        if (index % 2 === 0) playTone(note * 2, start + index * 0.48, 0.25, 0.025, "sine");
+      });
+      bassLine.forEach((note, index) => playTone(note, start + index * 0.96, 0.82, 0.075, "sine"));
+    }
+
+    function setMusicVolume() {
+      if (!musicGain || !audioContext) return;
+      const volume = Number(el.musicVolume.value) / 100;
+      musicGain.gain.setTargetAtTime(volume * 0.42, audioContext.currentTime, 0.03);
+    }
+
+    async function startMusic() {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) {
+        el.musicBtn.textContent = "Music unavailable";
+        el.musicBtn.disabled = true;
+        return;
+      }
+      audioContext = new AudioContextClass();
+      await audioContext.resume();
+      musicGain = audioContext.createGain();
+      musicGain.connect(audioContext.destination);
+      musicPlaying = true;
+      setMusicVolume();
+      scheduleMusicCycle();
+      musicTimer = setInterval(scheduleMusicCycle, 3840);
+      el.musicBtn.textContent = "🔊 Music";
+      el.musicBtn.setAttribute("aria-pressed", "true");
+    }
+
+    function stopMusic() {
+      musicPlaying = false;
+      clearInterval(musicTimer);
+      musicTimer = null;
+      if (musicGain && audioContext) musicGain.gain.setTargetAtTime(0.0001, audioContext.currentTime, 0.03);
+      const contextToClose = audioContext;
+      audioContext = null;
+      musicGain = null;
+      if (contextToClose) setTimeout(() => contextToClose.close(), 180);
+      el.musicBtn.textContent = "🔇 Music";
+      el.musicBtn.setAttribute("aria-pressed", "false");
+    }
+
+    function toggleMusic() {
+      if (musicPlaying) stopMusic();
+      else startMusic();
+    }
+
+    function formatMoney(value) {
+      const converted = value * exchangeRate;
+      return new Intl.NumberFormat(currencyLocale, {
+        style: "currency",
+        currency: selectedCurrency,
+        maximumFractionDigits: ["IDR","JPY","KRW"].includes(selectedCurrency) ? 0 : 2
+      }).format(converted);
+    }
+
+    async function updateCountryCurrency(countryCode, announce = true) {
+      const config = COUNTRY_CURRENCIES[countryCode] || COUNTRY_CURRENCIES.MY;
+      selectedCountry = countryCode;
+      selectedCurrency = config.currency;
+      currencyLocale = config.locale;
+      exchangeRate = 1;
+      el.countrySelect.disabled = true;
+
+      try {
+        if (selectedCurrency !== "MYR") {
+          const response = await fetch(`https://api.frankfurter.dev/v2/rate/MYR/${selectedCurrency}`);
+          if (!response.ok) throw new Error("Rate service unavailable");
+          const data = await response.json();
+          if (!Number.isFinite(Number(data.rate))) throw new Error("Invalid exchange rate");
+          exchangeRate = Number(data.rate);
+          localStorage.setItem(`mathCityRate_${selectedCurrency}`, JSON.stringify({rate:exchangeRate,date:data.date}));
+          if (announce) addLog(`Online currency updated: 1 MYR = ${exchangeRate.toLocaleString()} ${selectedCurrency} (${data.date}).`, "info");
+        } else if (announce) {
+          addLog("Currency changed to Malaysian Ringgit (MYR).", "info");
+        }
+      } catch (error) {
+        let cached = null;
+        try { cached = JSON.parse(localStorage.getItem(`mathCityRate_${selectedCurrency}`) || "null"); }
+        catch (cacheError) { cached = null; }
+        if (cached && Number.isFinite(Number(cached.rate))) {
+          exchangeRate = Number(cached.rate);
+          if (announce) addLog(`Using the last saved ${selectedCurrency} exchange rate because the online service is unavailable.`, "bad");
+        } else {
+          selectedCountry = "MY";
+          selectedCurrency = "MYR";
+          currencyLocale = "ms-MY";
+          exchangeRate = 1;
+          el.countrySelect.value = "MY";
+          if (announce) addLog("Online exchange rate unavailable. Currency returned to MYR.", "bad");
+        }
+      } finally {
+        el.countrySelect.disabled = false;
+        localStorage.setItem("mathCityCountry", selectedCountry);
+        render();
+      }
+    }
+
+    function countBuilding(type) {
+      return state.grid.filter(item => item === type).length;
+    }
+
+    function calculateStats() {
+      let population = state.basePopulation;
+      let happinessModifier = 0;
+      let pollution = 0;
+      let powerGenerated = 50;
+      let powerUsed = 0;
+      let dailyIncome = 0;
+      let dailyMaintenance = 0;
+
+      state.grid.forEach(type => {
+        if (!type) return;
+        const b = BUILDINGS[type];
+        population += b.population;
+        happinessModifier += b.happiness;
+        pollution += b.pollution;
+        dailyIncome += b.income;
+        dailyMaintenance += b.maintenance;
+
+        if (b.powerUse < 0) {
+          powerGenerated += Math.abs(b.powerUse);
+        } else {
+          powerUsed += b.powerUse;
+        }
+      });
+
+      pollution = Math.max(0, Math.min(100, pollution));
+      let happiness = 70 + happinessModifier - Math.floor(pollution / 3);
+
+      if (powerUsed > powerGenerated) {
+        happiness -= 12;
+      }
+
+      happiness = Math.max(0, Math.min(100, happiness));
+
+      return {
+        population,
+        happiness,
+        pollution,
+        powerGenerated,
+        powerUsed,
+        dailyIncome,
+        dailyMaintenance,
+        netIncome: dailyIncome - dailyMaintenance
+      };
+    }
+
+    function renderBuildMenu() {
+      el.buildList.innerHTML = "";
+      Object.entries(BUILDINGS).forEach(([key, b]) => {
+        const button = document.createElement("button");
+        button.className = "build-card" + (
+          state.selectedBuilding === key && !state.bulldozeMode ? " selected" : ""
+        );
+        button.innerHTML = `
+          <div class="build-icon">${b.icon}</div>
+          <div>
+            <div class="build-name">
+              <span>${b.name}</span>
+              <span>${formatMoney(b.cost)}</span>
+            </div>
+            <div class="build-meta">${b.description}<br>Maintenance: ${formatMoney(b.maintenance)}/day</div>
+          </div>
+        `;
+        button.addEventListener("click", () => {
+          state.selectedBuilding = key;
+          state.bulldozeMode = false;
+          render();
+        });
+        el.buildList.appendChild(button);
+      });
+    }
+
+    function renderMap() {
+      el.cityMap.innerHTML = "";
+      state.grid.forEach((type, index) => {
+        const tile = document.createElement("button");
+        tile.className = "tile" + (type ? " " + type : "");
+        tile.setAttribute("aria-label", type ? BUILDINGS[type].name : "Empty land");
+        tile.innerHTML = type
+          ? `${BUILDINGS[type].icon}<small>${index + 1}</small>`
+          : `<small>${index + 1}</small>`;
+        tile.addEventListener("click", () => handleTileClick(index));
+        el.cityMap.appendChild(tile);
+      });
+    }
+
+    function renderDashboard() {
+      const stats = calculateStats();
+      el.funds.textContent = formatMoney(state.funds);
+      el.population.textContent = stats.population.toLocaleString();
+      el.happiness.textContent = stats.happiness + "%";
+      el.pollution.textContent = stats.pollution + "%";
+      el.power.textContent = `${stats.powerUsed} / ${stats.powerGenerated}`;
+      el.day.textContent = state.day;
+
+      el.happiness.style.color = stats.happiness >= 70 ? "var(--success)" :
+        stats.happiness >= 45 ? "var(--accent)" : "var(--danger)";
+      el.pollution.style.color = stats.pollution <= 20 ? "var(--success)" :
+        stats.pollution <= 50 ? "var(--accent)" : "var(--danger)";
+      el.funds.style.color = state.funds >= 0 ? "var(--text)" : "var(--danger)";
+
+      if (state.bulldozeMode) {
+        el.selectedToolText.textContent = "Selected: Bulldoze";
+      } else {
+        el.selectedToolText.textContent = `Selected: ${BUILDINGS[state.selectedBuilding].name}`;
+      }
+      el.bulldozeBtn.classList.toggle("btn-primary", state.bulldozeMode);
+      el.bulldozeBtn.classList.toggle("btn-secondary", !state.bulldozeMode);
+    }
+
+    function renderLog() {
+      el.cityLog.innerHTML = "";
+      state.log.slice(0, 16).forEach(item => {
+        const row = document.createElement("div");
+        row.className = `log-item ${item.type || "info"}`;
+        row.textContent = item.text;
+        el.cityLog.appendChild(row);
+      });
+    }
+
+    function renderMission() {
+      const stats = calculateStats();
+      const objectives = [
+        { label: "Population reaches 100", done: stats.population >= 100 },
+        { label: "Build at least 1 school", done: countBuilding("school") >= 1 },
+        { label: "Build at least 1 park", done: countBuilding("park") >= 1 },
+        { label: "Happiness reaches 75%", done: stats.happiness >= 75 },
+        { label: "Maintain RM5,000 funds", done: state.funds >= 5000 }
+      ];
+
+      el.missionList.innerHTML = objectives.map(obj =>
+        `<li>${obj.done ? "✅" : "⬜"} ${obj.label}</li>`
+      ).join("");
+
+      const completed = objectives.filter(obj => obj.done).length;
+      el.missionProgress.style.width = `${(completed / objectives.length) * 100}%`;
+
+      if (completed === objectives.length && !state.missionRewarded) {
+        state.missionRewarded = true;
+        state.funds += 5000;
+        addLog("Mission completed! You earned a RM5,000 city grant.", "good");
+        saveGame(false);
+      }
+    }
+
+    function render() {
+      renderBuildMenu();
+      renderMap();
+      renderDashboard();
+      renderLog();
+      renderMission();
+    }
+
+    function handleTileClick(index) {
+      const current = state.grid[index];
+
+      if (state.bulldozeMode) {
+        if (!current) {
+          addLog("There is nothing to bulldoze on that tile.", "bad");
+          render();
+          return;
+        }
+
+        const refund = Math.round(BUILDINGS[current].cost * 0.35);
+        state.grid[index] = null;
+        state.funds += refund;
+        addLog(`${BUILDINGS[current].name} removed. Refund: ${formatMoney(refund)}.`, "info");
+        render();
+        return;
+      }
+
+      if (current) {
+        addLog(`Tile occupied by ${BUILDINGS[current].name}. Use bulldoze mode to remove it.`, "bad");
+        render();
+        return;
+      }
+
+      const building = BUILDINGS[state.selectedBuilding];
+
+      if (state.funds < building.cost) {
+        addLog(`Not enough money to build ${building.name}.`, "bad");
+        render();
+        return;
+      }
+
+      state.pendingBuild = { index, type: state.selectedBuilding };
+      openQuestion(building);
+    }
+
+    function generateQuestion() {
+      const level = Math.min(5, 1 + Math.floor(state.day / 4));
+      const modes = ["add", "subtract", "multiply", "divide", "percent"];
+      const mode = modes[Math.floor(Math.random() * Math.min(level, modes.length))];
+
+      if (mode === "add") {
+        const a = randomInt(12, 99);
+        const b = randomInt(10, 90);
+        return { text: `${a} + ${b} = ?`, answer: a + b };
+      }
+
+      if (mode === "subtract") {
+        const a = randomInt(40, 150);
+        const b = randomInt(10, a - 5);
+        return { text: `${a} − ${b} = ?`, answer: a - b };
+      }
+
+      if (mode === "multiply") {
+        const a = randomInt(3, 12);
+        const b = randomInt(3, 12);
+        return { text: `${a} × ${b} = ?`, answer: a * b };
+      }
+
+      if (mode === "divide") {
+        const divisor = randomInt(2, 12);
+        const answer = randomInt(2, 12);
+        const dividend = divisor * answer;
+        return { text: `${dividend} ÷ ${divisor} = ?`, answer };
+      }
+
+      const base = randomInt(2, 10) * 10;
+      const percent = [10, 20, 25, 50][randomInt(0, 3)];
+      return {
+        text: `${percent}% of ${base} = ?`,
+        answer: (percent / 100) * base
+      };
+    }
+
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function openQuestion(building) {
+      state.currentQuestion = generateQuestion();
+      el.questionTitle.textContent = `Build ${building.icon} ${building.name}`;
+      el.questionContext.textContent =
+        `Construction cost: ${formatMoney(building.cost)}. Solve correctly to approve construction.`;
+      el.questionText.textContent = state.currentQuestion.text;
+      el.answerInput.value = "";
+      el.feedback.textContent = "";
+      el.feedback.style.color = "var(--text)";
+      el.modal.classList.add("show");
+      setTimeout(() => el.answerInput.focus(), 50);
+    }
+
+    function closeQuestion() {
+      el.modal.classList.remove("show");
+      state.pendingBuild = null;
+      state.currentQuestion = null;
+    }
+
+    function submitAnswer() {
+      if (!state.currentQuestion || !state.pendingBuild) return;
+
+      const userAnswer = Number(el.answerInput.value);
+      if (el.answerInput.value.trim() === "" || Number.isNaN(userAnswer)) {
+        el.feedback.textContent = "Please enter a valid number.";
+        el.feedback.style.color = "var(--danger)";
+        return;
+      }
+
+      if (Math.abs(userAnswer - state.currentQuestion.answer) < 0.001) {
+        const { index, type } = state.pendingBuild;
+        const b = BUILDINGS[type];
+
+        if (state.funds < b.cost) {
+          el.feedback.textContent = "City funds changed and are now insufficient.";
+          el.feedback.style.color = "var(--danger)";
+          return;
+        }
+
+        state.funds -= b.cost;
+        state.grid[index] = type;
+        addLog(`${b.name} constructed successfully on tile ${index + 1}.`, "good");
+        el.feedback.textContent = "Correct! Construction approved.";
+        el.feedback.style.color = "var(--success)";
+
+        setTimeout(() => {
+          closeQuestion();
+          render();
+        }, 500);
+      } else {
+        el.feedback.textContent = `Not correct. Try again.`;
+        el.feedback.style.color = "var(--danger)";
+      }
+    }
+
+    function nextDay() {
+      const stats = calculateStats();
+      state.day += 1;
+      state.funds += stats.netIncome;
+
+      let message = `Day ${state.day}: Income ${formatMoney(stats.dailyIncome)}, expenses ${formatMoney(stats.dailyMaintenance)}.`;
+      addLog(message, stats.netIncome >= 0 ? "good" : "bad");
+
+      if (stats.powerUsed > stats.powerGenerated) {
+        addLog("Power shortage! Build a power plant to improve city happiness.", "bad");
+      }
+
+      if (stats.pollution > 35) {
+        addLog("Pollution is rising. Build parks and reduce industrial pressure.", "bad");
+      }
+
+      if (state.funds < 0) {
+        addLog("Warning: The city is in debt.", "bad");
+      }
+
+      if (state.day % 5 === 0) {
+        const bonus = Math.max(0, Math.round(stats.population * 5));
+        state.funds += bonus;
+        addLog(`Population grant received: ${formatMoney(bonus)}.`, "info");
+      }
+
+      render();
+    }
+
+    function addLog(text, type = "info") {
+      state.log.unshift({ text, type });
+      state.log = state.log.slice(0, 30);
+    }
+
+    function saveGame(showMessage = true) {
+      const saveData = {
+        funds: state.funds,
+        basePopulation: state.basePopulation,
+        day: state.day,
+        selectedBuilding: state.selectedBuilding,
+        grid: state.grid,
+        log: state.log,
+        missionRewarded: state.missionRewarded
+      };
+      localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
+      if (showMessage) {
+        addLog("Game saved on this device.", "good");
+        render();
+      }
+    }
+
+    function loadGame() {
+      const saved = localStorage.getItem(SAVE_KEY);
+      if (!saved) return;
+
+      try {
+        const data = JSON.parse(saved);
+        state.funds = Number(data.funds ?? state.funds);
+        state.basePopulation = Number(data.basePopulation ?? state.basePopulation);
+        state.day = Number(data.day ?? state.day);
+        state.selectedBuilding = data.selectedBuilding in BUILDINGS ? data.selectedBuilding : "house";
+        state.grid = Array.isArray(data.grid) && data.grid.length === GRID_SIZE * GRID_SIZE
+          ? data.grid
+          : state.grid;
+        state.log = Array.isArray(data.log) ? data.log : state.log;
+        state.missionRewarded = Boolean(data.missionRewarded);
+        addLog("Saved city loaded.", "info");
+      } catch (error) {
+        console.error("Could not load save:", error);
+      }
+    }
+
+    function resetGame() {
+      const confirmed = confirm("Reset the entire city? This will remove the saved game.");
+      if (!confirmed) return;
+      localStorage.removeItem(SAVE_KEY);
+      location.reload();
+    }
+
+    el.submitAnswerBtn.addEventListener("click", submitAnswer);
+    el.answerInput.addEventListener("keydown", event => {
+      if (event.key === "Enter") submitAnswer();
+    });
+    el.cancelQuestionBtn.addEventListener("click", closeQuestion);
+    el.modal.addEventListener("click", event => {
+      if (event.target === el.modal) closeQuestion();
+    });
+
+    el.bulldozeBtn.addEventListener("click", () => {
+      state.bulldozeMode = !state.bulldozeMode;
+      render();
+    });
+
+    el.nextDayBtn.addEventListener("click", nextDay);
+    el.saveBtn.addEventListener("click", () => saveGame(true));
+    el.resetBtn.addEventListener("click", resetGame);
+    el.musicBtn.addEventListener("click", toggleMusic);
+    el.musicVolume.addEventListener("input", setMusicVolume);
+    el.countrySelect.addEventListener("change", () => updateCountryCurrency(el.countrySelect.value));
+    el.calculatorBtn.addEventListener("click", () => el.calculatorModal.classList.add("show"));
+    el.closeCalculatorBtn.addEventListener("click", () => el.calculatorModal.classList.remove("show"));
+    el.calculatorModal.addEventListener("click", event => {
+      if (event.target === el.calculatorModal) el.calculatorModal.classList.remove("show");
+    });
+    el.calculatorGrid.addEventListener("click", event => {
+      const key = event.target.closest("[data-action]");
+      if (key) calculatorInput(key.dataset.action, key.dataset.value || "");
+    });
+
+    document.addEventListener("keydown", event => {
+      if (!el.calculatorModal.classList.contains("show")) return;
+      if (/^[0-9]$/.test(event.key)) calculatorInput("number", event.key);
+      else if (event.key === ".") calculatorInput("decimal");
+      else if (event.key === "+") calculatorInput("operator", "+");
+      else if (event.key === "-") calculatorInput("operator", "−");
+      else if (event.key === "*") calculatorInput("operator", "×");
+      else if (event.key === "/") { event.preventDefault(); calculatorInput("operator", "÷"); }
+      else if (event.key === "Enter" || event.key === "=") calculatorInput("equals");
+      else if (event.key === "Backspace") calculatorInput("backspace");
+      else if (event.key === "Escape") el.calculatorModal.classList.remove("show");
+      else if (event.key.toLowerCase() === "c") calculatorInput("clear");
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (!audioContext || !musicPlaying) return;
+      if (document.hidden) audioContext.suspend();
+      else audioContext.resume();
+    });
+
+    loadGame();
+    const savedCountry = localStorage.getItem("mathCityCountry");
+    if (savedCountry && COUNTRY_CURRENCIES[savedCountry]) {
+      el.countrySelect.value = savedCountry;
+      updateCountryCurrency(savedCountry, false);
+    } else {
+      render();
+    }
+  </script>
+  <script src="../../supabase-config.js"></script>
+  <script type="module" src="../../supabase-progress.js" data-activity-id="game/mathcity-builder" data-activity-type="game" data-progress-keys="mathCityBuilderSaveV1"></script>
+</body>
+</html>
