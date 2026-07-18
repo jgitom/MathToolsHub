@@ -34,6 +34,20 @@
   selector.innerHTML = '<option value="en">English</option><option value="ms">Bahasa Melayu</option><option value="zh">中文（普通话）</option>';
   (document.getElementById("siteLanguageSlot") || document.body).appendChild(selector);
 
+  function translateDynamicCatalogueName(source, language) {
+    if (language === "ms") {
+      return source
+        .replace(/\bYear ([1-6])\b/g, "Tahun $1")
+        .replace(/\bForm ([1-5])\b/g, "Tingkatan $1");
+    }
+    if (language === "zh") {
+      const numbers = { "1":"一", "2":"二", "3":"三", "4":"四", "5":"五", "6":"六" };
+      return source
+        .replace(/\bYear ([1-6])\b/g, (_, number) => `${numbers[number]}年级`)
+        .replace(/\bForm ([1-5])\b/g, (_, number) => `中${numbers[number]}`);
+    }
+    return source;
+  }
   const originals = new WeakMap();
   function apply(language) {
     document.documentElement.lang = language === "zh" ? "zh-CN" : language;
@@ -47,7 +61,7 @@
     nodes.forEach(node => {
       if (!originals.has(node)) originals.set(node,node.nodeValue);
       const source=originals.get(node), clean=source.trim();
-      const translated=language === "en" ? clean : translations[language]?.[clean] || clean;
+      const translated=language === "en" ? clean : translations[language]?.[clean] || translateDynamicCatalogueName(clean, language);
       node.nodeValue=source.replace(clean,translated);
     });
     selector.value=language;
