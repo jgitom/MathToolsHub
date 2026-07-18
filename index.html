@@ -278,6 +278,35 @@
         .ai-copy { display: flex; flex-direction: column; line-height: 1.15; }
         .ai-copy small { margin-top: 4px; color: #bfdbfe; font-size: .66rem; font-weight: 600; }
 
+        @media (min-width: 561px) {
+            .nav { position: relative; }
+            .menu-toggle { display: inline-flex; align-items: center; gap: 7px; }
+            .nav-links {
+                position: absolute;
+                top: 100%;
+                right: 0;
+                z-index: 40;
+                width: min(760px, calc(100vw - 40px));
+                display: none;
+                align-items: center;
+                justify-content: flex-end;
+                flex-wrap: wrap;
+                gap: 8px 18px;
+                padding: 16px;
+                border: 1px solid #496989;
+                border-radius: 0 0 12px 12px;
+                background: var(--navy);
+                box-shadow: 0 18px 38px rgba(3,17,34,.34);
+            }
+            .menu-toggle:hover + .nav-links,
+            .menu-toggle:focus-visible + .nav-links,
+            .nav-links:hover,
+            .nav-links:focus-within,
+            .nav-links.is-open { display: flex; }
+            .nav-links > a { padding: 10px 8px; border-radius: 7px; }
+            .nav-links > a:hover,
+            .nav-links > a:focus-visible { background: rgba(255,255,255,.1); text-decoration: none; }
+        }
         @media (max-width: 820px) {
             .hero-inner { grid-template-columns: 1fr; gap: 45px; }
             .hero-panel { max-width: 560px; }
@@ -462,6 +491,17 @@
         menuToggle.addEventListener("click", () => {
             const isOpen = mainMenu.classList.toggle("is-open");
             menuToggle.setAttribute("aria-expanded", String(isOpen));
+        });
+        const desktopHoverMenu = window.matchMedia("(min-width: 561px) and (hover: hover)");
+        const mainNavigation = menuToggle.closest(".nav");
+        menuToggle.addEventListener("pointerenter", event => {
+            if (desktopHoverMenu.matches && event.pointerType === "mouse") {
+                mainMenu.classList.add("is-open");
+                menuToggle.setAttribute("aria-expanded", "true");
+            }
+        });
+        mainNavigation.addEventListener("pointerleave", event => {
+            if (desktopHoverMenu.matches && event.pointerType === "mouse") closeMobileMenu();
         });
         mainMenu.addEventListener("click", event => { if (event.target.closest("a")) closeMobileMenu(); });
         document.addEventListener("click", event => { if (!event.target.closest(".nav")) closeMobileMenu(); });
