@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Year 5 Mathematics Escape Room Adventure" />
-  <title>Escape Room Mathematics: The Lost Island</title>
+  <title>Escape Room Mathematics: The Lost Island — Version 1.0</title>
   <style>
     :root {
       --bg: #062d3f;
@@ -595,7 +595,9 @@
         font-size: .65rem;
       }
     }
-  </style>
+
+    /* Version 1 release systems */
+    .release-badge{display:inline-flex;margin-top:8px;padding:5px 10px;border:1px solid #ffffff80;border-radius:999px;background:#ffffff29;color:#fff;font-size:.7rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.record-stat strong{color:#ffe08a}.start-options{display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:left}.start-options label{display:grid;gap:7px;font-weight:800}.start-options select{width:100%;padding:12px;border:2px solid #0f27472e;border-radius:12px;background:#fff;color:#172033;font:inherit}.record-summary{grid-column:1/-1;margin:0;padding:11px 13px;border-radius:12px;background:#eef6ff;color:#284c76;text-align:center;font-size:.85rem;font-weight:800}.end-badges{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:14px 0}.end-badge{padding:8px 11px;border:1px solid #e5b94f;border-radius:999px;background:#fff8d9;color:#73520a;font-size:.78rem;font-weight:900}@media(max-width:620px){.start-options{grid-template-columns:1fr}.record-summary{grid-column:auto}}</style>
   <meta name="author" content="Juil Gitom">
   <style id="creator-credit-style">
     .creator-credit{position:fixed;left:12px;bottom:10px;z-index:9998;display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border:1px solid rgba(148,163,184,.38);border-radius:999px;color:#334155;background:rgba(255,255,255,.9);box-shadow:0 5px 16px rgba(15,23,42,.13);font:600 11px/1.2 Inter,"Segoe UI",Arial,sans-serif;letter-spacing:.01em;backdrop-filter:blur(8px);pointer-events:none}
@@ -611,6 +613,7 @@
       <div class="brand">
         <h1>🏝️ Escape Room Mathematics</h1>
         <p>The Lost Island of Numbers · Year 5 Adventure</p>
+        <span class="release-badge">Version 1.0</span>
       </div>
 
       <section class="hud" aria-label="Game statistics">
@@ -618,6 +621,8 @@
         <div class="stat"><small>Score</small><strong id="score">0</strong></div>
         <div class="stat"><small>Lives</small><strong id="lives">❤️❤️❤️</strong></div>
         <div class="stat"><small>Keys</small><strong id="keys">0 / 6</strong></div>
+        <div class="stat record-stat"><small>Best</small><strong id="bestScore">0</strong></div>
+        <div class="stat record-stat"><small>Escapes</small><strong id="escapeCount">0</strong></div>
       </section>
     </header>
 
@@ -680,7 +685,7 @@
       </section>
     </section>
 
-    <p class="footer-note">MathToolsHub · Interactive Year 5 Mathematics Prototype</p>
+    <p class="footer-note">MathToolsHub · Escape Room Mathematics Year 5 · Version 1.0 · Created by Juil Gitom</p>
   </main>
 
   <div id="startOverlay" class="overlay">
@@ -696,6 +701,11 @@
           Explorer name
           <input id="nameInput" type="text" maxlength="18" placeholder="Enter your name" value="Student" />
         </label>
+        <label>
+          Adventure pace
+          <select id="modeInput"><option value="45">Explorer · 45 seconds</option><option value="30" selected>Classic · 30 seconds</option><option value="20">Challenge · 20 seconds</option></select>
+        </label>
+        <p id="recordSummary" class="record-summary">Best score: 0 · Escapes: 0</p>
       </div>
       <button id="startButton" class="primary-btn" type="button">Start Adventure</button>
     </div>
@@ -707,6 +717,7 @@
       <h2 id="endTitle">You Escaped!</h2>
       <p id="endMessage"></p>
       <div id="finalScore" class="final-score"></div>
+      <div id="endBadges" class="end-badges" aria-label="Achievements earned"></div>
       <button id="restartButton" class="primary-btn" type="button">Play Again</button>
     </div>
   </div>
@@ -745,6 +756,16 @@
       ]}
     ];
 
+    const releaseStorageKey = "escapeRoomMathYear5V1";
+    function loadRecords() {
+      try { const stored = JSON.parse(localStorage.getItem(releaseStorageKey) || "{}"); return { bestScore: Math.max(0, Number(stored.bestScore) || 0), escapes: Math.max(0, Number(stored.escapes) || 0), lastPlayer: typeof stored.lastPlayer === "string" ? stored.lastPlayer.slice(0, 18) : "Student" }; }
+      catch (error) { localStorage.removeItem(releaseStorageKey); return { bestScore: 0, escapes: 0, lastPlayer: "Student" }; }
+    }
+    function saveRecords() {
+      try { localStorage.setItem(releaseStorageKey, JSON.stringify({ bestScore: state.bestScore, escapes: state.escapes, lastPlayer: el.playerName.textContent })); }
+      catch (error) { console.warn("Escape Room records could not be saved.", error); }
+    }
+    const releaseRecords = loadRecords();
     const totalPuzzles = rooms.reduce((sum, room) => sum + room.questions.length, 0);
     const state = {
       room: 0,
@@ -755,7 +776,15 @@
       answered: false,
       timer: 30,
       interval: null,
-      completedRooms: new Set()
+      completedRooms: new Set(),
+      timeLimit: 30,
+      correct: 0,
+      attempted: 0,
+      streak: 0,
+      bestStreak: 0,
+      startedAt: 0,
+      bestScore: releaseRecords.bestScore,
+      escapes: releaseRecords.escapes
     };
 
     const el = {
@@ -763,6 +792,8 @@
       score: document.getElementById("score"),
       lives: document.getElementById("lives"),
       keys: document.getElementById("keys"),
+      bestScore: document.getElementById("bestScore"),
+      escapeCount: document.getElementById("escapeCount"),
       progressBar: document.getElementById("progressBar"),
       roomLabel: document.getElementById("roomLabel"),
       roomTitle: document.getElementById("roomTitle"),
@@ -780,11 +811,14 @@
       startOverlay: document.getElementById("startOverlay"),
       startButton: document.getElementById("startButton"),
       nameInput: document.getElementById("nameInput"),
+      modeInput: document.getElementById("modeInput"),
+      recordSummary: document.getElementById("recordSummary"),
       endOverlay: document.getElementById("endOverlay"),
       endEmoji: document.getElementById("endEmoji"),
       endTitle: document.getElementById("endTitle"),
       endMessage: document.getElementById("endMessage"),
       finalScore: document.getElementById("finalScore"),
+      endBadges: document.getElementById("endBadges"),
       restartButton: document.getElementById("restartButton"),
       mapNodes: [...document.querySelectorAll(".map-node")]
     };
@@ -793,6 +827,8 @@
       el.score.textContent = state.score;
       el.lives.textContent = state.lives > 0 ? "❤️".repeat(state.lives) : "💔";
       el.keys.textContent = `${state.keys} / ${rooms.length}`;
+      el.bestScore.textContent = Math.max(state.bestScore, state.score);
+      el.escapeCount.textContent = state.escapes;
 
       const completedPuzzles =
         rooms.slice(0, state.room).reduce((sum, room) => sum + room.questions.length, 0) +
@@ -817,7 +853,7 @@
     function renderQuestion() {
       clearInterval(state.interval);
       state.answered = false;
-      state.timer = 30;
+      state.timer = state.timeLimit;
       el.nextButton.disabled = true;
       el.feedback.textContent = "";
       el.feedback.className = "feedback";
@@ -864,7 +900,7 @@
 
     function updateTimerUi() {
       el.timerText.textContent = `${state.timer}s`;
-      el.timerBar.style.width = `${(state.timer / 30) * 100}%`;
+      el.timerBar.style.width = `${(state.timer / state.timeLimit) * 100}%`;
       el.timerBar.style.background = state.timer <= 10 ? "var(--danger)" : "var(--accent)";
     }
 
@@ -881,9 +917,13 @@
 
       const question = rooms[state.room].questions[state.question];
       const answerButtons = [...el.answers.children];
+      state.attempted += 1;
 
       if (selectedIndex === question.answer) {
         button.classList.add("correct");
+        state.correct += 1;
+        state.streak += 1;
+        state.bestStreak = Math.max(state.bestStreak, state.streak);
         const timeBonus = Math.max(0, state.timer);
         state.score += 100 + timeBonus * 2;
         el.feedback.textContent = `✅ Correct! ${question.explain} +${100 + timeBonus * 2} points`;
@@ -974,7 +1014,21 @@
           "You ran out of lives, but every explorer can try again. Review the explanations and return stronger.";
       }
 
-      el.finalScore.textContent = `Final Score: ${state.score}`;
+      const accuracy = state.attempted ? Math.round((state.correct / state.attempted) * 100) : 0;
+      const elapsedSeconds = Math.max(0, Math.round((Date.now() - state.startedAt) / 1000));
+      const badges = [];
+      if (won && state.lives === 3) badges.push("❤️ Perfect Escape");
+      if (won && accuracy >= 90) badges.push("🎯 Puzzle Master");
+      if (won && elapsedSeconds <= 600) badges.push("⚡ Speed Explorer");
+      if (state.bestStreak >= 5) badges.push("🔥 Five-Puzzle Streak");
+      if (won) state.escapes += 1;
+      if (won && state.escapes >= 3) badges.push("🏆 Master Escapologist");
+      state.bestScore = Math.max(state.bestScore, state.score);
+      saveRecords();
+      el.finalScore.textContent = `Score: ${state.score} · Accuracy: ${accuracy}% · Best: ${state.bestScore}`;
+      el.endBadges.textContent = "";
+      badges.forEach(label => { const badge = document.createElement("span"); badge.className = "end-badge"; badge.textContent = label; el.endBadges.appendChild(badge); });
+      updateHud();
     }
 
     function resetGame() {
@@ -985,8 +1039,13 @@
       state.lives = 3;
       state.keys = 0;
       state.answered = false;
-      state.timer = 30;
+      state.timer = state.timeLimit;
       state.completedRooms = new Set();
+      state.correct = 0;
+      state.attempted = 0;
+      state.streak = 0;
+      state.bestStreak = 0;
+      state.startedAt = Date.now();
       el.endOverlay.classList.add("hidden");
       renderQuestion();
     }
@@ -1015,6 +1074,9 @@
         }
       });
     });
+
+    el.nameInput.value = releaseRecords.lastPlayer;
+    el.recordSummary.textContent = `Best score: ${releaseRecords.bestScore} · Escapes: ${releaseRecords.escapes}`;
 
     updateHud();
     updateMap();

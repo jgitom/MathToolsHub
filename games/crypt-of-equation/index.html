@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Crypt of Equation — Interactive Math RPG</title>
+<title>Crypt of Equation — Version 1.0 Math RPG</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
 :root{
@@ -119,7 +119,9 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:.85rem}
   .journey-summary{grid-template-columns:1fr}
 }
 @media(min-width:781px) and (max-width:1050px){.main{grid-template-columns:1fr}.battle-graphic-container{min-height:300px}}
-</style>
+
+/* Version 1 release interface */
+.release-badge{display:inline-flex;margin-top:7px;padding:5px 10px;border:1px solid #ffffff70;border-radius:999px;background:#ffffff1f;color:#fff;font-size:.72rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.release-overlay{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:20px;background:#160e0dcc;backdrop-filter:blur(8px)}.release-overlay[hidden]{display:none}.release-modal{width:min(620px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:30px;border:2px solid #c5a46c;border-radius:22px;background:linear-gradient(145deg,#fffdf7,#f5ede2);box-shadow:0 30px 90px #0009;text-align:center}.release-crest{font-size:4.5rem}.release-modal h2{margin:7px 0;color:var(--red-dark);font-size:clamp(1.8rem,5vw,2.7rem)}.release-modal p{color:var(--muted);line-height:1.65}.release-features{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}.release-feature{padding:13px 8px;border:1px solid var(--line);border-radius:12px;background:#fff;font-size:.82rem;font-weight:800}.release-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}.release-actions button{min-width:150px}.record-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 18px}.record-metric{padding:14px;border:1px solid var(--line);border-radius:12px;background:#fffaf2;text-align:center}.record-metric strong{display:block;color:var(--red-dark);font-size:1.45rem}.record-metric small{color:var(--muted);font-weight:800}@media(max-width:700px){.release-features,.record-grid{grid-template-columns:1fr 1fr}}@media(max-width:460px){.release-features,.record-grid{grid-template-columns:1fr}.release-modal{padding:22px}.release-crest{font-size:3.5rem}}</style>
   <meta name="author" content="Juil Gitom">
   <style id="creator-credit-style">
     .creator-credit{position:fixed;left:12px;bottom:10px;z-index:9998;display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border:1px solid rgba(148,163,184,.38);border-radius:999px;color:#334155;background:rgba(255,255,255,.9);box-shadow:0 5px 16px rgba(15,23,42,.13);font:600 11px/1.2 Inter,"Segoe UI",Arial,sans-serif;letter-spacing:.01em;backdrop-filter:blur(8px);pointer-events:none}
@@ -130,9 +132,12 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:.85rem}
 </head>
 <body>
 <div class="creator-credit" role="contentinfo" aria-label="Created by Juil Gitom"><span>Created by</span><strong>Juil Gitom</strong></div>
+<div id="releaseOverlay" class="release-overlay" role="dialog" aria-modal="true" aria-labelledby="releaseTitle" hidden>
+  <div class="release-modal"><div id="releaseCrest" class="release-crest">⚔️</div><h2 id="releaseTitle">Crypt of Equation — Version 1.0</h2><p id="releaseMessage"></p><div id="releaseFeatures" class="release-features"><div class="release-feature">🗺️ Four realms</div><div class="release-feature">👑 Four bosses</div><div class="release-feature">🏆 Eight achievements</div></div><div class="release-actions"><button id="releasePrimary">Begin Quest</button><button id="releaseSecondary" class="secondary" hidden>Hero Record</button></div></div>
+</div>
 <header>
   <div class="header-inner">
-    <div><h1>⚔️ Crypt of Equation</h1><p>Interactive Math RPG — defeat monsters by solving equations.</p></div>
+    <div><h1>⚔️ Crypt of Equation</h1><p>Interactive Math RPG — defeat monsters by solving equations.</p><span class="release-badge">Version 1.0</span></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><a href="../" style="display:inline-flex;align-items:center;justify-content:center;padding:11px 16px;border-radius:10px;background:#fff;color:#6c2020;text-decoration:none;font-weight:bold">🎮 Games</a><button id="muteBtn" class="secondary" aria-pressed="false">🔊 Sound On</button></div>
   </div>
 </header>
@@ -193,7 +198,7 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:.85rem}
           <input id="answer" inputmode="numeric" placeholder="Your answer" />
           <button id="submitBtn" disabled>Attack</button>
         </div>
-        <div id="feedback" class="feedback"></div>
+        <div id="feedback" class="feedback" role="status" aria-live="polite"></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
           <button id="startBtn">Start Battle</button>
           <button id="hintBtn" class="gold">Use Hint Scroll (0)</button>
@@ -245,6 +250,8 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:.85rem}
   <section id="record" class="panel">
     <div class="grid main">
       <div class="card">
+        <h2>Version 1 Hero Record</h2>
+        <div class="record-grid"><div class="record-metric"><strong id="recordWins">0</strong><small>Battle wins</small></div><div class="record-metric"><strong id="recordAccuracy">0%</strong><small>Accuracy</small></div><div class="record-metric"><strong id="recordStreak">0</strong><small>Best streak</small></div><div class="record-metric"><strong id="recordRuns">0</strong><small>Crypt clears</small></div></div>
         <h2>Achievements</h2>
         <div class="badges" id="badges"></div>
       </div>
@@ -256,20 +263,32 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:.85rem}
   </section>
 </div>
 
-<footer>Crypt of Equation © 2026 — classroom prototype. Teacher approval applies to real-world rewards.</footer>
+<footer>Crypt of Equation Version 1.0 © 2026 — Created by Juil Gitom. Teacher approval applies to real-world rewards.</footer>
 
 <audio id="backgroundMusic" src="Math Kingdom March.mp3" loop preload="auto"></audio>
 <script>
 const defaultState = {
-  heroName:"", heroClass:"Alchemist", playerKind:"knight", difficulty:1,
-  level:1, xp:0, gold:0, bosses:0, wins:0, streak:0, currentRealm:"addition",
+  version:1, heroName:"", heroClass:"Alchemist", playerKind:"knight", difficulty:1,
+  level:1, xp:0, gold:0, bosses:0, wins:0, streak:0, bestStreak:0, attempted:0, correct:0, completedRuns:0, hasSeenIntro:false, currentRealm:"addition",
   realmWins:{addition:0,subtraction:0,multiplication:0,division:0}, defeatedBosses:[],
   hints:0, shields:0, secondChance:0, muted:false, log:[]
 };
-const savedState = JSON.parse(localStorage.getItem("cryptEquationSave") || "null");
-let state = savedState ? {...defaultState, ...savedState} : {...defaultState};
-state.realmWins = {...defaultState.realmWins, ...(state.realmWins || {})};
-state.defeatedBosses = Array.isArray(state.defeatedBosses) ? state.defeatedBosses : [];
+function freshState(){return {...defaultState,realmWins:{...defaultState.realmWins},defeatedBosses:[],log:[]}}
+function loadState(){
+  try{
+    const saved=JSON.parse(localStorage.getItem("cryptEquationSave")||"null");
+    if(!saved||typeof saved!=="object"||Array.isArray(saved))return freshState();
+    const loaded={...freshState(),...saved};
+    loaded.realmWins={...defaultState.realmWins,...(saved.realmWins||{})};
+    loaded.defeatedBosses=Array.isArray(saved.defeatedBosses)?saved.defeatedBosses.filter(key=>["addition","subtraction","multiplication","division"].includes(key)):[];
+    loaded.log=Array.isArray(saved.log)?saved.log.filter(entry=>typeof entry==="string").slice(0,40):[];
+    loaded.difficulty=Math.max(1,Math.min(3,Number(loaded.difficulty)||1));
+    loaded.bestStreak=Math.max(Number(loaded.bestStreak)||0,Number(loaded.streak)||0);
+    loaded.attempted=Math.max(0,Number(loaded.attempted)||0);loaded.correct=Math.max(0,Math.min(loaded.attempted,Number(loaded.correct)||0));
+    return loaded;
+  }catch(error){localStorage.removeItem("cryptEquationSave");return freshState()}
+}
+let state=loadState();
 let currentAnswer = null, enemyHP = 0, enemyMax = 0, inBattle = false, isBoss = false, currentMonster = null;
 let heroHP = 3, battleDeadline = 0, battleCanvas, battleCtx, battleParticles = [], graphicState = {message:"Ready for battle", flash:0, pulse:0};
 
@@ -295,7 +314,7 @@ const save = () => {
   state.heroClass = $("heroClass").value;
   state.playerKind = $("playerKind").value;
   state.difficulty = Number($("difficulty").value);
-  localStorage.setItem("cryptEquationSave", JSON.stringify(state));
+  try{localStorage.setItem("cryptEquationSave",JSON.stringify(state))}catch(error){console.warn("Crypt progress could not be saved.",error)}
 };
 const addLog = msg => {
   state.log.unshift(new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})+" — "+msg);
@@ -344,6 +363,10 @@ function render(){
   $("wins").textContent = state.wins;
   $("realmWinsText").textContent = `${Math.min(5,state.realmWins[state.currentRealm] || 0)} / 5${state.defeatedBosses.includes(state.currentRealm)?" · Boss defeated":""}`;
   $("streak").textContent = state.streak;
+  $("recordWins").textContent = state.wins;
+  $("recordAccuracy").textContent = `${state.attempted?Math.round(state.correct/state.attempted*100):0}%`;
+  $("recordStreak").textContent = state.bestStreak;
+  $("recordRuns").textContent = state.completedRuns;
   $("hintBtn").textContent = `Use Hint Scroll (${state.hints})`;
   $("enemyBar").style.width = enemyMax ? `${Math.max(0,enemyHP)/enemyMax*100}%` : "0%";
   $("enemyHudBar").style.width = enemyMax ? `${Math.max(0,enemyHP)/enemyMax*100}%` : "0%";
@@ -406,6 +429,8 @@ function attack(){
   if(value === currentAnswer){
     enemyHP--;
     state.streak++;
+    state.correct++;
+    state.bestStreak=Math.max(state.bestStreak,state.streak);
     animateHeroAttack(); playSound("hit");
     graphicState.flash = 18;
     graphicState.message = "Critical hit!";
@@ -419,6 +444,7 @@ function attack(){
       state.xp += xpGain; state.gold += goldGain; state.wins++;
       if(isBoss){
         if(!state.defeatedBosses.includes(state.currentRealm)) state.defeatedBosses.push(state.currentRealm);
+        if(state.defeatedBosses.length===4){state.completedRuns++;setTimeout(showCryptVictory,450)}
       } else {
         state.realmWins[state.currentRealm] = (state.realmWins[state.currentRealm] || 0) + 1;
       }
@@ -476,12 +502,14 @@ function renderShop(){
 }
 function getAchievements(){
   return [
-    {name:"The Executioner",icon:"⚔️",unlocked:state.streak>=5,desc:"Achieve a 5-answer correct streak."},
+    {name:"The Executioner",icon:"⚔️",unlocked:state.bestStreak>=5,desc:"Achieve a 5-answer correct streak."},
     {name:"The Alchemist",icon:"⚗️",unlocked:state.level>=3,desc:"Reach Level 3."},
     {name:"The Cleric",icon:"✨",unlocked:state.wins>=10,desc:"Defeat 10 enemies."},
     {name:"The Undying",icon:"💀",unlocked:state.bosses>=1,desc:"Defeat your first boss."},
     {name:"Realm Walker",icon:"🗺️",unlocked:state.bosses>=2,desc:"Conquer two mathematics realms."},
-    {name:"Crypt Legend",icon:"👑",unlocked:state.bosses>=4,desc:"Defeat every realm boss."}
+    {name:"Equation Master",icon:"🎯",unlocked:state.attempted>=20&&state.correct/state.attempted>=.9,desc:"Maintain at least 90% accuracy over 20 answers."},
+    {name:"Crypt Legend",icon:"👑",unlocked:state.bosses>=4,desc:"Defeat every realm boss."},
+    {name:"Eternal Champion",icon:"🏆",unlocked:state.completedRuns>=1,desc:"Complete the full Crypt quest."}
   ];
 }
 function renderBadges(){
@@ -734,6 +762,12 @@ function initBattleCanvas(){
   requestAnimationFrame(draw);
 }
 
+function openTab(id){document.querySelectorAll(".tab-btn,.panel").forEach(element=>element.classList.remove("active"));document.querySelector(`[data-tab="${id}"]`).classList.add("active");$(id).classList.add("active")}
+function showRelease({crest="⚔️",title,text,primary="Continue",secondary="",features=false,onPrimary,onSecondary}){
+  $("releaseCrest").textContent=crest;$("releaseTitle").textContent=title;$("releaseMessage").textContent=text;$("releaseFeatures").hidden=!features;$("releasePrimary").textContent=primary;$("releaseSecondary").hidden=!secondary;$("releaseSecondary").textContent=secondary||"";$("releaseOverlay").hidden=false;
+  $("releasePrimary").onclick=()=>{$("releaseOverlay").hidden=true;if(onPrimary)onPrimary()};$("releaseSecondary").onclick=()=>{$("releaseOverlay").hidden=true;if(onSecondary)onSecondary()};setTimeout(()=>$("releasePrimary").focus(),0);
+}
+function showCryptVictory(){addLog("Completed all four realms and became a Crypt Legend.");render();showRelease({crest:"👑",title:"The Crypt Is Conquered!",text:`${state.heroName||"Hero"}, you defeated every realm boss with ${state.wins} victories and reached Level ${state.level}.`,primary:"Continue Adventuring",secondary:"View Hero Record",onSecondary:()=>openTab("record")})}
 $("startBtn").onclick=startBattle;
 $("submitBtn").onclick=attack;
 $("answer").addEventListener("keydown",e=>{if(e.key==="Enter") attack()});
@@ -746,7 +780,7 @@ $("hintBtn").onclick=()=>{
 };
 $("resetBtn").onclick=()=>{
   if(confirm("Reset all hero progress?")){
-    state={...defaultState,log:[]}; localStorage.removeItem("cryptEquationSave"); inBattle=false; battleDeadline=0;
+    state=freshState(); localStorage.removeItem("cryptEquationSave"); inBattle=false; battleDeadline=0;
     graphicState.message = "Hero reborn.";
     $("question").textContent='Press “Start Battle”'; $("submitBtn").disabled=true;
     render(); createPlayer3D(); createEnemy3D();
@@ -764,13 +798,11 @@ $("muteBtn").onclick=()=>{state.muted=!state.muted;render();if(!state.muted)play
 $("startBtn").addEventListener("click",()=>syncBackgroundMusic(true));
 $("muteBtn").addEventListener("click",()=>syncBackgroundMusic(!state.muted));
 window.addEventListener("beforeunload",save);
-document.querySelectorAll(".tab-btn").forEach(btn=>btn.onclick=()=>{
-  document.querySelectorAll(".tab-btn,.panel").forEach(x=>x.classList.remove("active"));
-  btn.classList.add("active"); $(btn.dataset.tab).classList.add("active");
-});
+document.querySelectorAll(".tab-btn").forEach(btn=>btn.onclick=()=>openTab(btn.dataset.tab));
 initBattleCanvas();
 init3DScene();
 render();
+if(!state.hasSeenIntro){state.hasSeenIntro=true;save();showRelease({crest:"⚔️",title:"Crypt of Equation — Version 1.0",text:"Conquer four mathematical realms, defeat their bosses, build your hero and unlock eight achievements.",primary:"Begin Quest",features:true,onPrimary:()=>$("heroName").focus()})}
 setInterval(()=>{
   if(inBattle && battleDeadline && Date.now()>=battleDeadline) expireBattle();
   else renderBattleTimer();
