@@ -264,7 +264,8 @@
         footer { padding: 26px 0; border-top: 1px solid var(--line); background: #fff; }
         .footer-inner { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 20px; color: var(--muted); font-size: .8rem; }
         .footer-inner > span:first-child { justify-self: start; }
-        .footer-inner::after { content: ""; }
+        .footer-contact { justify-self: end; color: var(--blue); font-weight: 750; text-decoration: none; }
+        .footer-contact:hover, .footer-contact:focus-visible { text-decoration: underline; }
         .visitor-counter { display: inline-flex; align-items: center; gap: 8px; }
         .visitor-counter strong { min-width: 2ch; color: var(--navy); font-size: .95rem; font-variant-numeric: tabular-nums; }
         .visitor-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 3px #dcfce7; }
@@ -424,6 +425,7 @@
         <div class="footer-inner">
             <span>© 2026 MathToolsHub</span>
             <span class="visitor-counter" title="Shared visitor total"><span class="visitor-dot" aria-hidden="true"></span><strong id="visitorCount" aria-live="polite">—</strong> <span data-i18n="visitors">total visitors</span></span>
+            <a class="footer-contact" href="mailto:admin@mathtoolshub.com" aria-label="Email MathToolsHub at admin@mathtoolshub.com">admin@mathtoolshub.com</a>
         </div>
     </footer>
     <a class="ai-assistant" href="https://chatgpt.com/g/g-6a5203fa2aa88191bc23bbef5bb489d5-math-tools-tutor" target="_blank" rel="noopener noreferrer" aria-label="Open Math Tools Tutor in ChatGPT">
