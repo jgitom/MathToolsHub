@@ -149,7 +149,7 @@
 
     .dashboard {
       display: grid;
-      grid-template-columns: repeat(7, minmax(120px, 1fr));
+      grid-template-columns: repeat(8, minmax(115px, 1fr));
       gap: 10px;
       margin: 14px 0;
     }
@@ -336,6 +336,12 @@
       padding: 13px;
       margin-bottom: 13px;
     }
+
+    .achievement-list { display: grid; gap: 8px; margin-top: 10px; }
+    .achievement { display: grid; grid-template-columns: 34px 1fr; gap: 9px; align-items: center; padding: 9px; border: 1px solid var(--border); border-radius: 12px; background: #f8fbff; opacity: 0.55; }
+    .achievement.unlocked { border-color: #86efac; background: #f0fdf4; opacity: 1; }
+    .achievement strong, .achievement small { display: block; }
+    .achievement small { color: var(--muted); margin-top: 2px; }
 
     .mission-title {
       font-weight: 900;
@@ -631,6 +637,10 @@
         <div class="stat-label">City Rank</div>
         <div class="stat-value" id="rankStat">Village</div>
       </div>
+      <div class="stat">
+        <div class="stat-label">Maths Streak</div>
+        <div class="stat-value" id="streakStat">0 🔥</div>
+      </div>
     </section>
 
     <main class="main-layout">
@@ -665,13 +675,16 @@
           </div>
         </div>
 
+        <h2 style="margin-top:16px">🏅 Achievements</h2>
+        <div class="achievement-list" id="achievementList"></div>
+
         <h2>📢 City News</h2>
         <div class="log" id="cityLog"></div>
       </aside>
     </main>
 
     <div class="footer-note">
-      MathCity Builder Version 1.0 • Created by Juil Gitom for MathToolsHub
+      MathCity Builder Version 1.1 • Created by Juil Gitom for MathToolsHub
     </div>
   </div>
 
@@ -856,6 +869,13 @@
     ];
 
     const CITY_RANKS = ["Village", "Town", "City", "Metropolis", "MathCity Master"];
+    const ACHIEVEMENTS = [
+      { id:"firstBuild", icon:"🏠", name:"First Foundations", description:"Construct your first building.", check:stats => stats.buildingCount >= 1 },
+      { id:"mathStreak", icon:"🔥", name:"Maths on Fire", description:"Answer 5 challenges correctly in a row.", check:() => state.bestStreak >= 5 },
+      { id:"greenCity", icon:"🌿", name:"Green City", description:"Reach 150 population with pollution at 15% or lower.", check:stats => stats.population >= 150 && stats.pollution <= 15 },
+      { id:"profitable", icon:"💰", name:"Smart Treasurer", description:"Earn a daily net income of RM1,000 or more.", check:stats => stats.netIncome >= 1000 },
+      { id:"master", icon:"🏆", name:"MathCity Master", description:"Complete every city mission.", check:() => state.missionStage >= MISSIONS.length }
+    ];
     const CITY_EVENTS = [
       { text:"Education innovation grant awarded", amount:4500 },
       { text:"Emergency road repairs approved", amount:-2500 },
@@ -877,7 +897,10 @@
       pendingBuild: null,
       currentQuestion: null,
       missionStage: 0,
-      totalEvents: 0
+      totalEvents: 0,
+      correctStreak: 0,
+      bestStreak: 0,
+      unlockedAchievements: []
     };
 
     const el = {
@@ -890,12 +913,14 @@
       power: document.getElementById("powerStat"),
       day: document.getElementById("dayStat"),
       rank: document.getElementById("rankStat"),
+      streak: document.getElementById("streakStat"),
       selectedToolText: document.getElementById("selectedToolText"),
       cityLog: document.getElementById("cityLog"),
       missionTitle: document.getElementById("missionTitle"),
       missionDescription: document.getElementById("missionDescription"),
       missionList: document.getElementById("missionList"),
       missionProgress: document.getElementById("missionProgress"),
+      achievementList: document.getElementById("achievementList"),
       modal: document.getElementById("questionModal"),
       questionTitle: document.getElementById("questionTitle"),
       questionContext: document.getElementById("questionContext"),
@@ -1153,7 +1178,8 @@
         powerUsed,
         dailyIncome,
         dailyMaintenance,
-        netIncome: dailyIncome - dailyMaintenance
+        netIncome: dailyIncome - dailyMaintenance,
+        buildingCount: state.grid.filter(Boolean).length
       };
     }
 
@@ -1206,6 +1232,7 @@
       el.power.textContent = `${stats.powerUsed} / ${stats.powerGenerated}`;
       el.day.textContent = state.day;
       el.rank.textContent = CITY_RANKS[Math.min(state.missionStage, CITY_RANKS.length - 1)];
+      el.streak.textContent = `${state.correctStreak} 🔥`;
 
       el.happiness.style.color = stats.happiness >= 70 ? "var(--success)" :
         stats.happiness >= 45 ? "var(--accent)" : "var(--danger)";
@@ -1260,12 +1287,27 @@
         setTimeout(render, 0);
       }
     }
+    function renderAchievements() {
+      const stats = calculateStats();
+      ACHIEVEMENTS.forEach(achievement => {
+        if (achievement.check(stats) && !state.unlockedAchievements.includes(achievement.id)) {
+          state.unlockedAchievements.push(achievement.id);
+          addLog(`Achievement unlocked: ${achievement.name}!`, "good");
+          saveGame(false);
+        }
+      });
+      el.achievementList.innerHTML = ACHIEVEMENTS.map(achievement => {
+        const unlocked = state.unlockedAchievements.includes(achievement.id);
+        return `<div class="achievement${unlocked ? " unlocked" : ""}"><span aria-hidden="true">${unlocked ? achievement.icon : "🔒"}</span><div><strong>${achievement.name}</strong><small>${achievement.description}</small></div></div>`;
+      }).join("");
+    }
     function render() {
       renderBuildMenu();
       renderMap();
       renderDashboard();
       renderLog();
       renderMission();
+      renderAchievements();
     }
 
     function handleTileClick(index) {
@@ -1388,6 +1430,8 @@
 
         state.funds -= b.cost;
         state.grid[index] = type;
+        state.correctStreak += 1;
+        state.bestStreak = Math.max(state.bestStreak, state.correctStreak);
         addLog(`${b.name} constructed successfully on tile ${index + 1}.`, "good");
         saveGame(false);
         el.feedback.textContent = "Correct! Construction approved.";
@@ -1398,6 +1442,7 @@
           render();
         }, 500);
       } else {
+        state.correctStreak = 0;
         el.feedback.textContent = `Not correct. Try again.`;
         el.feedback.style.color = "var(--danger)";
       }
@@ -1455,9 +1500,12 @@
         selectedBuilding: state.selectedBuilding,
         grid: state.grid,
         log: state.log,
-        version: 2,
+        version: 3,
         missionStage: state.missionStage,
-        totalEvents: state.totalEvents
+        totalEvents: state.totalEvents,
+        correctStreak: state.correctStreak,
+        bestStreak: state.bestStreak,
+        unlockedAchievements: state.unlockedAchievements
       };
       localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
       if (showMessage) {
@@ -1484,6 +1532,9 @@
           ? Math.max(0, Math.min(MISSIONS.length, Number(data.missionStage)))
           : (data.missionRewarded ? 1 : 0);
         state.totalEvents = Math.max(0, Number(data.totalEvents) || 0);
+        state.correctStreak = Math.max(0, Number(data.correctStreak) || 0);
+        state.bestStreak = Math.max(state.correctStreak, Number(data.bestStreak) || 0);
+        state.unlockedAchievements = Array.isArray(data.unlockedAchievements) ? data.unlockedAchievements.filter(id => ACHIEVEMENTS.some(achievement => achievement.id === id)) : [];
         addLog("Saved city loaded.", "info");
       } catch (error) {
         console.error("Could not load save:", error);
