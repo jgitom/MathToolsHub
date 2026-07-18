@@ -204,6 +204,21 @@
         .stat strong { min-width: 58px; color: #fff; font-size: 1.8rem; letter-spacing: -.04em; }
         .stat span { color: #cbdcf0; font-size: .88rem; line-height: 1.45; }
 
+        .personal-dashboard { padding:30px 0; background:#eef6ff; }
+        .dashboard-shell { padding:26px; border:1px solid #bfdbfe; border-radius:22px; background:#fff; box-shadow:0 16px 38px rgba(15,39,71,.1); }
+        .dashboard-head { display:flex; justify-content:space-between; align-items:center; gap:18px; margin-bottom:18px; }
+        .dashboard-head h2 { margin:0 0 5px; color:#0f2747; }
+        .dashboard-head p { margin:0; color:#64748b; }
+        .dashboard-grid { display:grid; grid-template-columns:repeat(2,minmax(0,160px)) minmax(260px,1fr); gap:14px; }
+        .dashboard-stat,.dashboard-recent { padding:18px; border:1px solid #dbe3ec; border-radius:14px; background:#f8fafc; }
+        .dashboard-stat strong { display:block; color:#1d4ed8; font-size:2rem; }
+        .dashboard-stat span { color:#64748b; font-size:.82rem; font-weight:700; }
+        .dashboard-recent h3 { margin:0 0 10px; font-size:1rem; }
+        .dashboard-recent ul { margin:0; padding:0; list-style:none; display:grid; gap:8px; }
+        .dashboard-recent a { display:flex; justify-content:space-between; gap:12px; color:#172033; text-decoration:none; }
+        .dashboard-recent a span,.dashboard-empty { color:#64748b; font-size:.8rem; }
+        .dashboard-signin { text-align:center; }
+        [hidden] { display:none !important; }
         .featured-game-promo { padding:30px 0; background:#fff; }
         .featured-game-ad { position:relative; overflow:hidden; display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:24px; min-height:180px; padding:30px 34px; border:1px solid #93c5fd; border-radius:24px; color:#fff; background:linear-gradient(125deg,#0f2747 0%,#1d4ed8 62%,#0d9488 100%); box-shadow:0 20px 48px rgba(15,39,71,.2); text-decoration:none; transition:transform .2s ease,box-shadow .2s ease; }
         .featured-game-ad::after { content:""; position:absolute; right:-55px; top:-90px; width:230px; height:230px; border-radius:50%; background:rgba(255,255,255,.1); }
@@ -359,6 +374,9 @@
             .mascot-voice { justify-self:center; }
             .mascot-speech::before { left:50%; top:-12px; border-right:10px solid transparent; border-left:10px solid transparent; border-bottom:14px solid #fff; border-top:0; transform:translateX(-50%); }
             .programmes { padding: 60px 0; }
+            .dashboard-head { align-items:flex-start; flex-direction:column; }
+            .dashboard-grid { grid-template-columns:1fr 1fr; }
+            .dashboard-recent { grid-column:1 / -1; }
             .featured-game-ad { grid-template-columns:1fr; gap:16px; padding:24px; text-align:center; }
             .featured-game-icon,.featured-game-cta { justify-self:center; }
             .featured-game-copy p { margin-inline:auto; }
@@ -435,6 +453,17 @@
             </div>
         </section>
 
+        <section class="personal-dashboard" id="personalDashboard" hidden aria-label="Personal learning dashboard">
+            <div class="section-inner">
+                <div class="dashboard-shell">
+                    <div class="dashboard-signin" id="dashboardSignIn" hidden><h2>Your learning dashboard</h2><p>Sign in to continue activities and synchronise your progress across devices.</p><a class="button button-primary" href="account.html">Sign in or create account</a></div>
+                    <div id="dashboardContent" hidden>
+                        <div class="dashboard-head"><div><p class="eyebrow">My learning</p><h2 id="dashboardTitle">Welcome, <span id="dashboardName">User</span></h2><p>Your latest MathToolsHub progress across quizzes and games.</p></div><a class="button button-primary" id="dashboardContinue" href="quizzes.html">Continue learning →</a></div>
+                        <div class="dashboard-grid"><div class="dashboard-stat"><strong id="dashboardActivities">0</strong><span>Activities started</span></div><div class="dashboard-stat"><strong id="dashboardScore">—</strong><span>Average score</span></div><div class="dashboard-recent"><h3>Recent activity</h3><ul id="dashboardRecent"><li class="dashboard-empty">Loading progress…</li></ul></div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
         <section class="featured-game-promo" aria-labelledby="featuredGameTitle">
             <div class="section-inner">
                 <a class="featured-game-ad" href="games/mathcity-builder/">
@@ -736,5 +765,6 @@
     </script>
     <script src="supabase-config.js"></script>
     <script type="module" src="supabase-user.js"></script>
+    <script type="module" src="dashboard.js"></script>
 </body>
 </html>
