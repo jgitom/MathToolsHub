@@ -38,6 +38,9 @@
         .tag { padding:6px 9px; border-radius:999px; color:#1d4ed8; background:#eff6ff; font-size:.72rem; font-weight:800; }
         .open { display:inline-flex; align-items:center; gap:8px; margin-top:auto; padding-top:26px; color:var(--blue); font-size:.9rem; font-weight:850; }
         footer { padding:25px 0; border-top:1px solid var(--line); color:var(--muted); background:#fff; font-size:.82rem; }
+        .footer-inner { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+        .footer-contact { color:var(--blue); font-weight:750; text-decoration:none; }
+        .footer-contact:hover, .footer-contact:focus-visible { text-decoration:underline; }
         @media(max-width:700px) { .tool-grid { grid-template-columns:1fr; } .hero-inner { padding:54px 0; } .content { padding:44px 0 60px; } }
         @media(max-width:480px) { .nav,.hero-inner,.content,.footer-inner { width:min(100% - 24px,1120px); } .tool-card { min-height:270px; padding:24px; } }
     </style>
@@ -82,7 +85,7 @@
             </div>
         </section>
     </main>
-    <footer><div class="footer-inner">© 2026 MathToolsHub</div></footer>
+    <footer><div class="footer-inner"><span>© 2026 MathToolsHub</span><a class="footer-contact" href="mailto:admin@mathtoolshub.com" aria-label="Email MathToolsHub at admin@mathtoolshub.com">admin@mathtoolshub.com</a></div></footer>
 <script src="../site-language.js"></script>
 </body>
 </html>
