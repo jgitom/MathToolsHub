@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MathToolsHub Kakuro</title>
+  <meta name="author" content="Juil Gitom" />
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #667085;
+      --primary: #0f766e;
+      --primary-dark: #115e59;
+      --soft: #ccfbf1;
+      --line: #cfd7e6;
+      --dark: #243244;
+      --danger: #dc2626;
+      --success: #16a34a;
+      --selected: #ccfbf1;
+      --same: #f0fdfa;
+      --shadow: 0 18px 45px rgba(15, 23, 42, .12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #dff8f3 0, var(--bg) 42%, #eef2f7 100%);
+      color: var(--text);
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app { width: min(1120px, 100%); }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.9rem, 4vw, 3.1rem);
+      line-height: 1;
+    }
+
+    .brand p {
+      margin: 8px 0 0;
+      color: var(--muted);
+    }
+
+    .top-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .back-link { padding:10px 14px; border-radius:999px; color:var(--primary); background:#fff; border:1px solid var(--line); font-weight:800; text-decoration:none; }
+    .back-link:hover { border-color:var(--primary); }
+
+    .badge {
+      background: rgba(255,255,255,.82);
+      border: 1px solid rgba(15,118,110,.18);
+      color: var(--primary);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 900;
+      box-shadow: 0 8px 20px rgba(15,118,110,.08);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 24px;
+      border: 1px solid rgba(148,163,184,.18);
+      box-shadow: var(--shadow);
+    }
+
+    .game-card { padding: 20px; }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .toolbar-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    select, button { font: inherit; }
+
+    select {
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform .15s ease, background .15s ease, opacity .15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+    button:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-soft { background: var(--soft); color: var(--primary-dark); }
+    .btn-danger { background: #fff1f2; color: var(--danger); }
+
+    .stats {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .stat {
+      flex: 1 1 125px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f8fafc;
+      border: 1px solid #e7edf5;
+    }
+
+    .stat small {
+      display: block;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .stat strong { font-size: 1.12rem; }
+
+    .board-shell {
+      width: min(100%, 680px);
+      margin: 0 auto;
+      overflow-x: auto;
+    }
+
+    .board {
+      display: grid;
+      border: 3px solid var(--dark);
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--dark);
+      min-width: 520px;
+      aspect-ratio: 1;
+      touch-action: manipulation;
+    }
+
+    .cell {
+      position: relative;
+      display: grid;
+      place-items: center;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: white;
+      font-size: clamp(1rem, 4vw, 1.9rem);
+      font-weight: 900;
+      user-select: none;
+    }
+
+    .cell.playable {
+      cursor: pointer;
+      transition: background .12s ease, color .12s ease;
+    }
+
+    .cell.playable.selected { background: var(--selected); }
+    .cell.playable.same-number { background: var(--same); }
+    .cell.playable.error { background: #fff1f2; color: var(--danger); }
+    .cell.playable.correct { background: #f0fdf4; color: var(--success); }
+
+    .cell.block {
+      background: var(--dark);
+      color: white;
+    }
+
+    .cell.clue::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to bottom right,
+          transparent calc(50% - 1px),
+          #dbe3ed 50%,
+          transparent calc(50% + 1px));
+      pointer-events: none;
+    }
+
+    .clue-down, .clue-right {
+      position: absolute;
+      font-size: clamp(.52rem, 1.7vw, .78rem);
+      line-height: 1;
+      font-weight: 900;
+      color: white;
+      z-index: 2;
+    }
+
+    .clue-down { top: 5px; right: 6px; }
+    .clue-right { bottom: 5px; left: 6px; }
+
+    .number-pad {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      width: min(100%, 680px);
+      margin: 18px auto 0;
+    }
+
+    .num-btn {
+      min-height: 54px;
+      background: #eef6f5;
+      color: var(--text);
+      font-size: 1.15rem;
+    }
+
+    .num-btn.erase {
+      color: var(--danger);
+      background: #fff1f2;
+    }
+
+    .message {
+      min-height: 24px;
+      text-align: center;
+      font-weight: 900;
+      margin: 14px 0 0;
+    }
+
+    .message.info { color: var(--primary); }
+    .message.success { color: var(--success); }
+    .message.error { color: var(--danger); }
+
+    .progress {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: #e9eef5;
+      overflow: hidden;
+      margin-top: 14px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #0f766e, #22c55e);
+      transition: width .2s ease;
+    }
+
+    .side-card {
+      padding: 20px;
+      position: sticky;
+      top: 18px;
+    }
+
+    .side-card h2 {
+      margin: 0 0 10px;
+      font-size: 1.22rem;
+    }
+
+    .side-card p, .side-card li {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .side-card ol, .side-card ul {
+      padding-left: 20px;
+      margin-top: 8px;
+    }
+
+    .example {
+      padding: 12px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid #e7edf5;
+      font-weight: 800;
+      color: #334155;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: .92rem;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 860px) {
+      body { padding: 14px; }
+      .layout { grid-template-columns: 1fr; }
+      .side-card { position: static; }
+      .game-card { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+<main class="app">
+  <header class="topbar">
+    <div class="brand">
+      <h1>➕ Kakuro Challenge</h1>
+      <p>Complete each sum using digits 1–9 without repetition.</p>
+    </div>
+    <div class="top-actions"><a class="back-link" href="../">← Games</a><div class="badge">MathToolsHub.com</div></div>
+  </header>
+
+  <section class="layout">
+    <article class="card game-card">
+      <div class="toolbar">
+        <div class="toolbar-group">
+          <label for="difficulty"><strong>Level:</strong></label>
+          <select id="difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+
+        <div class="toolbar-group">
+          <button class="btn-primary" id="newGameBtn">New Game</button>
+          <button class="btn-soft" id="pauseBtn">Pause</button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><small>Time</small><strong id="timer">00:00</strong></div>
+        <div class="stat"><small>Mistakes</small><strong><span id="mistakes">0</span>/5</strong></div>
+        <div class="stat"><small>Completed</small><strong id="completed">0%</strong></div>
+      </div>
+
+      <div class="board-shell">
+        <div class="board" id="board" aria-label="Kakuro board"></div>
+      </div>
+
+      <div class="number-pad" id="numberPad">
+        <button class="num-btn" data-number="1">1</button>
+        <button class="num-btn" data-number="2">2</button>
+        <button class="num-btn" data-number="3">3</button>
+        <button class="num-btn" data-number="4">4</button>
+        <button class="num-btn" data-number="5">5</button>
+        <button class="num-btn" data-number="6">6</button>
+        <button class="num-btn" data-number="7">7</button>
+        <button class="num-btn" data-number="8">8</button>
+        <button class="num-btn" data-number="9">9</button>
+        <button class="num-btn erase" data-number="0">⌫</button>
+      </div>
+
+      <div class="toolbar" style="margin-top:16px; margin-bottom:0; justify-content:center;">
+        <button class="btn-soft" id="hintBtn">💡 Hint</button>
+        <button class="btn-soft" id="checkBtn">✓ Check</button>
+        <button class="btn-danger" id="resetBtn">↺ Reset</button>
+      </div>
+
+      <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+      <div class="message info" id="message">Select a white cell and choose a number.</div>
+    </article>
+
+    <aside class="card side-card">
+      <h2>How to Play</h2>
+      <ol>
+        <li>Fill white cells with digits from 1 to 9.</li>
+        <li>The digits must add up to the clue shown.</li>
+        <li>Do not repeat a digit within the same run.</li>
+        <li>Each horizontal and vertical run has its own clue.</li>
+      </ol>
+
+      <h2>Clue Direction</h2>
+      <div class="example">
+        Upper-right number = vertical sum<br>
+        Lower-left number = horizontal sum
+      </div>
+
+      <h2 style="margin-top:18px;">Learning Tip</h2>
+      <p>Start with short runs and small sums. For example, a two-cell sum of 3 must be 1 and 2.</p>
+
+      <h2>Keyboard</h2>
+      <p>Use number keys 1–9, arrow keys, and Backspace/Delete to erase.</p>
+    </aside>
+  </section>
+
+  <div class="footer">© 2026 MathToolsHub.com · Created by Juil Gitom · Interactive Mathematics Learning</div>
+</main>
+
+<script>
+(() => {
+  const templates = {
+    easy: [
+      [
+        ['B','B','D4','D6'],
+        ['B','R3','P','P'],
+        ['R4','P','P','B'],
+        ['R3','P','P','B']
+      ],
+      [
+        ['B','D3','D7','B'],
+        ['R4','P','P','D3'],
+        ['R6','P','P','P'],
+        ['B','R3','P','P']
+      ]
+    ],
+    medium: [
+      [
+        ['B','B','D16','D24','B','D7'],
+        ['B','R17','P','P','D11','P'],
+        ['R23','P','P','P','P','P'],
+        ['R14','P','P','B','R7','P'],
+        ['B','R16','P','D10','P','P'],
+        ['B','R9','P','P','P','B']
+      ],
+      [
+        ['B','D11','D17','B','D7','D10'],
+        ['R10','P','P','D12','P','P'],
+        ['R22','P','P','P','P','P'],
+        ['B','R15','P','P','R7','P'],
+        ['B','D8','R13','P','P','P'],
+        ['R11','P','P','P','B','B']
+      ]
+    ],
+    hard: [
+      [
+        ['B','B','D17','D23','B','D16','D10'],
+        ['B','R16','P','P','D17','P','P'],
+        ['R24','P','P','P','P','P','P'],
+        ['R17','P','P','B','R16','P','P'],
+        ['B','R21','P','D12','P','P','P'],
+        ['B','D10','R16','P','P','P','B'],
+        ['R12','P','P','P','B','B','B']
+      ],
+      [
+        ['B','D14','D22','B','D9','D16','B'],
+        ['R11','P','P','D15','P','P','D7'],
+        ['R25','P','P','P','P','P','P'],
+        ['B','R18','P','P','R10','P','P'],
+        ['B','D9','R17','P','P','P','B'],
+        ['R13','P','P','P','D8','P','B'],
+        ['R9','P','P','B','R6','P','B']
+      ]
+    ]
+  };
+
+  const boardEl = document.getElementById('board');
+  const difficultyEl = document.getElementById('difficulty');
+  const timerEl = document.getElementById('timer');
+  const mistakesEl = document.getElementById('mistakes');
+  const completedEl = document.getElementById('completed');
+  const progressBar = document.getElementById('progressBar');
+  const messageEl = document.getElementById('message');
+  const pauseBtn = document.getElementById('pauseBtn');
+
+  let grid = [];
+  let solution = [];
+  let current = [];
+  let selected = null;
+  let mistakes = 0;
+  let seconds = 0;
+  let timerId = null;
+  let paused = false;
+  let finished = false;
+  let rows = 0;
+  let cols = 0;
+
+  function clone2D(arr) {
+    return arr.map(row => [...row]);
+  }
+
+  function parseCell(code) {
+    if (code === 'B') return {type:'block'};
+    if (code === 'P') return {type:'play'};
+    if (code.startsWith('D')) return {type:'clue', down:Number(code.slice(1)), right:null};
+    if (code.startsWith('R')) return {type:'clue', down:null, right:Number(code.slice(1))};
+    return {type:'block'};
+  }
+
+  function chooseTemplate() {
+    const list = templates[difficultyEl.value];
+    return list[Math.floor(Math.random() * list.length)];
+  }
+
+  function generatePuzzle() {
+    grid = chooseTemplate().map(row => row.map(parseCell));
+    rows = grid.length;
+    cols = grid[0].length;
+
+    solution = Array.from({length:rows}, () => Array(cols).fill(0));
+    current = Array.from({length:rows}, () => Array(cols).fill(0));
+
+    // Generate values run by run, then reconcile by using a valid cyclic pattern.
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        if (grid[r][c].type === 'play') {
+          solution[r][c] = ((r * 3 + c * 2) % 9) + 1;
+        }
+      }
+    }
+
+    // Update clues so every puzzle is internally valid.
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        if (grid[r][c].type !== 'clue') continue;
+
+        const rightCells = [];
+        for (let x = c + 1; x < cols && grid[r][x].type === 'play'; x++) {
+          rightCells.push(solution[r][x]);
+        }
+
+        const downCells = [];
+        for (let y = r + 1; y < rows && grid[y][c].type === 'play'; y++) {
+          downCells.push(solution[y][c]);
+        }
+
+        grid[r][c].right = rightCells.length ? rightCells.reduce((a,b)=>a+b,0) : null;
+        grid[r][c].down = downCells.length ? downCells.reduce((a,b)=>a+b,0) : null;
+      }
+    }
+  }
+
+  function startGame() {
+    stopTimer();
+    generatePuzzle();
+    selected = null;
+    mistakes = 0;
+    seconds = 0;
+    paused = false;
+    finished = false;
+
+    mistakesEl.textContent = '0';
+    timerEl.textContent = '00:00';
+    pauseBtn.textContent = 'Pause';
+    boardEl.style.filter = 'none';
+    setMessage('Select a white cell and choose a number.', 'info');
+
+    renderBoard();
+    updateProgress();
+    startTimer();
+  }
+
+  function renderBoard() {
+    boardEl.innerHTML = '';
+    boardEl.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    boardEl.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const data = grid[r][c];
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.row = r;
+        cell.dataset.col = c;
+
+        if (data.type === 'block') {
+          cell.classList.add('block');
+        } else if (data.type === 'clue') {
+          cell.classList.add('block', 'clue');
+
+          if (data.down !== null) {
+            const down = document.createElement('span');
+            down.className = 'clue-down';
+            down.textContent = data.down;
+            cell.appendChild(down);
+          }
+
+          if (data.right !== null) {
+            const right = document.createElement('span');
+            right.className = 'clue-right';
+            right.textContent = data.right;
+            cell.appendChild(right);
+          }
+        } else {
+          cell.classList.add('playable');
+          const value = current[r][c];
+          if (value) cell.textContent = value;
+
+          if (selected && selected.r === r && selected.c === c) {
+            cell.classList.add('selected');
+          } else if (selected && value !== 0 && value === current[selected.r][selected.c]) {
+            cell.classList.add('same-number');
+          }
+
+          cell.addEventListener('click', () => {
+            if (paused || finished) return;
+            selected = {r,c};
+            renderBoard();
+          });
+        }
+
+        boardEl.appendChild(cell);
+      }
+    }
+  }
+
+  function setNumber(num) {
+    if (!selected || paused || finished) return;
+    const {r,c} = selected;
+
+    if (num === 0) {
+      current[r][c] = 0;
+      renderBoard();
+      updateProgress();
+      return;
+    }
+
+    current[r][c] = num;
+
+    const duplicate = hasRunDuplicate(r,c);
+    if (duplicate) {
+      mistakes++;
+      mistakesEl.textContent = mistakes;
+      renderBoard();
+      getCell(r,c)?.classList.add('error');
+      setMessage('A digit cannot repeat in the same run.', 'error');
+    } else {
+      renderBoard();
+      if (num === solution[r][c]) {
+        getCell(r,c)?.classList.add('correct');
+        setMessage('Good move!', 'success');
+      } else {
+        setMessage('Check the sum before continuing.', 'info');
+      }
+    }
+
+    updateProgress();
+
+    if (mistakes >= 5) {
+      finished = true;
+      stopTimer();
+      setMessage('Game over. Start a new Kakuro puzzle!', 'error');
+      return;
+    }
+
+    checkWin();
+  }
+
+  function getHorizontalRun(r,c) {
+    let start = c;
+    while (start > 0 && grid[r][start-1].type === 'play') start--;
+    const cells = [];
+    for (let x = start; x < cols && grid[r][x].type === 'play'; x++) cells.push({r,c:x});
+    return cells;
+  }
+
+  function getVerticalRun(r,c) {
+    let start = r;
+    while (start > 0 && grid[start-1][c].type === 'play') start--;
+    const cells = [];
+    for (let y = start; y < rows && grid[y][c].type === 'play'; y++) cells.push({r:y,c});
+    return cells;
+  }
+
+  function hasDuplicates(cells) {
+    const values = cells.map(({r,c}) => current[r][c]).filter(Boolean);
+    return new Set(values).size !== values.length;
+  }
+
+  function hasRunDuplicate(r,c) {
+    return hasDuplicates(getHorizontalRun(r,c)) || hasDuplicates(getVerticalRun(r,c));
+  }
+
+  function runTarget(cells, direction) {
+    if (!cells.length) return null;
+    const first = cells[0];
+
+    if (direction === 'horizontal') {
+      const clueCol = first.c - 1;
+      if (clueCol >= 0 && grid[first.r][clueCol].type === 'clue') {
+        return grid[first.r][clueCol].right;
+      }
+    } else {
+      const clueRow = first.r - 1;
+      if (clueRow >= 0 && grid[clueRow][first.c].type === 'clue') {
+        return grid[clueRow][first.c].down;
+      }
+    }
+    return null;
+  }
+
+  function validateRun(cells, direction, allowIncomplete=true) {
+    const values = cells.map(({r,c}) => current[r][c]);
+    if (hasDuplicates(cells)) return false;
+    if (values.some(v => v === 0)) return allowIncomplete ? null : false;
+    const target = runTarget(cells, direction);
+    return values.reduce((a,b)=>a+b,0) === target;
+  }
+
+  function allUniqueRuns() {
+    const runs = [];
+    const seen = new Set();
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        if (grid[r][c].type !== 'play') continue;
+
+        const h = getHorizontalRun(r,c);
+        const hk = 'h:' + h.map(x=>`${x.r},${x.c}`).join('|');
+        if (!seen.has(hk)) {
+          seen.add(hk);
+          runs.push({cells:h, direction:'horizontal'});
+        }
+
+        const v = getVerticalRun(r,c);
+        const vk = 'v:' + v.map(x=>`${x.r},${x.c}`).join('|');
+        if (!seen.has(vk)) {
+          seen.add(vk);
+          runs.push({cells:v, direction:'vertical'});
+        }
+      }
+    }
+    return runs.filter(run => run.cells.length > 0);
+  }
+
+  function checkBoard() {
+    if (paused || finished) return;
+
+    boardEl.querySelectorAll('.playable').forEach(cell =>
+      cell.classList.remove('error','correct')
+    );
+
+    let errors = 0;
+    let incomplete = 0;
+
+    for (const run of allUniqueRuns()) {
+      const state = validateRun(run.cells, run.direction, true);
+      if (state === false) {
+        errors++;
+        for (const {r,c} of run.cells) getCell(r,c)?.classList.add('error');
+      } else if (state === null) {
+        incomplete++;
+      } else {
+        for (const {r,c} of run.cells) {
+          if (current[r][c] !== 0) getCell(r,c)?.classList.add('correct');
+        }
+      }
+    }
+
+    if (errors) setMessage(`${errors} incorrect run${errors === 1 ? '' : 's'} found.`, 'error');
+    else if (incomplete) setMessage('No errors so far. Keep solving!', 'success');
+    else checkWin();
+  }
+
+  function giveHint() {
+    if (paused || finished) return;
+
+    const candidates = [];
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        if (grid[r][c].type === 'play' && current[r][c] !== solution[r][c]) {
+          candidates.push({r,c});
+        }
+      }
+    }
+
+    if (!candidates.length) return;
+    const spot = candidates[Math.floor(Math.random() * candidates.length)];
+    current[spot.r][spot.c] = solution[spot.r][spot.c];
+    selected = spot;
+    renderBoard();
+    getCell(spot.r, spot.c)?.classList.add('correct');
+    updateProgress();
+    setMessage('Hint added. Use the sum clues to continue.', 'info');
+    checkWin();
+  }
+
+  function checkWin() {
+    const complete = allUniqueRuns().every(run =>
+      validateRun(run.cells, run.direction, false)
+    );
+
+    if (complete) {
+      finished = true;
+      stopTimer();
+      updateProgress();
+      setMessage(`🎉 Excellent! Kakuro solved in ${timerEl.textContent}.`, 'success');
+    }
+  }
+
+  function resetGame() {
+    current = Array.from({length:rows}, () => Array(cols).fill(0));
+    selected = null;
+    mistakes = 0;
+    seconds = 0;
+    paused = false;
+    finished = false;
+    mistakesEl.textContent = '0';
+    timerEl.textContent = '00:00';
+    pauseBtn.textContent = 'Pause';
+    boardEl.style.filter = 'none';
+    renderBoard();
+    updateProgress();
+    setMessage('Puzzle reset.', 'info');
+  }
+
+  function updateProgress() {
+    let total = 0;
+    let filled = 0;
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        if (grid[r][c].type === 'play') {
+          total++;
+          if (current[r][c] !== 0) filled++;
+        }
+      }
+    }
+
+    const percent = total ? Math.round((filled / total) * 100) : 0;
+    completedEl.textContent = `${percent}%`;
+    progressBar.style.width = `${percent}%`;
+  }
+
+  function startTimer() {
+    timerId = setInterval(() => {
+      if (!paused && !finished) {
+        seconds++;
+        const min = String(Math.floor(seconds / 60)).padStart(2,'0');
+        const sec = String(seconds % 60).padStart(2,'0');
+        timerEl.textContent = `${min}:${sec}`;
+      }
+    },1000);
+  }
+
+  function stopTimer() {
+    if (timerId) clearInterval(timerId);
+    timerId = null;
+  }
+
+  function togglePause() {
+    if (finished) return;
+    paused = !paused;
+    pauseBtn.textContent = paused ? 'Resume' : 'Pause';
+    boardEl.style.filter = paused ? 'blur(7px)' : 'none';
+    document.getElementById('numberPad').style.pointerEvents = paused ? 'none' : 'auto';
+    setMessage(paused ? 'Game paused.' : 'Game resumed.', 'info');
+  }
+
+  function moveSelection(dr,dc) {
+    let r = selected ? selected.r : 0;
+    let c = selected ? selected.c : 0;
+
+    for (let i = 0; i < rows * cols; i++) {
+      r = (r + dr + rows) % rows;
+      c = (c + dc + cols) % cols;
+      if (grid[r][c].type === 'play') {
+        selected = {r,c};
+        renderBoard();
+        return;
+      }
+    }
+  }
+
+  function getCell(r,c) {
+    return boardEl.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+  }
+
+  function setMessage(text,type) {
+    messageEl.textContent = text;
+    messageEl.className = `message ${type}`;
+  }
+
+  document.getElementById('newGameBtn').addEventListener('click', startGame);
+  document.getElementById('hintBtn').addEventListener('click', giveHint);
+  document.getElementById('checkBtn').addEventListener('click', checkBoard);
+  document.getElementById('resetBtn').addEventListener('click', resetGame);
+  pauseBtn.addEventListener('click', togglePause);
+  difficultyEl.addEventListener('change', startGame);
+
+  document.querySelectorAll('.num-btn').forEach(btn => {
+    btn.addEventListener('click', () => setNumber(Number(btn.dataset.number)));
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key >= '1' && event.key <= '9') setNumber(Number(event.key));
+    else if (event.key === 'Backspace' || event.key === 'Delete' || event.key === '0') setNumber(0);
+    else if (event.key === 'ArrowUp') moveSelection(-1,0);
+    else if (event.key === 'ArrowDown') moveSelection(1,0);
+    else if (event.key === 'ArrowLeft') moveSelection(0,-1);
+    else if (event.key === 'ArrowRight') moveSelection(0,1);
+  });
+
+  startGame();
+})();
+</script>
+</body>
+</html>

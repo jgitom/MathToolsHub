@@ -32,9 +32,10 @@
         .section-heading p { margin:0; color:var(--muted); line-height:1.65; }
         .game-grid { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); align-items:stretch; gap:24px; }
         .game-card { grid-column:span 3; min-height:310px; height:100%; display:flex; flex-direction:column; padding:32px; border:1px solid var(--line); border-radius:14px; background:var(--surface); box-shadow:0 12px 32px rgba(15,39,71,.08); text-decoration:none; transition:transform .18s,border-color .18s,box-shadow .18s; }
-        .game-card:nth-child(n+5) { grid-column:span 2; min-height:330px; border-top:3px solid #60a5fa; }
-        .game-card:nth-child(5), .game-card:nth-child(6), .game-card:nth-child(7) { margin-top:28px; }
-        .game-card:nth-child(n+5) .game-icon { color:#6d28d9; background:#f3e8ff; }
+        .game-card:nth-child(n+3) { grid-column:span 2; min-height:330px; }
+        .game-card:nth-child(n+9) { border-top:3px solid #60a5fa; }
+        .game-card:nth-child(3), .game-card:nth-child(4), .game-card:nth-child(5) { margin-top:28px; }
+        .game-card:nth-child(n+9) .game-icon { color:#6d28d9; background:#f3e8ff; }
         .game-card:hover, .game-card:focus-visible { transform:translateY(-4px); border-color:#93b4e8; box-shadow:0 18px 38px rgba(15,39,71,.14); outline:none; }
         .game-icon { width:64px; height:64px; display:grid; place-items:center; margin-bottom:28px; border-radius:16px; color:var(--blue); background:#eff6ff; font-size:2rem; font-weight:900; }
         .game-card h2 { min-height:2.9em; margin:0 0 12px; color:var(--navy); font-size:1.45rem; line-height:1.35; }
@@ -46,7 +47,7 @@
         .footer-inner { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
         .footer-contact { color:var(--blue); font-weight:750; text-decoration:none; }
         .footer-contact:hover, .footer-contact:focus-visible { text-decoration:underline; }
-        @media (max-width:900px) { .game-card, .game-card:nth-child(n+5) { grid-column:span 3; } .game-card:nth-child(7) { margin-top:0; } }
+        @media (max-width:900px) { .game-card, .game-card:nth-child(n+3) { grid-column:span 3; margin-top:0; } }
         @media (max-width:700px) { .game-card, .game-card:nth-child(n+5) { grid-column:1/-1; min-height:0; margin-top:0; } .game-card h2 { min-height:0; } .hero-inner { padding:54px 0; } .content { padding:44px 0 60px; } }
         @media (max-width:480px) { .nav,.hero-inner,.content,.footer-inner { width:min(100% - 24px,1120px); } .nav { gap:10px; } .brand { flex:1 1 150px; } .nav-actions { flex:1 1 auto; gap:7px; } .home-link { white-space:nowrap; } .game-card { padding:24px; } }
     </style>
@@ -107,6 +108,34 @@
                     <p>Plan your moves, develop strategic thinking, and challenge an opponent in a classic game of chess.</p>
                     <div class=tags><span class=tag>Strategy</span><span class=tag>Logic</span><span class=tag>Board game</span></div>
                     <span class=play>Play Chess <span aria-hidden=true>→</span></span>
+                </a>
+                <a class="game-card" href="sudoku/">
+                    <div class="game-icon" aria-hidden="true">9</div>
+                    <h2>MathToolsHub Sudoku</h2>
+                    <p>Train logic, focus, and number sense through four levels of classic Sudoku challenges.</p>
+                    <div class="tags"><span class="tag">Logic</span><span class="tag">Numbers</span><span class="tag">Puzzle</span></div>
+                    <span class="play">Play Sudoku <span aria-hidden="true">→</span></span>
+                </a>
+                <a class="game-card" href="kenken/">
+                    <div class="game-icon" aria-hidden="true">＋</div>
+                    <h2>MathToolsHub KenKen</h2>
+                    <p>Combine arithmetic and logic to solve number cages across three board sizes and difficulty levels.</p>
+                    <div class="tags"><span class="tag">Logic</span><span class="tag">Arithmetic</span><span class="tag">Puzzle</span></div>
+                    <span class="play">Play KenKen <span aria-hidden="true">→</span></span>
+                </a>
+                <a class="game-card" href="kakuro/">
+                    <div class="game-icon" aria-hidden="true">Σ</div>
+                    <h2>MathToolsHub Kakuro</h2>
+                    <p>Solve intersecting number sums using digits 1–9 without repetition across three difficulty levels.</p>
+                    <div class="tags"><span class="tag">Logic</span><span class="tag">Sums</span><span class="tag">Puzzle</span></div>
+                    <span class="play">Play Kakuro <span aria-hidden="true">→</span></span>
+                </a>
+                <a class="game-card" href="logic-puzzles/">
+                    <div class="game-icon" aria-hidden="true">?</div>
+                    <h2>MathToolsHub Logic Puzzles</h2>
+                    <p>Build reasoning and pattern-recognition skills through varied ten-round logic challenges.</p>
+                    <div class="tags"><span class="tag">Logic</span><span class="tag">Reasoning</span><span class="tag">Patterns</span></div>
+                    <span class="play">Play Logic Puzzles <span aria-hidden="true">→</span></span>
                 </a>
                 <a class=game-card href=escape-room-mathematics-year1/>
                     <div class=game-icon aria-hidden=true>🗝</div>

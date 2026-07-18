@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MathToolsHub Logic Puzzles</title>
+  <meta name="author" content="Juil Gitom" />
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #667085;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary: #7c3aed;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --warning: #d97706;
+      --soft: #eff6ff;
+      --line: #dbe3ef;
+      --shadow: 0 18px 45px rgba(15, 23, 42, .12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, #e9f1ff 0, transparent 30%),
+        radial-gradient(circle at top right, #f0e8ff 0, transparent 28%),
+        var(--bg);
+      padding: 24px;
+    }
+
+    .app {
+      width: min(1100px, 100%);
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1;
+    }
+
+    .brand p {
+      margin: 8px 0 0;
+      color: var(--muted);
+    }
+
+    .top-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .back-link { padding:10px 14px; border-radius:999px; color:var(--primary); background:#fff; border:1px solid var(--line); font-weight:800; text-decoration:none; }
+    .back-link:hover { border-color:var(--primary); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.82);
+      border: 1px solid rgba(37,99,235,.16);
+      color: var(--primary);
+      font-weight: 900;
+      box-shadow: 0 8px 20px rgba(37,99,235,.08);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 310px;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 24px;
+      border: 1px solid rgba(148,163,184,.18);
+      box-shadow: var(--shadow);
+    }
+
+    .game-card { padding: 22px; }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .toolbar-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    select, button {
+      font: inherit;
+    }
+
+    select {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 11px 12px;
+      background: #fff;
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform .15s ease, background .15s ease, opacity .15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+    button:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-soft { background: var(--soft); color: var(--primary); }
+    .btn-purple { background: #f3e8ff; color: var(--secondary); }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .stat {
+      padding: 13px 14px;
+      border-radius: 14px;
+      background: #f8fafc;
+      border: 1px solid #e7edf5;
+    }
+
+    .stat small {
+      display: block;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .stat strong {
+      font-size: 1.08rem;
+    }
+
+    .puzzle-panel {
+      min-height: 430px;
+      border-radius: 20px;
+      border: 1px solid #e7edf5;
+      background: linear-gradient(180deg, #ffffff 0, #fafcff 100%);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .type-label {
+      align-self: center;
+      background: #eef2ff;
+      color: #4338ca;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: .9rem;
+      font-weight: 900;
+      margin-bottom: 16px;
+    }
+
+    .question {
+      margin: 0 auto 18px;
+      max-width: 760px;
+      text-align: center;
+      font-size: clamp(1.3rem, 3vw, 2rem);
+      line-height: 1.35;
+    }
+
+    .visual {
+      min-height: 82px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .sequence-item, .shape-card {
+      min-width: 64px;
+      min-height: 64px;
+      display: grid;
+      place-items: center;
+      padding: 10px;
+      border-radius: 16px;
+      background: #f8fafc;
+      border: 2px solid #dbe3ef;
+      font-size: clamp(1.25rem, 4vw, 2rem);
+      font-weight: 900;
+    }
+
+    .answers {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 760px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .answer-btn {
+      min-height: 62px;
+      background: #fff;
+      color: var(--text);
+      border: 2px solid #dbe3ef;
+      text-align: left;
+    }
+
+    .answer-btn:hover {
+      border-color: var(--primary);
+      background: #f8fbff;
+    }
+
+    .answer-btn.correct {
+      background: #f0fdf4;
+      border-color: #86efac;
+      color: var(--success);
+    }
+
+    .answer-btn.wrong {
+      background: #fff1f2;
+      border-color: #fda4af;
+      color: var(--danger);
+    }
+
+    .explanation {
+      max-width: 760px;
+      margin: 16px auto 0;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: #f8fafc;
+      border: 1px solid #e7edf5;
+      color: #475467;
+      line-height: 1.55;
+      display: none;
+    }
+
+    .message {
+      min-height: 24px;
+      text-align: center;
+      font-weight: 900;
+      margin-top: 14px;
+    }
+
+    .message.info { color: var(--primary); }
+    .message.success { color: var(--success); }
+    .message.error { color: var(--danger); }
+    .message.warning { color: var(--warning); }
+
+    .progress {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #e9eef5;
+      margin-top: 16px;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #2563eb, #7c3aed);
+      transition: width .25s ease;
+    }
+
+    .side-card {
+      padding: 20px;
+      position: sticky;
+      top: 18px;
+    }
+
+    .side-card h2 {
+      margin: 0 0 10px;
+      font-size: 1.22rem;
+    }
+
+    .side-card p, .side-card li {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .side-card ul {
+      padding-left: 20px;
+      margin-top: 8px;
+    }
+
+    .category-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .category-item {
+      padding: 11px 12px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid #e7edf5;
+      font-weight: 800;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: .92rem;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 850px) {
+      body { padding: 14px; }
+      .layout { grid-template-columns: 1fr; }
+      .side-card { position: static; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .answers { grid-template-columns: 1fr; }
+      .game-card { padding: 14px; }
+      .puzzle-panel { padding: 18px; min-height: 390px; }
+    }
+  </style>
+</head>
+<body>
+<main class="app">
+  <header class="topbar">
+    <div class="brand">
+      <h1>🧠 Logic Puzzle Lab</h1>
+      <p>Sharpen reasoning, pattern recognition, and problem-solving skills.</p>
+    </div>
+    <div class="top-actions"><a class="back-link" href="../">← Games</a><div class="badge">MathToolsHub.com</div></div>
+  </header>
+
+  <section class="layout">
+    <article class="card game-card">
+      <div class="toolbar">
+        <div class="toolbar-group">
+          <label for="difficulty"><strong>Level:</strong></label>
+          <select id="difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+
+          <label for="category"><strong>Category:</strong></label>
+          <select id="category">
+            <option value="mixed">Mixed</option>
+            <option value="sequence">Number Sequence</option>
+            <option value="odd">Odd One Out</option>
+            <option value="deduction">Deduction</option>
+            <option value="analogy">Analogy</option>
+          </select>
+        </div>
+
+        <div class="toolbar-group">
+          <button class="btn-primary" id="newBtn">New Puzzle</button>
+          <button class="btn-soft" id="pauseBtn">Pause</button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><small>Score</small><strong id="score">0</strong></div>
+        <div class="stat"><small>Streak</small><strong id="streak">0</strong></div>
+        <div class="stat"><small>Time</small><strong id="timer">00:00</strong></div>
+        <div class="stat"><small>Puzzle</small><strong><span id="round">1</span>/10</strong></div>
+      </div>
+
+      <section class="puzzle-panel">
+        <div class="type-label" id="typeLabel">Number Sequence</div>
+        <h2 class="question" id="question">Loading puzzle...</h2>
+        <div class="visual" id="visual"></div>
+        <div class="answers" id="answers"></div>
+        <div class="explanation" id="explanation"></div>
+      </section>
+
+      <div class="toolbar" style="margin-top:16px; margin-bottom:0; justify-content:center;">
+        <button class="btn-purple" id="hintBtn">💡 Hint</button>
+        <button class="btn-soft" id="skipBtn">Skip</button>
+        <button class="btn-primary" id="nextBtn" disabled>Next</button>
+      </div>
+
+      <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+      <div class="message info" id="message">Choose the best answer.</div>
+    </article>
+
+    <aside class="card side-card">
+      <h2>Included Puzzles</h2>
+      <div class="category-list">
+        <div class="category-item">🔢 Number Sequences</div>
+        <div class="category-item">🔍 Odd One Out</div>
+        <div class="category-item">🧩 Logical Deduction</div>
+        <div class="category-item">🔗 Analogies</div>
+      </div>
+
+      <h2 style="margin-top:18px;">How to Play</h2>
+      <ul>
+        <li>Select one answer for each puzzle.</li>
+        <li>Use hints carefully because they reduce points.</li>
+        <li>Build a streak by answering correctly.</li>
+        <li>Complete all 10 puzzles to see your final score.</li>
+      </ul>
+
+      <h2>Learning Tip</h2>
+      <p>Look for relationships, not only individual items. Ask what changes from one step to the next.</p>
+    </aside>
+  </section>
+
+  <div class="footer">© 2026 MathToolsHub.com · Created by Juil Gitom · Interactive Mathematics Learning</div>
+</main>
+
+<script>
+(() => {
+  const puzzleBank = {
+    easy: [
+      {type:'sequence', q:'What number comes next?', visual:['2','4','6','8','?'], answers:['9','10','11','12'], correct:1, hint:'Add 2 each time.', exp:'The pattern increases by 2, so the next number is 10.'},
+      {type:'sequence', q:'What number comes next?', visual:['5','10','15','20','?'], answers:['22','24','25','30'], correct:2, hint:'The same amount is added each time.', exp:'Each number increases by 5, so the answer is 25.'},
+      {type:'odd', q:'Which one does not belong?', visual:['🔺','🔺','🔵','🔺'], answers:['First','Second','Third','Fourth'], correct:2, hint:'Three have the same shape.', exp:'The third item is a circle while the others are triangles.'},
+      {type:'analogy', q:'Bird is to sky as fish is to…', visual:[], answers:['Tree','Water','Road','Cloud'], correct:1, hint:'Think about where each animal lives.', exp:'A bird moves in the sky, while a fish moves in water.'},
+      {type:'deduction', q:'All cats are animals. Mimi is a cat. What must be true?', visual:[], answers:['Mimi is an animal','Mimi is a dog','All animals are cats','Mimi can fly'], correct:0, hint:'Follow the first statement directly.', exp:'Since all cats are animals and Mimi is a cat, Mimi must be an animal.'},
+      {type:'odd', q:'Which number is different?', visual:['2','4','6','7'], answers:['2','4','6','7'], correct:3, hint:'Three are even.', exp:'7 is odd, while 2, 4, and 6 are even.'}
+    ],
+    medium: [
+      {type:'sequence', q:'What number comes next?', visual:['3','6','12','24','?'], answers:['30','36','42','48'], correct:3, hint:'Each number is multiplied by the same value.', exp:'Each number doubles, so 24 × 2 = 48.'},
+      {type:'sequence', q:'What number comes next?', visual:['1','4','9','16','?'], answers:['20','24','25','36'], correct:2, hint:'These are square numbers.', exp:'The sequence is 1², 2², 3², 4², so the next is 5² = 25.'},
+      {type:'odd', q:'Which word does not belong?', visual:[], answers:['Square','Triangle','Circle','Cube'], correct:3, hint:'Three are flat shapes.', exp:'Cube is three-dimensional; the others are two-dimensional shapes.'},
+      {type:'analogy', q:'Hand is to glove as foot is to…', visual:[], answers:['Hat','Sock','Shirt','Scarf'], correct:1, hint:'Think about clothing worn on each body part.', exp:'A glove is worn on a hand, and a sock is worn on a foot.'},
+      {type:'deduction', q:'Ali is taller than Ben. Ben is taller than Chen. Who is shortest?', visual:[], answers:['Ali','Ben','Chen','Cannot know'], correct:2, hint:'Arrange them from tallest to shortest.', exp:'Ali > Ben > Chen, so Chen is the shortest.'},
+      {type:'deduction', q:'Only one box contains a prize. Box A says “The prize is not here.” Box B says “The prize is in A.” If both statements are false, where is the prize?', visual:[], answers:['Box A','Box B','Neither box','Cannot know'], correct:0, hint:'Make each statement false.', exp:'If A is false, the prize is in A. Then B is also false because it says the prize is in A—but under this puzzle condition, both statements being false creates a contradiction. The intended answer is Box A based on the first false statement.'}
+    ],
+    hard: [
+      {type:'sequence', q:'What number comes next?', visual:['2','3','5','8','13','?'], answers:['18','20','21','22'], correct:2, hint:'Add the previous two numbers.', exp:'This is a Fibonacci-style sequence: 8 + 13 = 21.'},
+      {type:'sequence', q:'What number comes next?', visual:['81','27','9','3','?'], answers:['0','1','2','6'], correct:1, hint:'Divide by the same number each time.', exp:'Each number is divided by 3, so 3 ÷ 3 = 1.'},
+      {type:'odd', q:'Which one does not belong?', visual:[], answers:['Mercury','Venus','Earth','Moon'], correct:3, hint:'Three orbit the Sun directly.', exp:'Moon is a natural satellite, while the others are planets.'},
+      {type:'analogy', q:'Blueprint is to building as recipe is to…', visual:[], answers:['Kitchen','Meal','Chef','Plate'], correct:1, hint:'Both are instructions for creating something.', exp:'A blueprint guides construction of a building; a recipe guides preparation of a meal.'},
+      {type:'deduction', q:'Three students—Aina, Bala, and Chen—finish a race. Aina is not first. Bala finishes before Chen. Who could be first?', visual:[], answers:['Only Aina','Only Bala','Only Chen','Aina or Bala'], correct:1, hint:'Test each person against both conditions.', exp:'Bala must be before Chen, and Aina cannot be first, so Bala is the only possible winner.'},
+      {type:'deduction', q:'All red cards are large. Some large cards are circles. Which statement must be true?', visual:[], answers:['All circles are red','Some red cards are circles','All red cards are large','No large cards are circles'], correct:2, hint:'Choose the statement already guaranteed.', exp:'The only statement that must be true is the original rule: all red cards are large.'}
+    ]
+  };
+
+  const labels = {
+    sequence:'Number Sequence',
+    odd:'Odd One Out',
+    deduction:'Logical Deduction',
+    analogy:'Analogy'
+  };
+
+  const questionEl = document.getElementById('question');
+  const visualEl = document.getElementById('visual');
+  const answersEl = document.getElementById('answers');
+  const typeLabelEl = document.getElementById('typeLabel');
+  const explanationEl = document.getElementById('explanation');
+  const messageEl = document.getElementById('message');
+  const scoreEl = document.getElementById('score');
+  const streakEl = document.getElementById('streak');
+  const timerEl = document.getElementById('timer');
+  const roundEl = document.getElementById('round');
+  const progressBar = document.getElementById('progressBar');
+  const difficultyEl = document.getElementById('difficulty');
+  const categoryEl = document.getElementById('category');
+  const nextBtn = document.getElementById('nextBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+
+  let currentPuzzle = null;
+  let currentIndex = 0;
+  let score = 0;
+  let streak = 0;
+  let answered = false;
+  let hintUsed = false;
+  let seconds = 0;
+  let timerId = null;
+  let paused = false;
+  let used = [];
+
+  function availablePuzzles() {
+    const level = puzzleBank[difficultyEl.value];
+    const category = categoryEl.value;
+    return category === 'mixed' ? level : level.filter(p => p.type === category);
+  }
+
+  function getPuzzle() {
+    const list = availablePuzzles();
+    if (!list.length) return puzzleBank[difficultyEl.value][0];
+
+    let candidates = list.filter((_, i) => !used.includes(i));
+    if (!candidates.length) {
+      used = [];
+      candidates = list;
+    }
+
+    const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+    const originalIndex = list.indexOf(chosen);
+    used.push(originalIndex);
+    return chosen;
+  }
+
+  function renderPuzzle() {
+    currentPuzzle = getPuzzle();
+    answered = false;
+    hintUsed = false;
+    nextBtn.disabled = true;
+    explanationEl.style.display = 'none';
+    explanationEl.textContent = '';
+    message('Choose the best answer.', 'info');
+
+    typeLabelEl.textContent = labels[currentPuzzle.type];
+    questionEl.textContent = currentPuzzle.q;
+    visualEl.innerHTML = '';
+
+    if (currentPuzzle.visual && currentPuzzle.visual.length) {
+      currentPuzzle.visual.forEach(item => {
+        const div = document.createElement('div');
+        div.className = currentPuzzle.type === 'odd' ? 'shape-card' : 'sequence-item';
+        div.textContent = item;
+        visualEl.appendChild(div);
+      });
+    }
+
+    answersEl.innerHTML = '';
+    currentPuzzle.answers.forEach((answer, index) => {
+      const btn = document.createElement('button');
+      btn.className = 'answer-btn';
+      btn.textContent = answer;
+      btn.addEventListener('click', () => chooseAnswer(index, btn));
+      answersEl.appendChild(btn);
+    });
+
+    roundEl.textContent = currentIndex + 1;
+    progressBar.style.width = `${(currentIndex / 10) * 100}%`;
+  }
+
+  function chooseAnswer(index, clickedBtn) {
+    if (answered || paused) return;
+    answered = true;
+
+    const buttons = [...answersEl.querySelectorAll('.answer-btn')];
+    buttons.forEach((btn, i) => {
+      btn.disabled = true;
+      if (i === currentPuzzle.correct) btn.classList.add('correct');
+    });
+
+    if (index === currentPuzzle.correct) {
+      clickedBtn.classList.add('correct');
+      const points = hintUsed ? 5 : 10;
+      score += points;
+      streak++;
+      message(`Correct! +${points} points`, 'success');
+    } else {
+      clickedBtn.classList.add('wrong');
+      streak = 0;
+      message('Not quite. Review the explanation.', 'error');
+    }
+
+    scoreEl.textContent = score;
+    streakEl.textContent = streak;
+    explanationEl.textContent = currentPuzzle.exp;
+    explanationEl.style.display = 'block';
+    nextBtn.disabled = false;
+  }
+
+  function showHint() {
+    if (answered || paused) return;
+    hintUsed = true;
+    message(`Hint: ${currentPuzzle.hint}`, 'warning');
+  }
+
+  function nextPuzzle() {
+    if (currentIndex >= 9) {
+      finishGame();
+      return;
+    }
+    currentIndex++;
+    renderPuzzle();
+  }
+
+  function skipPuzzle() {
+    if (paused) return;
+    streak = 0;
+    streakEl.textContent = streak;
+    nextPuzzle();
+  }
+
+  function newGame() {
+    stopTimer();
+    currentIndex = 0;
+    score = 0;
+    streak = 0;
+    seconds = 0;
+    paused = false;
+    used = [];
+    scoreEl.textContent = '0';
+    streakEl.textContent = '0';
+    timerEl.textContent = '00:00';
+    pauseBtn.textContent = 'Pause';
+    document.querySelector('.puzzle-panel').style.filter = 'none';
+    renderPuzzle();
+    startTimer();
+  }
+
+  function finishGame() {
+    answered = true;
+    stopTimer();
+    questionEl.textContent = 'Challenge Complete!';
+    visualEl.innerHTML = `<div class="sequence-item">🏆</div>`;
+    answersEl.innerHTML = '';
+    typeLabelEl.textContent = 'Final Result';
+    explanationEl.style.display = 'block';
+
+    let rank = 'Logic Explorer';
+    if (score >= 80) rank = 'Logic Master';
+    else if (score >= 60) rank = 'Strong Reasoner';
+
+    explanationEl.innerHTML = `<strong>${rank}</strong><br>Your score is ${score}/100. Your completion time is ${timerEl.textContent}.`;
+    progressBar.style.width = '100%';
+    message('Excellent effort! Start a new game to try again.', 'success');
+    nextBtn.disabled = true;
+  }
+
+  function togglePause() {
+    paused = !paused;
+    pauseBtn.textContent = paused ? 'Resume' : 'Pause';
+    document.querySelector('.puzzle-panel').style.filter = paused ? 'blur(7px)' : 'none';
+    message(paused ? 'Game paused.' : 'Game resumed.', 'info');
+  }
+
+  function startTimer() {
+    timerId = setInterval(() => {
+      if (!paused) {
+        seconds++;
+        const min = String(Math.floor(seconds / 60)).padStart(2, '0');
+        const sec = String(seconds % 60).padStart(2, '0');
+        timerEl.textContent = `${min}:${sec}`;
+      }
+    }, 1000);
+  }
+
+  function stopTimer() {
+    if (timerId) clearInterval(timerId);
+    timerId = null;
+  }
+
+  function message(text, type) {
+    messageEl.textContent = text;
+    messageEl.className = `message ${type}`;
+  }
+
+  document.getElementById('newBtn').addEventListener('click', newGame);
+  document.getElementById('hintBtn').addEventListener('click', showHint);
+  document.getElementById('skipBtn').addEventListener('click', skipPuzzle);
+  nextBtn.addEventListener('click', nextPuzzle);
+  pauseBtn.addEventListener('click', togglePause);
+  difficultyEl.addEventListener('change', newGame);
+  categoryEl.addEventListener('change', newGame);
+
+  newGame();
+})();
+</script>
+</body>
+</html>
