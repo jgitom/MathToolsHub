@@ -16,6 +16,8 @@
         .nav { min-height:72px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
         .brand { display:flex; align-items:center; gap:12px; color:#fff; font-weight:750; text-decoration:none; }
         .brand-mark { width:38px; height:38px; display:grid; place-items:center; border-radius:8px; color:var(--navy); background:#fff; font:800 1.25rem Georgia,serif; }
+        .nav-actions { display:flex; align-items:center; justify-content:flex-end; gap:10px; flex-wrap:wrap; }
+        .site-language-slot { display:flex; align-items:center; }
         .home-link { color:#dbeafe; font-size:.9rem; font-weight:700; text-decoration:none; }
         .home-link:hover,.home-link:focus-visible { color:#fff; text-decoration:underline; }
         .hero { color:#fff; background:linear-gradient(125deg,var(--navy),var(--navy-light) 70%,#1e4d83); }
@@ -42,7 +44,7 @@
         .footer-contact { color:var(--blue); font-weight:750; text-decoration:none; }
         .footer-contact:hover, .footer-contact:focus-visible { text-decoration:underline; }
         @media(max-width:700px) { .tool-grid { grid-template-columns:1fr; } .hero-inner { padding:54px 0; } .content { padding:44px 0 60px; } }
-        @media(max-width:480px) { .nav,.hero-inner,.content,.footer-inner { width:min(100% - 24px,1120px); } .tool-card { min-height:270px; padding:24px; } }
+        @media(max-width:480px) { .nav,.hero-inner,.content,.footer-inner { width:min(100% - 24px,1120px); } .nav { gap:10px; } .brand { flex:1 1 150px; } .nav-actions { flex:1 1 auto; gap:7px; } .home-link { white-space:nowrap; } .tool-card { min-height:270px; padding:24px; } }
     </style>
     <link rel="stylesheet" href="../responsive-layout.css">
   <meta name="author" content="Juil Gitom">
@@ -55,7 +57,7 @@
 </head>
 <body>
 <div class="creator-credit" role="contentinfo" aria-label="Created by Juil Gitom"><span>Created by</span><strong>Juil Gitom</strong></div>
-    <header><nav class="nav" aria-label="Tools navigation"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">Σ</span> MathToolsHub</a><a class="home-link" href="../index.html">← Home</a></nav></header>
+    <header><nav class="nav" aria-label="Tools navigation"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">Σ</span> MathToolsHub</a><div class="nav-actions"><div class="site-language-slot" id="siteLanguageSlot"></div><a class="home-link" href="../index.html">← Home</a></div></nav></header>
     <main>
         <section class="hero"><div class="hero-inner"><p class="eyebrow">Useful utilities</p><h1>MathToolsHub Tools</h1><p>Simple browser-based utilities designed to support teaching, learning, and document workflows.</p></div></section>
         <section class="content" aria-labelledby="tools-heading">
