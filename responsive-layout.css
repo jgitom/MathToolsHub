@@ -1,0 +1,104 @@
+/* Shared responsive sizing for MathToolsHub games and learning tools. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+svg,
+canvas,
+video,
+iframe {
+  max-width: 100%;
+}
+
+img,
+video {
+  height: auto;
+}
+
+:where(.app, .container, .wrap, main, section, article, aside, .card, .panel, .content, .header-inner, .hero-inner, .game-grid, .tool-grid, .main, .toolbar) > * {
+  min-width: 0;
+}
+
+input,
+select,
+textarea,
+button {
+  max-width: 100%;
+}
+
+pre,
+code,
+.output,
+.log,
+.move-list {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 700px) {
+  :where(.app, .container, .wrap) {
+    width: min(calc(100% - 20px), 100%) !important;
+    max-width: 100% !important;
+    margin-inline: auto !important;
+  }
+
+  :where(.main, .game-grid, .tool-grid, .toolbar, .info-grid) {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  :where(.header, .topbar, .header-inner, .nav, .actions, .top-actions) {
+    flex-wrap: wrap;
+  }
+
+  .map,
+  .island-map {
+    height: clamp(320px, 58svh, 500px) !important;
+    min-height: 0 !important;
+  }
+
+  .battle-graphic-container,
+  .scene {
+    min-height: clamp(190px, 38svh, 300px) !important;
+  }
+
+  .hero-graphic,
+  .converter-graphic {
+    max-width: min(100%, 240px) !important;
+    min-width: 0 !important;
+    height: auto !important;
+    aspect-ratio: 21 / 15;
+  }
+
+  .certificate-paper {
+    padding-inline: clamp(12px, 4vw, 24px) !important;
+  }
+}
+
+@media (max-width: 420px) {
+  :where(.app, .container, .wrap) {
+    width: min(calc(100% - 12px), 100%) !important;
+  }
+
+  .back-link,
+  .site-back {
+    position: static !important;
+    margin: 6px 0 12px;
+  }
+
+  .board-wrap {
+    padding-inline: 4px !important;
+  }
+
+  .panel,
+  .card,
+  .game-card,
+  .side-card {
+    max-width: 100%;
+  }
+}

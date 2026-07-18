@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="CJ AI Image Creator - Generate images from text prompts." />
+  <title>CJ AI Image Creator</title>
+  <style>
+    :root {
+      --bg: #08111f;
+      --panel: rgba(15, 29, 50, 0.82);
+      --panel-2: rgba(24, 42, 70, 0.8);
+      --text: #f6f8ff;
+      --muted: #9fb0ca;
+      --primary: #7c5cff;
+      --secondary: #19c6d3;
+      --danger: #ff6577;
+      --success: #4ddd9a;
+      --border: rgba(255,255,255,.12);
+      --shadow: 0 24px 70px rgba(0,0,0,.35);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(124,92,255,.25), transparent 28%),
+        radial-gradient(circle at 90% 20%, rgba(25,198,211,.18), transparent 30%),
+        linear-gradient(135deg, #050a13 0%, #091426 50%, #07101d 100%);
+    }
+
+    button, input, textarea, select { font: inherit; }
+
+    .tools-back {
+      display: inline-flex;
+      margin-bottom: 16px;
+      padding: 9px 14px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--text);
+      background: var(--panel);
+      font-size: .84rem;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .tools-back:hover,
+    .tools-back:focus-visible { background: var(--panel-2); }
+
+    .app-shell {
+      width: min(1440px, 100%);
+      margin: auto;
+      padding: 22px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      letter-spacing: -.04em;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      box-shadow: 0 12px 30px rgba(90, 88, 255, .35);
+    }
+
+    .brand h1 { margin: 0; font-size: clamp(1.1rem, 2vw, 1.55rem); }
+    .brand p { margin: 3px 0 0; color: var(--muted); font-size: .88rem; }
+
+    .badge {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: #cbd6e8;
+      background: rgba(255,255,255,.05);
+      font-size: .8rem;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(330px, 430px) minmax(0, 1fr);
+      gap: 20px;
+    }
+
+    .panel {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .controls { padding: 22px; }
+    .workspace { min-height: 720px; display: flex; flex-direction: column; overflow: hidden; }
+
+    .section-title {
+      margin: 0 0 7px;
+      font-size: 1rem;
+    }
+
+    .section-description {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      margin: 16px 0 8px;
+      font-size: .88rem;
+      color: #dce4f4;
+      font-weight: 700;
+    }
+
+    textarea, select, input[type="text"] {
+      width: 100%;
+      color: var(--text);
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.055);
+      border-radius: 14px;
+      outline: none;
+      transition: .2s ease;
+    }
+
+    textarea {
+      min-height: 138px;
+      resize: vertical;
+      padding: 14px;
+      line-height: 1.5;
+    }
+
+    select, input[type="text"] { padding: 12px 13px; }
+
+    textarea:focus, select:focus, input:focus {
+      border-color: rgba(124,92,255,.8);
+      box-shadow: 0 0 0 4px rgba(124,92,255,.12);
+    }
+
+    .counter {
+      margin-top: 6px;
+      text-align: right;
+      color: var(--muted);
+      font-size: .75rem;
+    }
+
+    .quick-prompts {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 10px 0 2px;
+    }
+
+    .chip {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      color: #d9e2f2;
+      padding: 8px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: .76rem;
+    }
+
+    .chip:hover { background: rgba(124,92,255,.18); }
+
+
+    .upload-box {
+      position: relative;
+      min-height: 150px;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      border: 1.5px dashed rgba(255,255,255,.22);
+      border-radius: 16px;
+      background: rgba(255,255,255,.035);
+      cursor: pointer;
+      overflow: hidden;
+      transition: .2s ease;
+    }
+
+    .upload-box:hover,
+    .upload-box.dragover {
+      border-color: var(--secondary);
+      background: rgba(25,198,211,.08);
+    }
+
+    .upload-box input {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .upload-placeholder {
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .upload-placeholder .upload-icon {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    .upload-placeholder strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: .9rem;
+    }
+
+    .upload-placeholder span {
+      color: var(--muted);
+      font-size: .75rem;
+    }
+
+    .upload-preview {
+      display: none;
+      width: 100%;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .upload-preview img {
+      width: 92px;
+      height: 92px;
+      object-fit: cover;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+    }
+
+    .upload-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .upload-info strong,
+    .upload-info span {
+      display: block;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .upload-info strong {
+      font-size: .84rem;
+      margin-bottom: 5px;
+    }
+
+    .upload-info span {
+      color: var(--muted);
+      font-size: .73rem;
+    }
+
+    .remove-upload {
+      position: relative;
+      z-index: 2;
+      margin-top: 10px;
+      padding: 7px 10px;
+      border: 1px solid rgba(255,101,119,.3);
+      border-radius: 9px;
+      background: rgba(255,101,119,.1);
+      color: #ffabb5;
+      cursor: pointer;
+      font-size: .73rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .range-row {
+      display: grid;
+      grid-template-columns: 1fr 48px;
+      align-items: center;
+      gap: 10px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--primary);
+    }
+
+    .range-value {
+      text-align: center;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 6px;
+      color: #dfe7f6;
+      background: rgba(255,255,255,.05);
+      font-size: .78rem;
+    }
+
+    .switch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 16px;
+      padding: 12px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .switch-copy strong { display: block; font-size: .87rem; }
+    .switch-copy span { color: var(--muted); font-size: .76rem; }
+
+    .switch {
+      position: relative;
+      width: 48px;
+      height: 27px;
+    }
+
+    .switch input { opacity: 0; width: 0; height: 0; }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: #344159;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 21px;
+      height: 21px;
+      left: 3px;
+      top: 3px;
+      border-radius: 50%;
+      background: white;
+      transition: .2s;
+    }
+
+    .switch input:checked + .slider {
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+
+    .switch input:checked + .slider::before { transform: translateX(21px); }
+
+    .primary-btn, .secondary-btn, .icon-btn {
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      color: white;
+      transition: transform .15s ease, opacity .15s ease, background .15s ease;
+    }
+
+    .primary-btn {
+      width: 100%;
+      margin-top: 18px;
+      padding: 14px;
+      font-weight: 850;
+      background: linear-gradient(135deg, var(--primary), #5d86ff 55%, var(--secondary));
+      box-shadow: 0 15px 35px rgba(93, 94, 255, .3);
+    }
+
+    .primary-btn:hover { transform: translateY(-1px); }
+    .primary-btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+    .secondary-btn {
+      padding: 10px 13px;
+      background: rgba(255,255,255,.09);
+      border: 1px solid var(--border);
+    }
+
+    .icon-btn {
+      padding: 9px 11px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid var(--border);
+    }
+
+    .workspace-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .workspace-header h2 { margin: 0; font-size: 1rem; }
+    .workspace-header span { color: var(--muted); font-size: .78rem; }
+
+    .canvas-wrap {
+      position: relative;
+      flex: 1;
+      padding: 22px;
+      display: grid;
+      place-items: center;
+      min-height: 500px;
+    }
+
+    .empty-state {
+      max-width: 520px;
+      text-align: center;
+      padding: 35px;
+      border: 1px dashed rgba(255,255,255,.2);
+      border-radius: 24px;
+      background: rgba(255,255,255,.025);
+    }
+
+    .empty-icon {
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 18px;
+      border-radius: 28px;
+      display: grid;
+      place-items: center;
+      font-size: 2.4rem;
+      background: linear-gradient(135deg, rgba(124,92,255,.25), rgba(25,198,211,.2));
+      border: 1px solid var(--border);
+    }
+
+    .empty-state h3 { margin: 0 0 8px; }
+    .empty-state p { margin: 0; color: var(--muted); line-height: 1.6; font-size: .9rem; }
+
+    .generated-image {
+      display: none;
+      max-width: 100%;
+      max-height: 640px;
+      border-radius: 20px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.35);
+      object-fit: contain;
+      background: rgba(255,255,255,.04);
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+    }
+
+    .spinner {
+      width: 58px;
+      height: 58px;
+      margin: auto;
+      border: 5px solid rgba(255,255,255,.14);
+      border-top-color: var(--secondary);
+      border-radius: 50%;
+      animation: spin .9s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading h3 { margin: 16px 0 6px; }
+    .loading p { margin: 0; color: var(--muted); }
+
+    .toolbar {
+      display: none;
+      padding: 15px 20px;
+      border-top: 1px solid var(--border);
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .status { color: var(--muted); font-size: .78rem; }
+
+    .history {
+      padding: 18px 20px;
+      border-top: 1px solid var(--border);
+      background: rgba(0,0,0,.08);
+    }
+
+    .history-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 11px;
+    }
+
+    .history h3 { margin: 0; font-size: .9rem; }
+
+    .history-list {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .history-item {
+      min-height: 78px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      padding: 10px;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .history-item:hover { border-color: rgba(124,92,255,.55); }
+    .history-item strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: .75rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .history-item small { color: var(--muted); font-size: .68rem; }
+
+    .notice {
+      margin-top: 14px;
+      padding: 11px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,209,102,.2);
+      background: rgba(255,209,102,.07);
+      color: #efdca8;
+      font-size: .75rem;
+      line-height: 1.5;
+    }
+
+    .toast {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      max-width: 330px;
+      padding: 12px 15px;
+      border-radius: 12px;
+      background: #17253a;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      transform: translateY(30px);
+      opacity: 0;
+      pointer-events: none;
+      transition: .25s ease;
+      font-size: .85rem;
+      z-index: 99;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 940px) {
+      main { grid-template-columns: 1fr; }
+      .workspace { min-height: 620px; }
+      .history-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 560px) {
+      .app-shell { padding: 12px; }
+      header { align-items: flex-start; }
+      .badge { display: none; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .controls { padding: 17px; }
+      .canvas-wrap { padding: 14px; min-height: 420px; }
+      .history-list { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+  <link rel="stylesheet" href="../../responsive-layout.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <a class="tools-back" href="../">← All learning tools</a>
+    <header>
+      <div class="brand">
+        <div class="logo">CJ</div>
+        <div>
+          <h1>CJ AI Image Creator</h1>
+          <p>Transform your ideas into visual creations.</p>
+        </div>
+      </div>
+      <div class="badge">Demo Mode • API Ready</div>
+    </header>
+
+    <main>
+      <section class="panel controls">
+        <h2 class="section-title">Create an image</h2>
+        <p class="section-description">
+          Describe the subject, environment, lighting, camera angle, colors, and visual style.
+        </p>
+
+        <label for="prompt">Image prompt</label>
+        <textarea id="prompt" maxlength="1500" placeholder="Example: A futuristic digital classroom in Sabah, students learning mathematics using holographic displays, cinematic lighting, realistic, highly detailed"></textarea>
+        <div class="counter"><span id="charCount">0</span>/1500</div>
+
+        <div class="quick-prompts">
+          <button class="chip" data-prompt="A futuristic digital classroom in Sabah, students using interactive mathematics tools, clean modern design, cinematic lighting, highly detailed">Digital Classroom</button>
+          <button class="chip" data-prompt="A majestic Mount Kinabalu at sunrise, dramatic clouds, cinematic landscape photography, ultra detailed">Mount Kinabalu</button>
+          <button class="chip" data-prompt="A friendly robot teaching mathematics to primary school children, colorful 3D cartoon style, joyful classroom">Math Robot</button>
+        </div>
+
+
+        <label for="imageUpload">Reference image <span style="color:var(--muted);font-weight:500">(optional)</span></label>
+        <div id="uploadBox" class="upload-box">
+          <input id="imageUpload" type="file" accept="image/png,image/jpeg,image/webp" />
+          <div id="uploadPlaceholder" class="upload-placeholder">
+            <div class="upload-icon">📤</div>
+            <strong>Upload or drop an image here</strong>
+            <span>PNG, JPG or WEBP • Maximum 10 MB</span>
+          </div>
+
+          <div id="uploadPreview" class="upload-preview">
+            <img id="referencePreview" alt="Uploaded reference preview" />
+            <div class="upload-info">
+              <strong id="uploadFileName">Reference image</strong>
+              <span id="uploadFileDetails"></span>
+              <button id="removeUploadBtn" class="remove-upload" type="button">Remove image</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label for="imageMode">Image operation</label>
+            <select id="imageMode">
+              <option value="reference">Use as visual reference</option>
+              <option value="edit">Edit uploaded image</option>
+              <option value="variation">Create a variation</option>
+              <option value="background">Replace background</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="referenceStrength">Reference strength</label>
+            <select id="referenceStrength">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label for="style">Visual style</label>
+            <select id="style">
+              <option value="photorealistic">Photorealistic</option>
+              <option value="cinematic">Cinematic</option>
+              <option value="3d cartoon">3D Cartoon</option>
+              <option value="digital illustration">Digital Illustration</option>
+              <option value="watercolor">Watercolor</option>
+              <option value="anime">Anime</option>
+              <option value="minimalist">Minimalist</option>
+              <option value="isometric">Isometric</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="size">Image size</label>
+            <select id="size">
+              <option value="1024x1024">Square 1024 × 1024</option>
+              <option value="1536x1024">Landscape 1536 × 1024</option>
+              <option value="1024x1536">Portrait 1024 × 1536</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="negativePrompt">Exclude from image</label>
+        <input id="negativePrompt" type="text" placeholder="Example: blurry, text, watermark, distorted hands" />
+
+        <label for="creativity">Creativity level</label>
+        <div class="range-row">
+          <input id="creativity" type="range" min="1" max="10" value="7" />
+          <div id="creativityValue" class="range-value">7</div>
+        </div>
+
+        <div class="switch-row">
+          <div class="switch-copy">
+            <strong>Enhance prompt automatically</strong>
+            <span>Add quality, composition, and lighting details.</span>
+          </div>
+          <label class="switch">
+            <input id="enhancePrompt" type="checkbox" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <button id="generateBtn" class="primary-btn">✨ Generate Image</button>
+
+        <div class="notice">
+          <strong>Security:</strong> never place a paid AI API key directly inside this HTML file.
+          Connect this interface to your own backend endpoint such as <code>/api/generate-image</code>.
+        </div>
+      </section>
+
+      <section class="panel workspace">
+        <div class="workspace-header">
+          <div>
+            <h2>Generation Studio</h2>
+            <span id="modeLabel">Demo mode</span>
+          </div>
+          <button id="clearBtn" class="icon-btn">Clear</button>
+        </div>
+
+        <div class="canvas-wrap">
+          <div id="emptyState" class="empty-state">
+            <div class="empty-icon">🖼️</div>
+            <h3>Your creation will appear here</h3>
+            <p>Enter a detailed prompt and select a style. This prototype can run in demo mode or connect to a real AI image backend.</p>
+          </div>
+
+          <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <h3>Creating your image…</h3>
+            <p id="loadingText">Interpreting the prompt and composing the scene.</p>
+          </div>
+
+          <img id="resultImage" class="generated-image" alt="AI generated result" />
+        </div>
+
+        <div id="toolbar" class="toolbar">
+          <div class="status" id="resultStatus">Image ready</div>
+          <div class="toolbar-actions">
+            <button id="copyPromptBtn" class="secondary-btn">Copy Prompt</button>
+            <button id="downloadBtn" class="secondary-btn">Download</button>
+            <button id="regenerateBtn" class="secondary-btn">Regenerate</button>
+          </div>
+        </div>
+
+        <div class="history">
+          <div class="history-top">
+            <h3>Recent prompts</h3>
+            <button id="clearHistoryBtn" class="icon-btn">Clear history</button>
+          </div>
+          <div id="historyList" class="history-list"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    /*
+      REAL API CONNECTION
+      -------------------
+      Change DEMO_MODE to false after creating a secure backend endpoint.
+
+      Expected backend request:
+      POST /api/generate-image
+      {
+        "prompt": "...",
+        "size": "1024x1024",
+        "style": "cinematic",
+        "negativePrompt": "...",
+        "creativity": 7,
+        "imageMode": "edit",
+        "referenceStrength": "medium",
+        "referenceImage": "data:image/jpeg;base64,..."
+      }
+
+      Expected backend response:
+      {
+        "imageUrl": "https://...",
+        "revisedPrompt": "..."
+      }
+
+      The backend must store the AI provider API key in an environment variable.
+    */
+
+    const DEMO_MODE = true;
+    const API_ENDPOINT = "/api/generate-image";
+
+    const el = {
+      prompt: document.getElementById("prompt"),
+      charCount: document.getElementById("charCount"),
+      style: document.getElementById("style"),
+      size: document.getElementById("size"),
+      negativePrompt: document.getElementById("negativePrompt"),
+      creativity: document.getElementById("creativity"),
+      creativityValue: document.getElementById("creativityValue"),
+      enhancePrompt: document.getElementById("enhancePrompt"),
+      generateBtn: document.getElementById("generateBtn"),
+      emptyState: document.getElementById("emptyState"),
+      loading: document.getElementById("loading"),
+      loadingText: document.getElementById("loadingText"),
+      resultImage: document.getElementById("resultImage"),
+      toolbar: document.getElementById("toolbar"),
+      resultStatus: document.getElementById("resultStatus"),
+      historyList: document.getElementById("historyList"),
+      toast: document.getElementById("toast"),
+      modeLabel: document.getElementById("modeLabel"),
+      imageUpload: document.getElementById("imageUpload"),
+      uploadBox: document.getElementById("uploadBox"),
+      uploadPlaceholder: document.getElementById("uploadPlaceholder"),
+      uploadPreview: document.getElementById("uploadPreview"),
+      referencePreview: document.getElementById("referencePreview"),
+      uploadFileName: document.getElementById("uploadFileName"),
+      uploadFileDetails: document.getElementById("uploadFileDetails"),
+      imageMode: document.getElementById("imageMode"),
+      referenceStrength: document.getElementById("referenceStrength")
+    };
+
+    let currentPrompt = "";
+    let currentImageUrl = "";
+    let referenceImageData = "";
+    let referenceImageName = "";
+    let history = JSON.parse(localStorage.getItem("cj-ai-image-history") || "[]");
+
+    el.modeLabel.textContent = DEMO_MODE ? "Demo mode" : "Live API mode";
+
+    el.prompt.addEventListener("input", () => {
+      el.charCount.textContent = el.prompt.value.length;
+    });
+
+    el.creativity.addEventListener("input", () => {
+      el.creativityValue.textContent = el.creativity.value;
+    });
+
+    document.querySelectorAll(".chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        el.prompt.value = chip.dataset.prompt;
+        el.charCount.textContent = el.prompt.value.length;
+        el.prompt.focus();
+      });
+    });
+
+    function showToast(message) {
+      el.toast.textContent = message;
+      el.toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => el.toast.classList.remove("show"), 2600);
+    }
+
+    function setView(view) {
+      el.emptyState.style.display = view === "empty" ? "block" : "none";
+      el.loading.style.display = view === "loading" ? "block" : "none";
+      el.resultImage.style.display = view === "result" ? "block" : "none";
+      el.toolbar.style.display = view === "result" ? "flex" : "none";
+    }
+
+
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return `${bytes} B`;
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+      return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    }
+
+    function clearReferenceImage() {
+      referenceImageData = "";
+      referenceImageName = "";
+      el.imageUpload.value = "";
+      el.referencePreview.removeAttribute("src");
+      el.uploadPlaceholder.style.display = "block";
+      el.uploadPreview.style.display = "none";
+    }
+
+    function handleReferenceFile(file) {
+      const acceptedTypes = ["image/png", "image/jpeg", "image/webp"];
+      const maxSize = 10 * 1024 * 1024;
+
+      if (!file) return;
+
+      if (!acceptedTypes.includes(file.type)) {
+        showToast("Please upload a PNG, JPG, or WEBP image.");
+        return;
+      }
+
+      if (file.size > maxSize) {
+        showToast("The image must be smaller than 10 MB.");
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = event => {
+        referenceImageData = event.target.result;
+        referenceImageName = file.name;
+        el.referencePreview.src = referenceImageData;
+        el.uploadFileName.textContent = file.name;
+        el.uploadFileDetails.textContent = `${formatFileSize(file.size)} • ${file.type.replace("image/", "").toUpperCase()}`;
+        el.uploadPlaceholder.style.display = "none";
+        el.uploadPreview.style.display = "flex";
+        showToast("Reference image uploaded.");
+      };
+
+      reader.onerror = () => showToast("The image could not be read.");
+      reader.readAsDataURL(file);
+    }
+
+    el.imageUpload.addEventListener("change", event => {
+      handleReferenceFile(event.target.files[0]);
+    });
+
+    ["dragenter", "dragover"].forEach(eventName => {
+      el.uploadBox.addEventListener(eventName, event => {
+        event.preventDefault();
+        el.uploadBox.classList.add("dragover");
+      });
+    });
+
+    ["dragleave", "drop"].forEach(eventName => {
+      el.uploadBox.addEventListener(eventName, event => {
+        event.preventDefault();
+        el.uploadBox.classList.remove("dragover");
+      });
+    });
+
+    el.uploadBox.addEventListener("drop", event => {
+      handleReferenceFile(event.dataTransfer.files[0]);
+    });
+
+    document.getElementById("removeUploadBtn").addEventListener("click", event => {
+      event.preventDefault();
+      event.stopPropagation();
+      clearReferenceImage();
+      showToast("Reference image removed.");
+    });
+
+
+    function buildFinalPrompt() {
+      const raw = el.prompt.value.trim();
+      const style = el.style.value;
+      let finalPrompt = `${raw}. Visual style: ${style}.`;
+
+      if (referenceImageData) {
+        finalPrompt += ` Image operation: ${el.imageMode.value}. Reference strength: ${el.referenceStrength.value}.`;
+      }
+
+      if (el.enhancePrompt.checked) {
+        finalPrompt += " Strong composition, professional lighting, high detail, visually coherent, polished final image.";
+      }
+
+      const negative = el.negativePrompt.value.trim();
+      if (negative) finalPrompt += ` Avoid: ${negative}.`;
+
+      return finalPrompt;
+    }
+
+    function getDemoImage(size, seedText) {
+      const [w, h] = size.split("x").map(Number);
+      const seed = encodeURIComponent(seedText.slice(0, 180));
+      // Public placeholder image used only to demonstrate the interface.
+      return `https://picsum.photos/seed/${seed}/${w}/${h}`;
+    }
+
+    async function generateImage() {
+      const rawPrompt = el.prompt.value.trim();
+
+      if (rawPrompt.length < 8) {
+        showToast("Please enter a more detailed prompt.");
+        el.prompt.focus();
+        return;
+      }
+
+      currentPrompt = buildFinalPrompt();
+      el.generateBtn.disabled = true;
+      el.generateBtn.textContent = "Generating…";
+      setView("loading");
+
+      const loadingMessages = [
+        "Interpreting your creative direction.",
+        "Designing the composition and lighting.",
+        "Rendering visual details.",
+        "Preparing the final image."
+      ];
+
+      let messageIndex = 0;
+      const messageTimer = setInterval(() => {
+        messageIndex = (messageIndex + 1) % loadingMessages.length;
+        el.loadingText.textContent = loadingMessages[messageIndex];
+      }, 900);
+
+      try {
+        let imageUrl;
+        let revisedPrompt = currentPrompt;
+
+        if (DEMO_MODE) {
+          await new Promise(resolve => setTimeout(resolve, 2200));
+          imageUrl = referenceImageData || getDemoImage(el.size.value, currentPrompt + Date.now());
+        } else {
+          const response = await fetch(API_ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              prompt: currentPrompt,
+              size: el.size.value,
+              style: el.style.value,
+              negativePrompt: el.negativePrompt.value.trim(),
+              creativity: Number(el.creativity.value),
+              imageMode: referenceImageData ? el.imageMode.value : null,
+              referenceStrength: referenceImageData ? el.referenceStrength.value : null,
+              referenceImage: referenceImageData || null,
+              referenceImageName: referenceImageName || null
+            })
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `Server error: ${response.status}`);
+          }
+
+          const data = await response.json();
+          if (!data.imageUrl) throw new Error("The server did not return an image URL.");
+
+          imageUrl = data.imageUrl;
+          revisedPrompt = data.revisedPrompt || currentPrompt;
+        }
+
+        currentPrompt = revisedPrompt;
+        currentImageUrl = imageUrl;
+
+        el.resultImage.onload = () => {
+          setView("result");
+          const sourceLabel = referenceImageData ? ` • ${el.imageMode.value}` : "";
+          el.resultStatus.textContent = `${el.style.value} • ${el.size.value}${sourceLabel}${DEMO_MODE ? " • Demo mode" : ""}`;
+        };
+
+        el.resultImage.onerror = () => {
+          throw new Error("The generated image could not be loaded.");
+        };
+
+        el.resultImage.src = imageUrl;
+        saveHistory(rawPrompt);
+      } catch (error) {
+        console.error(error);
+        setView("empty");
+        showToast(error.message || "Image generation failed.");
+      } finally {
+        clearInterval(messageTimer);
+        el.generateBtn.disabled = false;
+        el.generateBtn.textContent = "✨ Generate Image";
+      }
+    }
+
+    function saveHistory(prompt) {
+      history = [
+        {
+          prompt,
+          style: el.style.value,
+          size: el.size.value,
+          date: new Date().toLocaleString()
+        },
+        ...history.filter(item => item.prompt !== prompt)
+      ].slice(0, 8);
+
+      localStorage.setItem("cj-ai-image-history", JSON.stringify(history));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      el.historyList.innerHTML = "";
+
+      if (!history.length) {
+        const empty = document.createElement("div");
+        empty.className = "history-item";
+        empty.innerHTML = "<strong>No prompts yet</strong><small>Your recent prompts will be stored in this browser.</small>";
+        el.historyList.appendChild(empty);
+        return;
+      }
+
+      history.slice(0, 4).forEach(item => {
+        const card = document.createElement("button");
+        card.className = "history-item";
+        card.type = "button";
+        card.innerHTML = `
+          <strong>${escapeHtml(item.prompt)}</strong>
+          <small>${escapeHtml(item.style)} • ${escapeHtml(item.size)}</small>
+        `;
+        card.addEventListener("click", () => {
+          el.prompt.value = item.prompt;
+          el.charCount.textContent = item.prompt.length;
+          el.style.value = item.style;
+          el.size.value = item.size;
+          showToast("Prompt restored.");
+        });
+        el.historyList.appendChild(card);
+      });
+    }
+
+    function escapeHtml(value) {
+      return value.replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    async function downloadImage() {
+      if (!currentImageUrl) return;
+
+      try {
+        const response = await fetch(currentImageUrl);
+        const blob = await response.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = objectUrl;
+        anchor.download = `cj-ai-image-${Date.now()}.jpg`;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        URL.revokeObjectURL(objectUrl);
+      } catch {
+        window.open(currentImageUrl, "_blank", "noopener,noreferrer");
+        showToast("Image opened in a new tab.");
+      }
+    }
+
+    document.getElementById("copyPromptBtn").addEventListener("click", async () => {
+      if (!currentPrompt) return;
+      await navigator.clipboard.writeText(currentPrompt);
+      showToast("Prompt copied.");
+    });
+
+    document.getElementById("downloadBtn").addEventListener("click", downloadImage);
+    document.getElementById("regenerateBtn").addEventListener("click", generateImage);
+    el.generateBtn.addEventListener("click", generateImage);
+
+    document.getElementById("clearBtn").addEventListener("click", () => {
+      el.resultImage.removeAttribute("src");
+      currentImageUrl = "";
+      setView("empty");
+    });
+
+    document.getElementById("clearHistoryBtn").addEventListener("click", () => {
+      history = [];
+      localStorage.removeItem("cj-ai-image-history");
+      renderHistory();
+      showToast("History cleared.");
+    });
+
+    el.prompt.addEventListener("keydown", event => {
+      if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+        generateImage();
+      }
+    });
+
+    renderHistory();
+    setView("empty");
+  </script>
+</body>
+</html>
