@@ -8,6 +8,9 @@
   <!-- PDF.js: reads text from PDF files -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
+  <!-- Tesseract.js: recognises text on scanned PDF pages -->
+  <script src="https://unpkg.com/tesseract.js@6.0.1/dist/tesseract.min.js"></script>
+
   <!-- docx: creates Microsoft Word .docx files -->
   <script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
 
@@ -205,14 +208,14 @@
     .field { display:grid; gap:7px; }
     .field.full { grid-column:1/-1; }
     .field label { color:#344054; font-size:13px; font-weight:800; }
-    .field input { width:100%; min-height:44px; padding:10px 12px; border:1px solid var(--border); border-radius:10px; color:var(--text); background:#fff; font:inherit; }
-    .field input:focus { outline:3px solid #bfdbfe; border-color:var(--primary); }
+    .field input, .field select { width:100%; min-height:44px; padding:10px 12px; border:1px solid var(--border); border-radius:10px; color:var(--text); background:#fff; font:inherit; }
+    .field input:focus, .field select:focus { outline:3px solid #bfdbfe; border-color:var(--primary); }
     .field-help { color:var(--muted); font-size:12px; line-height:1.45; }
     .checks { display:flex; flex-wrap:wrap; gap:14px; }
     .check { display:inline-flex; align-items:center; gap:8px; color:#344054; font-size:13px; font-weight:700; }
     .check input { width:17px; height:17px; accent-color:var(--primary); }
     .cancel { display:none; color:#fff; background:var(--danger); }
-    .summary { display:none; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:16px; }
+    .summary { display:none; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:16px; }
     .summary-item { padding:13px; border:1px solid #bbdfca; border-radius:12px; background:#f0fdf4; text-align:center; }
     .summary-item strong { display:block; color:var(--success); font-size:18px; }
     .summary-item span { color:var(--muted); font-size:12px; }
@@ -289,6 +292,7 @@
       .content, .header { padding: 22px; }
       .actions { flex-direction: column; }
       .settings { grid-template-columns: 1fr; }
+      .summary { grid-template-columns: repeat(2, 1fr); }
       .field.full { grid-column: auto; }
       .converter-graphic { display: none; }
       .header { display: block; }
@@ -319,6 +323,7 @@
           <span class="feature-chip">🔒 Browser processing</span>
           <span class="feature-chip">⚡ Fast conversion</span>
           <span class="feature-chip">📝 Editable DOCX</span>
+          <span class="feature-chip">🔍 Scanned-page OCR</span>
         </div>
       </div>
       <div class="converter-graphic" aria-hidden="true">
@@ -351,7 +356,8 @@
       <div class="settings" id="settings">
         <div class="field"><label for="pageRange">Pages to convert</label><input id="pageRange" type="text" inputmode="numeric" placeholder="All pages, or 1-3, 5" aria-describedby="pageRangeHelp" /><span class="field-help" id="pageRangeHelp">Leave blank for every page. Ranges such as 1-3, 5 are supported.</span></div>
         <div class="field"><label for="outputName">Output filename</label><input id="outputName" type="text" placeholder="document.docx" /><span class="field-help">The .docx extension is added automatically.</span></div>
-        <div class="field full"><div class="checks"><label class="check"><input id="includePageLabels" type="checkbox" checked /> Include page labels</label><label class="check"><input id="includePageBreaks" type="checkbox" checked /> Keep PDF page breaks</label></div></div>
+        <div class="field"><label for="ocrLanguage">OCR language</label><select id="ocrLanguage"><option value="eng">English</option><option value="msa">Bahasa Malaysia</option><option value="chi_sim">简体中文</option></select><span class="field-help">Used only for scanned or image-only pages.</span></div>
+        <div class="field full"><div class="checks"><label class="check"><input id="enableOcr" type="checkbox" checked /> Use OCR for scanned pages</label><label class="check"><input id="includePageLabels" type="checkbox" checked /> Include page labels</label><label class="check"><input id="includePageBreaks" type="checkbox" checked /> Keep PDF page breaks</label></div></div>
       </div>
 
       <div class="actions">
@@ -370,6 +376,7 @@
       <div class="summary" id="conversionSummary">
         <div class="summary-item"><strong id="summaryPages">0</strong><span>Pages converted</span></div>
         <div class="summary-item"><strong id="summaryWords">0</strong><span>Words extracted</span></div>
+        <div class="summary-item"><strong id="summaryOcr">0</strong><span>Pages recognised by OCR</span></div>
         <div class="summary-item"><strong id="summarySize">0 KB</strong><span>DOCX size</span></div>
       </div>
 
@@ -383,9 +390,10 @@
           <span class="note-icon">⚠️</span>
           <strong>Conversion limitations</strong>
         </div>
-        <div class="supported">✓ Works best with PDFs containing selectable text.</div>
+        <div class="supported">✓ Supports selectable text and scanned pages with OCR.</div>
         <ul>
-          <li>Scanned documents and handwriting are not recognised because OCR is not included.</li>
+          <li>Printed text on scanned pages can be recognised with OCR; handwriting accuracy may vary.</li>
+          <li>The first OCR conversion downloads recognition data for the selected language.</li>
           <li>Images, charts, backgrounds, headers and footers are not transferred.</li>
           <li>Complex tables, columns and page layouts may lose their original formatting.</li>
           <li>Password-protected or damaged PDF files may not open.</li>
@@ -402,11 +410,11 @@
   const pdfInput = byId("pdfInput"), dropZone = byId("dropZone"), fileInfo = byId("fileInfo");
   const fileName = byId("fileName"), fileSize = byId("fileSize"), settings = byId("settings");
   const pageRange = byId("pageRange"), outputName = byId("outputName");
-  const includePageLabels = byId("includePageLabels"), includePageBreaks = byId("includePageBreaks");
+  const enableOcr = byId("enableOcr"), ocrLanguage = byId("ocrLanguage"), includePageLabels = byId("includePageLabels"), includePageBreaks = byId("includePageBreaks");
   const convertBtn = byId("convertBtn"), cancelBtn = byId("cancelBtn"), resetBtn = byId("resetBtn");
   const status = byId("status"), progressWrap = byId("progressWrap"), progressBar = byId("progressBar"), progressTrack = byId("progressTrack");
   const previewSection = byId("previewSection"), textPreview = byId("textPreview"), conversionSummary = byId("conversionSummary");
-  const summaryPages = byId("summaryPages"), summaryWords = byId("summaryWords"), summarySize = byId("summarySize");
+  const summaryPages = byId("summaryPages"), summaryWords = byId("summaryWords"), summaryOcr = byId("summaryOcr"), summarySize = byId("summarySize");
   const MAX_FILE_SIZE = 50 * 1024 * 1024;
   let selectedFile = null, cancelRequested = false;
 
@@ -489,6 +497,16 @@
       return line.replace(/\s+/g," ").trim();
     }).filter(Boolean);
   }
+  async function renderPageForOcr(page) {
+    const viewport = page.getViewport({scale:2});
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d", {alpha:false});
+    canvas.width = Math.ceil(viewport.width); canvas.height = Math.ceil(viewport.height);
+    context.fillStyle = "#fff"; context.fillRect(0, 0, canvas.width, canvas.height);
+    await page.render({canvasContext:context,viewport}).promise;
+    return canvas;
+  }
+
   function safeOutputName(value) {
     const cleaned = value.trim().replace(/[<>:"/\\|?*\u0000-\u001F]/g,"-");
     return `${cleaned.replace(/\.docx$/i,"") || "converted-document"}.docx`;
@@ -507,9 +525,10 @@
 
   convertBtn.addEventListener("click", async () => {
     if (!selectedFile) return;
-    if (!window.pdfjsLib || !window.docx) return setStatus("Conversion libraries did not load. Check your connection and try again.", "error");
+    if (!window.pdfjsLib || !window.docx || (enableOcr.checked && !window.Tesseract)) return setStatus("Conversion libraries did not load. Check your connection and try again.", "error");
     convertBtn.disabled = true; resetBtn.disabled = true; cancelBtn.disabled = false; cancelBtn.style.display = "block"; cancelRequested = false;
     resetResults(); setProgress(4); setStatus("Opening PDF...");
+    let ocrWorker = null, ocrPageCount = 0;
     try {
       const pdf = await pdfjsLib.getDocument({data:await selectedFile.arrayBuffer()}).promise;
       const selectedPages = parsePageRange(pageRange.value, pdf.numPages);
@@ -522,11 +541,30 @@
         setProgress(8 + ((index+1)/selectedPages.length)*70);
         const page = await pdf.getPage(pageNumber);
         const textContent = await page.getTextContent({normalizeWhitespace:true});
-        const lines = extractLines(textContent.items);
+        let lines = extractLines(textContent.items), usedOcr = false;
+        const selectableText = lines.join(" ").replace(/\s+/g, " ").trim();
+        if (enableOcr.checked && selectableText.length < 20) {
+          if (cancelRequested) throw new Error("Conversion cancelled.");
+          if (!ocrWorker) {
+            setStatus(`Preparing ${ocrLanguage.options[ocrLanguage.selectedIndex].text} OCR...`);
+            ocrWorker = await Tesseract.createWorker(ocrLanguage.value, 1, {logger: message => {
+              if (message.status === "recognizing text") {
+                setStatus(`Using OCR on page ${pageNumber} (${Math.round((message.progress || 0) * 100)}%)...`);
+                setProgress(8 + ((index + (message.progress || 0)) / selectedPages.length) * 70);
+              }
+            }});
+          }
+          setStatus(`Scanning page ${pageNumber} with OCR...`);
+          const canvas = await renderPageForOcr(page);
+          const result = await ocrWorker.recognize(canvas);
+          lines = (result.data.text || "").split(/\r?\n/).map(line => line.replace(/\s+/g, " ").trim()).filter(Boolean);
+          usedOcr = true; ocrPageCount++;
+          canvas.width = canvas.height = 1;
+        }
         wordCount += lines.join(" ").split(/\s+/).filter(Boolean).length;
-        previewPages.push(`PAGE ${pageNumber}\n${lines.join("\n") || "[No selectable text detected]"}`);
+        previewPages.push(`PAGE ${pageNumber}${usedOcr ? " (OCR)" : ""}\n${lines.join("\n") || "[No text detected]"}`);
         if (includePageLabels.checked) paragraphs.push(new docx.Paragraph({children:[new docx.TextRun({text:`Page ${pageNumber}`,bold:true,size:28,color:"1D4ED8"})],spacing:{before:index?120:0,after:220}}));
-        if (!lines.length) paragraphs.push(new docx.Paragraph({children:[new docx.TextRun({text:"[No selectable text detected on this page]",italics:true,color:"667085"})]}));
+        if (!lines.length) paragraphs.push(new docx.Paragraph({children:[new docx.TextRun({text:"[No text detected on this page]",italics:true,color:"667085"})]}));
         else lines.forEach(line => paragraphs.push(new docx.Paragraph({children:[new docx.TextRun({text:line,size:22})],spacing:{after:100},alignment:docx.AlignmentType.LEFT})));
         if (includePageBreaks.checked && index < selectedPages.length-1) paragraphs.push(new docx.Paragraph({children:[new docx.PageBreak()]}));
       }
@@ -536,16 +574,16 @@
       const wordDocument = new docx.Document({creator:"CJ PDF to Word Converter by Juil Gitom",title:selectedFile.name.replace(/\.pdf$/i,""),description:`Editable text extracted from ${selectedPages.length} PDF page(s)`,sections:[{properties:{page:{margin:{top:1100,right:1100,bottom:1100,left:1100}}},children:paragraphs}]});
       const blob = await docx.Packer.toBlob(wordDocument), finalName = safeOutputName(outputName.value), objectUrl = URL.createObjectURL(blob);
       const link = document.createElement("a"); link.href = objectUrl; link.download = finalName; document.body.appendChild(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(objectUrl),1500);
-      summaryPages.textContent = selectedPages.length.toLocaleString(); summaryWords.textContent = wordCount.toLocaleString(); summarySize.textContent = formatBytes(blob.size); conversionSummary.style.display = "grid";
+      summaryPages.textContent = selectedPages.length.toLocaleString(); summaryWords.textContent = wordCount.toLocaleString(); summaryOcr.textContent = ocrPageCount.toLocaleString(); summarySize.textContent = formatBytes(blob.size); conversionSummary.style.display = "grid";
       setProgress(100); setStatus(`Success! ${finalName} has been downloaded.`,"success");
     } catch (error) {
       console.error(error);
       if (error.message === "Conversion cancelled.") setStatus("Conversion cancelled. Your PDF remains selected.","error");
       else if (/Invalid page|outside this PDF|Choose at least/.test(error.message)) setStatus(error.message,"error");
       else if (error?.name === "PasswordException") setStatus("This PDF is password-protected. Remove the password and try again.","error");
-      else setStatus("Conversion failed. The PDF may be encrypted, damaged, scanned, or unsupported.","error");
+      else setStatus("Conversion failed. The PDF may be encrypted, damaged, or unsupported. If OCR was enabled, check your connection and language choice.","error");
       progressWrap.style.display = "none";
-    } finally { convertBtn.disabled = false; resetBtn.disabled = false; cancelBtn.style.display = "none"; }
+    } finally { if (ocrWorker) await ocrWorker.terminate().catch(() => {}); convertBtn.disabled = false; resetBtn.disabled = false; cancelBtn.style.display = "none"; }
   });
 </script>
 </body>
