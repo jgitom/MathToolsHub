@@ -16,6 +16,8 @@
         .nav { min-height:72px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
         .brand { display:flex; align-items:center; gap:12px; color:#fff; font-weight:750; text-decoration:none; }
         .brand-mark { width:38px; height:38px; display:grid; place-items:center; border-radius:8px; color:var(--navy); background:#fff; font:800 1.25rem Georgia,serif; }
+        .nav-actions { display:flex; align-items:center; justify-content:flex-end; gap:10px; flex-wrap:wrap; }
+        .site-language-slot { display:flex; align-items:center; }
         .home-link { color:#dbeafe; font-size:.9rem; font-weight:700; text-decoration:none; }
         .home-link:hover, .home-link:focus-visible { color:#fff; text-decoration:underline; }
         .hero { color:#fff; background:linear-gradient(125deg,var(--navy),var(--navy-light) 70%,#1e4d83); }
@@ -46,7 +48,7 @@
         .footer-contact:hover, .footer-contact:focus-visible { text-decoration:underline; }
         @media (max-width:900px) { .game-card, .game-card:nth-child(n+5) { grid-column:span 3; } .game-card:nth-child(7) { margin-top:0; } }
         @media (max-width:700px) { .game-card, .game-card:nth-child(n+5) { grid-column:1/-1; min-height:0; margin-top:0; } .game-card h2 { min-height:0; } .hero-inner { padding:54px 0; } .content { padding:44px 0 60px; } }
-        @media (max-width:480px) { .nav,.hero-inner,.content,.footer-inner { width:min(100% - 24px,1120px); } .game-card { padding:24px; } }
+        @media (max-width:480px) { .nav,.hero-inner,.content,.footer-inner { width:min(100% - 24px,1120px); } .nav { gap:10px; } .brand { flex:1 1 150px; } .nav-actions { flex:1 1 auto; gap:7px; } .home-link { white-space:nowrap; } .game-card { padding:24px; } }
     </style>
   <meta name="author" content="Juil Gitom">
   <style id="creator-credit-style">
@@ -61,7 +63,7 @@
     <header>
         <nav class="nav" aria-label="Games navigation">
             <a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">Σ</span> MathToolsHub</a>
-            <a class="home-link" href="../index.html">← Home</a>
+            <div class="nav-actions"><div class="site-language-slot" id="siteLanguageSlot"></div><a class="home-link" href="../index.html">← Home</a></div>
         </nav>
     </header>
     <main>

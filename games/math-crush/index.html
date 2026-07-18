@@ -72,7 +72,8 @@
       flex-wrap: wrap;
     }
 
-    .title-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .title-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+    .site-language-slot { display: flex; align-items: center; }
     .back-link { display: inline-flex; align-items: center; min-height: 40px; padding: 0 12px; border: 1px solid #dcd5ff; border-radius: 13px; color: #4f32cb; background: #fff; font-size: .82rem; font-weight: 800; text-decoration: none; }
     .back-link:hover, .back-link:focus-visible { background: #f2efff; outline: 3px solid #ddd6fe; outline-offset: 2px; }
 
@@ -407,6 +408,7 @@
           </div>
         </div>
         <div class="title-actions">
+          <div class="site-language-slot" id="siteLanguageSlot"></div>
           <a class="back-link" href="../">← Games</a>
           <button id="soundBtn" class="action secondary" type="button">🔊 Sound On</button>
         </div>
