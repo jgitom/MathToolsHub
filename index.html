@@ -219,6 +219,43 @@
         .programme-card-link:hover, .programme-card-link:focus-visible { transform: translateY(-3px); border-color: #93b4e8; box-shadow: 0 14px 30px rgba(15,39,71,.1); outline: none; }
         .card-action { display: inline-flex; align-items: center; gap: 6px; margin-top: 18px; color: var(--blue); font-size: .82rem; font-weight: 800; }
 
+        /* Student-focused homepage presentation */
+        .hero { overflow: hidden; isolation: isolate; }
+        .hero::before, .hero::after { content: ""; position: absolute; z-index: -1; border-radius: 50%; opacity: .48; }
+        .hero::before { width: 420px; height: 420px; right: -130px; top: -180px; background: #2563eb; }
+        .hero::after { width: 300px; height: 300px; left: -110px; bottom: -180px; background: #0d9488; }
+        .hero-inner { min-height: 560px; gap: 56px; }
+        .hero h1 { max-width: 720px; font-size: clamp(2.55rem, 5.8vw, 5rem); line-height: .98; letter-spacing: -.055em; }
+        .hero .lead { max-width: 640px; font-size: 1.08rem; }
+        .actions .button { border-radius: 14px; min-height: 48px; }
+        .hero-shortcuts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 28px; }
+        .hero-shortcut { display: flex; align-items: center; gap: 10px; min-height: 64px; padding: 12px 14px; color: #fff; text-decoration: none; border: 1px solid rgba(255,255,255,.15); border-radius: 16px; background: rgba(255,255,255,.08); transition: transform .2s ease, background .2s ease; }
+        .hero-shortcut:hover { transform: translateY(-3px); background: rgba(255,255,255,.15); }
+        .hero-shortcut span { display: grid; place-items: center; flex: 0 0 36px; height: 36px; border-radius: 11px; background: rgba(255,255,255,.14); font-size: 1.15rem; }
+        .hero-shortcut strong { font-size: .82rem; line-height: 1.25; }
+        .hero-panel { border-radius: 26px; padding: 30px; box-shadow: 0 28px 70px rgba(0,0,0,.2); }
+        .stat { margin-top: 10px; padding: 17px 18px; border: 1px solid rgba(255,255,255,.12); border-radius: 16px; background: rgba(255,255,255,.06); }
+        .stat:first-of-type { margin-top: 20px; }
+        .stat strong { font-size: 2rem; }
+        .programmes { background: linear-gradient(180deg, #f8fbff 0%, #eef5ff 100%); }
+        .section-heading { max-width: 680px; }
+        .section-heading h2 { font-size: clamp(1.8rem, 3.5vw, 2.7rem); letter-spacing: -.035em; }
+        .programme-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 20px; }
+        .programme-card { position: relative; display: flex; flex-direction: column; overflow: hidden; min-height: 245px; padding: 28px; border-radius: 22px; border-top: 4px solid var(--card-accent, #0b63f0); }
+        .programme-card::after { content: ""; position: absolute; width: 110px; height: 110px; right: -48px; bottom: -48px; border-radius: 50%; background: var(--card-wash, rgba(11,99,240,.08)); }
+        .programme-card:nth-child(-n+3) { grid-column: span 4; }
+        .programme-card:nth-child(n+4) { grid-column: span 3; }
+        .programme-card:nth-child(1) { --card-accent: #16a34a; --card-wash: rgba(22,163,74,.11); }
+        .programme-card:nth-child(2) { --card-accent: #0b63f0; --card-wash: rgba(11,99,240,.11); }
+        .programme-card:nth-child(3) { --card-accent: #7c3aed; --card-wash: rgba(124,58,237,.11); }
+        .programme-card:nth-child(4) { --card-accent: #ef4444; --card-wash: rgba(239,68,68,.11); }
+        .programme-card:nth-child(5) { --card-accent: #f59e0b; --card-wash: rgba(245,158,11,.13); }
+        .programme-card:nth-child(6) { --card-accent: #0891b2; --card-wash: rgba(8,145,178,.11); }
+        .programme-card:nth-child(7) { --card-accent: #db2777; --card-wash: rgba(219,39,119,.11); }
+        .card-icon { width: 54px; height: 54px; margin-bottom: 22px; border: 0; border-radius: 16px; color: #fff; background: var(--card-accent, #0b63f0); font-size: 1.35rem; box-shadow: 0 10px 20px var(--card-wash, rgba(11,99,240,.18)); }
+        .programme-card h3 { font-size: 1.12rem; }
+        .programme-card p { line-height: 1.65; }
+        .card-action { margin-top: auto; padding-top: 20px; }
         .cta { padding: 0 0 82px; }
         .cta-box { display: flex; align-items: center; justify-content: space-between; gap: 32px; padding: 38px 42px; border-radius: 12px; background: var(--navy); color: #fff; box-shadow: var(--shadow); }
         .cta-box h2 { margin: 0 0 8px; font-size: 1.55rem; }
@@ -241,6 +278,7 @@
             .hero-inner { grid-template-columns: 1fr; gap: 45px; }
             .hero-panel { max-width: 560px; }
             .programme-grid { grid-template-columns: 1fr 1fr; }
+            .programme-card:nth-child(n) { grid-column: auto; }
             .nav-links { gap: 12px; }
             .nav-links > a:first-child { display: none; }
         }
@@ -255,6 +293,8 @@
             .hero-panel { padding: 22px; }
             .programmes { padding: 60px 0; }
             .programme-grid { grid-template-columns: 1fr; }
+            .hero-shortcuts { grid-template-columns: 1fr; }
+            .hero-shortcut { min-height: 56px; }
             .cta { padding-bottom: 60px; }
             .cta-box { align-items: flex-start; flex-direction: column; padding: 28px; }
             .footer-inner { display: flex; align-items: center; flex-direction: column; text-align: center; }
@@ -302,6 +342,11 @@
                         <a class="button button-primary" href="quizzes.html"><span data-i18n="explore">Explore programmes</span> <span aria-hidden="true">→</span></a>
                         <a class="button button-secondary" href="#programmes" data-i18n="overview">View platform overview</a>
                     </div>
+                    <div class="hero-shortcuts" aria-label="Quick access">
+                        <a class="hero-shortcut" href="quizzes.html"><span aria-hidden="true">✏️</span><strong data-i18n="primaryTitle">Primary mathematics</strong></a>
+                        <a class="hero-shortcut" href="quizzes.html"><span aria-hidden="true">📐</span><strong data-i18n="secondaryTitle">Secondary courses</strong></a>
+                        <a class="hero-shortcut" href="games/"><span aria-hidden="true">🎮</span><strong data-i18n="navGames">Games</strong></a>
+                    </div>
                 </div>
 
                 <aside class="hero-panel" aria-label="Platform overview">
@@ -323,39 +368,39 @@
 
                 <div class="programme-grid">
                     <article class="programme-card">
-                        <div class="card-icon" aria-hidden="true">01</div>
+                        <div class="card-icon" aria-hidden="true">🌱</div>
                         <h3 data-i18n="foundationTitle">Foundation learning</h3>
                         <p data-i18n="foundationText">Accessible early-learning activities that introduce numbers, patterns and core mathematical concepts.</p>
                     </article>
                     <article class="programme-card">
-                        <div class="card-icon" aria-hidden="true">02</div>
+                        <div class="card-icon" aria-hidden="true">✏️</div>
                         <h3 data-i18n="primaryTitle">Primary mathematics</h3>
                         <p data-i18n="primaryText">Structured quizzes for Years 1 through 6, organised around progressive curriculum skills.</p>
                     </article>
                     <article class="programme-card">
-                        <div class="card-icon" aria-hidden="true">03</div>
+                        <div class="card-icon" aria-hidden="true">📐</div>
                         <h3 data-i18n="secondaryTitle">Secondary courses</h3>
                         <p data-i18n="secondaryText">Dedicated programme access for Forms 1 through 5 to support continued academic development.</p>
                     </article>
                     <a class="programme-card programme-card-link" href="games/math-crush/">
-                        <div class="card-icon" aria-hidden="true">×</div>
+                        <div class="card-icon" aria-hidden="true">🎯</div>
                         <h3>CJMath EquaGems</h3>
                         <p data-i18n="gameText">Build speed and accuracy through an engaging interactive mathematics game.</p>
                         <span class="card-action"><span data-i18n="playGame">Play CJMath EquaGems</span> <span aria-hidden="true">→</span></span>
                     </a>
                     <a class="programme-card programme-card-link" href="games/math-kingdom-defender/">
-                        <div class="card-icon" aria-hidden="true">04</div>
+                        <div class="card-icon" aria-hidden="true">🏰</div>
                         <h3>Math Kingdom Defender</h3>
                         <p>Solve equations, power your towers, and defend the kingdom.</p>
                         <span class="card-action">Play Math Kingdom Defender <span aria-hidden="true">→</span></span>
                     </a>
                     <a class="programme-card programme-card-link" href="games/crypt-of-equation/">
-                        <div class="card-icon" aria-hidden="true">05</div>
+                        <div class="card-icon" aria-hidden="true">⚔️</div>
                         <h3>Crypt of Equation</h3>
                         <p>Explore mathematical realms and defeat monsters by solving equations.</p>
                         <span class="card-action">Play Crypt of Equation <span aria-hidden="true">→</span></span>
                     </a>
-                    <a class="programme-card programme-card-link" href="games/chess_game.html">
+                    <a class="programme-card programme-card-link" href="games/chess/">
                         <div class="card-icon" aria-hidden="true">♞</div>
                         <h3>MathToolsHub Chess</h3>
                         <p>Practise planning, logic and strategic thinking in a complete two-player chess game.</p>
