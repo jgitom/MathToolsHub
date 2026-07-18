@@ -125,5 +125,7 @@ $("startBtn").onclick=()=>{syncMusic(true);startWave()};$("attackBtn").onclick=a
 render();
 if(!state.hasSeenIntro){state.hasSeenIntro=true;save();showModal({crest:"🏰",title:"Math Kingdom Defender — Version 1.0",text:"Master 30 waves across three campaigns, strengthen your towers, unlock achievements, and defeat each realm boss.",primary:"Begin Adventure",features:true,onPrimary:()=>$("playerName").focus()})}
 </script>
+<script src="../../supabase-config.js"></script>
+<script type="module" src="../../supabase-progress.js" data-activity-id="game/math-kingdom-defender" data-activity-type="game" data-progress-keys="mathKingdomSave"></script>
 </body>
 </html>
