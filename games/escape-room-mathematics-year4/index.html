@@ -1,0 +1,1015 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Year 4 Mathematics Escape Room Adventure" />
+  <title>Escape Room Mathematics: The Lost Island</title>
+  <style>
+    :root {
+      --bg: #062d3f;
+      --panel: rgba(7, 41, 57, 0.92);
+      --panel-2: rgba(11, 67, 80, 0.92);
+      --primary: #ffd166;
+      --accent: #36d399;
+      --danger: #ff6b6b;
+      --text: #f4fbff;
+      --muted: #b8d5df;
+      --shadow: 0 18px 45px rgba(0, 0, 0, 0.32);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-rounded, "SF Pro Rounded", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 10%, rgba(54, 211, 153, 0.16), transparent 24%),
+        radial-gradient(circle at 88% 15%, rgba(255, 209, 102, 0.18), transparent 22%),
+        linear-gradient(180deg, #0a6072 0%, #0b8290 30%, #0d5869 63%, #052c3e 100%);
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: auto 0 0;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    body::before {
+      height: 28vh;
+      background:
+        radial-gradient(circle at 12% 80%, #f0c56b 0 8%, transparent 8.5%),
+        radial-gradient(circle at 30% 92%, #e7b95c 0 11%, transparent 11.5%),
+        radial-gradient(circle at 56% 88%, #e9bd64 0 12%, transparent 12.5%),
+        radial-gradient(circle at 84% 90%, #f1c66e 0 11%, transparent 11.5%);
+      opacity: 0.35;
+    }
+
+    body::after {
+      height: 140px;
+      background:
+        radial-gradient(ellipse at 10% 100%, rgba(255,255,255,.16), transparent 55%),
+        radial-gradient(ellipse at 35% 100%, rgba(255,255,255,.12), transparent 55%),
+        radial-gradient(ellipse at 65% 100%, rgba(255,255,255,.13), transparent 55%),
+        radial-gradient(ellipse at 90% 100%, rgba(255,255,255,.15), transparent 55%);
+      animation: waves 5s ease-in-out infinite alternate;
+    }
+
+    @keyframes waves {
+      from { transform: translateY(8px); }
+      to { transform: translateY(-6px); }
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      width: min(1180px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 18px 0 42px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1.3fr auto;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.55rem, 3vw, 2.5rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .brand p {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .hud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .stat {
+      min-width: 92px;
+      padding: 10px 13px;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 16px;
+      background: rgba(2, 31, 44, .62);
+      box-shadow: 0 8px 22px rgba(0,0,0,.17);
+      text-align: center;
+      backdrop-filter: blur(9px);
+    }
+
+    .stat small {
+      display: block;
+      color: var(--muted);
+      font-size: .73rem;
+      margin-bottom: 2px;
+    }
+
+    .stat strong {
+      font-size: 1.12rem;
+    }
+
+    .progress-shell {
+      height: 11px;
+      background: rgba(255,255,255,.12);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 18px;
+      border: 1px solid rgba(255,255,255,.1);
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--accent), var(--primary));
+      transition: width .35s ease;
+    }
+
+    .game-grid {
+      display: grid;
+      grid-template-columns: minmax(250px, 0.78fr) minmax(0, 1.62fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .map-card,
+    .room-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .map-card {
+      background: linear-gradient(180deg, rgba(10,80,85,.96), rgba(7,45,55,.96));
+      padding: 18px;
+    }
+
+    .map-card h2,
+    .room-card h2 {
+      margin: 0;
+      font-size: 1.15rem;
+    }
+
+    .map-card p {
+      color: var(--muted);
+      margin: 6px 0 16px;
+      font-size: .9rem;
+    }
+
+    .island-map {
+      position: relative;
+      min-height: 470px;
+      border-radius: 20px;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 52% 56%, #efd07f 0 28%, #c69547 28.6% 31%, transparent 31.4%),
+        radial-gradient(ellipse at 48% 52%, rgba(38, 164, 102, .92) 0 19%, transparent 19.7%),
+        radial-gradient(ellipse at 50% 55%, rgba(32, 118, 78, .95) 0 24%, transparent 24.7%),
+        linear-gradient(180deg, #2ea7c4, #0b708e 62%, #07526d);
+      border: 1px solid rgba(255,255,255,.15);
+    }
+
+    .island-map::after {
+      content: "🌊  🌊  🌊";
+      position: absolute;
+      left: 50%;
+      bottom: 10px;
+      transform: translateX(-50%);
+      letter-spacing: 8px;
+      opacity: .65;
+    }
+
+    .route {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .route svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .route path {
+      stroke: rgba(255,255,255,.65);
+      stroke-width: 3;
+      stroke-dasharray: 7 8;
+      fill: none;
+    }
+
+    .map-node {
+      position: absolute;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 1.65rem;
+      background: rgba(3, 42, 52, .88);
+      color: white;
+      border: 3px solid rgba(255,255,255,.72);
+      box-shadow: 0 9px 18px rgba(0,0,0,.28);
+      transition: .25s ease;
+    }
+
+    .map-node span {
+      position: absolute;
+      top: 63px;
+      width: 90px;
+      text-align: center;
+      font-size: .72rem;
+      color: white;
+      text-shadow: 0 2px 6px rgba(0,0,0,.9);
+    }
+
+    .map-node.locked {
+      opacity: .48;
+      filter: grayscale(.55);
+    }
+
+    .map-node.active {
+      transform: scale(1.12);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 7px rgba(255,209,102,.16), 0 10px 20px rgba(0,0,0,.3);
+    }
+
+    .map-node.completed {
+      background: #17745d;
+      border-color: var(--accent);
+    }
+
+    .map-node[data-room="0"] { left: 12%; top: 71%; }
+    .map-node[data-room="1"] { left: 26%; top: 49%; }
+    .map-node[data-room="2"] { left: 49%; top: 59%; }
+    .map-node[data-room="3"] { left: 63%; top: 39%; }
+    .map-node[data-room="4"] { left: 45%; top: 21%; }
+    .map-node[data-room="5"] { left: 72%; top: 12%; }
+
+    .room-card {
+      background: var(--panel);
+      padding: 22px;
+      min-height: 575px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .room-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .room-label {
+      color: var(--primary);
+      font-weight: 700;
+      letter-spacing: .03em;
+      text-transform: uppercase;
+      font-size: .78rem;
+    }
+
+    .room-description {
+      color: var(--muted);
+      margin: 7px 0 0;
+      max-width: 650px;
+    }
+
+    .badge {
+      white-space: nowrap;
+      background: rgba(255,209,102,.12);
+      border: 1px solid rgba(255,209,102,.38);
+      color: #ffe29a;
+      padding: 8px 11px;
+      border-radius: 999px;
+      font-size: .8rem;
+    }
+
+    .scene {
+      min-height: 170px;
+      border-radius: 20px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      margin-bottom: 18px;
+      padding: 18px;
+      background:
+        linear-gradient(135deg, rgba(54,211,153,.13), rgba(255,209,102,.10)),
+        rgba(255,255,255,.045);
+      border: 1px solid rgba(255,255,255,.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scene-art {
+      font-size: clamp(3.5rem, 9vw, 6.2rem);
+      filter: drop-shadow(0 12px 13px rgba(0,0,0,.26));
+      animation: float 2.8s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      50% { transform: translateY(-8px); }
+    }
+
+    .scene-message {
+      margin-top: 8px;
+      color: var(--muted);
+      max-width: 540px;
+    }
+
+    .question-box {
+      margin-top: auto;
+      padding: 18px;
+      background: var(--panel-2);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.13);
+    }
+
+    .question-number {
+      color: var(--muted);
+      font-size: .82rem;
+      margin-bottom: 7px;
+    }
+
+    .question {
+      margin: 0 0 14px;
+      font-size: clamp(1.1rem, 2.5vw, 1.45rem);
+      line-height: 1.35;
+    }
+
+    .answers {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .answer {
+      min-height: 52px;
+      text-align: left;
+      padding: 12px 14px;
+      border-radius: 14px;
+      color: var(--text);
+      background: rgba(255,255,255,.075);
+      border: 1px solid rgba(255,255,255,.14);
+      transition: .18s ease;
+    }
+
+    .answer:hover:not(:disabled) {
+      transform: translateY(-2px);
+      border-color: rgba(255,209,102,.75);
+      background: rgba(255,209,102,.12);
+    }
+
+    .answer.correct {
+      background: rgba(54,211,153,.2);
+      border-color: var(--accent);
+    }
+
+    .answer.wrong {
+      background: rgba(255,107,107,.2);
+      border-color: var(--danger);
+    }
+
+    .answer:disabled {
+      cursor: default;
+    }
+
+    .feedback {
+      min-height: 28px;
+      margin-top: 12px;
+      font-weight: 650;
+    }
+
+    .feedback.ok { color: #7ff0bd; }
+    .feedback.bad { color: #ffaaaa; }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+      padding: 11px 16px;
+      border-radius: 13px;
+      font-weight: 750;
+    }
+
+    .primary-btn {
+      background: var(--primary);
+      color: #3a2a00;
+      box-shadow: 0 8px 18px rgba(255,209,102,.2);
+    }
+
+    .secondary-btn {
+      background: rgba(255,255,255,.085);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.14);
+    }
+
+    .primary-btn:disabled,
+    .secondary-btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .timer-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .timer {
+      width: 110px;
+      height: 8px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255,255,255,.12);
+    }
+
+    .timer > div {
+      height: 100%;
+      width: 100%;
+      background: var(--accent);
+      transition: width 1s linear, background .2s ease;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(1,18,27,.78);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      z-index: 20;
+      backdrop-filter: blur(9px);
+    }
+
+    .overlay.hidden {
+      display: none;
+    }
+
+    .modal {
+      width: min(520px, 100%);
+      background: #073746;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 26px;
+      padding: 26px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .modal-emoji {
+      font-size: 4.7rem;
+      margin-bottom: 8px;
+    }
+
+    .modal h2 {
+      margin: 0;
+      font-size: 1.75rem;
+    }
+
+    .modal p {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .final-score {
+      font-size: 2rem;
+      color: var(--primary);
+      font-weight: 850;
+      margin: 12px 0;
+    }
+
+    .start-options {
+      display: grid;
+      gap: 10px;
+      text-align: left;
+      margin: 18px 0;
+    }
+
+    .start-options label {
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .start-options input {
+      width: 100%;
+      margin-top: 6px;
+      padding: 12px 13px;
+      border-radius: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.16);
+      outline: none;
+    }
+
+    .start-options input:focus {
+      border-color: var(--primary);
+    }
+
+    .footer-note {
+      text-align: center;
+      color: rgba(255,255,255,.65);
+      font-size: .82rem;
+      margin-top: 17px;
+    }
+
+    @media (max-width: 850px) {
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .hud {
+        justify-content: flex-start;
+      }
+
+      .game-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .island-map {
+        min-height: 360px;
+      }
+
+      .room-card {
+        min-height: unset;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .app {
+        width: min(100% - 14px, 1180px);
+      }
+
+      .stat {
+        min-width: calc(50% - 4px);
+      }
+
+      .answers {
+        grid-template-columns: 1fr;
+      }
+
+      .room-head {
+        flex-direction: column;
+      }
+
+      .map-node {
+        width: 48px;
+        height: 48px;
+        font-size: 1.35rem;
+      }
+
+      .map-node span {
+        top: 52px;
+        width: 72px;
+        font-size: .65rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>🏝️ Escape Room Mathematics</h1>
+        <p>The Lost Island of Numbers · Year 4 Adventure</p>
+      </div>
+
+      <section class="hud" aria-label="Game statistics">
+        <div class="stat"><small>Explorer</small><strong id="playerName">Student</strong></div>
+        <div class="stat"><small>Score</small><strong id="score">0</strong></div>
+        <div class="stat"><small>Lives</small><strong id="lives">❤️❤️❤️</strong></div>
+        <div class="stat"><small>Keys</small><strong id="keys">0 / 6</strong></div>
+      </section>
+    </header>
+
+    <div class="progress-shell" aria-label="Island escape progress">
+      <div id="progressBar" class="progress-bar"></div>
+    </div>
+
+    <section class="game-grid">
+      <aside class="map-card">
+        <h2>Island Map</h2>
+        <p>Complete each location to unlock the rescue point.</p>
+
+        <div class="island-map" aria-label="Map of the Lost Island">
+          <div class="route" aria-hidden="true">
+            <svg viewBox="0 0 300 470" preserveAspectRatio="none">
+              <path d="M58 357 C78 315, 82 270, 106 240 S156 300, 168 235 S201 210, 203 170 S183 123, 167 105 S215 80, 235 74" />
+            </svg>
+          </div>
+
+          <button class="map-node active" data-room="0" type="button">🏖️<span>Beach</span></button>
+          <button class="map-node locked" data-room="1" type="button">🏛️<span>Temple</span></button>
+          <button class="map-node locked" data-room="2" type="button">🌴<span>Jungle</span></button>
+          <button class="map-node locked" data-room="3" type="button">🏴‍☠️<span>Cave</span></button>
+          <button class="map-node locked" data-room="4" type="button">🌋<span>Volcano</span></button>
+          <button class="map-node locked" data-room="5" type="button">🗼<span>Lighthouse</span></button>
+        </div>
+      </aside>
+
+      <section class="room-card">
+        <div class="room-head">
+          <div>
+            <div id="roomLabel" class="room-label">Room 1 of 6</div>
+            <h2 id="roomTitle">Beach Landing</h2>
+            <p id="roomDescription" class="room-description"></p>
+          </div>
+          <div id="topicBadge" class="badge">Whole Numbers</div>
+        </div>
+
+        <div class="scene">
+          <div>
+            <div id="sceneArt" class="scene-art">🏖️📦</div>
+            <div id="sceneMessage" class="scene-message"></div>
+          </div>
+        </div>
+
+        <div class="question-box">
+          <div id="questionNumber" class="question-number">Puzzle 1 of 3</div>
+          <h3 id="questionText" class="question"></h3>
+          <div id="answers" class="answers"></div>
+          <div id="feedback" class="feedback" aria-live="polite"></div>
+
+          <div class="controls">
+            <div class="timer-wrap">
+              ⏱️ <span id="timerText">30s</span>
+              <div class="timer" aria-hidden="true"><div id="timerBar"></div></div>
+            </div>
+            <button id="nextButton" class="primary-btn" type="button" disabled>Next Puzzle →</button>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <p class="footer-note">MathToolsHub · Interactive Year 4 Mathematics Prototype</p>
+  </main>
+
+  <div id="startOverlay" class="overlay">
+    <div class="modal">
+      <div class="modal-emoji">🧭</div>
+      <h2>Begin Your Island Escape</h2>
+      <p>
+        Solve 18 mathematics puzzles, collect six keys, and activate the lighthouse
+        before the rescue helicopter leaves.
+      </p>
+      <div class="start-options">
+        <label>
+          Explorer name
+          <input id="nameInput" type="text" maxlength="18" placeholder="Enter your name" value="Student" />
+        </label>
+      </div>
+      <button id="startButton" class="primary-btn" type="button">Start Adventure</button>
+    </div>
+  </div>
+
+  <div id="endOverlay" class="overlay hidden">
+    <div class="modal">
+      <div id="endEmoji" class="modal-emoji">🚁</div>
+      <h2 id="endTitle">You Escaped!</h2>
+      <p id="endMessage"></p>
+      <div id="finalScore" class="final-score"></div>
+      <button id="restartButton" class="primary-btn" type="button">Play Again</button>
+    </div>
+  </div>
+
+  <script>
+    const rooms = [
+      { title: "Beach Landing", topic: "Whole Numbers", description: "A supply crate is locked. Solve the number puzzles to obtain the Bronze Key.", art: "🏖️📦", message: "The waves are rising. Open the crate before it is swept away!", questions: [
+        { q: "234 × 6 = ?", choices: ["1,204", "1,304", "1,404", "1,504"], answer: 2, explain: "234 × 6 = 1,404." },
+        { q: "50,000 − 18,765 = ?", choices: ["31,135", "31,235", "31,335", "32,235"], answer: 1, explain: "50,000 − 18,765 = 31,235." },
+        { q: "96 shells are shared equally among 8 pupils. How many does each pupil receive?", choices: ["10", "11", "12", "14"], answer: 2, explain: "96 ÷ 8 = 12 shells." }
+      ]},
+      { title: "Ancient Temple", topic: "Multiplication & Division", description: "Stone symbols glow above the doorway. Calculate each value to unlock it.", art: "🏛️🔐", message: "Three stone locks block the entrance. Each answer reveals a code.", questions: [
+        { q: "144 ÷ 12 = ?", choices: ["10", "11", "12", "14"], answer: 2, explain: "144 ÷ 12 = 12." },
+        { q: "27 × 8 = ?", choices: ["196", "206", "216", "226"], answer: 2, explain: "27 × 8 = 216." },
+        { q: "315 treasure beads are packed equally into 9 bags. How many beads are in each bag?", choices: ["25", "30", "35", "45"], answer: 2, explain: "315 ÷ 9 = 35 beads." }
+      ]},
+      { title: "Jungle Maze", topic: "Fractions", description: "Only the correct fraction path is safe. Wrong turns cost one life.", art: "🌴🐍", message: "Solve each fraction puzzle to choose the safe path.", questions: [
+        { q: "1/4 + 2/4 = ?", choices: ["2/4", "3/4", "3/8", "1"], answer: 1, explain: "1/4 + 2/4 = 3/4." },
+        { q: "7/8 − 3/8 = ?", choices: ["1/4", "1/2", "3/8", "5/8"], answer: 1, explain: "7/8 − 3/8 = 4/8 = 1/2." },
+        { q: "What is 2/3 of 18?", choices: ["6", "9", "12", "15"], answer: 2, explain: "18 ÷ 3 × 2 = 12." }
+      ]},
+      { title: "Pirate Cave", topic: "Decimals & Money", description: "A silver key is hidden in a chest protected by decimal and money puzzles.", art: "🏴‍☠️💰", message: "Calculate carefully before the cave tide rises!", questions: [
+        { q: "3.6 + 2.4 = ?", choices: ["5.0", "5.8", "6.0", "6.2"], answer: 2, explain: "3.6 + 2.4 = 6.0." },
+        { q: "RM24.50 + RM13.20 = ?", choices: ["RM36.70", "RM37.70", "RM38.60", "RM38.70"], answer: 1, explain: "RM24.50 + RM13.20 = RM37.70." },
+        { q: "You pay RM50 for items costing RM28.65. What is the change?", choices: ["RM20.35", "RM21.25", "RM21.35", "RM22.35"], answer: 2, explain: "RM50.00 − RM28.65 = RM21.35." }
+      ]},
+      { title: "Volcano Bridge", topic: "Measurement & Geometry", description: "Repair the broken bridge before the lava reaches the path.", art: "🌋🪵", message: "The bridge needs exact measurements. Calculate every piece.", questions: [
+        { q: "A rectangle is 7 m long and 4 m wide. What is its perimeter?", choices: ["11 m", "18 m", "22 m", "28 m"], answer: 2, explain: "Perimeter = 2 × (7 + 4) = 22 m." },
+        { q: "Convert 2.5 km to metres.", choices: ["250 m", "2,050 m", "2,500 m", "25,000 m"], answer: 2, explain: "2.5 km = 2,500 m." },
+        { q: "3 kg 250 g + 1 kg 750 g = ?", choices: ["4 kg", "4 kg 500 g", "5 kg", "5 kg 500 g"], answer: 2, explain: "3 kg 250 g + 1 kg 750 g = 5 kg." }
+      ]},
+      { title: "Lighthouse Control Room", topic: "Time, Data & Capacity", description: "Activate the lighthouse beam and signal the rescue helicopter.", art: "🗼🚁", message: "The final panel needs three correct codes!", questions: [
+        { q: "A trip starts at 9:25 a.m. and lasts 1 hour 35 minutes. When does it end?", choices: ["10:50 a.m.", "11:00 a.m.", "11:10 a.m.", "11:20 a.m."], answer: 1, explain: "9:25 a.m. + 1 hour 35 minutes = 11:00 a.m." },
+        { q: "A pictograph has 6 stars. Each star represents 4 boats. How many boats are shown?", choices: ["10", "20", "24", "28"], answer: 2, explain: "6 × 4 = 24 boats." },
+        { q: "3 L 250 mL + 1 L 750 mL = ?", choices: ["4 L", "4 L 500 mL", "5 L", "5 L 500 mL"], answer: 2, explain: "The total is exactly 5 L." }
+      ]}
+    ];
+
+    const totalPuzzles = rooms.reduce((sum, room) => sum + room.questions.length, 0);
+    const state = {
+      room: 0,
+      question: 0,
+      score: 0,
+      lives: 3,
+      keys: 0,
+      answered: false,
+      timer: 30,
+      interval: null,
+      completedRooms: new Set()
+    };
+
+    const el = {
+      playerName: document.getElementById("playerName"),
+      score: document.getElementById("score"),
+      lives: document.getElementById("lives"),
+      keys: document.getElementById("keys"),
+      progressBar: document.getElementById("progressBar"),
+      roomLabel: document.getElementById("roomLabel"),
+      roomTitle: document.getElementById("roomTitle"),
+      roomDescription: document.getElementById("roomDescription"),
+      topicBadge: document.getElementById("topicBadge"),
+      sceneArt: document.getElementById("sceneArt"),
+      sceneMessage: document.getElementById("sceneMessage"),
+      questionNumber: document.getElementById("questionNumber"),
+      questionText: document.getElementById("questionText"),
+      answers: document.getElementById("answers"),
+      feedback: document.getElementById("feedback"),
+      nextButton: document.getElementById("nextButton"),
+      timerText: document.getElementById("timerText"),
+      timerBar: document.getElementById("timerBar"),
+      startOverlay: document.getElementById("startOverlay"),
+      startButton: document.getElementById("startButton"),
+      nameInput: document.getElementById("nameInput"),
+      endOverlay: document.getElementById("endOverlay"),
+      endEmoji: document.getElementById("endEmoji"),
+      endTitle: document.getElementById("endTitle"),
+      endMessage: document.getElementById("endMessage"),
+      finalScore: document.getElementById("finalScore"),
+      restartButton: document.getElementById("restartButton"),
+      mapNodes: [...document.querySelectorAll(".map-node")]
+    };
+
+    function updateHud() {
+      el.score.textContent = state.score;
+      el.lives.textContent = state.lives > 0 ? "❤️".repeat(state.lives) : "💔";
+      el.keys.textContent = `${state.keys} / ${rooms.length}`;
+
+      const completedPuzzles =
+        rooms.slice(0, state.room).reduce((sum, room) => sum + room.questions.length, 0) +
+        state.question;
+      el.progressBar.style.width = `${Math.min(100, (completedPuzzles / totalPuzzles) * 100)}%`;
+    }
+
+    function updateMap() {
+      el.mapNodes.forEach((node, index) => {
+        node.classList.remove("active", "completed", "locked");
+
+        if (state.completedRooms.has(index)) {
+          node.classList.add("completed");
+        } else if (index === state.room) {
+          node.classList.add("active");
+        } else {
+          node.classList.add("locked");
+        }
+      });
+    }
+
+    function renderQuestion() {
+      clearInterval(state.interval);
+      state.answered = false;
+      state.timer = 30;
+      el.nextButton.disabled = true;
+      el.feedback.textContent = "";
+      el.feedback.className = "feedback";
+
+      const room = rooms[state.room];
+      const question = room.questions[state.question];
+
+      el.roomLabel.textContent = `Room ${state.room + 1} of ${rooms.length}`;
+      el.roomTitle.textContent = room.title;
+      el.roomDescription.textContent = room.description;
+      el.topicBadge.textContent = room.topic;
+      el.sceneArt.textContent = room.art;
+      el.sceneMessage.textContent = room.message;
+      el.questionNumber.textContent = `Puzzle ${state.question + 1} of ${room.questions.length}`;
+      el.questionText.textContent = question.q;
+      el.answers.innerHTML = "";
+
+      question.choices.forEach((choice, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "answer";
+        button.textContent = `${String.fromCharCode(65 + index)}. ${choice}`;
+        button.addEventListener("click", () => checkAnswer(index, button));
+        el.answers.appendChild(button);
+      });
+
+      updateHud();
+      updateMap();
+      startTimer();
+    }
+
+    function startTimer() {
+      updateTimerUi();
+      state.interval = setInterval(() => {
+        state.timer -= 1;
+        updateTimerUi();
+
+        if (state.timer <= 0) {
+          clearInterval(state.interval);
+          timeOut();
+        }
+      }, 1000);
+    }
+
+    function updateTimerUi() {
+      el.timerText.textContent = `${state.timer}s`;
+      el.timerBar.style.width = `${(state.timer / 30) * 100}%`;
+      el.timerBar.style.background = state.timer <= 10 ? "var(--danger)" : "var(--accent)";
+    }
+
+    function disableAnswers() {
+      [...el.answers.children].forEach(btn => btn.disabled = true);
+    }
+
+    function checkAnswer(selectedIndex, button) {
+      if (state.answered) return;
+
+      state.answered = true;
+      clearInterval(state.interval);
+      disableAnswers();
+
+      const question = rooms[state.room].questions[state.question];
+      const answerButtons = [...el.answers.children];
+
+      if (selectedIndex === question.answer) {
+        button.classList.add("correct");
+        const timeBonus = Math.max(0, state.timer);
+        state.score += 100 + timeBonus * 2;
+        el.feedback.textContent = `✅ Correct! ${question.explain} +${100 + timeBonus * 2} points`;
+        el.feedback.classList.add("ok");
+      } else {
+        button.classList.add("wrong");
+        answerButtons[question.answer].classList.add("correct");
+        state.lives -= 1;
+        el.feedback.textContent = `❌ Not quite. ${question.explain}`;
+        el.feedback.classList.add("bad");
+
+        if (state.lives <= 0) {
+          setTimeout(() => endGame(false), 700);
+          updateHud();
+          return;
+        }
+      }
+
+      el.nextButton.disabled = false;
+      updateHud();
+    }
+
+    function timeOut() {
+      if (state.answered) return;
+
+      state.answered = true;
+      state.lives -= 1;
+      disableAnswers();
+
+      const question = rooms[state.room].questions[state.question];
+      [...el.answers.children][question.answer].classList.add("correct");
+      el.feedback.textContent = `⏰ Time is up. ${question.explain}`;
+      el.feedback.classList.add("bad");
+      el.nextButton.disabled = state.lives <= 0;
+
+      updateHud();
+
+      if (state.lives <= 0) {
+        setTimeout(() => endGame(false), 700);
+      }
+    }
+
+    function nextPuzzle() {
+      const room = rooms[state.room];
+
+      if (state.question < room.questions.length - 1) {
+        state.question += 1;
+        renderQuestion();
+        return;
+      }
+
+      state.completedRooms.add(state.room);
+      state.keys += 1;
+      state.score += 250;
+
+      if (state.room < rooms.length - 1) {
+        state.room += 1;
+        state.question = 0;
+        renderQuestion();
+        el.feedback.textContent = "🗝️ New key collected! The next location is now unlocked.";
+        el.feedback.className = "feedback ok";
+      } else {
+        state.score += 500;
+        el.progressBar.style.width = "100%";
+        updateHud();
+        endGame(true);
+      }
+    }
+
+    function endGame(won) {
+      clearInterval(state.interval);
+      el.endOverlay.classList.remove("hidden");
+
+      if (won) {
+        const accuracyLabel =
+          state.lives === 3 ? "Perfect Escape" :
+          state.lives === 2 ? "Brilliant Explorer" :
+          "Island Survivor";
+
+        el.endEmoji.textContent = "🚁🏆";
+        el.endTitle.textContent = "You Escaped the Island!";
+        el.endMessage.textContent =
+          `${el.playerName.textContent}, you collected all six keys and activated the lighthouse. Rank: ${accuracyLabel}.`;
+      } else {
+        el.endEmoji.textContent = "🌊💔";
+        el.endTitle.textContent = "The Island Won This Time";
+        el.endMessage.textContent =
+          "You ran out of lives, but every explorer can try again. Review the explanations and return stronger.";
+      }
+
+      el.finalScore.textContent = `Final Score: ${state.score}`;
+    }
+
+    function resetGame() {
+      clearInterval(state.interval);
+      state.room = 0;
+      state.question = 0;
+      state.score = 0;
+      state.lives = 3;
+      state.keys = 0;
+      state.answered = false;
+      state.timer = 30;
+      state.completedRooms = new Set();
+      el.endOverlay.classList.add("hidden");
+      renderQuestion();
+    }
+
+    el.startButton.addEventListener("click", () => {
+      const player = el.nameInput.value.trim() || "Student";
+      el.playerName.textContent = player;
+      el.startOverlay.classList.add("hidden");
+      renderQuestion();
+    });
+
+    el.nameInput.addEventListener("keydown", event => {
+      if (event.key === "Enter") el.startButton.click();
+    });
+
+    el.nextButton.addEventListener("click", nextPuzzle);
+    el.restartButton.addEventListener("click", resetGame);
+
+    el.mapNodes.forEach((node, index) => {
+      node.addEventListener("click", () => {
+        if (index === state.room || state.completedRooms.has(index)) {
+          el.sceneMessage.textContent =
+            index === state.room
+              ? "You are currently exploring this location."
+              : "This location has already been completed and its key collected.";
+        }
+      });
+    });
+
+    updateHud();
+    updateMap();
+  </script>
+</body>
+</html>
