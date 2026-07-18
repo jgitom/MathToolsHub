@@ -46,7 +46,13 @@ if (!config?.url || !config?.publishableKey || !keys.length) {
   }
 
   function hydrate(storage, updatedAt) {
-    Object.entries(storage || {}).forEach(([key, value]) => { if (keys.includes(key) && typeof value === "string") localStorage.setItem(key, value); });
+    Object.entries(storage || {}).forEach(([key, value]) => {
+      if (!keys.includes(key) || typeof value !== "string") return;
+      if (key === "mathKingdomSave") {
+        try { const remoteState = JSON.parse(value), localState = JSON.parse(localStorage.getItem(key) || "{}"); remoteState.hasSeenIntro = Boolean(remoteState.hasSeenIntro || localState.hasSeenIntro); value = JSON.stringify(remoteState); } catch {}
+      }
+      localStorage.setItem(key, value);
+    });
     writeMarker({ remoteUpdated: updatedAt, dirty: false });
     sessionStorage.setItem(hydratedKey, updatedAt);
     announce("loaded", { updatedAt });
