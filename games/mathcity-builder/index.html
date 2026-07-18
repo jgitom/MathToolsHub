@@ -149,7 +149,7 @@
 
     .dashboard {
       display: grid;
-      grid-template-columns: repeat(6, minmax(130px, 1fr));
+      grid-template-columns: repeat(7, minmax(120px, 1fr));
       gap: 10px;
       margin: 14px 0;
     }
@@ -627,6 +627,10 @@
         <div class="stat-label">Day</div>
         <div class="stat-value" id="dayStat">1</div>
       </div>
+      <div class="stat">
+        <div class="stat-label">City Rank</div>
+        <div class="stat-value" id="rankStat">Village</div>
+      </div>
     </section>
 
     <main class="main-layout">
@@ -653,8 +657,8 @@
 
       <aside class="panel right-panel">
         <div class="mission">
-          <div class="mission-title">🎯 Mission: Growing Community</div>
-          <div>Build a balanced city and complete all objectives.</div>
+          <div class="mission-title" id="missionTitle">🎯 Mission: Growing Community</div>
+          <div id="missionDescription">Build a balanced city and complete all objectives.</div>
           <ul id="missionList"></ul>
           <div class="progress-bar">
             <div class="progress-fill" id="missionProgress"></div>
@@ -667,7 +671,7 @@
     </main>
 
     <div class="footer-note">
-      MathCity Builder MVP • Created by Juil Gitom for MathToolsHub
+      MathCity Builder Version 1.0 • Created by Juil Gitom for MathToolsHub
     </div>
   </div>
 
@@ -820,6 +824,44 @@
       }
     };
 
+    const MISSIONS = [
+      { name:"Growing Community", description:"Build the foundations of a balanced town.", reward:5000, objectives:[
+        ["Population reaches 100", stats => stats.population >= 100],
+        ["Build at least 1 school", () => countBuilding("school") >= 1],
+        ["Build at least 1 park", () => countBuilding("park") >= 1],
+        ["Happiness reaches 75%", stats => stats.happiness >= 75],
+        ["Maintain RM5,000 funds", () => state.funds >= 5000]
+      ]},
+      { name:"Sustainable Town", description:"Grow without sacrificing clean air or essential services.", reward:12000, objectives:[
+        ["Population reaches 150", stats => stats.population >= 150],
+        ["Build at least 2 schools", () => countBuilding("school") >= 2],
+        ["Build at least 3 parks", () => countBuilding("park") >= 3],
+        ["Keep pollution at 20% or lower", stats => stats.pollution <= 20],
+        ["Maintain RM10,000 funds", () => state.funds >= 10000]
+      ]},
+      { name:"Thriving City", description:"Develop strong services and a dependable local economy.", reward:25000, objectives:[
+        ["Population reaches 220", stats => stats.population >= 220],
+        ["Build at least 1 hospital", () => countBuilding("hospital") >= 1],
+        ["Build at least 3 shops", () => countBuilding("shop") >= 3],
+        ["Happiness reaches 80%", stats => stats.happiness >= 80],
+        ["Reach Day 20", () => state.day >= 20]
+      ]},
+      { name:"Modern Metropolis", description:"Complete a prosperous, powered and resilient MathCity.", reward:50000, objectives:[
+        ["Population reaches 300", stats => stats.population >= 300],
+        ["Build at least 1 power plant", () => countBuilding("power") >= 1],
+        ["Build at least 2 factories", () => countBuilding("factory") >= 2],
+        ["Happiness remains at 75% or higher", stats => stats.happiness >= 75],
+        ["Maintain RM50,000 funds", () => state.funds >= 50000]
+      ]}
+    ];
+
+    const CITY_RANKS = ["Village", "Town", "City", "Metropolis", "MathCity Master"];
+    const CITY_EVENTS = [
+      { text:"Education innovation grant awarded", amount:4500 },
+      { text:"Emergency road repairs approved", amount:-2500 },
+      { text:"Community market generated extra revenue", amount:3000 },
+      { text:"Regional development grant received", amount:6000 }
+    ];
     const state = {
       funds: 20000,
       basePopulation: 50,
@@ -834,7 +876,8 @@
       ],
       pendingBuild: null,
       currentQuestion: null,
-      missionRewarded: false
+      missionStage: 0,
+      totalEvents: 0
     };
 
     const el = {
@@ -846,8 +889,11 @@
       pollution: document.getElementById("pollutionStat"),
       power: document.getElementById("powerStat"),
       day: document.getElementById("dayStat"),
+      rank: document.getElementById("rankStat"),
       selectedToolText: document.getElementById("selectedToolText"),
       cityLog: document.getElementById("cityLog"),
+      missionTitle: document.getElementById("missionTitle"),
+      missionDescription: document.getElementById("missionDescription"),
       missionList: document.getElementById("missionList"),
       missionProgress: document.getElementById("missionProgress"),
       modal: document.getElementById("questionModal"),
@@ -1159,6 +1205,7 @@
       el.pollution.textContent = stats.pollution + "%";
       el.power.textContent = `${stats.powerUsed} / ${stats.powerGenerated}`;
       el.day.textContent = state.day;
+      el.rank.textContent = CITY_RANKS[Math.min(state.missionStage, CITY_RANKS.length - 1)];
 
       el.happiness.style.color = stats.happiness >= 70 ? "var(--success)" :
         stats.happiness >= 45 ? "var(--accent)" : "var(--danger)";
@@ -1187,29 +1234,32 @@
 
     function renderMission() {
       const stats = calculateStats();
-      const objectives = [
-        { label: "Population reaches 100", done: stats.population >= 100 },
-        { label: "Build at least 1 school", done: countBuilding("school") >= 1 },
-        { label: "Build at least 1 park", done: countBuilding("park") >= 1 },
-        { label: "Happiness reaches 75%", done: stats.happiness >= 75 },
-        { label: "Maintain RM5,000 funds", done: state.funds >= 5000 }
-      ];
+      if (state.missionStage >= MISSIONS.length) {
+        el.missionTitle.textContent = "🏆 All Missions Complete";
+        el.missionDescription.textContent = "You built a successful MathCity. Continue expanding and improving your city.";
+        el.missionList.innerHTML = "<li>✅ MathCity Master achieved</li>";
+        el.missionProgress.style.width = "100%";
+        return;
+      }
 
-      el.missionList.innerHTML = objectives.map(obj =>
-        `<li>${obj.done ? "✅" : "⬜"} ${obj.label}</li>`
+      const mission = MISSIONS[state.missionStage];
+      const objectives = mission.objectives.map(([label, check]) => ({ label, done:Boolean(check(stats)) }));
+      el.missionTitle.textContent = `🎯 Mission ${state.missionStage + 1}: ${mission.name}`;
+      el.missionDescription.textContent = `${mission.description} Reward: ${formatMoney(mission.reward)}.`;
+      el.missionList.innerHTML = objectives.map(objective =>
+        `<li>${objective.done ? "✅" : "⬜"} ${objective.label}</li>`
       ).join("");
 
-      const completed = objectives.filter(obj => obj.done).length;
+      const completed = objectives.filter(objective => objective.done).length;
       el.missionProgress.style.width = `${(completed / objectives.length) * 100}%`;
-
-      if (completed === objectives.length && !state.missionRewarded) {
-        state.missionRewarded = true;
-        state.funds += 5000;
-        addLog("Mission completed! You earned a RM5,000 city grant.", "good");
+      if (completed === objectives.length) {
+        state.funds += mission.reward;
+        state.missionStage += 1;
+        addLog(`Mission complete: ${mission.name}. Grant received: ${formatMoney(mission.reward)}.`, "good");
         saveGame(false);
+        setTimeout(render, 0);
       }
     }
-
     function render() {
       renderBuildMenu();
       renderMap();
@@ -1232,6 +1282,7 @@
         state.grid[index] = null;
         state.funds += refund;
         addLog(`${BUILDINGS[current].name} removed. Refund: ${formatMoney(refund)}.`, "info");
+        saveGame(false);
         render();
         return;
       }
@@ -1338,6 +1389,7 @@
         state.funds -= b.cost;
         state.grid[index] = type;
         addLog(`${b.name} constructed successfully on tile ${index + 1}.`, "good");
+        saveGame(false);
         el.feedback.textContent = "Correct! Construction approved.";
         el.feedback.style.color = "var(--success)";
 
@@ -1351,6 +1403,14 @@
       }
     }
 
+    function triggerCivicEvent(stats) {
+      let event;
+      if (stats.pollution > 35) event = { text:"Environmental clean-up order", amount:-1800 };
+      else event = CITY_EVENTS[Math.floor(Math.random() * CITY_EVENTS.length)];
+      state.funds += event.amount;
+      state.totalEvents += 1;
+      addLog(`City event: ${event.text}. ${event.amount >= 0 ? "+" : ""}${formatMoney(event.amount)}.`, event.amount >= 0 ? "good" : "bad");
+    }
     function nextDay() {
       const stats = calculateStats();
       state.day += 1;
@@ -1377,6 +1437,8 @@
         addLog(`Population grant received: ${formatMoney(bonus)}.`, "info");
       }
 
+      if (state.day % 7 === 0) triggerCivicEvent(stats);
+      saveGame(false);
       render();
     }
 
@@ -1393,7 +1455,9 @@
         selectedBuilding: state.selectedBuilding,
         grid: state.grid,
         log: state.log,
-        missionRewarded: state.missionRewarded
+        version: 2,
+        missionStage: state.missionStage,
+        totalEvents: state.totalEvents
       };
       localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
       if (showMessage) {
@@ -1416,7 +1480,10 @@
           ? data.grid
           : state.grid;
         state.log = Array.isArray(data.log) ? data.log : state.log;
-        state.missionRewarded = Boolean(data.missionRewarded);
+        state.missionStage = Number.isFinite(Number(data.missionStage))
+          ? Math.max(0, Math.min(MISSIONS.length, Number(data.missionStage)))
+          : (data.missionRewarded ? 1 : 0);
+        state.totalEvents = Math.max(0, Number(data.totalEvents) || 0);
         addLog("Saved city loaded.", "info");
       } catch (error) {
         console.error("Could not load save:", error);
