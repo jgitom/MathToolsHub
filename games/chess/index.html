@@ -71,6 +71,19 @@
       color: var(--muted);
       font-size: 0.92rem;
     }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+      color: #bae6fd;
+      font-size: 0.88rem;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .back-link:hover { color: #fff; text-decoration: underline; }
+    .back-link:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
 
     .status-badge {
       min-width: 145px;
@@ -365,6 +378,7 @@
     <section class="game-card">
       <header class="header">
         <div class="brand">
+          <a class="back-link" href="../" aria-label="Back to Games">← Back to Games</a>
           <h1>♟️ MathToolsHub Chess</h1>
           <p id="gameSubtitle">Play chess against the computer</p>
         </div>
