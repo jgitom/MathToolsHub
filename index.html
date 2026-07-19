@@ -223,7 +223,7 @@
         .featured-game-ad { position:relative; overflow:hidden; display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:24px; min-height:180px; padding:30px 34px; border:1px solid #93c5fd; border-radius:24px; color:#fff; background:linear-gradient(125deg,#0f2747 0%,#1d4ed8 62%,#0d9488 100%); box-shadow:0 20px 48px rgba(15,39,71,.2); text-decoration:none; transition:transform .2s ease,box-shadow .2s ease; }
         .featured-game-ad::after { content:""; position:absolute; right:-55px; top:-90px; width:230px; height:230px; border-radius:50%; background:rgba(255,255,255,.1); }
         .featured-game-ad:hover,.featured-game-ad:focus-visible { transform:translateY(-4px); box-shadow:0 26px 58px rgba(15,39,71,.28); outline:3px solid #93c5fd; outline-offset:3px; }
-        .featured-game-icon { position:relative; z-index:1; width:104px; height:104px; display:grid; place-items:center; border-radius:24px; background:rgba(255,255,255,.14); font-size:3.8rem; box-shadow:inset 0 0 0 1px rgba(255,255,255,.2); }
+        .featured-game-video { position:relative; z-index:1; width:180px; aspect-ratio:16/10; object-fit:cover; border:2px solid rgba(255,255,255,.35); border-radius:18px; background:#071a2f; box-shadow:0 12px 28px rgba(0,0,0,.25); }
         .featured-game-copy { position:relative; z-index:1; }
         .featured-game-badge { display:inline-flex; margin-bottom:8px; padding:6px 10px; border-radius:999px; color:#713f12; background:#fef3c7; font-size:.72rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
         .featured-game-copy h2 { margin:0 0 8px; font-size:clamp(1.65rem,4vw,2.4rem); }
@@ -378,7 +378,7 @@
             .dashboard-grid { grid-template-columns:1fr 1fr; }
             .dashboard-recent { grid-column:1 / -1; }
             .featured-game-ad { grid-template-columns:1fr; gap:16px; padding:24px; text-align:center; }
-            .featured-game-icon,.featured-game-cta { justify-self:center; }
+            .featured-game-video,.featured-game-cta { justify-self:center; }
             .featured-game-copy p { margin-inline:auto; }
             .programme-grid { grid-template-columns: 1fr; }
             .hero-shortcuts { grid-template-columns: 1fr; }
@@ -466,15 +466,15 @@
         </section>
         <section class="featured-game-promo" aria-labelledby="featuredGameTitle">
             <div class="section-inner">
-                <a class="featured-game-ad" href="games/mathcity-builder/">
-                    <div class="featured-game-icon" aria-hidden="true">🏙️</div>
+                <div class="featured-game-ad">
+                    <video class="featured-game-video" controls playsinline preload="metadata" aria-label="MathCity Builder advertisement"><source src="assets/mathcity-builder-advertisement.mp4" type="video/mp4">Your browser does not support the MathCity advertisement video.</video>
                     <div class="featured-game-copy">
                         <span class="featured-game-badge" data-i18n="featuredBadge">New featured game</span>
                         <h2 id="featuredGameTitle" data-i18n="featuredTitle">Build Your Dream City with Mathematics!</h2>
                         <p data-i18n="featuredText">Solve challenges, manage money, construct buildings, and grow your own MathCity.</p>
                     </div>
-                    <span class="featured-game-cta"><span data-i18n="featuredPlay">Play MathCity Builder</span>&nbsp;→</span>
-                </a>
+                    <a class="featured-game-cta" href="games/mathcity-builder/"><span data-i18n="featuredPlay">Play MathCity Builder</span>&nbsp;→</a>
+                </div>
             </div>
         </section>
         <section class="programmes" id="programmes">
