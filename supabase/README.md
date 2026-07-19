@@ -32,3 +32,15 @@ Games and quizzes keep fast local saves while `supabase-progress.js` synchronise
 ## Database-driven catalogue
 
 Run `supabase/catalogue.sql` once in the SQL Editor. Afterwards, manage catalogue rows in **Table Editor > catalogue_items**. The built-in HTML remains as an automatic fallback.
+## Private downloadable content
+
+1. Run `supabase/protected-storage.sql` in **SQL Editor**. It creates the private `protected-content` bucket and Storage RLS policies.
+2. Open **Storage > protected-content** and create an `ebooks` folder.
+3. Upload the repository PDFs using these exact object paths:
+   - `ebooks/mula-mengguna-notebooklm.pdf`
+   - `ebooks/cara-kerja-ai.pdf`
+4. The ebook page uses these private object paths through `protected-assets.js`; the former public repository copies have been removed.
+
+Authenticated visitors receive signed links that expire after 120 seconds. Do not put a `service_role` key in browser code.
+
+Authenticated accounts receive access through 31 July 2026 via `profiles.content_access_until`. After the promotion, extend this timestamp for paid subscribers; administrators retain access.

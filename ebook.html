@@ -43,7 +43,7 @@
         </section>
 
         <div class="trust"><div class="trust-grid wrap"><div class="trust-item"><strong id="downloadCount" aria-live="polite">0</strong><span>Total guide downloads</span></div><div class="trust-item"><strong>Instant download</strong><span>Receive the PDF without waiting</span></div><div class="trust-item"><strong>Practical learning</strong><span>Examples designed for real progress</span></div><div class="trust-item"><strong>Study anywhere</strong><span>Compatible with your favourite device</span></div></div></div>
-        <section class="resource-strip" id="free-guides" aria-labelledby="guides-title"><div class="wrap"><div class="resource-heading"><div><p class="eyebrow">Free learning resources</p><h2 id="guides-title">Explore our practical AI guides</h2></div><p>Build useful digital skills with clear, downloadable guides created for students and educators.</p></div><div class="resource-grid"><a class="resource-card" href="resources/mula-mengguna-notebooklm.pdf" target="_blank" rel="noopener" type="application/pdf"><span class="resource-icon">PDF</span><span><strong>Start using NotebookLM</strong><small>A beginner-friendly guide to learning and research with NotebookLM.</small></span><span class="resource-arrow" aria-hidden="true">↗</span></a><a class="resource-card" href="resources/cara-kerja-ai.pdf" target="_blank" rel="noopener" type="application/pdf"><span class="resource-icon">PDF</span><span><strong>How AI Works</strong><small>Discover the basic ideas behind artificial intelligence in an accessible guide.</small></span><span class="resource-arrow" aria-hidden="true">↗</span></a></div></div></section>
+        <section class="resource-strip" id="free-guides" aria-labelledby="guides-title"><div class="wrap"><div class="resource-heading"><div><p class="eyebrow">Free learning resources</p><h2 id="guides-title">Explore our practical AI guides</h2></div><p>Build useful digital skills with clear, downloadable guides created for students and educators.</p></div><div class="resource-grid"><a class="resource-card" href="account.html?return=ebook.html%23free-guides" data-protected-bucket="protected-content" data-protected-path="ebooks/mula-mengguna-notebooklm.pdf"><span class="resource-icon">PDF</span><span><strong>Start using NotebookLM</strong><small>A beginner-friendly guide to learning and research with NotebookLM.</small></span><span class="resource-arrow" aria-hidden="true">↗</span></a><a class="resource-card" href="account.html?return=ebook.html%23free-guides" data-protected-bucket="protected-content" data-protected-path="ebooks/cara-kerja-ai.pdf"><span class="resource-icon">PDF</span><span><strong>How AI Works</strong><small>Discover the basic ideas behind artificial intelligence in an accessible guide.</small></span><span class="resource-arrow" aria-hidden="true">↗</span></a></div></div></section>
 
         <section class="content" aria-labelledby="benefits-title"><div class="wrap"><div class="heading"><p class="eyebrow">Designed for better learning</p><h2 id="benefits-title">Everything learners need to progress</h2><p>The guide turns challenging ideas into manageable steps, making independent revision clearer and more productive.</p></div><div class="cards"><article class="card"><div class="icon">01</div><h3>Clear explanations</h3><p>Understand key ideas through concise language and carefully structured examples.</p></article><article class="card"><div class="icon">02</div><h3>Worked solutions</h3><p>Follow each method from the first step to the final answer without missing the reasoning.</p></article><article class="card"><div class="icon">03</div><h3>Focused practice</h3><p>Strengthen knowledge with exercises created to reinforce each chapter's core skills.</p></article></div></div></section>
 
@@ -56,10 +56,11 @@
 
     <footer><div class="wrap">© 2026 MathToolsHub · All rights reserved</div></footer>
 <script src="site-language.js"></script>
+<script src="supabase-config.js"></script>
+<script type="module" src="protected-assets.js"></script>
 <script>
 (() => {
     const display = document.getElementById("downloadCount");
-    const cards = document.querySelectorAll(".resource-card");
     const counterUrl = "https://api.counterapi.dev/v1/mathtoolshub-public/ebook-guide-downloads";
     const cachedKey = "mathToolsHubEbookDownloadTotal";
     const show = value => {
@@ -73,12 +74,12 @@
         .then(response => { if (!response.ok) throw new Error("Counter unavailable"); return response.json(); })
         .then(data => show(data.count ?? data.value))
         .catch(() => {});
-    cards.forEach(card => card.addEventListener("click", () => {
+    document.addEventListener("protectedAssetOpened", () => {
         fetch(`${counterUrl}/up`, { headers:{ "Accept":"application/json" }, keepalive:true })
             .then(response => { if (!response.ok) throw new Error("Counter unavailable"); return response.json(); })
             .then(data => show(data.count ?? data.value))
             .catch(() => {});
-    }));
+    });
 })();
 </script>
 </body>
