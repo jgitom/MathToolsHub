@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="author" content="Juil Gitom"><meta name="theme-color" content="#14213d">
+<title>CJ Math Detective Agency – Form 2</title>
+  <style>
+    :root{
+      --ink:#202a44;
+      --blue:#3f91e8;
+      --dark:#183f72;
+      --yellow:#ffd45f;
+      --green:#68cf88;
+      --pink:#ff8fc8;
+      --purple:#7a68df;
+      --shadow:0 16px 36px rgba(32,42,68,.16);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh;
+      font-family:"Trebuchet MS",system-ui,sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 8% 8%,#fff4a5 0 6%,transparent 7%),
+        radial-gradient(circle at 92% 14%,#ffd7ed 0 6%,transparent 7%),
+        linear-gradient(180deg,#c7edff 0%,#edf9ff 48%,#fff4d4 100%);
+    }
+    button{font:inherit;border:none;cursor:pointer}
+    .app{width:min(1240px,94vw);margin:20px auto 42px}
+    .topbar{
+      display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+      padding:14px 18px;background:rgba(255,255,255,.96);border:5px solid #fff;
+      border-radius:28px;box-shadow:var(--shadow);position:sticky;top:10px;z-index:20;
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{
+      width:64px;height:64px;display:grid;place-items:center;border-radius:50%;font-size:34px;
+      background:linear-gradient(135deg,var(--yellow),#fff);box-shadow:0 8px 18px rgba(0,0,0,.12)
+    }
+    .brand h1{margin:0;color:var(--dark);font-size:clamp(1.2rem,2.7vw,2rem)}
+    .brand small{font-weight:800;color:#60708b}
+    .stats{display:flex;gap:10px;flex-wrap:wrap}
+    .pill{
+      min-width:100px;padding:10px 14px;text-align:center;border-radius:999px;
+      background:#fff5bc;border:3px solid #ffe16e;font-weight:900
+    }
+    .hero{
+      margin-top:22px;display:grid;grid-template-columns:1.15fr .85fr;gap:22px;align-items:center;
+      padding:30px;background:rgba(255,255,255,.96);border:5px solid #fff;border-radius:34px;
+      box-shadow:var(--shadow)
+    }
+    .hero h2{
+      margin:0 0 12px;font-size:clamp(2.1rem,5vw,4.1rem);line-height:.98;color:#6652d7
+    }
+    .hero p{margin:0 0 18px;font-size:1.16rem;line-height:1.55;font-weight:800}
+    .mascot-card{
+      min-height:310px;border-radius:28px;display:grid;place-items:center;
+      background:linear-gradient(180deg,#d8f5ff,#fff0b0);position:relative;overflow:hidden
+    }
+    .mascot{
+      font-size:150px;animation:float 2.8s ease-in-out infinite;
+      filter:drop-shadow(0 14px 10px rgba(0,0,0,.14))
+    }
+    .speech{
+      position:absolute;left:18px;right:18px;top:18px;padding:12px;border-radius:18px;
+      background:#fff;text-align:center;font-weight:900;box-shadow:0 8px 20px rgba(0,0,0,.1)
+    }
+    @keyframes float{50%{transform:translateY(-12px) rotate(-2deg)}}
+    .main-btn{
+      padding:15px 24px;border-radius:18px;color:#fff;
+      background:linear-gradient(180deg,#75d2ff,#3e9de6);font-weight:900;font-size:1.15rem;
+      box-shadow:0 8px 0 #2178b7;transition:.15s
+    }
+    .main-btn:hover{transform:translateY(-2px)}
+    .main-btn:active{transform:translateY(5px);box-shadow:0 3px 0 #2178b7}
+    .section{
+      margin-top:24px;padding:24px;background:rgba(255,255,255,.97);border:5px solid #fff;
+      border-radius:31px;box-shadow:var(--shadow)
+    }
+    .section h3{
+      margin:0 0 18px;text-align:center;color:#df5a9a;font-size:clamp(1.7rem,3vw,2.45rem)
+    }
+    .case-grid{
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(225px,1fr));gap:16px
+    }
+    .case{
+      min-height:235px;padding:18px;border-radius:24px;position:relative;text-align:center;
+      background:#fff7d3;border:4px solid #ffe06d;box-shadow:0 8px 16px rgba(0,0,0,.08);
+      transition:.2s
+    }
+    .case:nth-child(2n){background:#e8f7ff;border-color:#9ddaff}
+    .case:nth-child(3n){background:#f0eaff;border-color:#c5b3ff}
+    .case:nth-child(4n){background:#ffeaf1;border-color:#ffb5d1}
+    .case:hover{transform:translateY(-5px)}
+    .case .icon{font-size:63px}
+    .case h4{margin:8px 0 6px;font-size:1.16rem}
+    .case p{margin:0 0 13px;font-weight:800;color:#61708a}
+    .case button{
+      width:100%;padding:11px;border-radius:14px;background:#fff;border:3px solid #bde6ff;
+      color:#3276bb;font-weight:900
+    }
+    .completed::after{
+      content:"✓";position:absolute;right:10px;top:10px;width:36px;height:36px;
+      display:grid;place-items:center;border-radius:50%;color:#fff;background:var(--green);
+      font-size:22px;font-weight:900
+    }
+    .game{
+      display:none;margin-top:24px;padding:22px;background:#fff;border:5px solid #fff;
+      border-radius:31px;box-shadow:var(--shadow)
+    }
+    .game.active{display:block}
+    .game-head{
+      display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+      padding-bottom:14px;border-bottom:4px dashed #c8ebff
+    }
+    .game-title{margin:0;color:#5c63ce;text-align:center;flex:1}
+    .voice-btn,.back-btn{padding:10px 14px;border-radius:14px;font-weight:900}
+    .voice-btn{background:#e5f8ff;color:#2677b3}
+    .back-btn{background:#ffe7ef;color:#b33974}
+    .progress-wrap{
+      margin-top:16px;height:18px;border-radius:999px;overflow:hidden;
+      border:3px solid #c8ebff;background:#edf8ff
+    }
+    .progress{
+      height:100%;width:0;background:linear-gradient(90deg,#62d588,#f3d64e);transition:.4s
+    }
+    .scene{
+      min-height:370px;margin-top:18px;padding:26px;display:grid;place-items:center;
+      border-radius:25px;text-align:center;background:linear-gradient(180deg,#e8f8ff,#fff4c8)
+    }
+    .question-icon{font-size:88px}
+    .visuals{
+      min-height:82px;margin:8px 0 14px;font-size:clamp(1.8rem,4.5vw,3.6rem);
+      letter-spacing:3px;white-space:pre-wrap
+    }
+    .question{
+      max-width:860px;margin:0 auto 18px;font-size:clamp(1.3rem,2.8vw,2rem);
+      line-height:1.32;color:#314b75;font-weight:900
+    }
+    .answers{
+      width:min(860px,100%);display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:14px
+    }
+    .answer{
+      padding:18px 12px;border-radius:20px;background:#fff;border:4px solid #bee7ff;
+      box-shadow:0 7px 0 #9ed7f4;color:#315d98;font-size:1.15rem;font-weight:900;transition:.15s
+    }
+    .answer:hover{transform:translateY(-3px)}
+    .answer:active{transform:translateY(4px);box-shadow:0 3px 0 #9ed7f4}
+    .feedback{min-height:52px;margin-top:18px;font-size:1.3rem;font-weight:900}
+    .success{color:#2c984b}
+    .retry{color:#d56a2d}
+    .reward{display:none;padding:36px 16px;text-align:center}
+    .reward.show{display:block}
+    .reward .big{font-size:100px}
+    .reward h3{margin:8px;color:#6d58d5;font-size:2.35rem}
+    .reward p{font-size:1.2rem;font-weight:800}
+    .confetti{font-size:42px;letter-spacing:10px;animation:bounce .8s infinite alternate}
+    @keyframes bounce{to{transform:translateY(-8px)}}
+    .footer{padding:22px;text-align:center;color:#61708a;font-weight:800}
+    @media(max-width:760px){
+      .hero{grid-template-columns:1fr;padding:20px}
+      .mascot-card{min-height:245px}
+      .mascot{font-size:120px}
+      .topbar{position:static}
+    }
+  .mth-academy-back{position:fixed;left:12px;bottom:12px;z-index:9999;padding:10px 13px;border-radius:999px;color:#fff;background:#14213d;text-decoration:none;font:800 13px "Segoe UI",Arial,sans-serif;box-shadow:0 8px 22px #0f172a44}.mth-creator{text-align:center;padding:14px;color:#64748b;font:700 12px "Segoe UI",Arial,sans-serif}</style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">🕵️</div>
+        <div>
+          <h1>CJ Math Detective Agency</h1>
+          <small>Form 2 Investigation Division</small>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="pill">⭐ <span id="starCount">0</span></div>
+        <div class="pill">🏅 <span id="badgeCount">0</span></div>
+      </div>
+    </header>
+
+    <section class="hero" id="home">
+      <div>
+        <h2>Welcome, Form 2 Detective!</h2>
+        <p>Solve nine investigation files involving directed numbers, standard form, algebra, factorisation, equations, Pythagoras, transformations, probability, statistics, and logical reasoning.</p>
+        <button class="main-btn" onclick="scrollToCases()">Open Investigation Files 🔍</button>
+      </div>
+      <div class="mascot-card">
+        <div class="speech">“Analyse the evidence, choose a method, and verify every result.”</div>
+        <div class="mascot">🐶</div>
+      </div>
+    </section>
+
+    <section class="section" id="cases">
+      <h3>Choose an Investigation File</h3>
+      <div class="case-grid" id="caseGrid"></div>
+    </section>
+
+    <section class="game" id="game">
+      <div class="game-head">
+        <button class="back-btn" onclick="goHome()">← Case Files</button>
+        <h2 class="game-title" id="gameTitle">Case</h2>
+        <button class="voice-btn" onclick="speakCurrent()">🔊 Read Aloud</button>
+      </div>
+      <div class="progress-wrap"><div class="progress" id="progress"></div></div>
+      <div class="scene" id="scene">
+        <div>
+          <div class="question-icon" id="questionIcon">🔎</div>
+          <div class="visuals" id="visuals"></div>
+          <div class="question" id="question"></div>
+          <div class="answers" id="answers"></div>
+          <div class="feedback" id="feedback"></div>
+        </div>
+      </div>
+      <div class="reward" id="reward">
+        <div class="confetti">🎉 ✨ 🎊 ✨ 🎉</div>
+        <div class="big" id="rewardIcon">🏅</div>
+        <h3>Case Solved!</h3>
+        <p id="rewardText"></p>
+        <button class="main-btn" onclick="goHome()">Choose Another Case</button>
+      </div>
+    </section>
+
+    <footer class="footer">Form 2 Mathematics • Progress is saved automatically on this device.</footer>
+  </main>
+
+  <script>
+    const cases = [
+      {
+        id:"directed",
+        title:"The Frozen Chamber Case",
+        icon:"❄️",
+        skill:"Directed numbers",
+        badge:"Directed Number Analyst",
+        questions:[
+          {icon:"➕",visuals:"−12 + 7",q:"What is the result?",a:["−19","−5","5"],correct:"−5"},
+          {icon:"➖",visuals:"−4 − 9",q:"Solve the clue.",a:["−13","5","13"],correct:"−13"},
+          {icon:"✖️",visuals:"−6 × −8",q:"What is the product?",a:["−48","14","48"],correct:"48"},
+          {icon:"➗",visuals:"72 ÷ −9",q:"What is the quotient?",a:["−8","8","63"],correct:"−8"}
+        ]
+      },
+      {
+        id:"standard",
+        title:"The Space Signal File",
+        icon:"🛰️",
+        skill:"Indices and standard form",
+        badge:"Standard Form Specialist",
+        questions:[
+          {icon:"🔢",visuals:"2³ × 2²",q:"Simplify using index laws.",a:["2⁵","4⁵","2⁶"],correct:"2⁵"},
+          {icon:"➗",visuals:"5⁶ ÷ 5²",q:"Simplify the expression.",a:["5³","5⁴","25⁴"],correct:"5⁴"},
+          {icon:"🌌",visuals:"4,500,000",q:"Write the number in standard form.",a:["4.5 × 10⁵","4.5 × 10⁶","45 × 10⁶"],correct:"4.5 × 10⁶"},
+          {icon:"📡",visuals:"3.2 × 10⁴",q:"Write the number in ordinary form.",a:["3,200","32,000","320,000"],correct:"32,000"}
+        ]
+      },
+      {
+        id:"algebra",
+        title:"The Algebra Evidence Locker",
+        icon:"🧩",
+        skill:"Expansion and factorisation",
+        badge:"Algebra Evidence Expert",
+        questions:[
+          {icon:"📦",visuals:"3(x + 4)",q:"Expand the expression.",a:["3x + 4","3x + 12","7x"],correct:"3x + 12"},
+          {icon:"➖",visuals:"5(2y − 3)",q:"Expand the expression.",a:["10y − 3","10y − 15","7y − 15"],correct:"10y − 15"},
+          {icon:"🔐",visuals:"6x + 18",q:"Factorise completely.",a:["3(2x + 6)","6(x + 3)","2(3x + 18)"],correct:"6(x + 3)"},
+          {icon:"🧠",visuals:"8a − 12",q:"Factorise completely.",a:["2(4a − 6)","4(2a − 3)","8(a − 12)"],correct:"4(2a − 3)"}
+        ]
+      },
+      {
+        id:"equations",
+        title:"The Linear Equation Lock",
+        icon:"🔒",
+        skill:"Linear equations",
+        badge:"Equation Lock Breaker",
+        questions:[
+          {icon:"⚖️",visuals:"3x + 5 = 20",q:"Find x.",a:["3","5","15"],correct:"5"},
+          {icon:"➖",visuals:"5y − 7 = 18",q:"Find y.",a:["5","7","25"],correct:"5"},
+          {icon:"🔐",visuals:"4(a − 2) = 24",q:"Find a.",a:["4","6","8"],correct:"8"},
+          {icon:"🧩",visuals:"2m + 3 = m + 11",q:"Find m.",a:["7","8","14"],correct:"8"}
+        ]
+      },
+      {
+        id:"pythagoras",
+        title:"The Rooftop Distance Mystery",
+        icon:"📐",
+        skill:"Pythagoras and geometry",
+        badge:"Pythagoras Field Inspector",
+        questions:[
+          {icon:"📏",visuals:"Right triangle legs: 6 cm and 8 cm",q:"Find the hypotenuse.",a:["10 cm","12 cm","14 cm"],correct:"10 cm"},
+          {icon:"🔺",visuals:"Hypotenuse 13 cm, one leg 5 cm",q:"Find the other leg.",a:["8 cm","10 cm","12 cm"],correct:"12 cm"},
+          {icon:"📐",visuals:"Angles in a triangle: 45°, 65°, ?",q:"Find the third angle.",a:["60°","70°","80°"],correct:"70°"},
+          {icon:"⬛",visuals:"Exterior angle 125°, adjacent interior angle ?",q:"Find the adjacent interior angle.",a:["45°","55°","65°"],correct:"55°"}
+        ]
+      },
+      {
+        id:"transform",
+        title:"The Transformation Surveillance",
+        icon:"🔄",
+        skill:"Coordinates and transformations",
+        badge:"Transformation Surveillance Expert",
+        questions:[
+          {icon:"➡️",visuals:"Translate (−2,3) by (+6,−4)",q:"What is the new coordinate?",a:["(4,−1)","(4,7)","(−8,−1)"],correct:"(4,−1)"},
+          {icon:"🪞",visuals:"Reflect (5,−3) across x-axis",q:"What is the image?",a:["(−5,−3)","(5,3)","(−5,3)"],correct:"(5,3)"},
+          {icon:"🔄",visuals:"Rotate (2,1) by 180° about the origin",q:"What is the image?",a:["(−2,−1)","(−1,2)","(2,−1)"],correct:"(−2,−1)"},
+          {icon:"📍",visuals:"Point (3,4) enlarged by scale factor 2 from origin",q:"What is the image?",a:["(5,6)","(6,8)","(1.5,2)"],correct:"(6,8)"}
+        ]
+      },
+      {
+        id:"probability",
+        title:"The Probability Interception",
+        icon:"🎲",
+        skill:"Probability",
+        badge:"Probability Intelligence Officer",
+        questions:[
+          {icon:"🪙",visuals:"One fair coin",q:"What is the probability of getting heads?",a:["0","1/2","1"],correct:"1/2"},
+          {icon:"🎲",visuals:"One fair six-sided die",q:"What is the probability of rolling a 4?",a:["1/4","1/6","4/6"],correct:"1/6"},
+          {icon:"🔴",visuals:"Bag: 3 red, 2 blue",q:"What is the probability of choosing red?",a:["2/5","3/5","3/2"],correct:"3/5"},
+          {icon:"🟦",visuals:"Bag: 4 green, 1 yellow",q:"What is the probability of not choosing yellow?",a:["1/5","4/5","5/4"],correct:"4/5"}
+        ]
+      },
+      {
+        id:"statistics",
+        title:"The Statistical Pattern File",
+        icon:"📊",
+        skill:"Statistics and data",
+        badge:"Statistical Pattern Analyst",
+        questions:[
+          {icon:"📈",visuals:"6, 8, 8, 10, 13",q:"What is the mode?",a:["8","9","10"],correct:"8"},
+          {icon:"📊",visuals:"4, 6, 8, 10, 12",q:"What is the mean?",a:["7","8","9"],correct:"8"},
+          {icon:"📉",visuals:"15, 19, 21, 28, 34",q:"What is the range?",a:["15","19","21"],correct:"19"},
+          {icon:"🔍",visuals:"3, 5, 8, 11, 14, 18",q:"What is the median?",a:["8","9.5","11"],correct:"9.5"}
+        ]
+      },
+      {
+        id:"logic",
+        title:"The Final Investigation Network",
+        icon:"🧠",
+        skill:"Patterns and multi-step reasoning",
+        badge:"Form 2 Master Detective",
+        questions:[
+          {icon:"🔢",visuals:"4, 9, 16, 25, ?",q:"Which number comes next?",a:["30","36","49"],correct:"36"},
+          {icon:"🧠",visuals:"2, 5, 10, 17, 26, ?",q:"Which number comes next?",a:["35","37","39"],correct:"37"},
+          {icon:"🔐",visuals:"3(x + 2) = 24",q:"Find x.",a:["4","6","8"],correct:"6"},
+          {icon:"🕵️",visuals:"After a 20% increase, a value becomes 96",q:"What was the original value?",a:["76","80","84"],correct:"80"}
+        ]
+      }
+    ];
+
+    let currentCase = null;
+    let currentIndex = 0;
+    let currentQuestionText = "";
+
+    const saved = JSON.parse(
+      localStorage.getItem("cjMathDetectiveForm2Progress") ||
+      '{"stars":0,"completed":[]}'
+    );
+
+    function save(){
+      localStorage.setItem("cjMathDetectiveForm2Progress",JSON.stringify(saved));
+      updateStats();
+    }
+
+    function updateStats(){
+      document.getElementById("starCount").textContent = saved.stars;
+      document.getElementById("badgeCount").textContent = saved.completed.length;
+    }
+
+    function renderCases(){
+      const grid = document.getElementById("caseGrid");
+      grid.innerHTML = "";
+      cases.forEach(c=>{
+        const card = document.createElement("article");
+        card.className = "case" + (saved.completed.includes(c.id) ? " completed" : "");
+        card.innerHTML = `
+          <div class="icon">${c.icon}</div>
+          <h4>${c.title}</h4>
+          <p>${c.skill}</p>
+          <button onclick="startCase('${c.id}')">
+            ${saved.completed.includes(c.id) ? "Play Again" : "Start Case"}
+          </button>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function scrollToCases(){
+      document.getElementById("cases").scrollIntoView({behavior:"smooth"});
+    }
+
+    function startCase(id){
+      currentCase = cases.find(c=>c.id===id);
+      currentIndex = 0;
+      document.getElementById("home").style.display = "none";
+      document.getElementById("cases").style.display = "none";
+      document.getElementById("game").classList.add("active");
+      document.getElementById("reward").classList.remove("show");
+      document.getElementById("scene").style.display = "grid";
+      document.getElementById("gameTitle").textContent = currentCase.icon + " " + currentCase.title;
+      showQuestion();
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+
+    function showQuestion(){
+      const item = currentCase.questions[currentIndex];
+      currentQuestionText = item.q;
+      document.getElementById("questionIcon").textContent = item.icon;
+      document.getElementById("visuals").textContent = item.visuals;
+      document.getElementById("question").textContent = item.q;
+      document.getElementById("feedback").textContent = "";
+      document.getElementById("feedback").className = "feedback";
+      document.getElementById("progress").style.width =
+        `${(currentIndex/currentCase.questions.length)*100}%`;
+
+      const answers = document.getElementById("answers");
+      answers.innerHTML = "";
+      item.a.forEach(choice=>{
+        const btn = document.createElement("button");
+        btn.className = "answer";
+        btn.textContent = choice;
+        btn.onclick = ()=>checkAnswer(choice,item.correct);
+        answers.appendChild(btn);
+      });
+      setTimeout(speakCurrent,250);
+    }
+
+    function checkAnswer(choice,correct){
+      const feedback = document.getElementById("feedback");
+      if(choice===correct){
+        feedback.textContent = "Excellent deduction! The next clue is unlocked. ⭐";
+        feedback.className = "feedback success";
+        speak("Excellent deduction. The next clue is unlocked.");
+        document.querySelectorAll(".answer").forEach(b=>b.disabled=true);
+        saved.stars += 1;
+        save();
+        setTimeout(()=>{
+          currentIndex++;
+          if(currentIndex<currentCase.questions.length){
+            showQuestion();
+          }else{
+            finishCase();
+          }
+        },900);
+      }else{
+        feedback.textContent = "Review your method and try again. 🌟";
+        feedback.className = "feedback retry";
+        speak("Review your method and try again.");
+      }
+    }
+
+    function finishCase(){
+      if(!saved.completed.includes(currentCase.id)){
+        saved.completed.push(currentCase.id);
+        saved.stars += 7;
+        save();
+      }
+      document.getElementById("progress").style.width = "100%";
+      document.getElementById("scene").style.display = "none";
+      document.getElementById("reward").classList.add("show");
+      document.getElementById("rewardIcon").textContent = currentCase.icon + "🏅";
+      document.getElementById("rewardText").textContent =
+        `You earned the "${currentCase.badge}" badge and solved ${currentCase.title}!`;
+      speak(`Case solved. You earned the ${currentCase.badge} badge.`);
+    }
+
+    function goHome(){
+      document.getElementById("game").classList.remove("active");
+      document.getElementById("home").style.display = "grid";
+      document.getElementById("cases").style.display = "block";
+      renderCases();
+      document.getElementById("cases").scrollIntoView({behavior:"smooth"});
+    }
+
+    function speak(text){
+      if(!("speechSynthesis" in window)) return;
+      speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.rate = .96;
+      utter.pitch = 1;
+      speechSynthesis.speak(utter);
+    }
+
+    function speakCurrent(){
+      if(currentQuestionText) speak(currentQuestionText);
+    }
+
+    updateStats();
+    renderCases();
+  </script>
+<a class="mth-academy-back" href="./">← Academy</a><div class="mth-creator">Created by Juil Gitom for MathToolsHub</div><script src="../../supabase-config.js"></script><script type="module" src="../../supabase-progress.js" data-activity-id="game/math-detective-form2" data-activity-type="game" data-progress-keys="cjMathDetectiveForm2Progress"></script></body>
+</html>

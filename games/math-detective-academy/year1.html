@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="author" content="Juil Gitom"><meta name="theme-color" content="#14213d">
+<title>CJ Math Detective Agency – Year 1</title>
+  <style>
+    :root{
+      --navy:#23395d;
+      --blue:#4aa8ff;
+      --cyan:#bfefff;
+      --yellow:#ffd45f;
+      --orange:#ff9b54;
+      --green:#6fd08c;
+      --pink:#ff8fc8;
+      --purple:#8b7cf6;
+      --white:#ffffff;
+      --shadow:0 16px 36px rgba(35,57,93,.16);
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:"Trebuchet MS",system-ui,sans-serif;
+      color:var(--navy);
+      background:
+        radial-gradient(circle at 10% 10%,#fff7b0 0 7%,transparent 8%),
+        radial-gradient(circle at 90% 15%,#ffd4ec 0 7%,transparent 8%),
+        linear-gradient(180deg,#cdefff 0%,#effbff 52%,#fff8de 100%);
+    }
+
+    button{
+      font:inherit;
+      cursor:pointer;
+      border:none;
+    }
+
+    .app{
+      width:min(1180px,94vw);
+      margin:20px auto 40px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      flex-wrap:wrap;
+      background:rgba(255,255,255,.95);
+      border:5px solid #fff;
+      border-radius:26px;
+      box-shadow:var(--shadow);
+      padding:14px 18px;
+      position:sticky;
+      top:10px;
+      z-index:10;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .logo{
+      width:62px;
+      height:62px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      font-size:34px;
+      background:linear-gradient(135deg,var(--yellow),#fff);
+      box-shadow:0 8px 16px rgba(0,0,0,.12);
+    }
+
+    .brand h1{
+      margin:0;
+      color:#3174bf;
+      font-size:clamp(1.2rem,2.6vw,2rem);
+    }
+
+    .brand small{
+      font-weight:800;
+      color:#61708a;
+    }
+
+    .stats{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .pill{
+      min-width:96px;
+      text-align:center;
+      padding:10px 14px;
+      border-radius:999px;
+      font-weight:900;
+      background:#fff5bf;
+      border:3px solid #ffe06b;
+    }
+
+    .hero{
+      margin-top:22px;
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:22px;
+      align-items:center;
+      padding:30px;
+      background:rgba(255,255,255,.94);
+      border:5px solid #fff;
+      border-radius:34px;
+      box-shadow:var(--shadow);
+    }
+
+    .hero h2{
+      margin:0 0 12px;
+      font-size:clamp(2rem,5vw,4rem);
+      line-height:.98;
+      color:#735edc;
+    }
+
+    .hero p{
+      font-size:1.15rem;
+      font-weight:800;
+      line-height:1.55;
+      margin:0 0 18px;
+    }
+
+    .mascot-card{
+      min-height:300px;
+      border-radius:28px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(180deg,#d8f7ff,#fff1bc);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .mascot{
+      font-size:150px;
+      animation:float 2.7s ease-in-out infinite;
+      filter:drop-shadow(0 14px 10px rgba(0,0,0,.14));
+    }
+
+    .speech{
+      position:absolute;
+      top:18px;
+      left:18px;
+      right:18px;
+      padding:12px;
+      border-radius:18px;
+      background:#fff;
+      text-align:center;
+      font-weight:900;
+      box-shadow:0 8px 20px rgba(0,0,0,.1);
+    }
+
+    @keyframes float{
+      50%{transform:translateY(-12px) rotate(-2deg)}
+    }
+
+    .main-btn{
+      padding:15px 24px;
+      border-radius:18px;
+      background:linear-gradient(180deg,#7fd6ff,#3fa5ef);
+      color:#fff;
+      font-weight:900;
+      font-size:1.15rem;
+      box-shadow:0 8px 0 #217dbd;
+      transition:.15s;
+    }
+
+    .main-btn:hover{transform:translateY(-2px)}
+    .main-btn:active{transform:translateY(5px);box-shadow:0 3px 0 #217dbd}
+
+    .section{
+      margin-top:24px;
+      padding:24px;
+      border-radius:30px;
+      background:rgba(255,255,255,.95);
+      border:5px solid #fff;
+      box-shadow:var(--shadow);
+    }
+
+    .section h3{
+      margin:0 0 18px;
+      text-align:center;
+      color:#e15b9d;
+      font-size:clamp(1.6rem,3vw,2.4rem);
+    }
+
+    .case-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:16px;
+    }
+
+    .case{
+      position:relative;
+      min-height:230px;
+      padding:18px;
+      border-radius:24px;
+      background:#fff7d5;
+      border:4px solid #ffe071;
+      text-align:center;
+      box-shadow:0 8px 16px rgba(0,0,0,.08);
+      transition:.2s;
+    }
+
+    .case:nth-child(2n){background:#e8f8ff;border-color:#9ddcff}
+    .case:nth-child(3n){background:#f1eaff;border-color:#c2afff}
+    .case:hover{transform:translateY(-5px)}
+    .case .icon{font-size:62px}
+    .case h4{font-size:1.16rem;margin:8px 0 6px}
+    .case p{margin:0 0 13px;font-weight:800;color:#62708a}
+    .case button{
+      width:100%;
+      padding:11px;
+      border-radius:14px;
+      background:#fff;
+      border:3px solid #bfe7ff;
+      color:#3276ba;
+      font-weight:900;
+    }
+
+    .completed::after{
+      content:"✓";
+      position:absolute;
+      top:10px;
+      right:10px;
+      width:36px;
+      height:36px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:var(--green);
+      color:#fff;
+      font-size:22px;
+      font-weight:900;
+    }
+
+    .game{
+      display:none;
+      margin-top:24px;
+      padding:22px;
+      background:#fff;
+      border:5px solid #fff;
+      border-radius:30px;
+      box-shadow:var(--shadow);
+    }
+
+    .game.active{display:block}
+
+    .game-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      border-bottom:4px dashed #caecff;
+      padding-bottom:14px;
+    }
+
+    .game-title{
+      margin:0;
+      color:#5d63ce;
+      text-align:center;
+      flex:1;
+    }
+
+    .voice-btn,.back-btn{
+      padding:10px 14px;
+      border-radius:14px;
+      font-weight:900;
+    }
+
+    .voice-btn{background:#e7f8ff;color:#267ab7}
+    .back-btn{background:#ffe7ef;color:#b63c75}
+
+    .progress-wrap{
+      margin-top:16px;
+      height:18px;
+      background:#edf8ff;
+      border:3px solid #caecff;
+      border-radius:999px;
+      overflow:hidden;
+    }
+
+    .progress{
+      height:100%;
+      width:0;
+      background:linear-gradient(90deg,#62d987,#f4d751);
+      transition:.4s;
+    }
+
+    .scene{
+      margin-top:18px;
+      min-height:330px;
+      padding:24px;
+      border-radius:25px;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      background:linear-gradient(180deg,#e6f8ff,#fff4cb);
+    }
+
+    .question-icon{font-size:88px}
+    .visuals{
+      min-height:82px;
+      margin:10px 0 14px;
+      font-size:clamp(2.5rem,7vw,5rem);
+      letter-spacing:7px;
+      white-space:pre-wrap;
+    }
+
+    .question{
+      max-width:760px;
+      margin:0 auto 18px;
+      font-size:clamp(1.5rem,3.5vw,2.4rem);
+      font-weight:900;
+      color:#314d78;
+    }
+
+    .answers{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(135px,1fr));
+      gap:14px;
+      width:min(760px,100%);
+    }
+
+    .answer{
+      padding:18px 12px;
+      border-radius:20px;
+      background:#fff;
+      border:4px solid #bfe7ff;
+      box-shadow:0 7px 0 #9cd6f5;
+      color:#315d97;
+      font-size:1.35rem;
+      font-weight:900;
+      transition:.15s;
+    }
+
+    .answer:hover{transform:translateY(-3px)}
+    .answer:active{transform:translateY(4px);box-shadow:0 3px 0 #9cd6f5}
+
+    .feedback{
+      min-height:52px;
+      margin-top:18px;
+      font-size:1.3rem;
+      font-weight:900;
+    }
+
+    .success{color:#2b9a4d}
+    .retry{color:#d76b2e}
+
+    .reward{
+      display:none;
+      text-align:center;
+      padding:36px 16px;
+    }
+
+    .reward.show{display:block}
+    .reward .big{font-size:100px}
+    .reward h3{margin:8px;color:#6f59d8;font-size:2.3rem}
+    .reward p{font-size:1.2rem;font-weight:800}
+    .confetti{font-size:42px;letter-spacing:10px;animation:bounce .8s infinite alternate}
+
+    @keyframes bounce{to{transform:translateY(-8px)}}
+
+    .footer{
+      padding:22px;
+      text-align:center;
+      color:#61708a;
+      font-weight:800;
+    }
+
+    @media(max-width:760px){
+      .hero{grid-template-columns:1fr;padding:20px}
+      .mascot-card{min-height:240px}
+      .mascot{font-size:120px}
+      .topbar{position:static}
+    }
+  .mth-academy-back{position:fixed;left:12px;bottom:12px;z-index:9999;padding:10px 13px;border-radius:999px;color:#fff;background:#14213d;text-decoration:none;font:800 13px "Segoe UI",Arial,sans-serif;box-shadow:0 8px 22px #0f172a44}.mth-creator{text-align:center;padding:14px;color:#64748b;font:700 12px "Segoe UI",Arial,sans-serif}</style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">🕵️</div>
+        <div>
+          <h1>CJ Math Detective Agency</h1>
+          <small>Year 1 Mission Centre</small>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="pill">⭐ <span id="starCount">0</span></div>
+        <div class="pill">🏅 <span id="badgeCount">0</span></div>
+      </div>
+    </header>
+
+    <section class="hero" id="home">
+      <div>
+        <h2>Welcome, Year 1 Detective!</h2>
+        <p>Solve six friendly mysteries using addition, subtraction, number comparison, money, time, shapes, and simple word problems.</p>
+        <button class="main-btn" onclick="scrollToCases()">Open the Case Files 🔍</button>
+      </div>
+      <div class="mascot-card">
+        <div class="speech">“Use your maths skills to find every clue!”</div>
+        <div class="mascot">🐶</div>
+      </div>
+    </section>
+
+    <section class="section" id="cases">
+      <h3>Choose Your Case</h3>
+      <div class="case-grid" id="caseGrid"></div>
+    </section>
+
+    <section class="game" id="game">
+      <div class="game-head">
+        <button class="back-btn" onclick="goHome()">← Case Files</button>
+        <h2 class="game-title" id="gameTitle">Mystery</h2>
+        <button class="voice-btn" onclick="speakCurrent()">🔊 Read Aloud</button>
+      </div>
+
+      <div class="progress-wrap"><div class="progress" id="progress"></div></div>
+
+      <div class="scene" id="scene">
+        <div>
+          <div class="question-icon" id="questionIcon">🔎</div>
+          <div class="visuals" id="visuals"></div>
+          <div class="question" id="question"></div>
+          <div class="answers" id="answers"></div>
+          <div class="feedback" id="feedback"></div>
+        </div>
+      </div>
+
+      <div class="reward" id="reward">
+        <div class="confetti">🎉 ✨ 🎊 ✨ 🎉</div>
+        <div class="big" id="rewardIcon">🏅</div>
+        <h3>Case Solved!</h3>
+        <p id="rewardText"></p>
+        <button class="main-btn" onclick="goHome()">Choose Another Case</button>
+      </div>
+    </section>
+
+    <footer class="footer">
+      Year 1 Mathematics • Progress is saved automatically on this device.
+    </footer>
+  </main>
+
+  <script>
+    const cases = [
+      {
+        id:"bag",
+        title:"The Missing School Bag",
+        icon:"🎒",
+        skill:"Addition within 20",
+        badge:"Addition Investigator",
+        questions:[
+          {icon:"➕",visuals:"7 + 5",q:"What is 7 plus 5?",a:["10","12","13"],correct:"12"},
+          {icon:"🍎",visuals:"🍎 🍎 🍎 🍎\n+ 🍎 🍎 🍎",q:"There are 4 apples and 3 more apples. How many altogether?",a:["6","7","8"],correct:"7"},
+          {icon:"🔢",visuals:"9 + 6",q:"Solve the number clue.",a:["14","15","16"],correct:"15"},
+          {icon:"🎒",visuals:"8 + 2",q:"The final locker code is 8 plus 2. What is it?",a:["9","10","11"],correct:"10"}
+        ]
+      },
+      {
+        id:"pencil",
+        title:"The Lost Pencil Box",
+        icon:"✏️",
+        skill:"Subtraction within 20",
+        badge:"Subtraction Sleuth",
+        questions:[
+          {icon:"➖",visuals:"14 − 5",q:"What is 14 minus 5?",a:["8","9","10"],correct:"9"},
+          {icon:"🖍️",visuals:"10 crayons − 3 crayons",q:"Ten crayons were in the box. Three were used. How many are left?",a:["6","7","8"],correct:"7"},
+          {icon:"🔢",visuals:"18 − 8",q:"Solve the subtraction clue.",a:["9","10","11"],correct:"10"},
+          {icon:"✏️",visuals:"12 − 4",q:"The last clue is 12 minus 4.",a:["7","8","9"],correct:"8"}
+        ]
+      },
+      {
+        id:"trophy",
+        title:"The Trophy Room Mystery",
+        icon:"🏆",
+        skill:"Compare numbers",
+        badge:"Number Comparison Expert",
+        questions:[
+          {icon:"⚖️",visuals:"14   ?   11",q:"Which number is greater?",a:["14","11","They are equal"],correct:"14"},
+          {icon:"🔍",visuals:"7   ?   9",q:"Which number is smaller?",a:["7","9","They are equal"],correct:"7"},
+          {icon:"🧩",visuals:"16   ?   16",q:"Compare the two numbers.",a:["First is greater","Second is greater","They are equal"],correct:"They are equal"},
+          {icon:"🏆",visuals:"18   ?   20",q:"Choose the greater number to unlock the trophy cabinet.",a:["18","20","19"],correct:"20"}
+        ]
+      },
+      {
+        id:"shop",
+        title:"The School Shop Clue",
+        icon:"🛒",
+        skill:"Money",
+        badge:"Money Master",
+        questions:[
+          {icon:"💰",visuals:"RM1 + RM1 + RM1",q:"How much money is shown?",a:["RM2","RM3","RM4"],correct:"RM3"},
+          {icon:"🍭",visuals:"Lollipop = RM2",q:"You pay RM2 for a lollipop. Which amount is correct?",a:["RM1","RM2","RM5"],correct:"RM2"},
+          {icon:"🪙",visuals:"50 sen + 50 sen",q:"What is 50 sen plus 50 sen?",a:["RM1","RM2","50 sen"],correct:"RM1"},
+          {icon:"🛒",visuals:"Book RM4 + Pencil RM2",q:"How much altogether?",a:["RM5","RM6","RM7"],correct:"RM6"}
+        ]
+      },
+      {
+        id:"clock",
+        title:"The Classroom Clock",
+        icon:"🕒",
+        skill:"Time",
+        badge:"Time Detective",
+        questions:[
+          {icon:"🕘",visuals:"🕘",q:"What time is shown?",a:["8 o'clock","9 o'clock","10 o'clock"],correct:"9 o'clock"},
+          {icon:"🌞",visuals:"School starts at 7 o'clock",q:"Is 7 o'clock usually morning or night?",a:["Morning","Night","Midnight"],correct:"Morning"},
+          {icon:"🕒",visuals:"🕒",q:"Choose the correct time.",a:["2 o'clock","3 o'clock","4 o'clock"],correct:"3 o'clock"},
+          {icon:"🕕",visuals:"🕕",q:"The final clock clue shows what time?",a:["5 o'clock","6 o'clock","7 o'clock"],correct:"6 o'clock"}
+        ]
+      },
+      {
+        id:"shape",
+        title:"The Secret Shape Code",
+        icon:"🔷",
+        skill:"Shapes and patterns",
+        badge:"Shape Code Breaker",
+        questions:[
+          {icon:"🔺",visuals:"🔴 🔵 🔴 🔵 ?",q:"Which colour comes next in the pattern?",a:["🔴","🔵","🟢"],correct:"🔴"},
+          {icon:"⬛",visuals:"◯ △ □",q:"Which shape has four equal sides?",a:["Circle","Triangle","Square"],correct:"Square"},
+          {icon:"🔷",visuals:"△ △ ◯ △ △ ◯ ?",q:"Which shape comes next?",a:["Triangle","Circle","Square"],correct:"Triangle"},
+          {icon:"🧠",visuals:"2, 4, 6, ?",q:"Which number completes the pattern?",a:["7","8","9"],correct:"8"}
+        ]
+      }
+    ];
+
+    let currentCase = null;
+    let currentIndex = 0;
+    let currentQuestionText = "";
+
+    const saved = JSON.parse(
+      localStorage.getItem("cjMathDetectiveYear1Progress") ||
+      '{"stars":0,"completed":[]}'
+    );
+
+    function save(){
+      localStorage.setItem("cjMathDetectiveYear1Progress",JSON.stringify(saved));
+      updateStats();
+    }
+
+    function updateStats(){
+      document.getElementById("starCount").textContent = saved.stars;
+      document.getElementById("badgeCount").textContent = saved.completed.length;
+    }
+
+    function renderCases(){
+      const grid = document.getElementById("caseGrid");
+      grid.innerHTML = "";
+      cases.forEach(c=>{
+        const card = document.createElement("article");
+        card.className = "case" + (saved.completed.includes(c.id) ? " completed" : "");
+        card.innerHTML = `
+          <div class="icon">${c.icon}</div>
+          <h4>${c.title}</h4>
+          <p>${c.skill}</p>
+          <button onclick="startCase('${c.id}')">
+            ${saved.completed.includes(c.id) ? "Play Again" : "Start Case"}
+          </button>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function scrollToCases(){
+      document.getElementById("cases").scrollIntoView({behavior:"smooth"});
+    }
+
+    function startCase(id){
+      currentCase = cases.find(c=>c.id===id);
+      currentIndex = 0;
+      document.getElementById("home").style.display = "none";
+      document.getElementById("cases").style.display = "none";
+      document.getElementById("game").classList.add("active");
+      document.getElementById("reward").classList.remove("show");
+      document.getElementById("scene").style.display = "grid";
+      document.getElementById("gameTitle").textContent = currentCase.icon + " " + currentCase.title;
+      showQuestion();
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+
+    function showQuestion(){
+      const item = currentCase.questions[currentIndex];
+      currentQuestionText = item.q;
+      document.getElementById("questionIcon").textContent = item.icon;
+      document.getElementById("visuals").textContent = item.visuals;
+      document.getElementById("question").textContent = item.q;
+      document.getElementById("feedback").textContent = "";
+      document.getElementById("feedback").className = "feedback";
+      document.getElementById("progress").style.width =
+        `${(currentIndex/currentCase.questions.length)*100}%`;
+
+      const answers = document.getElementById("answers");
+      answers.innerHTML = "";
+
+      item.a.forEach(choice=>{
+        const btn = document.createElement("button");
+        btn.className = "answer";
+        btn.textContent = choice;
+        btn.onclick = ()=>checkAnswer(choice,item.correct);
+        answers.appendChild(btn);
+      });
+
+      setTimeout(speakCurrent,250);
+    }
+
+    function checkAnswer(choice,correct){
+      const feedback = document.getElementById("feedback");
+
+      if(choice===correct){
+        feedback.textContent = "Excellent detective work! ⭐";
+        feedback.className = "feedback success";
+        speak("Excellent detective work!");
+        document.querySelectorAll(".answer").forEach(b=>b.disabled=true);
+        saved.stars += 1;
+        save();
+
+        setTimeout(()=>{
+          currentIndex++;
+          if(currentIndex<currentCase.questions.length){
+            showQuestion();
+          }else{
+            finishCase();
+          }
+        },900);
+      }else{
+        feedback.textContent = "Good try. Check the clue and try again. 🌟";
+        feedback.className = "feedback retry";
+        speak("Good try. Check the clue and try again.");
+      }
+    }
+
+    function finishCase(){
+      if(!saved.completed.includes(currentCase.id)){
+        saved.completed.push(currentCase.id);
+        saved.stars += 3;
+        save();
+      }
+
+      document.getElementById("progress").style.width = "100%";
+      document.getElementById("scene").style.display = "none";
+      document.getElementById("reward").classList.add("show");
+      document.getElementById("rewardIcon").textContent = currentCase.icon + "🏅";
+      document.getElementById("rewardText").textContent =
+        `You earned the "${currentCase.badge}" badge and solved ${currentCase.title}!`;
+      speak(`Case solved. You earned the ${currentCase.badge} badge.`);
+    }
+
+    function goHome(){
+      document.getElementById("game").classList.remove("active");
+      document.getElementById("home").style.display = "grid";
+      document.getElementById("cases").style.display = "block";
+      renderCases();
+      document.getElementById("cases").scrollIntoView({behavior:"smooth"});
+    }
+
+    function speak(text){
+      if(!("speechSynthesis" in window)) return;
+      speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.rate = .85;
+      utter.pitch = 1.1;
+      speechSynthesis.speak(utter);
+    }
+
+    function speakCurrent(){
+      if(currentQuestionText) speak(currentQuestionText);
+    }
+
+    updateStats();
+    renderCases();
+  </script>
+<a class="mth-academy-back" href="./">← Academy</a><div class="mth-creator">Created by Juil Gitom for MathToolsHub</div><script src="../../supabase-config.js"></script><script type="module" src="../../supabase-progress.js" data-activity-id="game/math-detective-year1" data-activity-type="game" data-progress-keys="cjMathDetectiveYear1Progress"></script></body>
+</html>
