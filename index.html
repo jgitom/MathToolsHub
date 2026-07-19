@@ -630,6 +630,16 @@
             mascotVoice.disabled = true;
             mascotVoice.title = "Browser voice is not supported on this device.";
         }
+        const mathCityAdvertisement = document.querySelector(".featured-game-video");
+        if (mathCityAdvertisement) {
+            mathCityAdvertisement.muted = true;
+            mathCityAdvertisement.addEventListener("pointerenter", () => {
+                mathCityAdvertisement.play().catch(() => {});
+            });
+            mathCityAdvertisement.addEventListener("pointerleave", () => {
+                mathCityAdvertisement.pause();
+            });
+        }
         const menuVoiceToggle = document.getElementById("menuVoiceToggle");
         let menuVoiceEnabled = localStorage.getItem("mathToolsHubMenuVoice") === "true";
         let lastSpokenControl = null;
