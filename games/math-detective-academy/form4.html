@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="author" content="Juil Gitom"><meta name="theme-color" content="#14213d">
+<title>CJ Math Detective Agency – Form 4</title>
+  <style>
+    :root{
+      --ink:#202a44;
+      --blue:#3f91e8;
+      --dark:#183f72;
+      --yellow:#ffd45f;
+      --green:#68cf88;
+      --pink:#ff8fc8;
+      --purple:#7a68df;
+      --shadow:0 16px 36px rgba(32,42,68,.16);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:"Trebuchet MS",system-ui,sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 8% 8%,#fff4a5 0 6%,transparent 7%),
+        radial-gradient(circle at 92% 14%,#ffd7ed 0 6%,transparent 7%),
+        linear-gradient(180deg,#c7edff 0%,#edf9ff 48%,#fff4d4 100%);
+    }
+    button{font:inherit;border:none;cursor:pointer}
+    .app{width:min(1260px,94vw);margin:20px auto 42px}
+    .topbar{
+      display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+      padding:14px 18px;background:rgba(255,255,255,.96);border:5px solid #fff;
+      border-radius:28px;box-shadow:var(--shadow);position:sticky;top:10px;z-index:20;
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{
+      width:64px;height:64px;display:grid;place-items:center;border-radius:50%;font-size:34px;
+      background:linear-gradient(135deg,var(--yellow),#fff);box-shadow:0 8px 18px rgba(0,0,0,.12)
+    }
+    .brand h1{margin:0;color:var(--dark);font-size:clamp(1.2rem,2.7vw,2rem)}
+    .brand small{font-weight:800;color:#60708b}
+    .stats{display:flex;gap:10px;flex-wrap:wrap}
+    .pill{
+      min-width:100px;padding:10px 14px;text-align:center;border-radius:999px;
+      background:#fff5bc;border:3px solid #ffe16e;font-weight:900
+    }
+    .hero{
+      margin-top:22px;display:grid;grid-template-columns:1.15fr .85fr;gap:22px;align-items:center;
+      padding:30px;background:rgba(255,255,255,.96);border:5px solid #fff;border-radius:34px;
+      box-shadow:var(--shadow)
+    }
+    .hero h2{
+      margin:0 0 12px;font-size:clamp(2.1rem,5vw,4.1rem);line-height:.98;color:#6652d7
+    }
+    .hero p{margin:0 0 18px;font-size:1.16rem;line-height:1.55;font-weight:800}
+    .mascot-card{
+      min-height:310px;border-radius:28px;display:grid;place-items:center;
+      background:linear-gradient(180deg,#d8f5ff,#fff0b0);position:relative;overflow:hidden
+    }
+    .mascot{
+      font-size:150px;animation:float 2.8s ease-in-out infinite;
+      filter:drop-shadow(0 14px 10px rgba(0,0,0,.14))
+    }
+    .speech{
+      position:absolute;left:18px;right:18px;top:18px;padding:12px;border-radius:18px;
+      background:#fff;text-align:center;font-weight:900;box-shadow:0 8px 20px rgba(0,0,0,.1)
+    }
+    @keyframes float{50%{transform:translateY(-12px) rotate(-2deg)}}
+    .main-btn{
+      padding:15px 24px;border-radius:18px;color:#fff;
+      background:linear-gradient(180deg,#75d2ff,#3e9de6);font-weight:900;font-size:1.15rem;
+      box-shadow:0 8px 0 #2178b7;transition:.15s
+    }
+    .main-btn:hover{transform:translateY(-2px)}
+    .main-btn:active{transform:translateY(5px);box-shadow:0 3px 0 #2178b7}
+    .section{
+      margin-top:24px;padding:24px;background:rgba(255,255,255,.97);border:5px solid #fff;
+      border-radius:31px;box-shadow:var(--shadow)
+    }
+    .section h3{
+      margin:0 0 18px;text-align:center;color:#df5a9a;font-size:clamp(1.7rem,3vw,2.45rem)
+    }
+    .case-grid{
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(225px,1fr));gap:16px
+    }
+    .case{
+      min-height:235px;padding:18px;border-radius:24px;position:relative;text-align:center;
+      background:#fff7d3;border:4px solid #ffe06d;box-shadow:0 8px 16px rgba(0,0,0,.08);
+      transition:.2s
+    }
+    .case:nth-child(2n){background:#e8f7ff;border-color:#9ddaff}
+    .case:nth-child(3n){background:#f0eaff;border-color:#c5b3ff}
+    .case:nth-child(4n){background:#ffeaf1;border-color:#ffb5d1}
+    .case:hover{transform:translateY(-5px)}
+    .case .icon{font-size:63px}
+    .case h4{margin:8px 0 6px;font-size:1.16rem}
+    .case p{margin:0 0 13px;font-weight:800;color:#61708a}
+    .case button{
+      width:100%;padding:11px;border-radius:14px;background:#fff;border:3px solid #bde6ff;
+      color:#3276bb;font-weight:900
+    }
+    .completed::after{
+      content:"✓";position:absolute;right:10px;top:10px;width:36px;height:36px;
+      display:grid;place-items:center;border-radius:50%;color:#fff;background:var(--green);
+      font-size:22px;font-weight:900
+    }
+    .game{
+      display:none;margin-top:24px;padding:22px;background:#fff;border:5px solid #fff;
+      border-radius:31px;box-shadow:var(--shadow)
+    }
+    .game.active{display:block}
+    .game-head{
+      display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+      padding-bottom:14px;border-bottom:4px dashed #c8ebff
+    }
+    .game-title{margin:0;color:#5c63ce;text-align:center;flex:1}
+    .voice-btn,.back-btn{padding:10px 14px;border-radius:14px;font-weight:900}
+    .voice-btn{background:#e5f8ff;color:#2677b3}
+    .back-btn{background:#ffe7ef;color:#b33974}
+    .progress-wrap{
+      margin-top:16px;height:18px;border-radius:999px;overflow:hidden;
+      border:3px solid #c8ebff;background:#edf8ff
+    }
+    .progress{
+      height:100%;width:0;background:linear-gradient(90deg,#62d588,#f3d64e);transition:.4s
+    }
+    .scene{
+      min-height:380px;margin-top:18px;padding:26px;display:grid;place-items:center;
+      border-radius:25px;text-align:center;background:linear-gradient(180deg,#e8f8ff,#fff4c8)
+    }
+    .question-icon{font-size:88px}
+    .visuals{
+      min-height:82px;margin:8px 0 14px;font-size:clamp(1.8rem,4.5vw,3.5rem);
+      letter-spacing:3px;white-space:pre-wrap
+    }
+    .question{
+      max-width:880px;margin:0 auto 18px;font-size:clamp(1.3rem,2.8vw,2rem);
+      line-height:1.32;color:#314b75;font-weight:900
+    }
+    .answers{
+      width:min(880px,100%);display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px
+    }
+    .answer{
+      padding:18px 12px;border-radius:20px;background:#fff;border:4px solid #bee7ff;
+      box-shadow:0 7px 0 #9ed7f4;color:#315d98;font-size:1.14rem;font-weight:900;transition:.15s
+    }
+    .answer:hover{transform:translateY(-3px)}
+    .answer:active{transform:translateY(4px);box-shadow:0 3px 0 #9ed7f4}
+    .feedback{min-height:52px;margin-top:18px;font-size:1.3rem;font-weight:900}
+    .success{color:#2c984b}
+    .retry{color:#d56a2d}
+    .reward{display:none;padding:36px 16px;text-align:center}
+    .reward.show{display:block}
+    .reward .big{font-size:100px}
+    .reward h3{margin:8px;color:#6d58d5;font-size:2.35rem}
+    .reward p{font-size:1.2rem;font-weight:800}
+    .confetti{font-size:42px;letter-spacing:10px;animation:bounce .8s infinite alternate}
+    @keyframes bounce{to{transform:translateY(-8px)}}
+    .footer{padding:22px;text-align:center;color:#61708a;font-weight:800}
+    @media(max-width:760px){
+      .hero{grid-template-columns:1fr;padding:20px}
+      .mascot-card{min-height:245px}
+      .mascot{font-size:120px}
+      .topbar{position:static}
+    }
+  .mth-academy-back{position:fixed;left:12px;bottom:12px;z-index:9999;padding:10px 13px;border-radius:999px;color:#fff;background:#14213d;text-decoration:none;font:800 13px "Segoe UI",Arial,sans-serif;box-shadow:0 8px 22px #0f172a44}.mth-creator{text-align:center;padding:14px;color:#64748b;font:700 12px "Segoe UI",Arial,sans-serif}</style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">🕵️</div>
+        <div>
+          <h1>CJ Math Detective Agency</h1>
+          <small>Form 4 Investigation Division</small>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="pill">⭐ <span id="starCount">0</span></div>
+        <div class="pill">🏅 <span id="badgeCount">0</span></div>
+      </div>
+    </header>
+
+    <section class="hero" id="home">
+      <div>
+        <h2>Welcome, Form 4 Detective!</h2>
+        <p>Solve ten advanced investigation files involving quadratic functions, number bases, logic, sets, networks, inequalities, coordinate geometry, trigonometry, probability, statistics, and financial mathematics.</p>
+        <button class="main-btn" onclick="scrollToCases()">Open Investigation Files 🔍</button>
+      </div>
+      <div class="mascot-card">
+        <div class="speech">“Build the model, test the evidence, and defend your conclusion.”</div>
+        <div class="mascot">🐶</div>
+      </div>
+    </section>
+
+    <section class="section" id="cases">
+      <h3>Choose an Investigation File</h3>
+      <div class="case-grid" id="caseGrid"></div>
+    </section>
+
+    <section class="game" id="game">
+      <div class="game-head">
+        <button class="back-btn" onclick="goHome()">← Case Files</button>
+        <h2 class="game-title" id="gameTitle">Case</h2>
+        <button class="voice-btn" onclick="speakCurrent()">🔊 Read Aloud</button>
+      </div>
+      <div class="progress-wrap"><div class="progress" id="progress"></div></div>
+      <div class="scene" id="scene">
+        <div>
+          <div class="question-icon" id="questionIcon">🔎</div>
+          <div class="visuals" id="visuals"></div>
+          <div class="question" id="question"></div>
+          <div class="answers" id="answers"></div>
+          <div class="feedback" id="feedback"></div>
+        </div>
+      </div>
+      <div class="reward" id="reward">
+        <div class="confetti">🎉 ✨ 🎊 ✨ 🎉</div>
+        <div class="big" id="rewardIcon">🏅</div>
+        <h3>Case Solved!</h3>
+        <p id="rewardText"></p>
+        <button class="main-btn" onclick="goHome()">Choose Another Case</button>
+      </div>
+    </section>
+
+    <footer class="footer">Form 4 Mathematics • Progress is saved automatically on this device.</footer>
+  </main>
+
+  <script>
+    const cases = [
+      {
+        id:"quadratic",
+        title:"The Quadratic Trajectory Case",
+        icon:"📉",
+        skill:"Quadratic expressions and functions",
+        badge:"Quadratic Evidence Analyst",
+        questions:[
+          {icon:"🧩",visuals:"x² − 9x + 20",q:"Factorise the quadratic expression.",a:["(x−4)(x−5)","(x+4)(x+5)","(x−2)(x−10)"],correct:"(x−4)(x−5)"},
+          {icon:"🔐",visuals:"x² − 5x + 6 = 0",q:"What are the roots?",a:["2 and 3","−2 and −3","1 and 6"],correct:"2 and 3"},
+          {icon:"📈",visuals:"y = x² − 4x + 3",q:"What is the axis of symmetry?",a:["x = 2","x = 4","x = −2"],correct:"x = 2"},
+          {icon:"🎯",visuals:"y = (x−3)² − 4",q:"What is the vertex?",a:["(3,−4)","(−3,4)","(3,4)"],correct:"(3,−4)"}
+        ]
+      },
+      {
+        id:"bases",
+        title:"The Number Base Cipher",
+        icon:"💾",
+        skill:"Number bases",
+        badge:"Number Base Code Breaker",
+        questions:[
+          {icon:"🔢",visuals:"1011₂",q:"Convert to base ten.",a:["9","11","13"],correct:"11"},
+          {icon:"🔐",visuals:"25₁₀",q:"Convert to base two.",a:["11001₂","10101₂","11100₂"],correct:"11001₂"},
+          {icon:"➕",visuals:"101₂ + 11₂",q:"Find the sum in base two.",a:["1000₂","1100₂","1110₂"],correct:"1000₂"},
+          {icon:"🧠",visuals:"32₅",q:"Convert to base ten.",a:["15","17","20"],correct:"17"}
+        ]
+      },
+      {
+        id:"logic",
+        title:"The Logical Reasoning File",
+        icon:"🧠",
+        skill:"Statements and reasoning",
+        badge:"Logical Reasoning Specialist",
+        questions:[
+          {icon:"✅",visuals:"If p is true and q is false",q:"What is the truth value of p AND q?",a:["True","False","Cannot be known"],correct:"False"},
+          {icon:"🔄",visuals:"Statement: All squares are rectangles",q:"Which is the converse?",a:["All rectangles are squares","Some squares are rectangles","No rectangles are squares"],correct:"All rectangles are squares"},
+          {icon:"🧩",visuals:"If it rains, the field is wet",q:"Which is the inverse?",a:["If it does not rain, the field is not wet","If the field is wet, it rains","If the field is not wet, it does not rain"],correct:"If it does not rain, the field is not wet"},
+          {icon:"🔍",visuals:"Premise: A→B, A is true",q:"What can be concluded?",a:["B is true","B is false","Nothing"],correct:"B is true"}
+        ]
+      },
+      {
+        id:"sets",
+        title:"The Set Intersection Mystery",
+        icon:"⭕",
+        skill:"Sets and Venn diagrams",
+        badge:"Set Theory Investigator",
+        questions:[
+          {icon:"🔵",visuals:"A={1,2,3,4}, B={3,4,5}",q:"Find A ∩ B.",a:["{1,2,5}","{3,4}","{1,2,3,4,5}"],correct:"{3,4}"},
+          {icon:"🟣",visuals:"A={1,2,3}, B={3,4}",q:"Find A ∪ B.",a:["{3}","{1,2,4}","{1,2,3,4}"],correct:"{1,2,3,4}"},
+          {icon:"🔍",visuals:"Universal set U={1,2,3,4,5}, A={2,4}",q:"Find A′.",a:["{1,3,5}","{2,4}","{1,2,3,4,5}"],correct:"{1,3,5}"},
+          {icon:"📊",visuals:"n(A)=18, n(B)=14, n(A∩B)=5",q:"Find n(A∪B).",a:["27","32","37"],correct:"27"}
+        ]
+      },
+      {
+        id:"network",
+        title:"The Network Route Investigation",
+        icon:"🕸️",
+        skill:"Networks and graph theory",
+        badge:"Network Route Analyst",
+        questions:[
+          {icon:"🔗",visuals:"A network has 6 vertices",q:"What does a vertex represent?",a:["A connection","A point or node","A weight"],correct:"A point or node"},
+          {icon:"🛣️",visuals:"A route uses edges 4, 7 and 5 km",q:"What is the total route length?",a:["12 km","16 km","18 km"],correct:"16 km"},
+          {icon:"🌳",visuals:"A connected graph has no cycles",q:"What is it called?",a:["Tree","Circuit","Complete graph"],correct:"Tree"},
+          {icon:"🧠",visuals:"A complete graph has 4 vertices",q:"How many edges does it have?",a:["4","6","8"],correct:"6"}
+        ]
+      },
+      {
+        id:"inequality",
+        title:"The Inequality Barrier Case",
+        icon:"🚧",
+        skill:"Linear inequalities",
+        badge:"Inequality Barrier Expert",
+        questions:[
+          {icon:"⚖️",visuals:"3x + 2 > 11",q:"Solve the inequality.",a:["x > 3","x < 3","x > 13/3"],correct:"x > 3"},
+          {icon:"➖",visuals:"5 − 2y ≤ 9",q:"Solve the inequality.",a:["y ≥ −2","y ≤ −2","y ≥ 2"],correct:"y ≥ −2"},
+          {icon:"📍",visuals:"−4 < x ≤ 2",q:"Which number is included?",a:["−4","2","3"],correct:"2"},
+          {icon:"🧠",visuals:"2x − 7 < x + 4",q:"Solve the inequality.",a:["x < 11","x > 11","x < −11"],correct:"x < 11"}
+        ]
+      },
+      {
+        id:"coordinate",
+        title:"The Coordinate Geometry Pursuit",
+        icon:"🗺️",
+        skill:"Coordinate geometry",
+        badge:"Coordinate Geometry Specialist",
+        questions:[
+          {icon:"📏",visuals:"Points (2,3) and (8,11)",q:"Find the gradient.",a:["4/3","3/4","8/6"],correct:"4/3"},
+          {icon:"📍",visuals:"Midpoint of (2,4) and (8,10)",q:"What is the midpoint?",a:["(5,7)","(6,7)","(5,6)"],correct:"(5,7)"},
+          {icon:"📐",visuals:"Distance between (1,2) and (4,6)",q:"Find the distance.",a:["4","5","7"],correct:"5"},
+          {icon:"📈",visuals:"Gradient = 2, through (0,−3)",q:"What is the equation?",a:["y=2x−3","y=−3x+2","y=2x+3"],correct:"y=2x−3"}
+        ]
+      },
+      {
+        id:"trig",
+        title:"The Elevation Angle File",
+        icon:"🏗️",
+        skill:"Trigonometry and bearings",
+        badge:"Trigonometric Field Expert",
+        questions:[
+          {icon:"📐",visuals:"sin θ = 5/13",q:"What is the opposite side if the hypotenuse is 26 cm?",a:["5 cm","10 cm","12 cm"],correct:"10 cm"},
+          {icon:"🔺",visuals:"cos θ = 12/13",q:"What is the adjacent side if the hypotenuse is 39 cm?",a:["24 cm","30 cm","36 cm"],correct:"36 cm"},
+          {icon:"🏢",visuals:"tan θ = 3/4",q:"What is the opposite side if the adjacent side is 20 m?",a:["12 m","15 m","18 m"],correct:"15 m"},
+          {icon:"🧭",visuals:"Bearing from A to B is 065°",q:"What type of angle notation is used?",a:["Two-digit","Three-digit","Quadrant"],correct:"Three-digit"}
+        ]
+      },
+      {
+        id:"statistics",
+        title:"The Statistical Distribution File",
+        icon:"📊",
+        skill:"Statistics and probability",
+        badge:"Statistical Evidence Officer",
+        questions:[
+          {icon:"📈",visuals:"Data: 3,5,7,7,8,10",q:"What is the mode?",a:["5","7","8"],correct:"7"},
+          {icon:"📊",visuals:"Data: 4,6,8,10,12",q:"What is the mean?",a:["7","8","9"],correct:"8"},
+          {icon:"🎲",visuals:"P(A)=0.42",q:"Find P(not A).",a:["0.42","0.58","1.42"],correct:"0.58"},
+          {icon:"🔍",visuals:"Data: 2,4,6,9,11,15",q:"What is the median?",a:["6","7.5","9"],correct:"7.5"}
+        ]
+      },
+      {
+        id:"finance",
+        title:"The Financial Fraud Investigation",
+        icon:"💰",
+        skill:"Consumer mathematics",
+        badge:"Financial Investigation Expert",
+        questions:[
+          {icon:"🏦",visuals:"Simple interest: RM2000 at 4% for 3 years",q:"What is the interest?",a:["RM160","RM240","RM320"],correct:"RM240"},
+          {icon:"📈",visuals:"RM5000 invested at 5% simple interest for 2 years",q:"What is the final amount?",a:["RM5250","RM5500","RM6000"],correct:"RM5500"},
+          {icon:"🏷️",visuals:"Marked price RM800, discount 15%",q:"What is the sale price?",a:["RM660","RM680","RM720"],correct:"RM680"},
+          {icon:"🧾",visuals:"Monthly income RM3200, expenses RM2450",q:"What is the monthly savings?",a:["RM650","RM750","RM850"],correct:"RM750"}
+        ]
+      }
+    ];
+
+    let currentCase = null;
+    let currentIndex = 0;
+    let currentQuestionText = "";
+
+    const saved = JSON.parse(
+      localStorage.getItem("cjMathDetectiveForm4Progress") ||
+      '{"stars":0,"completed":[]}'
+    );
+
+    function save(){
+      localStorage.setItem("cjMathDetectiveForm4Progress",JSON.stringify(saved));
+      updateStats();
+    }
+
+    function updateStats(){
+      document.getElementById("starCount").textContent = saved.stars;
+      document.getElementById("badgeCount").textContent = saved.completed.length;
+    }
+
+    function renderCases(){
+      const grid = document.getElementById("caseGrid");
+      grid.innerHTML = "";
+      cases.forEach(c=>{
+        const card = document.createElement("article");
+        card.className = "case" + (saved.completed.includes(c.id) ? " completed" : "");
+        card.innerHTML = `
+          <div class="icon">${c.icon}</div>
+          <h4>${c.title}</h4>
+          <p>${c.skill}</p>
+          <button onclick="startCase('${c.id}')">
+            ${saved.completed.includes(c.id) ? "Play Again" : "Start Case"}
+          </button>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function scrollToCases(){
+      document.getElementById("cases").scrollIntoView({behavior:"smooth"});
+    }
+
+    function startCase(id){
+      currentCase = cases.find(c=>c.id===id);
+      currentIndex = 0;
+      document.getElementById("home").style.display = "none";
+      document.getElementById("cases").style.display = "none";
+      document.getElementById("game").classList.add("active");
+      document.getElementById("reward").classList.remove("show");
+      document.getElementById("scene").style.display = "grid";
+      document.getElementById("gameTitle").textContent = currentCase.icon + " " + currentCase.title;
+      showQuestion();
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+
+    function showQuestion(){
+      const item = currentCase.questions[currentIndex];
+      currentQuestionText = item.q;
+      document.getElementById("questionIcon").textContent = item.icon;
+      document.getElementById("visuals").textContent = item.visuals;
+      document.getElementById("question").textContent = item.q;
+      document.getElementById("feedback").textContent = "";
+      document.getElementById("feedback").className = "feedback";
+      document.getElementById("progress").style.width =
+        `${(currentIndex/currentCase.questions.length)*100}%`;
+
+      const answers = document.getElementById("answers");
+      answers.innerHTML = "";
+      item.a.forEach(choice=>{
+        const btn = document.createElement("button");
+        btn.className = "answer";
+        btn.textContent = choice;
+        btn.onclick = ()=>checkAnswer(choice,item.correct);
+        answers.appendChild(btn);
+      });
+      setTimeout(speakCurrent,250);
+    }
+
+    function checkAnswer(choice,correct){
+      const feedback = document.getElementById("feedback");
+      if(choice===correct){
+        feedback.textContent = "Strong deduction! The next clue is unlocked. ⭐";
+        feedback.className = "feedback success";
+        speak("Strong deduction. The next clue is unlocked.");
+        document.querySelectorAll(".answer").forEach(b=>b.disabled=true);
+        saved.stars += 1;
+        save();
+        setTimeout(()=>{
+          currentIndex++;
+          if(currentIndex<currentCase.questions.length){
+            showQuestion();
+          }else{
+            finishCase();
+          }
+        },900);
+      }else{
+        feedback.textContent = "Review the model and try again. 🌟";
+        feedback.className = "feedback retry";
+        speak("Review the model and try again.");
+      }
+    }
+
+    function finishCase(){
+      if(!saved.completed.includes(currentCase.id)){
+        saved.completed.push(currentCase.id);
+        saved.stars += 9;
+        save();
+      }
+      document.getElementById("progress").style.width = "100%";
+      document.getElementById("scene").style.display = "none";
+      document.getElementById("reward").classList.add("show");
+      document.getElementById("rewardIcon").textContent = currentCase.icon + "🏅";
+      document.getElementById("rewardText").textContent =
+        `You earned the "${currentCase.badge}" badge and solved ${currentCase.title}!`;
+      speak(`Case solved. You earned the ${currentCase.badge} badge.`);
+    }
+
+    function goHome(){
+      document.getElementById("game").classList.remove("active");
+      document.getElementById("home").style.display = "grid";
+      document.getElementById("cases").style.display = "block";
+      renderCases();
+      document.getElementById("cases").scrollIntoView({behavior:"smooth"});
+    }
+
+    function speak(text){
+      if(!("speechSynthesis" in window)) return;
+      speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.rate = .97;
+      utter.pitch = 1;
+      speechSynthesis.speak(utter);
+    }
+
+    function speakCurrent(){
+      if(currentQuestionText) speak(currentQuestionText);
+    }
+
+    updateStats();
+    renderCases();
+  </script>
+<a class="mth-academy-back" href="./">← Academy</a><div class="mth-creator">Created by Juil Gitom for MathToolsHub</div><script src="../../supabase-config.js"></script><script type="module" src="../../supabase-progress.js" data-activity-id="game/math-detective-form4" data-activity-type="game" data-progress-keys="cjMathDetectiveForm4Progress"></script></body>
+</html>
