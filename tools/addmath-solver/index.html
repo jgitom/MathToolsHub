@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0f2747">
+<meta name="description" content="Solve KSSM Additional Mathematics problems for Form 4 and Form 5 with clear step-by-step explanations.">
+<title>Additional Mathematics Solver | MathToolsHub</title>
+<style>
+:root{--navy:#0f2747;--blue:#2563eb;--ink:#172033;--muted:#64748b;--line:#dbe3ec;--soft:#eff6ff;--green:#166534}*{box-sizing:border-box}body{margin:0;color:var(--ink);background:#f4f7fa;font-family:Inter,"Segoe UI",Arial,sans-serif}header{color:#fff;background:var(--navy);border-bottom:4px solid #3b82f6}.nav,.hero-inner,.shell{width:min(1050px,calc(100% - 32px));margin:auto}.nav{min-height:68px;display:flex;align-items:center;justify-content:space-between}.nav a{color:#fff;font-weight:800;text-decoration:none}.back{color:#dbeafe!important;font-size:.9rem}.hero{padding:48px 0;color:#fff;background:linear-gradient(125deg,#0f2747,#174d80 62%,#7c3aed)}.hero h1{margin:0;font-size:clamp(2.2rem,7vw,4rem)}.hero p{max-width:720px;margin:15px 0 0;color:#ede9fe;line-height:1.65}.shell{padding:38px 0 70px}.layout{display:grid;grid-template-columns:330px 1fr;gap:22px}.panel{padding:24px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 14px 34px #0f274716}.field{margin-bottom:15px}label{display:block;margin-bottom:6px;color:var(--navy);font-weight:850}input,select{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;font:inherit}input:focus,select:focus,button:focus-visible{outline:3px solid #bfdbfe;outline-offset:2px}.input-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.button{width:100%;min-height:43px;margin-top:8px;border:0;border-radius:10px;font-weight:850;cursor:pointer}.primary{color:#fff;background:var(--blue)}.secondary{color:var(--navy);background:#e2e8f0}.note{color:var(--muted);font-size:.82rem;line-height:1.55}.empty{display:grid;place-items:center;min-height:480px;color:var(--muted);text-align:center}.solution-head{padding-bottom:16px;border-bottom:2px solid var(--navy)}.solution-head h2{margin:0 0 8px}.problem{display:inline-block;padding:8px 12px;border-radius:9px;color:#1e3a8a;background:var(--soft);font-size:1.08rem;font-weight:850}.steps{margin:26px 0 0;padding:0;list-style:none;counter-reset:steps}.step{position:relative;margin-bottom:16px;padding:17px 17px 17px 58px;border:1px solid var(--line);border-radius:13px;background:#f8fafc;line-height:1.6}.step:before{counter-increment:steps;content:counter(steps);position:absolute;left:16px;top:15px;width:28px;height:28px;display:grid;place-items:center;border-radius:50%;color:#fff;background:var(--blue);font-weight:900}.step strong{display:block;color:var(--navy)}.final{margin-top:22px;padding:18px;border:2px solid #86efac;border-radius:13px;color:var(--green);background:#f0fdf4;font-size:1.15rem;font-weight:900}.solution-actions{display:flex;gap:9px;margin-top:18px}.solution-actions .button{flex:1}.error{padding:14px;border:1px solid #fca5a5;border-radius:10px;color:#991b1b;background:#fef2f2}@media(max-width:760px){.layout{grid-template-columns:1fr}}@media(max-width:480px){.input-grid{grid-template-columns:1fr}.solution-actions{flex-direction:column}}@media print{header,.hero,.controls,.solution-actions{display:none}body{background:#fff}.shell{width:100%;padding:0}.layout{display:block}.solution{border:0;box-shadow:none;padding:12mm}.step{break-inside:avoid}}
+</style>
+</head>
+<body>
+<header><nav class="nav"><a href="../../index.html">Σ MathToolsHub</a><a class="back" href="../">← All Tools</a></nav></header>
+<section class="hero"><div class="hero-inner"><h1>Additional Mathematics Solver</h1><p>Solve supported KSSM Form 4 and Form 5 Additional Mathematics problems with formulas, substitutions, working steps, and final answers.</p></div></section>
+<main class="shell"><div class="layout">
+<aside class="panel controls">
+<div class="field"><label for="form">KSSM level</label><select id="form"><option value="Form 4" selected>Form 4</option><option value="Form 5">Form 5</option></select></div>
+<div class="field"><label for="type">KPM-supported Additional Mathematics topic</label><select id="type"></select></div>
+<div id="inputs"></div>
+<button class="button primary" id="solve">Show step-by-step solution</button>
+<button class="button secondary" id="example" type="button">Load another example</button>
+<p class="note" id="syllabusNote">Only supported problem formats suitable for the selected KSSM Additional Mathematics form are shown.</p>
+</aside>
+<section class="panel solution" id="solution"><div class="empty"><div><strong>Your worked solution will appear here.</strong><br>Choose a Form and supported topic, then enter the values.</div></div></section>
+</div></main>
+<script src="addmath.js"></script>
+</body></html>
