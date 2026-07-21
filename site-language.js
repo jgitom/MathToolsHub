@@ -116,6 +116,8 @@
   Object.assign(translations.zh, { "Fraction Pizza Party":"分数披萨派对", "Read coloured pizza slices, identify fractions, and recognise equivalent fractions across three difficulty levels.":"观察彩色披萨切片，在三个难度级别中识别分数和等值分数。", "Fractions":"分数", "Visual maths":"可视化数学", "Equivalence":"等值", "Join the Pizza Party":"参加披萨派对" });
   Object.assign(translations.ms, { "Measurement Kitchen":"Dapur Pengukuran", "Choose measurement units, read kitchen scales and jugs, and convert or compare metric measurements.":"Pilih unit pengukuran, baca penimbang dan jag dapur serta tukar atau bandingkan ukuran metrik.", "Measurement":"Pengukuran", "Metric units":"Unit metrik", "Cooking":"Memasak", "Enter Measurement Kitchen":"Masuk ke Dapur Pengukuran" });
   Object.assign(translations.zh, { "Measurement Kitchen":"测量厨房", "Choose measurement units, read kitchen scales and jugs, and convert or compare metric measurements.":"选择测量单位，读取厨房秤和量杯，并换算或比较公制测量。", "Measurement":"测量", "Metric units":"公制单位", "Cooking":"烹饪", "Enter Measurement Kitchen":"进入测量厨房" });
+  Object.assign(translations.ms, { "Math Space Mission":"Misi Angkasa Matematik", "Complete space missions using addition, subtraction, multiplication, division, and mixed calculations.":"Selesaikan misi angkasa menggunakan tambah, tolak, darab, bahagi dan pengiraan campuran.", "Space":"Angkasa", "Launch Math Mission":"Lancarkan Misi Matematik" });
+  Object.assign(translations.zh, { "Math Space Mission":"数学太空任务", "Complete space missions using addition, subtraction, multiplication, division, and mixed calculations.":"使用加法、减法、乘法、除法和混合运算完成太空任务。", "Space":"太空", "Launch Math Mission":"启动数学任务" });
   const originals = new WeakMap();
   function apply(language) {
     document.documentElement.lang = language === "zh" ? "zh-CN" : language;

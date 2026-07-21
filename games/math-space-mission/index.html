@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Math Space Mission</title>
+  <style>
+    :root{
+      --space:#081426;
+      --space-2:#102a43;
+      --panel:#12263d;
+      --cyan:#41d9ff;
+      --blue:#2f80ed;
+      --purple:#8b5cf6;
+      --yellow:#ffd166;
+      --orange:#ff9f1c;
+      --green:#2dd4a7;
+      --red:#ef476f;
+      --white:#ffffff;
+      --cream:#f7fbff;
+      --dark:#102030;
+      --shadow:0 16px 34px rgba(0,0,0,.34);
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:"Trebuchet MS",Arial,sans-serif;
+      color:var(--white);
+      background:
+        radial-gradient(circle at 12% 18%,rgba(255,255,255,.8) 0 1px,transparent 2px),
+        radial-gradient(circle at 28% 35%,rgba(255,255,255,.7) 0 1px,transparent 2px),
+        radial-gradient(circle at 78% 22%,rgba(255,255,255,.8) 0 1.5px,transparent 2.5px),
+        radial-gradient(circle at 65% 65%,rgba(255,255,255,.65) 0 1px,transparent 2px),
+        linear-gradient(160deg,var(--space),#050b18 70%);
+      background-size:170px 170px,210px 210px,260px 260px,190px 190px,cover;
+      overflow-x:hidden;
+    }
+
+    .app{
+      width:min(1140px,95vw);
+      margin:20px auto 30px;
+    }
+
+    .header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      flex-wrap:wrap;
+      background:rgba(12,34,58,.94);
+      border:4px solid var(--cyan);
+      border-radius:24px;
+      padding:15px 20px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(8px);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:13px;
+    }
+
+    .brand-icon{
+      font-size:clamp(2.5rem,6vw,4rem);
+      filter:drop-shadow(0 0 12px rgba(65,217,255,.7));
+    }
+
+    h1{
+      margin:0;
+      color:var(--cyan);
+      font-size:clamp(1.8rem,4vw,3rem);
+      text-shadow:0 0 16px rgba(65,217,255,.4);
+    }
+
+    .subtitle{
+      margin:3px 0 0;
+      color:#d9efff;
+      font-size:.98rem;
+    }
+
+    .stats{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .stat{
+      min-width:108px;
+      text-align:center;
+      background:rgba(255,255,255,.1);
+      border:2px solid rgba(255,255,255,.25);
+      border-radius:16px;
+      padding:8px 12px;
+      font-weight:900;
+    }
+
+    .stat span{
+      display:block;
+      color:var(--yellow);
+      font-size:1.2rem;
+    }
+
+    .card{
+      margin-top:18px;
+      background:rgba(10,27,47,.95);
+      border:4px solid var(--cyan);
+      border-radius:28px;
+      overflow:hidden;
+      box-shadow:var(--shadow);
+    }
+
+    .start-screen,.end-screen{
+      padding:34px 24px 38px;
+      text-align:center;
+    }
+
+    .hero{
+      font-size:clamp(3rem,9vw,6rem);
+      margin:8px 0 14px;
+      letter-spacing:6px;
+    }
+
+    .level-grid{
+      max-width:860px;
+      margin:24px auto;
+      display:grid;
+      grid-template-columns:repeat(3,minmax(160px,1fr));
+      gap:14px;
+    }
+
+    .level-card{
+      border:none;
+      cursor:pointer;
+      font-family:inherit;
+      font-weight:900;
+      color:var(--white);
+      background:linear-gradient(160deg,#173858,#0e263f);
+      border:3px solid var(--blue);
+      border-radius:20px;
+      padding:18px 12px;
+      box-shadow:0 7px 0 #0a4d8c;
+      transition:.16s;
+      font-size:1rem;
+    }
+
+    .level-card:hover,.level-card.selected{
+      transform:translateY(-4px);
+      border-color:var(--yellow);
+      box-shadow:0 7px 0 #b47a00,0 0 20px rgba(255,209,102,.25);
+      background:linear-gradient(160deg,#21476d,#112f4e);
+    }
+
+    .main-btn,.small-btn,.answer-btn{
+      border:none;
+      font-family:inherit;
+      font-weight:900;
+      cursor:pointer;
+      transition:transform .15s ease,box-shadow .15s ease;
+    }
+
+    .main-btn{
+      background:linear-gradient(#49e0b6,#1e9f7e);
+      color:#06251d;
+      border:3px solid #14735a;
+      border-radius:18px;
+      padding:13px 25px;
+      font-size:1.05rem;
+      box-shadow:0 6px 0 #0f5b47;
+    }
+
+    .main-btn.orange{
+      background:linear-gradient(#ffbd5a,#f57f17);
+      color:#4a2500;
+      border-color:#b85d00;
+      box-shadow:0 6px 0 #9c4f00;
+    }
+
+    .small-btn{
+      background:#f5fbff;
+      color:#123852;
+      border:3px solid #76dfff;
+      border-radius:15px;
+      padding:10px 14px;
+      box-shadow:0 5px 0 #2d9ec0;
+    }
+
+    button:hover{transform:translateY(-3px)}
+    button:active{transform:translateY(2px);box-shadow:none!important}
+    button:disabled{opacity:.55;cursor:not-allowed}
+
+    .progress-wrap{
+      background:rgba(255,255,255,.06);
+      padding:12px 18px;
+      border-bottom:2px dashed rgba(65,217,255,.45);
+    }
+
+    .progress-label{
+      display:flex;
+      justify-content:space-between;
+      font-weight:900;
+      color:#d9f6ff;
+      margin-bottom:7px;
+    }
+
+    .progress-track{
+      height:18px;
+      background:#173650;
+      border:2px solid #2d7596;
+      border-radius:999px;
+      overflow:hidden;
+    }
+
+    .progress-bar{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,var(--green),var(--cyan),var(--yellow));
+      transition:width .3s ease;
+    }
+
+    .play-area{
+      padding:22px;
+      text-align:center;
+    }
+
+    .instruction{
+      margin:0 0 8px;
+      color:#d7efff;
+      font-size:clamp(1.15rem,3vw,1.7rem);
+      font-weight:900;
+    }
+
+    .question{
+      margin:0 0 16px;
+      color:var(--yellow);
+      font-size:clamp(1.7rem,5vw,3rem);
+      font-weight:900;
+      text-shadow:0 0 14px rgba(255,209,102,.28);
+    }
+
+    .mission-layout{
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:18px;
+      align-items:stretch;
+    }
+
+    .space-scene,.answer-panel{
+      border:3px solid rgba(65,217,255,.55);
+      border-radius:24px;
+      padding:20px;
+      background:rgba(7,20,36,.82);
+    }
+
+    .space-scene{
+      min-height:470px;
+      position:relative;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 20% 16%,rgba(255,255,255,.85) 0 1.2px,transparent 2.2px),
+        radial-gradient(circle at 72% 31%,rgba(255,255,255,.7) 0 1px,transparent 2px),
+        radial-gradient(circle at 42% 78%,rgba(255,255,255,.8) 0 1.4px,transparent 2.4px),
+        linear-gradient(160deg,#0d2540,#08101f);
+      background-size:140px 140px,180px 180px,220px 220px,cover;
+    }
+
+    .planet{
+      position:absolute;
+      width:150px;
+      height:150px;
+      right:8%;
+      top:14%;
+      border-radius:50%;
+      background:radial-gradient(circle at 35% 30%,#f7c873,#d87324 60%,#7b2f0a);
+      box-shadow:
+        inset -22px -18px 0 rgba(0,0,0,.18),
+        0 0 32px rgba(255,153,61,.35);
+    }
+
+    .planet::after{
+      content:"";
+      position:absolute;
+      left:-35px;
+      right:-35px;
+      top:58px;
+      height:30px;
+      border:9px solid rgba(255,224,165,.75);
+      border-radius:50%;
+      transform:rotate(-15deg);
+    }
+
+    .moon{
+      position:absolute;
+      width:64px;
+      height:64px;
+      left:12%;
+      top:15%;
+      border-radius:50%;
+      background:radial-gradient(circle at 35% 30%,#f1f1f1,#9fa6ad 70%);
+      box-shadow:inset -10px -8px 0 rgba(0,0,0,.16);
+    }
+
+    .rocket{
+      position:absolute;
+      left:50%;
+      bottom:56px;
+      transform:translateX(-50%);
+      font-size:120px;
+      filter:drop-shadow(0 14px 7px rgba(0,0,0,.35));
+      transition:transform .5s ease,left .5s ease,bottom .5s ease;
+      z-index:3;
+    }
+
+    .rocket.fly{
+      animation:flyRocket .9s ease forwards;
+    }
+
+    @keyframes flyRocket{
+      0%{transform:translateX(-50%) translateY(0) rotate(0)}
+      60%{transform:translateX(-50%) translateY(-120px) rotate(8deg)}
+      100%{transform:translateX(-50%) translateY(-250px) rotate(16deg);opacity:.15}
+    }
+
+    .flame{
+      position:absolute;
+      left:50%;
+      bottom:38px;
+      transform:translateX(-50%);
+      width:34px;
+      height:80px;
+      background:linear-gradient(#fff7a1,#ff9f1c,#ef476f);
+      clip-path:polygon(50% 100%,0 0,100% 0);
+      filter:blur(.4px) drop-shadow(0 0 14px rgba(255,159,28,.8));
+      animation:flame 0.25s ease-in-out infinite alternate;
+    }
+
+    @keyframes flame{
+      from{height:65px}
+      to{height:88px}
+    }
+
+    .mission-box{
+      position:absolute;
+      left:20px;
+      bottom:20px;
+      background:rgba(255,255,255,.09);
+      border:2px solid rgba(255,255,255,.18);
+      border-radius:14px;
+      padding:10px 13px;
+      text-align:left;
+      font-size:.92rem;
+      color:#d8f3ff;
+    }
+
+    .energy{
+      position:absolute;
+      top:18px;
+      left:50%;
+      transform:translateX(-50%);
+      width:min(330px,78%);
+      background:rgba(255,255,255,.08);
+      border:2px solid rgba(255,255,255,.2);
+      border-radius:15px;
+      padding:9px 12px;
+      z-index:4;
+    }
+
+    .energy-label{
+      display:flex;
+      justify-content:space-between;
+      font-weight:900;
+      font-size:.9rem;
+      margin-bottom:6px;
+    }
+
+    .energy-track{
+      height:14px;
+      background:#18344d;
+      border-radius:999px;
+      overflow:hidden;
+    }
+
+    .energy-bar{
+      width:0%;
+      height:100%;
+      background:linear-gradient(90deg,var(--red),var(--yellow),var(--green));
+      transition:width .3s ease;
+    }
+
+    .answer-panel{
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+
+    .answer-panel h3{
+      margin:0 0 14px;
+      color:#d7f4ff;
+    }
+
+    .answers{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    .answer-btn{
+      min-height:100px;
+      border-radius:20px;
+      border:3px solid #4ec9f5;
+      background:linear-gradient(160deg,#1d4d73,#123451);
+      box-shadow:0 7px 0 #08253a;
+      color:var(--white);
+      font-size:clamp(1.35rem,3vw,2rem);
+    }
+
+    .answer-btn:hover{
+      border-color:var(--yellow);
+      box-shadow:0 7px 0 #6f4d00,0 0 16px rgba(255,209,102,.22);
+    }
+
+    .mission-tip{
+      margin-top:16px;
+      background:rgba(45,212,167,.1);
+      border:2px solid rgba(45,212,167,.55);
+      border-radius:16px;
+      padding:12px;
+      color:#cffff0;
+      font-weight:900;
+    }
+
+    .feedback{
+      min-height:44px;
+      margin:16px 0 0;
+      font-size:clamp(1.05rem,3vw,1.45rem);
+      font-weight:900;
+    }
+
+    .feedback.correct{color:#5dffc5}
+    .feedback.wrong{color:#ff8ca8}
+
+    .controls{
+      margin-top:14px;
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .hidden{display:none!important}
+
+    .stars{
+      font-size:clamp(2.5rem,8vw,5rem);
+      letter-spacing:8px;
+      margin:14px 0;
+    }
+
+    .certificate{
+      margin:18px auto 0;
+      max-width:650px;
+      background:#f8fcff;
+      color:#17334a;
+      border:8px double #42c9f5;
+      border-radius:18px;
+      padding:20px;
+    }
+
+    .certificate h2{
+      margin:0 0 8px;
+      color:#176184;
+    }
+
+    @media(max-width:880px){
+      .mission-layout{grid-template-columns:1fr}
+      .space-scene{min-height:430px}
+    }
+
+    @media(max-width:650px){
+      .header{justify-content:center}
+      .brand{width:100%;justify-content:center;text-align:center}
+      .stats{justify-content:center}
+      .level-grid{grid-template-columns:1fr}
+      .answers{grid-template-columns:1fr 1fr}
+      .rocket{font-size:100px}
+    }
+
+    @media(max-width:430px){
+      .answers{grid-template-columns:1fr}
+      .planet{width:120px;height:120px}
+      .rocket{font-size:88px}
+    }
+
+    @media(prefers-reduced-motion:reduce){
+      *{animation:none!important;transition:none!important}
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <div class="brand">
+        <div class="brand-icon">🚀</div>
+        <div>
+          <h1>Math Space Mission</h1>
+          <p class="subtitle">Solve the maths challenge and power the rocket to the next planet!</p>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">Score <span id="score">0</span></div>
+        <div class="stat">Lives <span id="lives">❤️❤️❤️</span></div>
+        <div class="stat">Level <span id="levelLabel">Easy</span></div>
+      </div>
+    </header>
+
+    <section class="card">
+      <section id="startScreen" class="start-screen">
+        <div class="hero">🚀 🪐 🌟</div>
+        <h2>Welcome, Space Cadet!</h2>
+        <p>Solve each maths problem to collect energy and complete the mission.</p>
+
+        <div class="level-grid">
+          <button class="level-card selected" data-level="easy">
+            🌙 Moon Mission<br><small>Addition and subtraction to 20</small>
+          </button>
+          <button class="level-card" data-level="medium">
+            🪐 Planet Explorer<br><small>Multiplication and division</small>
+          </button>
+          <button class="level-card" data-level="hard">
+            🌌 Galaxy Commander<br><small>Mixed operations and brackets</small>
+          </button>
+        </div>
+
+        <button id="startBtn" class="main-btn">▶ Launch Mission</button>
+      </section>
+
+      <section id="playScreen" class="hidden">
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span>Mission Progress</span>
+            <span id="roundLabel">Mission 1 / 10</span>
+          </div>
+          <div class="progress-track">
+            <div id="progressBar" class="progress-bar"></div>
+          </div>
+        </div>
+
+        <div class="play-area">
+          <p class="instruction">Solve the equation to charge the rocket.</p>
+          <p id="question" class="question">8 + 5 = ?</p>
+
+          <div class="mission-layout">
+            <section class="space-scene">
+              <div class="moon"></div>
+              <div class="planet"></div>
+
+              <div class="energy">
+                <div class="energy-label">
+                  <span>Rocket Energy</span>
+                  <span id="energyText">0%</span>
+                </div>
+                <div class="energy-track">
+                  <div id="energyBar" class="energy-bar"></div>
+                </div>
+              </div>
+
+              <div id="rocket" class="rocket">🚀</div>
+              <div class="flame"></div>
+
+              <div class="mission-box">
+                <strong id="missionName">Moon Base Alpha</strong><br>
+                Answer correctly to move closer to the destination.
+              </div>
+            </section>
+
+            <aside class="answer-panel">
+              <h3>Choose the correct answer</h3>
+              <div id="answers" class="answers"></div>
+              <div id="missionTip" class="mission-tip">
+                Mission tip: Work carefully before choosing.
+              </div>
+            </aside>
+          </div>
+
+          <p id="feedback" class="feedback" aria-live="polite"></p>
+
+          <div class="controls">
+            <button id="soundBtn" class="small-btn">🔊 Sound On</button>
+            <button id="restartBtn" class="small-btn">↻ Restart</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="endScreen" class="end-screen hidden">
+        <div class="hero">🏆 🚀 🌌</div>
+        <h2>Mission Accomplished!</h2>
+        <div id="stars" class="stars">⭐⭐⭐</div>
+        <p id="finalMessage"></p>
+
+        <div class="certificate">
+          <h2>Junior Space Mathematician Certificate</h2>
+          <p>This certificate is awarded for completing</p>
+          <strong>Math Space Mission</strong>
+          <p id="certificateScore"></p>
+        </div>
+
+        <div class="controls">
+          <button id="playAgainBtn" class="main-btn">Launch Again</button>
+          <button id="homeBtn" class="main-btn orange">Choose Level</button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const levelConfig={
+      easy:{
+        label:"Easy",
+        rounds:10,
+        modes:["add","subtract"],
+        tip:"Use counting on for addition and counting back for subtraction."
+      },
+      medium:{
+        label:"Medium",
+        rounds:10,
+        modes:["multiply","divide"],
+        tip:"Use times-table facts and inverse operations."
+      },
+      hard:{
+        label:"Hard",
+        rounds:12,
+        modes:["mixed","brackets"],
+        tip:"Remember the correct order of operations."
+      }
+    };
+
+    const missionNames=[
+      "Moon Base Alpha",
+      "Mars Research Camp",
+      "Saturn Ring Station",
+      "Jupiter Storm Lab",
+      "Neptune Ice Outpost",
+      "Orion Star Gate"
+    ];
+
+    let selectedLevel="easy";
+    let round=0;
+    let score=0;
+    let lives=3;
+    let correctCount=0;
+    let correctAnswer=0;
+    let soundOn=true;
+    let locked=false;
+
+    const startScreen=document.getElementById("startScreen");
+    const playScreen=document.getElementById("playScreen");
+    const endScreen=document.getElementById("endScreen");
+    const scoreEl=document.getElementById("score");
+    const livesEl=document.getElementById("lives");
+    const levelLabel=document.getElementById("levelLabel");
+    const roundLabel=document.getElementById("roundLabel");
+    const progressBar=document.getElementById("progressBar");
+    const questionEl=document.getElementById("question");
+    const answers=document.getElementById("answers");
+    const feedback=document.getElementById("feedback");
+    const missionTip=document.getElementById("missionTip");
+    const missionName=document.getElementById("missionName");
+    const energyBar=document.getElementById("energyBar");
+    const energyText=document.getElementById("energyText");
+    const rocket=document.getElementById("rocket");
+    const soundBtn=document.getElementById("soundBtn");
+    const stars=document.getElementById("stars");
+    const finalMessage=document.getElementById("finalMessage");
+    const certificateScore=document.getElementById("certificateScore");
+
+    document.querySelectorAll(".level-card").forEach(card=>{
+      card.addEventListener("click",()=>{
+        document.querySelectorAll(".level-card").forEach(c=>c.classList.remove("selected"));
+        card.classList.add("selected");
+        selectedLevel=card.dataset.level;
+        levelLabel.textContent=levelConfig[selectedLevel].label;
+      });
+    });
+
+    document.getElementById("startBtn").addEventListener("click",startGame);
+    document.getElementById("restartBtn").addEventListener("click",startGame);
+    document.getElementById("playAgainBtn").addEventListener("click",startGame);
+    document.getElementById("homeBtn").addEventListener("click",showHome);
+
+    soundBtn.addEventListener("click",()=>{
+      soundOn=!soundOn;
+      soundBtn.textContent=soundOn?"🔊 Sound On":"🔇 Sound Off";
+    });
+
+    function startGame(){
+      round=0;
+      score=0;
+      lives=3;
+      correctCount=0;
+      locked=false;
+      rocket.classList.remove("fly");
+
+      updateStats();
+      updateEnergy();
+      startScreen.classList.add("hidden");
+      endScreen.classList.add("hidden");
+      playScreen.classList.remove("hidden");
+      nextRound();
+    }
+
+    function showHome(){
+      playScreen.classList.add("hidden");
+      endScreen.classList.add("hidden");
+      startScreen.classList.remove("hidden");
+    }
+
+    function nextRound(){
+      const config=levelConfig[selectedLevel];
+
+      if(round>=config.rounds||lives<=0){
+        finishGame();
+        return;
+      }
+
+      round++;
+      locked=false;
+      feedback.textContent="";
+      feedback.className="feedback";
+      rocket.classList.remove("fly");
+
+      missionName.textContent=missionNames[(round-1)%missionNames.length];
+      missionTip.textContent=`Mission tip: ${config.tip}`;
+
+      const mode=randomChoice(config.modes);
+      buildQuestion(mode);
+      renderAnswers();
+
+      roundLabel.textContent=`Mission ${round} / ${config.rounds}`;
+      progressBar.style.width=`${(round/config.rounds)*100}%`;
+      updateEnergy();
+    }
+
+    function buildQuestion(mode){
+      let a,b,c;
+
+      if(mode==="add"){
+        a=randomInt(1,15);
+        b=randomInt(1,20-a);
+        correctAnswer=a+b;
+        questionEl.textContent=`${a} + ${b} = ?`;
+        return;
+      }
+
+      if(mode==="subtract"){
+        a=randomInt(6,20);
+        b=randomInt(1,a-1);
+        correctAnswer=a-b;
+        questionEl.textContent=`${a} − ${b} = ?`;
+        return;
+      }
+
+      if(mode==="multiply"){
+        a=randomInt(2,12);
+        b=randomInt(2,12);
+        correctAnswer=a*b;
+        questionEl.textContent=`${a} × ${b} = ?`;
+        return;
+      }
+
+      if(mode==="divide"){
+        b=randomInt(2,12);
+        correctAnswer=randomInt(2,12);
+        a=b*correctAnswer;
+        questionEl.textContent=`${a} ÷ ${b} = ?`;
+        return;
+      }
+
+      if(mode==="mixed"){
+        const operation=randomChoice(["addSub","multAdd","multSub"]);
+
+        if(operation==="addSub"){
+          a=randomInt(5,20);
+          b=randomInt(1,10);
+          c=randomInt(1,Math.max(1,a+b-1));
+          correctAnswer=a+b-c;
+          questionEl.textContent=`${a} + ${b} − ${c} = ?`;
+        }else if(operation==="multAdd"){
+          a=randomInt(2,8);
+          b=randomInt(2,8);
+          c=randomInt(1,10);
+          correctAnswer=a*b+c;
+          questionEl.textContent=`${a} × ${b} + ${c} = ?`;
+        }else{
+          a=randomInt(3,9);
+          b=randomInt(2,8);
+          c=randomInt(1,Math.max(1,a*b-1));
+          correctAnswer=a*b-c;
+          questionEl.textContent=`${a} × ${b} − ${c} = ?`;
+        }
+        return;
+      }
+
+      a=randomInt(2,9);
+      b=randomInt(1,8);
+      c=randomInt(2,6);
+      correctAnswer=(a+b)*c;
+      questionEl.textContent=`(${a} + ${b}) × ${c} = ?`;
+    }
+
+    function renderAnswers(){
+      answers.innerHTML="";
+      const choices=new Set([correctAnswer]);
+
+      while(choices.size<4){
+        const spread=Math.max(4,Math.round(Math.abs(correctAnswer)*.25));
+        let candidate=correctAnswer+randomInt(-spread,spread);
+        candidate=Math.max(0,candidate);
+
+        if(candidate===correctAnswer){
+          candidate=correctAnswer+randomChoice([-3,-2,2,3]);
+        }
+
+        choices.add(candidate);
+      }
+
+      shuffle([...choices]).forEach(value=>{
+        const button=document.createElement("button");
+        button.className="answer-btn";
+        button.textContent=value;
+        button.addEventListener("click",()=>checkAnswer(value));
+        answers.appendChild(button);
+      });
+    }
+
+    function checkAnswer(selected){
+      if(locked) return;
+      locked=true;
+
+      document.querySelectorAll(".answer-btn").forEach(btn=>btn.disabled=true);
+
+      if(selected===correctAnswer){
+        score+=selectedLevel==="hard"?15:10;
+        correctCount++;
+        feedback.textContent=randomChoice([
+          "Correct! Rocket energy increased! 🚀",
+          "Excellent calculation, Space Cadet! 🌟",
+          "Mission success! The ship moves forward! 🪐"
+        ]);
+        feedback.classList.add("correct");
+        rocket.classList.add("fly");
+        playSuccess();
+      }else{
+        lives--;
+        feedback.textContent=`Good try! The correct answer is ${correctAnswer}.`;
+        feedback.classList.add("wrong");
+        playTone(180,.22);
+      }
+
+      updateStats();
+      updateEnergy();
+
+      setTimeout(()=>nextRound(),1150);
+    }
+
+    function updateEnergy(){
+      const total=levelConfig[selectedLevel].rounds;
+      const percent=Math.min(100,Math.round((correctCount/total)*100));
+      energyBar.style.width=`${percent}%`;
+      energyText.textContent=`${percent}%`;
+    }
+
+    function updateStats(){
+      scoreEl.textContent=score;
+      livesEl.textContent=lives>0?"❤️".repeat(lives):"💔";
+      levelLabel.textContent=levelConfig[selectedLevel].label;
+    }
+
+    function finishGame(){
+      playScreen.classList.add("hidden");
+      endScreen.classList.remove("hidden");
+
+      const total=levelConfig[selectedLevel].rounds;
+      const accuracy=Math.round((correctCount/total)*100);
+
+      if(accuracy>=80){
+        stars.textContent="⭐⭐⭐";
+        finalMessage.textContent="Outstanding! You are a Galaxy Math Commander!";
+      }else if(accuracy>=50){
+        stars.textContent="⭐⭐";
+        finalMessage.textContent="Great work! Your space maths skills are growing.";
+      }else{
+        stars.textContent="⭐";
+        finalMessage.textContent="Nice effort! Keep training for the next mission.";
+      }
+
+      certificateScore.textContent=`Final Score: ${score} points • ${accuracy}% accuracy`;
+      playSuccess();
+    }
+
+    function randomInt(min,max){
+      return Math.floor(Math.random()*(max-min+1))+min;
+    }
+
+    function randomChoice(items){
+      return items[Math.floor(Math.random()*items.length)];
+    }
+
+    function shuffle(items){
+      for(let i=items.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*(i+1));
+        [items[i],items[j]]=[items[j],items[i]];
+      }
+      return items;
+    }
+
+    function playSuccess(){
+      if(!soundOn) return;
+      playTone(440,.1);
+      setTimeout(()=>playTone(660,.12),110);
+      setTimeout(()=>playTone(880,.18),230);
+    }
+
+    function playTone(frequency,duration){
+      if(!soundOn) return;
+
+      const AudioContext=window.AudioContext||window.webkitAudioContext;
+      if(!AudioContext) return;
+
+      const context=new AudioContext();
+      const oscillator=context.createOscillator();
+      const gain=context.createGain();
+
+      oscillator.type="sine";
+      oscillator.frequency.value=frequency;
+      gain.gain.setValueAtTime(.12,context.currentTime);
+      gain.gain.exponentialRampToValueAtTime(.001,context.currentTime+duration);
+
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+
+      oscillator.start();
+      oscillator.stop(context.currentTime+duration);
+      oscillator.addEventListener("ended",()=>context.close());
+    }
+  </script>
+<a class="mth-back-link" href="../" aria-label="Back to all games">← All Games</a>
+<style>.mth-back-link{position:fixed;top:12px;left:12px;z-index:9999;padding:9px 13px;border-radius:999px;color:#fff!important;background:#0f2747;text-decoration:none;font:800 13px/1.2 "Segoe UI",Arial,sans-serif;box-shadow:0 5px 14px #0004}.mth-back-link:hover,.mth-back-link:focus{background:#1d4ed8;outline:3px solid #bfdbfe}@media(max-width:520px){.mth-back-link{position:static;display:inline-block;margin:8px 0 0 2.5vw;padding:8px 11px;font-size:11px}}</style>
+</body>
+</html>
