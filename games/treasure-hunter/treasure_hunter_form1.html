@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Treasure Hunter: Counting Adventure — Tingkatan 1</title>
+<style>
+:root{
+  --navy:#0f2f4f;--blue:#1d5f7a;--gold:#ffc857;--sand:#f4d27d;
+  --sky:#7fd6f4;--green:#43b86e;--red:#e36c6c;--ink:#17324f;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;color:var(--ink);
+  background:linear-gradient(#7ed7f4 0 33%,#f2cf76 33% 100%)
+}
+header{
+  background:linear-gradient(90deg,var(--navy),var(--blue));color:#fff;
+  text-align:center;padding:18px 12px;box-shadow:0 5px 14px #0003
+}
+header h1{margin:0;font-size:clamp(1.4rem,4vw,2.5rem)}
+header p{margin:.45rem 0 0}
+.topbar{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding:12px}
+.pill{
+  background:#fff;border:3px solid var(--navy);border-radius:999px;
+  padding:8px 14px;font-weight:900
+}
+main{width:min(1140px,94%);margin:auto;padding-bottom:35px}
+.panel{
+  background:#ffffffef;border:4px solid var(--navy);border-radius:22px;
+  box-shadow:0 10px 0 #0f2f4f2d;padding:18px;margin:16px 0
+}
+.center{text-align:center}
+.mapline{
+  text-align:center;white-space:nowrap;overflow:auto;font-size:2rem;
+  letter-spacing:4px;padding:10px
+}
+.worlds{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:14px;margin-top:16px
+}
+.world{
+  background:#fff;border:3px solid var(--navy);border-radius:18px;
+  padding:15px;text-align:center;cursor:pointer;transition:.2s;min-height:155px
+}
+.world:hover{transform:translateY(-4px)}
+.world.locked{filter:grayscale(1);opacity:.55;cursor:not-allowed}
+.icon{font-size:2.9rem}
+.levels{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(76px,1fr));
+  gap:10px;margin:18px 0
+}
+.level{
+  border:3px solid var(--navy);border-radius:14px;background:#fff7d8;
+  padding:13px 6px;font-weight:900;cursor:pointer
+}
+.level.done{background:#b9efc8}
+.level.locked{opacity:.45;cursor:not-allowed}
+.game{display:none}
+.progress{
+  height:20px;background:#dbe5eb;border:2px solid var(--navy);
+  border-radius:999px;overflow:hidden
+}
+.progress>div{
+  height:100%;width:0;background:linear-gradient(90deg,#42b96d,#ffd34f);
+  transition:.35s
+}
+.badge{
+  display:inline-block;background:#e9f7ff;border:2px solid var(--navy);
+  border-radius:12px;padding:6px 10px;margin:6px 3px;font-weight:800
+}
+.question{
+  font-size:clamp(1.25rem,3vw,2rem);font-weight:900;text-align:center;
+  margin:22px 0
+}
+.answers{
+  display:grid;grid-template-columns:repeat(2,minmax(145px,1fr));
+  gap:12px;max-width:760px;margin:auto
+}
+.answer{
+  background:#fff;border:3px solid var(--navy);border-radius:15px;
+  padding:16px;font-size:1.15rem;font-weight:800;cursor:pointer
+}
+.answer:hover{background:#fff0b9}
+.feedback{
+  min-height:44px;margin-top:14px;text-align:center;
+  font-size:1.2rem;font-weight:900
+}
+button.mainbtn{
+  background:var(--gold);border:3px solid var(--navy);border-radius:14px;
+  padding:12px 18px;font-weight:900;cursor:pointer;margin:5px
+}
+button.secondary{background:#fff}
+.modal{
+  position:fixed;inset:0;background:#0008;display:none;align-items:center;
+  justify-content:center;padding:20px;z-index:30
+}
+.modal .box{
+  width:min(540px,92%);background:#fff;border:5px solid var(--gold);
+  border-radius:24px;padding:26px;text-align:center
+}
+.big{font-size:4rem}
+footer{text-align:center;padding:25px;font-weight:700}
+@media(max-width:580px){
+  .answers{grid-template-columns:1fr}
+  .worlds{grid-template-columns:1fr 1fr}
+  .panel{padding:13px}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>🏴‍☠️ Treasure Hunter: Counting Adventure — Tingkatan 1</h1>
+  <p>Jelajah tujuh wilayah matematik dan rebut Relik Kompas Algebra!</p>
+</header>
+
+<div class="topbar">
+  <div class="pill">🪙 Syiling: <span id="coins">0</span></div>
+  <div class="pill">⭐ Bintang: <span id="stars">0</span></div>
+  <div class="pill">🗝️ Kunci: <span id="keys">0</span>/7</div>
+  <div class="pill">🏆 Tahap: <span id="doneCount">0</span>/35</div>
+</div>
+
+<main>
+<section id="home" class="panel">
+  <div class="center">
+    <h2>🗺️ Peta Pengembaraan Tingkatan 1</h2>
+    <p>Selesaikan lima cabaran dalam setiap wilayah untuk membuka wilayah seterusnya.</p>
+    <div class="mapline">🌊 ➜ ➕ ➜ 𝑥 ➜ ⚖️ ➜ 📐 ➜ 📊 ➜ 🧭</div>
+  </div>
+  <div id="worlds" class="worlds"></div>
+  <div class="center">
+    <button class="mainbtn secondary" onclick="resetGame()">🔄 Padam Kemajuan</button>
+  </div>
+</section>
+
+<section id="levelSelect" class="panel" style="display:none">
+  <div class="center">
+    <h2 id="worldTitle"></h2>
+    <p id="worldDesc"></p>
+  </div>
+  <div id="levels" class="levels"></div>
+  <div class="center">
+    <button class="mainbtn secondary" onclick="goHome()">⬅ Kembali ke Peta</button>
+  </div>
+</section>
+
+<section id="game" class="panel game">
+  <div class="progress"><div id="progressBar"></div></div>
+  <div class="center">
+    <span class="badge" id="gameWorld"></span>
+    <span class="badge" id="gameLevel"></span>
+  </div>
+  <div id="question" class="question"></div>
+  <div id="answers" class="answers"></div>
+  <div id="feedback" class="feedback"></div>
+  <div class="center">
+    <button id="nextBtn" class="mainbtn" style="display:none" onclick="nextQuestion()">Soalan Seterusnya ➜</button>
+  </div>
+</section>
+</main>
+
+<div id="modal" class="modal">
+  <div class="box">
+    <div id="modalIcon" class="big">🎉</div>
+    <h2 id="modalTitle"></h2>
+    <p id="modalText"></p>
+    <button class="mainbtn" onclick="closeModal()">Teruskan</button>
+  </div>
+</div>
+
+<footer>MathToolsHub • Permainan Matematik Interaktif Tingkatan 1</footer>
+
+<script>
+const worlds=[
+  {icon:"🌊",name:"Laut Integer",desc:"Integer positif dan negatif, tertib operasi dan garis nombor."},
+  {icon:"➕",name:"Pelabuhan Pecahan",desc:"Pecahan, perpuluhan, peratus dan operasi bercampur."},
+  {icon:"𝑥",name:"Kota Algebra",desc:"Ungkapan algebra, pemudahan dan persamaan linear mudah."},
+  {icon:"⚖️",name:"Teluk Nisbah & Kadar",desc:"Nisbah, kadar, kadaran dan penyelesaian masalah."},
+  {icon:"📐",name:"Kuil Geometri",desc:"Sudut, perimeter, luas, bentuk 2D dan koordinat."},
+  {icon:"📊",name:"Pulau Data",desc:"Min, median, mod, julat dan kebarangkalian asas."},
+  {icon:"🧭",name:"Gua Relik Algebra",desc:"Masalah pelbagai langkah dan cabaran bos akhir."}
+];
+
+const Q=[
+[
+  {q:"Hitung: −7 + 12 =",a:["−19","−5","5","19"],c:2},
+  {q:"Hitung: 15 − 23 =",a:["8","−8","−38","38"],c:1},
+  {q:"Hitung: (−6) × 4 =",a:["−24","−10","10","24"],c:0},
+  {q:"Hitung: 36 ÷ (−9) =",a:["−4","4","−27","27"],c:0},
+  {q:"Hitung: 18 − 3 × 4 =",a:["60","6","12","−6"],c:1}
+],
+[
+  {q:"3/4 + 2/5 =",a:["5/9","23/20","17/20","6/20"],c:1},
+  {q:"5/6 − 1/3 =",a:["1/2","2/3","4/6","1/3"],c:0},
+  {q:"0.375 bersamaan dengan pecahan...",a:["3/8","5/8","3/5","7/20"],c:0},
+  {q:"18% daripada 250 ialah...",a:["35","40","45","50"],c:2},
+  {q:"2.4 + 1.75 − 0.65 =",a:["3.2","3.5","4.1","4.8"],c:1}
+],
+[
+  {q:"Permudahkan: 3x + 5x =",a:["8","8x","15x","x²"],c:1},
+  {q:"Permudahkan: 7a − 2a + 4 =",a:["5a + 4","9a + 4","5a","5a − 4"],c:0},
+  {q:"Jika x = 4, nilai 3x + 2 ialah...",a:["10","12","14","16"],c:2},
+  {q:"Selesaikan: x + 7 = 19",a:["10","12","26","−12"],c:1},
+  {q:"Selesaikan: 3y = 27",a:["6","8","9","12"],c:2}
+],
+[
+  {q:"Nisbah 18:24 dalam bentuk termudah ialah...",a:["2:3","3:4","4:3","6:8"],c:1},
+  {q:"Jika 5 buku berharga RM30, harga 8 buku ialah...",a:["RM42","RM46","RM48","RM50"],c:2},
+  {q:"Sebuah kereta bergerak 180 km dalam 3 jam. Kadarnya ialah...",a:["50 km/j","60 km/j","70 km/j","90 km/j"],c:1},
+  {q:"Nisbah lelaki kepada perempuan 3:5. Jika lelaki 12 orang, perempuan ialah...",a:["15","18","20","24"],c:2},
+  {q:"Pada skala 1 cm : 4 km, 7.5 cm mewakili...",a:["22 km","26 km","30 km","32 km"],c:2}
+],
+[
+  {q:"Jumlah sudut dalam sebuah segi tiga ialah...",a:["90°","180°","270°","360°"],c:1},
+  {q:"Sudut pelurus kepada 125° ialah...",a:["45°","55°","65°","75°"],c:1},
+  {q:"Perimeter segi empat tepat panjang 12 cm dan lebar 7 cm ialah...",a:["19 cm","38 cm","84 cm","24 cm"],c:1},
+  {q:"Luas segi tiga, tapak 14 cm dan tinggi 9 cm ialah...",a:["63 cm²","126 cm²","46 cm²","72 cm²"],c:0},
+  {q:"Titik A(2,3) bergerak 4 unit ke kanan dan 2 unit ke atas. Koordinat baharu?",a:["(6,5)","(4,5)","(6,1)","(−2,5)"],c:0}
+],
+[
+  {q:"Data: 4, 7, 7, 9, 13. Mod ialah...",a:["4","7","9","13"],c:1},
+  {q:"Data: 2, 5, 6, 8, 10. Median ialah...",a:["5","6","7","8"],c:1},
+  {q:"Min bagi 6, 8, 10, 12 ialah...",a:["8","9","10","11"],c:1},
+  {q:"Julat bagi 3, 5, 11, 14, 8 ialah...",a:["9","10","11","12"],c:2},
+  {q:"Sebuah beg ada 3 guli merah dan 5 biru. Kebarangkalian memilih merah ialah...",a:["3/5","3/8","5/8","1/3"],c:1}
+],
+[
+  {q:"Sebuah kapal membawa 48 peti. Setiap peti ada 36 syiling. 240 syiling digunakan. Baki?",a:["1,388","1,488","1,588","1,688"],c:1},
+  {q:"Harga barang RM240 meningkat 15%. Harga baharu?",a:["RM264","RM270","RM276","RM284"],c:2},
+  {q:"Jika 2x + 5 = 19, nilai x ialah...",a:["5","6","7","12"],c:2},
+  {q:"Sebuah segi empat tepat mempunyai luas 96 cm² dan lebar 8 cm. Panjang?",a:["10 cm","12 cm","14 cm","16 cm"],c:1},
+  {q:"BOS: 3 peti mengandungi x syiling setiap satu. Selepas 45 syiling digunakan, baki 120. Nilai x?",a:["45","50","55","60"],c:2}
+]
+];
+
+let save=JSON.parse(localStorage.getItem("th_f1")||'{"coins":0,"stars":0,"keys":0,"completed":[],"unlockedWorld":0}');
+let currentWorld=0,currentLevel=0,answered=false;
+
+function sync(){
+  coins.textContent=save.coins;
+  stars.textContent=save.stars;
+  keys.textContent=save.keys;
+  doneCount.textContent=save.completed.length;
+  localStorage.setItem("th_f1",JSON.stringify(save));
+}
+function renderWorlds(){
+  const box=document.getElementById("worlds");
+  box.innerHTML="";
+  worlds.forEach((w,i)=>{
+    const d=document.createElement("div");
+    d.className="world"+(i>save.unlockedWorld?" locked":"");
+    d.innerHTML=`<div class="icon">${w.icon}</div><h3>${w.name}</h3><p>${w.desc}</p><b>${i<=save.unlockedWorld?"Dibuka":"🔒 Terkunci"}</b>`;
+    if(i<=save.unlockedWorld)d.onclick=()=>openWorld(i);
+    box.appendChild(d);
+  });
+}
+function openWorld(i){
+  currentWorld=i;
+  home.style.display="none";
+  levelSelect.style.display="block";
+  worldTitle.textContent=worlds[i].icon+" "+worlds[i].name;
+  worldDesc.textContent=worlds[i].desc;
+  levels.innerHTML="";
+  for(let j=0;j<5;j++){
+    const id=`${i}-${j}`;
+    const open=j===0||save.completed.includes(`${i}-${j-1}`);
+    const b=document.createElement("button");
+    b.className="level"+(save.completed.includes(id)?" done":"")+(open?"":" locked");
+    b.textContent=save.completed.includes(id)?`✅ ${j+1}`:`${j+1}`;
+    if(open)b.onclick=()=>startLevel(j);
+    levels.appendChild(b);
+  }
+}
+function startLevel(j){
+  currentLevel=j;
+  answered=false;
+  levelSelect.style.display="none";
+  game.style.display="block";
+  gameWorld.textContent=worlds[currentWorld].icon+" "+worlds[currentWorld].name;
+  gameLevel.textContent="Tahap "+(j+1);
+  progressBar.style.width=((j+1)/5*100)+"%";
+  showQuestion();
+}
+function showQuestion(){
+  const item=Q[currentWorld][currentLevel];
+  question.textContent=item.q;
+  answers.innerHTML="";
+  feedback.textContent="";
+  nextBtn.style.display="none";
+  answered=false;
+  item.a.forEach((x,i)=>{
+    const b=document.createElement("button");
+    b.className="answer";
+    b.textContent=x;
+    b.onclick=()=>choose(i,b);
+    answers.appendChild(b);
+  });
+}
+function choose(i,b){
+  if(answered)return;
+  answered=true;
+  const item=Q[currentWorld][currentLevel];
+  [...answers.children].forEach((el,k)=>{
+    el.disabled=true;
+    if(k===item.c)el.style.background="#b9efc8";
+  });
+  if(i===item.c){
+    feedback.textContent="✅ Tepat! Anda mendapat 35 syiling dan 1 bintang.";
+    save.coins+=35;
+    save.stars+=1;
+    beep(780);
+  }else{
+    b.style.background="#ffc7c7";
+    feedback.textContent="❌ Belum tepat. Jawapan betul telah ditunjukkan.";
+    beep(220);
+  }
+  const id=`${currentWorld}-${currentLevel}`;
+  if(!save.completed.includes(id))save.completed.push(id);
+  nextBtn.style.display="inline-block";
+  sync();
+}
+function nextQuestion(){
+  if(currentLevel<4){
+    currentLevel++;
+    gameLevel.textContent="Tahap "+(currentLevel+1);
+    progressBar.style.width=((currentLevel+1)/5*100)+"%";
+    showQuestion();
+  }else{
+    finishWorld();
+  }
+}
+function finishWorld(){
+  game.style.display="none";
+  if(save.keys<currentWorld+1)save.keys=currentWorld+1;
+  if(currentWorld<6)save.unlockedWorld=Math.max(save.unlockedWorld,currentWorld+1);
+  sync();
+  renderWorlds();
+  modalIcon.textContent=currentWorld===6?"🧭":"🗝️";
+  modalTitle.textContent=currentWorld===6?"Relik Kompas Algebra Ditemui!":"Wilayah Selesai!";
+  modalText.textContent=currentWorld===6
+    ?"Tahniah! Anda berjaya menamatkan Treasure Hunter Tingkatan 1."
+    :"Anda memperoleh satu kunci dan membuka wilayah seterusnya.";
+  modal.style.display="flex";
+}
+function closeModal(){
+  modal.style.display="none";
+  goHome();
+}
+function goHome(){
+  game.style.display="none";
+  levelSelect.style.display="none";
+  home.style.display="block";
+  renderWorlds();
+}
+function resetGame(){
+  if(confirm("Padam semua kemajuan permainan?")){
+    save={coins:0,stars:0,keys:0,completed:[],unlockedWorld:0};
+    sync();
+    renderWorlds();
+  }
+}
+function beep(freq){
+  try{
+    const a=new(window.AudioContext||window.webkitAudioContext)();
+    const o=a.createOscillator();
+    const g=a.createGain();
+    o.frequency.value=freq;
+    o.connect(g);
+    g.connect(a.destination);
+    g.gain.setValueAtTime(.08,a.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.18);
+    o.start();
+    o.stop(a.currentTime+.18);
+  }catch(e){}
+}
+sync();
+renderWorlds();
+</script>
+<a class="mth-back-link" href="index.html" aria-label="Back to Treasure Hunter levels">← All Treasure Hunter Levels</a>
+<style>.mth-back-link{position:fixed;top:12px;left:12px;z-index:9999;padding:9px 13px;border-radius:999px;color:#fff!important;background:#0f2747;text-decoration:none;font:800 13px/1.2 "Segoe UI",Arial,sans-serif;box-shadow:0 5px 14px #0004}.mth-back-link:hover,.mth-back-link:focus{background:#1d4ed8;outline:3px solid #bfdbfe}@media(max-width:520px){.mth-back-link{top:7px;left:7px;padding:7px 10px;font-size:11px}}</style>
+</body>
+</html>
