@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Measurement Kitchen</title>
+  <style>
+    :root{
+      --cream:#fff8e8;
+      --yellow:#ffd166;
+      --orange:#ff9f1c;
+      --green:#2a9d8f;
+      --green-dark:#1f746a;
+      --blue:#277da1;
+      --red:#ef476f;
+      --purple:#8f5bd9;
+      --brown:#8d6e63;
+      --dark:#263238;
+      --white:#ffffff;
+      --shadow:0 14px 30px rgba(0,0,0,.18);
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:"Trebuchet MS",Arial,sans-serif;
+      color:var(--dark);
+      background:
+        radial-gradient(circle at 15% 12%,rgba(255,255,255,.68) 0 5%,transparent 6%),
+        linear-gradient(#9bdcff 0 52%,#8bd16b 52% 100%);
+      overflow-x:hidden;
+    }
+
+    .app{
+      width:min(1140px,95vw);
+      margin:20px auto 30px;
+    }
+
+    .header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      flex-wrap:wrap;
+      background:rgba(255,255,255,.96);
+      border:5px solid #8a5734;
+      border-radius:24px;
+      padding:15px 20px;
+      box-shadow:var(--shadow);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:13px;
+    }
+
+    .brand-icon{
+      font-size:clamp(2.5rem,6vw,4rem);
+    }
+
+    h1{
+      margin:0;
+      color:#83491f;
+      font-size:clamp(1.8rem,4vw,3rem);
+    }
+
+    .subtitle{
+      margin:3px 0 0;
+      color:#5f6a72;
+      font-size:.98rem;
+    }
+
+    .stats{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .stat{
+      min-width:108px;
+      text-align:center;
+      background:var(--cream);
+      border:3px solid var(--yellow);
+      border-radius:16px;
+      padding:8px 12px;
+      font-weight:900;
+    }
+
+    .stat span{
+      display:block;
+      color:#6d4c41;
+      font-size:1.2rem;
+    }
+
+    .card{
+      margin-top:18px;
+      background:rgba(255,255,255,.96);
+      border:5px solid #8a5734;
+      border-radius:28px;
+      overflow:hidden;
+      box-shadow:var(--shadow);
+    }
+
+    .start-screen,.end-screen{
+      padding:34px 24px 38px;
+      text-align:center;
+    }
+
+    .hero{
+      font-size:clamp(3rem,9vw,6rem);
+      margin:8px 0 14px;
+      letter-spacing:6px;
+    }
+
+    .level-grid{
+      max-width:850px;
+      margin:24px auto;
+      display:grid;
+      grid-template-columns:repeat(3,minmax(150px,1fr));
+      gap:14px;
+    }
+
+    .level-card{
+      border:none;
+      cursor:pointer;
+      font-family:inherit;
+      font-weight:900;
+      color:#5d4037;
+      background:#fff6c7;
+      border:4px solid var(--orange);
+      border-radius:20px;
+      padding:18px 12px;
+      box-shadow:0 7px 0 #d97700;
+      transition:.16s;
+      font-size:1rem;
+    }
+
+    .level-card:hover,.level-card.selected{
+      transform:translateY(-4px);
+      background:#fff29f;
+      border-color:var(--green);
+      box-shadow:0 7px 0 var(--green-dark);
+    }
+
+    .main-btn,.small-btn,.answer-btn{
+      border:none;
+      font-family:inherit;
+      font-weight:900;
+      cursor:pointer;
+      transition:transform .15s ease,box-shadow .15s ease;
+    }
+
+    .main-btn{
+      background:linear-gradient(#4bc56f,#238d4f);
+      color:white;
+      border:3px solid #166b39;
+      border-radius:18px;
+      padding:13px 25px;
+      font-size:1.05rem;
+      box-shadow:0 6px 0 #166b39;
+    }
+
+    .main-btn.orange{
+      background:linear-gradient(#ffb347,#f47b20);
+      border-color:#c65010;
+      box-shadow:0 6px 0 #c65010;
+    }
+
+    .small-btn{
+      background:white;
+      color:#7c4b2d;
+      border:3px solid #d29c78;
+      border-radius:15px;
+      padding:10px 14px;
+      box-shadow:0 5px 0 #b77a51;
+    }
+
+    button:hover{transform:translateY(-3px)}
+    button:active{transform:translateY(2px);box-shadow:none!important}
+    button:disabled{opacity:.58;cursor:not-allowed}
+
+    .progress-wrap{
+      background:#fff2e9;
+      padding:12px 18px;
+      border-bottom:3px dashed #d29b78;
+    }
+
+    .progress-label{
+      display:flex;
+      justify-content:space-between;
+      font-weight:900;
+      color:#824e30;
+      margin-bottom:7px;
+    }
+
+    .progress-track{
+      height:18px;
+      background:#f4d3bf;
+      border:2px solid #d59e7d;
+      border-radius:999px;
+      overflow:hidden;
+    }
+
+    .progress-bar{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,#2a9d8f,#ffd166,#ef476f);
+      transition:width .3s ease;
+    }
+
+    .play-area{
+      padding:22px;
+      text-align:center;
+    }
+
+    .instruction{
+      margin:0 0 8px;
+      color:#6d4c41;
+      font-size:clamp(1.2rem,3vw,1.75rem);
+      font-weight:900;
+    }
+
+    .question{
+      margin:0 0 16px;
+      color:#83491f;
+      font-size:clamp(1.45rem,4vw,2.3rem);
+      font-weight:900;
+    }
+
+    .game-layout{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:18px;
+      align-items:stretch;
+    }
+
+    .kitchen-scene,.answer-panel{
+      border:4px solid #d4a17f;
+      border-radius:24px;
+      padding:20px;
+    }
+
+    .kitchen-scene{
+      min-height:455px;
+      position:relative;
+      overflow:hidden;
+      background:
+        linear-gradient(rgba(255,255,255,.16),rgba(255,255,255,.16)),
+        repeating-linear-gradient(0deg,#fff6dc 0 46px,#f6e6c0 46px 48px),
+        repeating-linear-gradient(90deg,transparent 0 46px,#e7cfa6 46px 48px);
+    }
+
+    .kitchen-sign{
+      position:absolute;
+      top:18px;
+      left:50%;
+      transform:translateX(-50%);
+      background:#ef476f;
+      color:white;
+      border:5px solid #96304b;
+      border-radius:18px;
+      padding:10px 20px;
+      font-weight:900;
+      box-shadow:0 7px 0 rgba(0,0,0,.12);
+      z-index:2;
+    }
+
+    .counter{
+      position:absolute;
+      left:5%;
+      right:5%;
+      bottom:26px;
+      height:120px;
+      background:#b8794d;
+      border:7px solid #70442a;
+      border-radius:18px 18px 8px 8px;
+      box-shadow:0 12px 0 rgba(0,0,0,.12);
+    }
+
+    .challenge{
+      position:absolute;
+      left:50%;
+      top:100px;
+      transform:translateX(-50%);
+      width:min(440px,88%);
+      min-height:245px;
+      background:#fffdf6;
+      border:5px solid #c79162;
+      border-radius:22px;
+      box-shadow:0 10px 0 rgba(0,0,0,.1);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:24px;
+      padding:22px;
+      z-index:3;
+    }
+
+    .challenge-icon{
+      font-size:clamp(4.5rem,10vw,7rem);
+      line-height:1;
+      filter:drop-shadow(0 6px 3px rgba(0,0,0,.14));
+    }
+
+    .visual-wrap{
+      min-width:180px;
+    }
+
+    .visual-title{
+      font-weight:900;
+      color:#6c4a32;
+      margin-bottom:10px;
+    }
+
+    .measuring-cup{
+      width:120px;
+      height:170px;
+      margin:auto;
+      border:6px solid #4f8399;
+      border-top:none;
+      border-radius:0 0 22px 22px;
+      position:relative;
+      background:rgba(173,227,247,.45);
+      overflow:hidden;
+    }
+
+    .liquid{
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:0;
+      background:#5cc8ff;
+      transition:height .35s ease;
+    }
+
+    .cup-mark{
+      position:absolute;
+      right:4px;
+      width:33px;
+      border-top:2px solid #315f70;
+      font-size:.68rem;
+      color:#315f70;
+      text-align:right;
+      z-index:2;
+    }
+
+    .scale{
+      width:180px;
+      margin:auto;
+      position:relative;
+    }
+
+    .scale-pan{
+      width:140px;
+      height:32px;
+      margin:auto;
+      border-radius:50%;
+      background:#cfd8dc;
+      border:5px solid #65777f;
+      display:grid;
+      place-items:center;
+      font-size:2.3rem;
+    }
+
+    .scale-body{
+      width:100px;
+      height:105px;
+      margin:-4px auto 0;
+      background:#ef476f;
+      border:6px solid #96304b;
+      border-radius:12px 12px 25px 25px;
+      display:grid;
+      place-items:center;
+    }
+
+    .scale-display{
+      width:72px;
+      background:#ecffde;
+      border:4px solid #567a45;
+      border-radius:10px;
+      padding:6px 4px;
+      font-weight:900;
+      color:#38552f;
+    }
+
+    .ruler{
+      width:235px;
+      height:64px;
+      margin:auto;
+      background:#ffd166;
+      border:5px solid #af7c00;
+      border-radius:10px;
+      position:relative;
+      display:flex;
+      align-items:flex-end;
+      padding:0 8px 8px;
+      gap:0;
+    }
+
+    .ruler-mark{
+      flex:1;
+      border-left:2px solid #755500;
+      height:18px;
+      position:relative;
+    }
+
+    .ruler-mark.major{
+      height:32px;
+    }
+
+    .ruler-mark span{
+      position:absolute;
+      bottom:32px;
+      left:-5px;
+      font-size:.72rem;
+      color:#5f4500;
+      font-weight:900;
+    }
+
+    .answer-panel{
+      background:#fffaf0;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+
+    .answer-panel h3{
+      margin:0 0 14px;
+      color:#5b4636;
+    }
+
+    .answers{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    .answer-btn{
+      min-height:96px;
+      border-radius:20px;
+      border:4px solid #e59c26;
+      background:linear-gradient(#fff29d,#ffd166);
+      box-shadow:0 7px 0 #c77900;
+      color:#5d4037;
+      font-size:clamp(1.15rem,3vw,1.65rem);
+      padding:10px;
+    }
+
+    .unit-tip{
+      margin-top:16px;
+      background:#eef9f2;
+      border:3px solid #65ad7b;
+      border-radius:16px;
+      padding:12px;
+      color:#285d43;
+      font-weight:900;
+    }
+
+    .feedback{
+      min-height:44px;
+      margin:16px 0 0;
+      font-size:clamp(1.05rem,3vw,1.45rem);
+      font-weight:900;
+    }
+
+    .feedback.correct{color:#1b7f44}
+    .feedback.wrong{color:#d62828}
+
+    .controls{
+      margin-top:14px;
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .hidden{display:none!important}
+
+    .stars{
+      font-size:clamp(2.5rem,8vw,5rem);
+      letter-spacing:8px;
+      margin:14px 0;
+    }
+
+    .certificate{
+      margin:18px auto 0;
+      max-width:650px;
+      background:#fffcec;
+      border:8px double #d99a19;
+      border-radius:18px;
+      padding:20px;
+    }
+
+    .certificate h2{
+      margin:0 0 8px;
+      color:#83491f;
+    }
+
+    @media(max-width:870px){
+      .game-layout{grid-template-columns:1fr}
+      .kitchen-scene{min-height:430px}
+    }
+
+    @media(max-width:650px){
+      .header{justify-content:center}
+      .brand{width:100%;justify-content:center;text-align:center}
+      .stats{justify-content:center}
+      .level-grid{grid-template-columns:1fr}
+      .answers{grid-template-columns:1fr 1fr}
+      .challenge{flex-direction:column;gap:10px;top:88px}
+    }
+
+    @media(max-width:430px){
+      .answers{grid-template-columns:1fr}
+      .challenge{width:92%}
+      .ruler{width:205px}
+    }
+
+    @media(prefers-reduced-motion:reduce){
+      *{animation:none!important;transition:none!important}
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <div class="brand">
+        <div class="brand-icon">🥣</div>
+        <div>
+          <h1>Measurement Kitchen</h1>
+          <p class="subtitle">Measure ingredients using capacity, mass, and length!</p>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">Score <span id="score">0</span></div>
+        <div class="stat">Lives <span id="lives">❤️❤️❤️</span></div>
+        <div class="stat">Level <span id="levelLabel">Easy</span></div>
+      </div>
+    </header>
+
+    <section class="card">
+      <section id="startScreen" class="start-screen">
+        <div class="hero">🥣 ⚖️ 📏</div>
+        <h2>Welcome, Junior Chef!</h2>
+        <p>Choose the correct measurement to complete each kitchen task.</p>
+
+        <div class="level-grid">
+          <button class="level-card selected" data-level="easy">
+            🌱 Kitchen Helper<br><small>Choose the correct unit</small>
+          </button>
+          <button class="level-card" data-level="medium">
+            🥄 Recipe Maker<br><small>Read simple measurements</small>
+          </button>
+          <button class="level-card" data-level="hard">
+            👨‍🍳 Master Chef<br><small>Convert and compare measurements</small>
+          </button>
+        </div>
+
+        <button id="startBtn" class="main-btn">▶ Enter the Kitchen</button>
+      </section>
+
+      <section id="playScreen" class="hidden">
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span>Recipe Progress</span>
+            <span id="roundLabel">Round 1 / 10</span>
+          </div>
+          <div class="progress-track">
+            <div id="progressBar" class="progress-bar"></div>
+          </div>
+        </div>
+
+        <div class="play-area">
+          <p class="instruction">Complete the measurement challenge.</p>
+          <p id="question" class="question">Which unit should measure milk?</p>
+
+          <div class="game-layout">
+            <section class="kitchen-scene">
+              <div class="kitchen-sign">Junior Chef Kitchen</div>
+              <div id="challenge" class="challenge"></div>
+              <div class="counter"></div>
+            </section>
+
+            <aside class="answer-panel">
+              <h3>Choose the correct answer</h3>
+              <div id="answers" class="answers"></div>
+              <div id="unitTip" class="unit-tip">Tip: Capacity tells us how much liquid a container holds.</div>
+            </aside>
+          </div>
+
+          <p id="feedback" class="feedback" aria-live="polite"></p>
+
+          <div class="controls">
+            <button id="soundBtn" class="small-btn">🔊 Sound On</button>
+            <button id="restartBtn" class="small-btn">↻ Restart</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="endScreen" class="end-screen hidden">
+        <div class="hero">🏆 🥣 🌟</div>
+        <h2>Recipe Complete!</h2>
+        <div id="stars" class="stars">⭐⭐⭐</div>
+        <p id="finalMessage"></p>
+
+        <div class="certificate">
+          <h2>Junior Measurement Chef Certificate</h2>
+          <p>This certificate is awarded for completing</p>
+          <strong>Measurement Kitchen</strong>
+          <p id="certificateScore"></p>
+        </div>
+
+        <div class="controls">
+          <button id="playAgainBtn" class="main-btn">Cook Again</button>
+          <button id="homeBtn" class="main-btn orange">Choose Level</button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const levelConfig={
+      easy:{label:"Easy",rounds:10,modes:["unit"]},
+      medium:{label:"Medium",rounds:10,modes:["capacity","mass","length"]},
+      hard:{label:"Hard",rounds:12,modes:["convertCapacity","convertMass","compare"]}
+    };
+
+    const unitQuestions=[
+      {item:"milk",icon:"🥛",answer:"millilitres",choices:["millilitres","grams","centimetres","kilograms"],tip:"Liquids are commonly measured in millilitres or litres."},
+      {item:"flour",icon:"🌾",answer:"grams",choices:["grams","litres","metres","millilitres"],tip:"Light ingredients such as flour are commonly measured in grams."},
+      {item:"table",icon:"🍽️",answer:"centimetres",choices:["centimetres","litres","grams","millilitres"],tip:"Length can be measured in centimetres or metres."},
+      {item:"watermelon",icon:"🍉",answer:"kilograms",choices:["kilograms","millilitres","centimetres","litres"],tip:"Heavy objects are commonly measured in kilograms."}
+    ];
+
+    const ingredients=[
+      {name:"milk",icon:"🥛"},
+      {name:"juice",icon:"🧃"},
+      {name:"water",icon:"💧"},
+      {name:"flour",icon:"🌾"},
+      {name:"sugar",icon:"🍬"},
+      {name:"butter",icon:"🧈"},
+      {name:"bread",icon:"🍞"},
+      {name:"carrot",icon:"🥕"}
+    ];
+
+    let selectedLevel="easy";
+    let round=0;
+    let score=0;
+    let lives=3;
+    let correctCount=0;
+    let correctAnswer="";
+    let soundOn=true;
+    let locked=false;
+
+    const startScreen=document.getElementById("startScreen");
+    const playScreen=document.getElementById("playScreen");
+    const endScreen=document.getElementById("endScreen");
+    const scoreEl=document.getElementById("score");
+    const livesEl=document.getElementById("lives");
+    const levelLabel=document.getElementById("levelLabel");
+    const roundLabel=document.getElementById("roundLabel");
+    const progressBar=document.getElementById("progressBar");
+    const questionEl=document.getElementById("question");
+    const challenge=document.getElementById("challenge");
+    const answers=document.getElementById("answers");
+    const feedback=document.getElementById("feedback");
+    const unitTip=document.getElementById("unitTip");
+    const soundBtn=document.getElementById("soundBtn");
+    const stars=document.getElementById("stars");
+    const finalMessage=document.getElementById("finalMessage");
+    const certificateScore=document.getElementById("certificateScore");
+
+    document.querySelectorAll(".level-card").forEach(card=>{
+      card.addEventListener("click",()=>{
+        document.querySelectorAll(".level-card").forEach(c=>c.classList.remove("selected"));
+        card.classList.add("selected");
+        selectedLevel=card.dataset.level;
+        levelLabel.textContent=levelConfig[selectedLevel].label;
+      });
+    });
+
+    document.getElementById("startBtn").addEventListener("click",startGame);
+    document.getElementById("restartBtn").addEventListener("click",startGame);
+    document.getElementById("playAgainBtn").addEventListener("click",startGame);
+    document.getElementById("homeBtn").addEventListener("click",showHome);
+
+    soundBtn.addEventListener("click",()=>{
+      soundOn=!soundOn;
+      soundBtn.textContent=soundOn?"🔊 Sound On":"🔇 Sound Off";
+    });
+
+    function startGame(){
+      round=0;
+      score=0;
+      lives=3;
+      correctCount=0;
+      locked=false;
+
+      updateStats();
+      startScreen.classList.add("hidden");
+      endScreen.classList.add("hidden");
+      playScreen.classList.remove("hidden");
+      nextRound();
+    }
+
+    function showHome(){
+      playScreen.classList.add("hidden");
+      endScreen.classList.add("hidden");
+      startScreen.classList.remove("hidden");
+    }
+
+    function nextRound(){
+      const config=levelConfig[selectedLevel];
+
+      if(round>=config.rounds||lives<=0){
+        finishGame();
+        return;
+      }
+
+      round++;
+      locked=false;
+      feedback.textContent="";
+      feedback.className="feedback";
+
+      const mode=randomChoice(config.modes);
+
+      if(mode==="unit") setupUnitQuestion();
+      if(mode==="capacity") setupCapacityQuestion();
+      if(mode==="mass") setupMassQuestion();
+      if(mode==="length") setupLengthQuestion();
+      if(mode==="convertCapacity") setupCapacityConversion();
+      if(mode==="convertMass") setupMassConversion();
+      if(mode==="compare") setupComparison();
+
+      roundLabel.textContent=`Round ${round} / ${config.rounds}`;
+      progressBar.style.width=`${(round/config.rounds)*100}%`;
+    }
+
+    function setupUnitQuestion(){
+      const q=randomChoice(unitQuestions);
+      questionEl.textContent=`Which unit should be used to measure ${q.item}?`;
+      correctAnswer=q.answer;
+      unitTip.textContent=`Tip: ${q.tip}`;
+      challenge.innerHTML=`
+        <div class="challenge-icon">${q.icon}</div>
+        <div class="visual-wrap">
+          <div class="visual-title">Choose the best measurement unit</div>
+          <div style="font-size:1.2rem;font-weight:900;color:#704a31">${capitalize(q.item)}</div>
+        </div>
+      `;
+      renderAnswers(q.choices);
+    }
+
+    function setupCapacityQuestion(){
+      const values=[100,200,250,300,400,500];
+      const value=randomChoice(values);
+      const ingredient=randomChoice(ingredients.slice(0,3));
+
+      correctAnswer=`${value} mL`;
+      questionEl.textContent=`How much ${ingredient.name} is in the measuring cup?`;
+      unitTip.textContent="Tip: 1 litre equals 1000 millilitres.";
+
+      challenge.innerHTML=`
+        <div class="challenge-icon">${ingredient.icon}</div>
+        <div class="visual-wrap">
+          <div class="visual-title">Read the measuring cup</div>
+          <div class="measuring-cup">
+            <div class="liquid" style="height:${Math.max(15,value/5)}%"></div>
+            <span class="cup-mark" style="bottom:20%">100</span>
+            <span class="cup-mark" style="bottom:40%">200</span>
+            <span class="cup-mark" style="bottom:60%">300</span>
+            <span class="cup-mark" style="bottom:80%">400</span>
+          </div>
+        </div>
+      `;
+
+      renderAnswers(shuffle([
+        correctAnswer,
+        `${Math.max(50,value-100)} mL`,
+        `${value+100} mL`,
+        `${Math.max(100,value-50)} mL`
+      ]));
+    }
+
+    function setupMassQuestion(){
+      const values=[100,200,250,300,500,750];
+      const value=randomChoice(values);
+      const ingredient=randomChoice(ingredients.slice(3,6));
+
+      correctAnswer=`${value} g`;
+      questionEl.textContent=`What mass does the kitchen scale show?`;
+      unitTip.textContent="Tip: 1000 grams equals 1 kilogram.";
+
+      challenge.innerHTML=`
+        <div class="challenge-icon">${ingredient.icon}</div>
+        <div class="visual-wrap">
+          <div class="visual-title">Read the kitchen scale</div>
+          <div class="scale">
+            <div class="scale-pan">${ingredient.icon}</div>
+            <div class="scale-body">
+              <div class="scale-display">${value} g</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      renderAnswers(shuffle([
+        correctAnswer,
+        `${Math.max(50,value-100)} g`,
+        `${value+100} g`,
+        `${Math.max(100,value-50)} g`
+      ]));
+    }
+
+    function setupLengthQuestion(){
+      const value=randomChoice([5,8,10,12,15,20]);
+      const ingredient=randomChoice(ingredients.slice(6));
+
+      correctAnswer=`${value} cm`;
+      questionEl.textContent=`How long is the ${ingredient.name}?`;
+      unitTip.textContent="Tip: Short objects are often measured in centimetres.";
+
+      challenge.innerHTML=`
+        <div class="challenge-icon">${ingredient.icon}</div>
+        <div class="visual-wrap">
+          <div class="visual-title">Read the ruler</div>
+          ${buildRuler(value)}
+        </div>
+      `;
+
+      renderAnswers(shuffle([
+        correctAnswer,
+        `${Math.max(1,value-3)} cm`,
+        `${value+3} cm`,
+        `${Math.max(2,value-2)} cm`
+      ]));
+    }
+
+    function setupCapacityConversion(){
+      const litres=randomChoice([1,2,3,4]);
+      correctAnswer=`${litres*1000} mL`;
+      questionEl.textContent=`How many millilitres are in ${litres} L?`;
+      unitTip.textContent="Tip: Multiply litres by 1000 to get millilitres.";
+
+      challenge.innerHTML=`
+        <div class="challenge-icon">🧃</div>
+        <div class="visual-wrap">
+          <div class="visual-title">Convert capacity</div>
+          <div style="font-size:2.3rem;font-weight:900;color:#315f70">${litres} L</div>
+        </div>
+      `;
+
+      renderAnswers(shuffle([
+        correctAnswer,
+        `${litres*100} mL`,
+        `${litres*500} mL`,
+        `${litres*1000+500} mL`
+      ]));
+    }
+
+    function setupMassConversion(){
+      const kg=randomChoice([1,2,3,4]);
+      correctAnswer=`${kg*1000} g`;
+      questionEl.textContent=`How many grams are in ${kg} kg?`;
+      unitTip.textContent="Tip: Multiply kilograms by 1000 to get grams.";
+
+      challenge.innerHTML=`
+        <div class="challenge-icon">⚖️</div>
+        <div class="visual-wrap">
+          <div class="visual-title">Convert mass</div>
+          <div style="font-size:2.3rem;font-weight:900;color:#315f70">${kg} kg</div>
+        </div>
+      `;
+
+      renderAnswers(shuffle([
+        correctAnswer,
+        `${kg*100} g`,
+        `${kg*500} g`,
+        `${kg*1000+250} g`
+      ]));
+    }
+
+    function setupComparison(){
+      const type=randomChoice(["capacity","mass"]);
+
+      if(type==="capacity"){
+        const left=randomChoice([250,500,750]);
+        const right=randomChoice([1,2]);
+        const leftMl=left;
+        const rightMl=right*1000;
+
+        correctAnswer=leftMl>rightMl?"Left":"Right";
+        questionEl.textContent="Which container holds more liquid?";
+        unitTip.textContent="Tip: Convert litres into millilitres before comparing.";
+
+        challenge.innerHTML=`
+          <div class="visual-wrap">
+            <div class="visual-title">Left container</div>
+            <div style="font-size:4rem">🥤</div>
+            <div style="font-size:1.5rem;font-weight:900">${left} mL</div>
+          </div>
+          <div style="font-size:2rem;font-weight:900">VS</div>
+          <div class="visual-wrap">
+            <div class="visual-title">Right container</div>
+            <div style="font-size:4rem">🧃</div>
+            <div style="font-size:1.5rem;font-weight:900">${right} L</div>
+          </div>
+        `;
+      }else{
+        const left=randomChoice([500,750,1500]);
+        const right=randomChoice([1,2]);
+        const rightG=right*1000;
+
+        correctAnswer=left>rightG?"Left":"Right";
+        questionEl.textContent="Which ingredient is heavier?";
+        unitTip.textContent="Tip: Convert kilograms into grams before comparing.";
+
+        challenge.innerHTML=`
+          <div class="visual-wrap">
+            <div class="visual-title">Left ingredient</div>
+            <div style="font-size:4rem">🌾</div>
+            <div style="font-size:1.5rem;font-weight:900">${left} g</div>
+          </div>
+          <div style="font-size:2rem;font-weight:900">VS</div>
+          <div class="visual-wrap">
+            <div class="visual-title">Right ingredient</div>
+            <div style="font-size:4rem">🍚</div>
+            <div style="font-size:1.5rem;font-weight:900">${right} kg</div>
+          </div>
+        `;
+      }
+
+      renderAnswers(["Left","Right","They are equal","Cannot tell"]);
+    }
+
+    function buildRuler(value){
+      let marks="";
+      for(let i=0;i<=20;i++){
+        const major=i%5===0;
+        marks+=`<div class="ruler-mark ${major?"major":""}">${major?`<span>${i}</span>`:""}</div>`;
+      }
+
+      return `
+        <div class="ruler">
+          ${marks}
+          <div style="
+            position:absolute;
+            left:8px;
+            bottom:10px;
+            height:12px;
+            width:${Math.min(95,value*4.5)}%;
+            background:#ef476f;
+            border-radius:999px;
+            opacity:.8;
+          "></div>
+        </div>
+      `;
+    }
+
+    function renderAnswers(choices){
+      answers.innerHTML="";
+      shuffle([...new Set(choices)]).forEach(choice=>{
+        const button=document.createElement("button");
+        button.className="answer-btn";
+        button.textContent=choice;
+        button.addEventListener("click",()=>checkAnswer(choice));
+        answers.appendChild(button);
+      });
+    }
+
+    function checkAnswer(selected){
+      if(locked) return;
+      locked=true;
+      document.querySelectorAll(".answer-btn").forEach(btn=>btn.disabled=true);
+
+      if(selected===correctAnswer){
+        score+=selectedLevel==="hard"?15:10;
+        correctCount++;
+        feedback.textContent=randomChoice([
+          "Correct! Excellent measuring, Chef! 🥣",
+          "Great work! The recipe is perfect! ⭐",
+          "Excellent! You chose the correct measurement! 🎉"
+        ]);
+        feedback.classList.add("correct");
+        playSuccess();
+      }else{
+        lives--;
+        feedback.textContent=`Good try! The correct answer is ${correctAnswer}.`;
+        feedback.classList.add("wrong");
+        playTone(180,.22);
+      }
+
+      updateStats();
+      setTimeout(()=>nextRound(),1150);
+    }
+
+    function updateStats(){
+      scoreEl.textContent=score;
+      livesEl.textContent=lives>0?"❤️".repeat(lives):"💔";
+      levelLabel.textContent=levelConfig[selectedLevel].label;
+    }
+
+    function finishGame(){
+      playScreen.classList.add("hidden");
+      endScreen.classList.remove("hidden");
+
+      const total=levelConfig[selectedLevel].rounds;
+      const accuracy=Math.round((correctCount/total)*100);
+
+      if(accuracy>=80){
+        stars.textContent="⭐⭐⭐";
+        finalMessage.textContent="Outstanding! You are a Measurement Kitchen Master!";
+      }else if(accuracy>=50){
+        stars.textContent="⭐⭐";
+        finalMessage.textContent="Great work! Your measurement skills are growing.";
+      }else{
+        stars.textContent="⭐";
+        finalMessage.textContent="Nice effort! Keep practising kitchen measurements.";
+      }
+
+      certificateScore.textContent=`Final Score: ${score} points • ${accuracy}% accuracy`;
+      playSuccess();
+    }
+
+    function randomChoice(items){
+      return items[Math.floor(Math.random()*items.length)];
+    }
+
+    function shuffle(items){
+      for(let i=items.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*(i+1));
+        [items[i],items[j]]=[items[j],items[i]];
+      }
+      return items;
+    }
+
+    function capitalize(text){
+      return text.charAt(0).toUpperCase()+text.slice(1);
+    }
+
+    function playSuccess(){
+      if(!soundOn) return;
+      playTone(523,.12);
+      setTimeout(()=>playTone(659,.12),120);
+      setTimeout(()=>playTone(784,.18),240);
+    }
+
+    function playTone(frequency,duration){
+      if(!soundOn) return;
+
+      const AudioContext=window.AudioContext||window.webkitAudioContext;
+      if(!AudioContext) return;
+
+      const context=new AudioContext();
+      const oscillator=context.createOscillator();
+      const gain=context.createGain();
+
+      oscillator.type="sine";
+      oscillator.frequency.value=frequency;
+      gain.gain.setValueAtTime(.12,context.currentTime);
+      gain.gain.exponentialRampToValueAtTime(.001,context.currentTime+duration);
+
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+
+      oscillator.start();
+      oscillator.stop(context.currentTime+duration);
+      oscillator.addEventListener("ended",()=>context.close());
+    }
+  </script>
+<a class="mth-back-link" href="../" aria-label="Back to all games">← All Games</a>
+<style>.mth-back-link{position:fixed;top:12px;left:12px;z-index:9999;padding:9px 13px;border-radius:999px;color:#fff!important;background:#0f2747;text-decoration:none;font:800 13px/1.2 "Segoe UI",Arial,sans-serif;box-shadow:0 5px 14px #0004}.mth-back-link:hover,.mth-back-link:focus{background:#1d4ed8;outline:3px solid #bfdbfe}@media(max-width:520px){.mth-back-link{top:7px;left:7px;padding:7px 10px;font-size:11px}}</style>
+</body>
+</html>
