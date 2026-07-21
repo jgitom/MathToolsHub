@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Money Market Kids</title>
+  <style>
+    :root{
+      --sky:#93dcff;
+      --green:#2f9e63;
+      --green-dark:#1f6f46;
+      --cream:#fff8e8;
+      --yellow:#ffd166;
+      --orange:#ff9f1c;
+      --red:#ef476f;
+      --blue:#277da1;
+      --purple:#8f5bd9;
+      --brown:#8d6e63;
+      --dark:#263238;
+      --white:#ffffff;
+      --shadow:0 14px 30px rgba(0,0,0,.18);
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:"Trebuchet MS", Arial, sans-serif;
+      color:var(--dark);
+      background:
+        radial-gradient(circle at 16% 13%,rgba(255,255,255,.7) 0 5%,transparent 6%),
+        linear-gradient(var(--sky) 0 52%,#86d16b 52% 100%);
+      overflow-x:hidden;
+    }
+
+    .app{
+      width:min(1140px,95vw);
+      margin:20px auto 30px;
+    }
+
+    .header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      flex-wrap:wrap;
+      background:rgba(255,255,255,.95);
+      border:5px solid var(--green-dark);
+      border-radius:24px;
+      padding:15px 20px;
+      box-shadow:var(--shadow);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:13px;
+    }
+
+    .brand-icon{
+      font-size:clamp(2.5rem,6vw,4rem);
+    }
+
+    h1{
+      margin:0;
+      color:var(--green-dark);
+      font-size:clamp(1.8rem,4vw,3rem);
+    }
+
+    .subtitle{
+      margin:3px 0 0;
+      color:#5f6a72;
+      font-size:.98rem;
+    }
+
+    .stats{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .stat{
+      min-width:108px;
+      text-align:center;
+      background:var(--cream);
+      border:3px solid var(--yellow);
+      border-radius:16px;
+      padding:8px 12px;
+      font-weight:900;
+    }
+
+    .stat span{
+      display:block;
+      color:#6d4c41;
+      font-size:1.2rem;
+    }
+
+    .card{
+      margin-top:18px;
+      background:rgba(255,255,255,.96);
+      border:5px solid var(--green-dark);
+      border-radius:28px;
+      overflow:hidden;
+      box-shadow:var(--shadow);
+    }
+
+    .start-screen,
+    .end-screen{
+      padding:34px 24px 38px;
+      text-align:center;
+    }
+
+    .hero{
+      font-size:clamp(3rem,9vw,6rem);
+      margin:8px 0 14px;
+      letter-spacing:6px;
+    }
+
+    .level-grid{
+      max-width:850px;
+      margin:24px auto;
+      display:grid;
+      grid-template-columns:repeat(3,minmax(150px,1fr));
+      gap:14px;
+    }
+
+    .level-card{
+      border:none;
+      cursor:pointer;
+      font-family:inherit;
+      font-weight:900;
+      color:#5d4037;
+      background:#fff6c7;
+      border:4px solid var(--orange);
+      border-radius:20px;
+      padding:18px 12px;
+      box-shadow:0 7px 0 #d97700;
+      transition:.16s;
+      font-size:1rem;
+    }
+
+    .level-card:hover,
+    .level-card.selected{
+      transform:translateY(-4px);
+      background:#fff29f;
+      border-color:#2a9d8f;
+      box-shadow:0 7px 0 #1f746a;
+    }
+
+    .main-btn,
+    .small-btn,
+    .money-btn,
+    .answer-btn{
+      border:none;
+      font-family:inherit;
+      font-weight:900;
+      cursor:pointer;
+      transition:transform .15s ease, box-shadow .15s ease;
+    }
+
+    .main-btn{
+      background:linear-gradient(#4bc56f,#238d4f);
+      color:white;
+      border:3px solid #166b39;
+      border-radius:18px;
+      padding:13px 25px;
+      font-size:1.05rem;
+      box-shadow:0 6px 0 #166b39;
+    }
+
+    .main-btn.orange{
+      background:linear-gradient(#ffb347,#f47b20);
+      border-color:#c65010;
+      box-shadow:0 6px 0 #c65010;
+    }
+
+    .small-btn{
+      background:white;
+      color:#2c6448;
+      border:3px solid #77bc8b;
+      border-radius:15px;
+      padding:10px 14px;
+      box-shadow:0 5px 0 #4f9d69;
+    }
+
+    button:hover{transform:translateY(-3px)}
+    button:active{transform:translateY(2px);box-shadow:none!important}
+    button:disabled{opacity:.56;cursor:not-allowed}
+
+    .progress-wrap{
+      background:#edf7f0;
+      padding:12px 18px;
+      border-bottom:3px dashed #79b98c;
+    }
+
+    .progress-label{
+      display:flex;
+      justify-content:space-between;
+      font-weight:900;
+      color:#285d43;
+      margin-bottom:7px;
+    }
+
+    .progress-track{
+      height:18px;
+      background:#cce8d4;
+      border:2px solid #78b28a;
+      border-radius:999px;
+      overflow:hidden;
+    }
+
+    .progress-bar{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,#2a9d8f,#ffd166,#ef476f);
+      transition:width .3s ease;
+    }
+
+    .play-area{
+      padding:22px;
+      text-align:center;
+    }
+
+    .instruction{
+      margin:0 0 8px;
+      color:#6d4c41;
+      font-size:clamp(1.2rem,3vw,1.75rem);
+      font-weight:900;
+    }
+
+    .question{
+      margin:0 0 16px;
+      color:#2d5a3c;
+      font-size:clamp(1.45rem,4vw,2.3rem);
+      font-weight:900;
+    }
+
+    .market-layout{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:18px;
+      align-items:stretch;
+    }
+
+    .shop-scene,
+    .money-panel{
+      border:4px solid #85bd90;
+      border-radius:24px;
+      padding:20px;
+    }
+
+    .shop-scene{
+      min-height:440px;
+      position:relative;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 20% 15%,white 0 6%,transparent 7%),
+        linear-gradient(#b8e8ff 0 58%,#f7d69a 58% 100%);
+    }
+
+    .stall{
+      position:absolute;
+      left:50%;
+      bottom:30px;
+      transform:translateX(-50%);
+      width:min(470px,88%);
+      height:260px;
+      background:#f0c97d;
+      border:7px solid #8a5b2b;
+      border-radius:18px 18px 8px 8px;
+      box-shadow:0 12px 0 rgba(0,0,0,.12);
+    }
+
+    .stall::before{
+      content:"";
+      position:absolute;
+      left:-7px;
+      right:-7px;
+      top:-70px;
+      height:70px;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          #ef476f 0 55px,
+          #ffffff 55px 110px
+        );
+      border:7px solid #8a5b2b;
+      border-bottom:none;
+      border-radius:22px 22px 0 0;
+    }
+
+    .stall-title{
+      position:absolute;
+      top:18px;
+      left:50%;
+      transform:translateX(-50%);
+      background:#fff7d5;
+      border:4px solid #9d6a2d;
+      border-radius:14px;
+      padding:8px 18px;
+      font-weight:900;
+      color:#7b4f1d;
+      white-space:nowrap;
+    }
+
+    .product-card{
+      position:absolute;
+      left:50%;
+      top:80px;
+      transform:translateX(-50%);
+      width:180px;
+      min-height:130px;
+      background:#fffdf5;
+      border:4px solid #c49a55;
+      border-radius:18px;
+      padding:12px;
+      box-shadow:0 7px 0 rgba(0,0,0,.1);
+    }
+
+    .product-icon{
+      display:block;
+      font-size:64px;
+      line-height:1;
+      margin-bottom:7px;
+    }
+
+    .product-name{
+      display:block;
+      font-weight:900;
+      color:#5d4037;
+      margin-bottom:4px;
+    }
+
+    .price-tag{
+      display:inline-block;
+      background:#ffd166;
+      border:3px solid #bd8600;
+      border-radius:12px;
+      padding:5px 10px;
+      color:#5b4300;
+      font-size:1.15rem;
+      font-weight:900;
+    }
+
+    .money-panel{
+      background:#fffaf0;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+
+    .money-panel h3{
+      margin:0 0 12px;
+      color:#5b4636;
+    }
+
+    .wallet-total{
+      background:#eef9f2;
+      border:3px solid #65ad7b;
+      border-radius:16px;
+      padding:10px;
+      margin-bottom:14px;
+      font-size:1.15rem;
+      font-weight:900;
+      color:#285d43;
+    }
+
+    .money-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(120px,1fr));
+      gap:12px;
+    }
+
+    .money-btn{
+      min-height:96px;
+      border-radius:18px;
+      color:#3f3328;
+      border:4px solid rgba(0,0,0,.18);
+      box-shadow:0 6px 0 rgba(0,0,0,.22);
+      padding:10px;
+      font-size:1rem;
+      background:#fff1ac;
+    }
+
+    .money-btn .money-shape{
+      display:block;
+      margin:0 auto 6px;
+      font-size:1.1rem;
+      font-weight:900;
+    }
+
+    .coin{
+      width:58px;
+      height:58px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      margin:0 auto 6px;
+      background:linear-gradient(145deg,#f8d26a,#b9861f);
+      border:4px solid #8f6616;
+      color:#5f430c;
+      box-shadow:inset -6px -6px 0 rgba(0,0,0,.1);
+    }
+
+    .note{
+      min-width:95px;
+      height:52px;
+      display:grid;
+      place-items:center;
+      margin:0 auto 6px;
+      border-radius:8px;
+      border:4px solid rgba(0,0,0,.18);
+      color:#fff;
+      text-shadow:0 2px 2px rgba(0,0,0,.25);
+    }
+
+    .note.one{background:#5ca36d}
+    .note.five{background:#5f8ed8}
+    .note.ten{background:#e05c5c}
+
+    .selected-list{
+      min-height:58px;
+      margin-top:14px;
+      background:#fff;
+      border:3px dashed #c49a55;
+      border-radius:14px;
+      padding:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:7px;
+      justify-content:center;
+      align-items:center;
+      color:#6a5436;
+      font-weight:900;
+    }
+
+    .selected-token{
+      background:#fff3c4;
+      border:2px solid #d7a843;
+      border-radius:999px;
+      padding:5px 9px;
+    }
+
+    .answer-panel{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns:repeat(4,minmax(110px,1fr));
+      gap:12px;
+    }
+
+    .answer-btn{
+      min-height:78px;
+      border-radius:18px;
+      border:4px solid #e59c26;
+      background:linear-gradient(#fff29d,#ffd166);
+      box-shadow:0 6px 0 #c77900;
+      color:#5d4037;
+      font-size:1.2rem;
+    }
+
+    .feedback{
+      min-height:44px;
+      margin:16px 0 0;
+      font-size:clamp(1.05rem,3vw,1.45rem);
+      font-weight:900;
+    }
+
+    .feedback.correct{color:#1b7f44}
+    .feedback.wrong{color:#d62828}
+
+    .controls{
+      margin-top:14px;
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .hidden{display:none!important}
+
+    .stars{
+      font-size:clamp(2.5rem,8vw,5rem);
+      letter-spacing:8px;
+      margin:14px 0;
+    }
+
+    .certificate{
+      margin:18px auto 0;
+      max-width:650px;
+      background:#fffcec;
+      border:8px double #d99a19;
+      border-radius:18px;
+      padding:20px;
+    }
+
+    .certificate h2{
+      margin:0 0 8px;
+      color:#315f43;
+    }
+
+    @media(max-width:880px){
+      .market-layout{grid-template-columns:1fr}
+      .shop-scene{min-height:390px}
+    }
+
+    @media(max-width:680px){
+      .header{justify-content:center}
+      .brand{width:100%;justify-content:center;text-align:center}
+      .stats{justify-content:center}
+      .level-grid{grid-template-columns:1fr}
+      .answer-panel{grid-template-columns:repeat(2,1fr)}
+    }
+
+    @media(max-width:430px){
+      .money-grid{grid-template-columns:1fr}
+      .answer-panel{grid-template-columns:1fr}
+      .stall{width:92%}
+      .product-card{width:165px}
+    }
+
+    @media(prefers-reduced-motion:reduce){
+      *{animation:none!important;transition:none!important}
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <div class="brand">
+        <div class="brand-icon">🛒</div>
+        <div>
+          <h1>Money Market Kids</h1>
+          <p class="subtitle">Count Malaysian money, buy items, and work out the change!</p>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">Score <span id="score">0</span></div>
+        <div class="stat">Lives <span id="lives">❤️❤️❤️</span></div>
+        <div class="stat">Level <span id="levelLabel">Easy</span></div>
+      </div>
+    </header>
+
+    <section class="card">
+      <section id="startScreen" class="start-screen">
+        <div class="hero">💵 🪙 🛍️</div>
+        <h2>Welcome to Money Market!</h2>
+        <p>Learn to recognise money, pay the correct amount, and calculate change.</p>
+
+        <div class="level-grid">
+          <button class="level-card selected" data-level="easy">
+            🌱 Money Explorer<br><small>Recognise coins and notes</small>
+          </button>
+          <button class="level-card" data-level="medium">
+            🛍️ Smart Shopper<br><small>Pay the exact amount</small>
+          </button>
+          <button class="level-card" data-level="hard">
+            🧾 Change Champion<br><small>Calculate the correct change</small>
+          </button>
+        </div>
+
+        <button id="startBtn" class="main-btn">▶ Open the Market</button>
+      </section>
+
+      <section id="playScreen" class="hidden">
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span>Market Progress</span>
+            <span id="roundLabel">Round 1 / 10</span>
+          </div>
+          <div class="progress-track">
+            <div id="progressBar" class="progress-bar"></div>
+          </div>
+        </div>
+
+        <div class="play-area">
+          <p class="instruction">Complete the shopping task.</p>
+          <p id="question" class="question">Which money is worth RM1?</p>
+
+          <div class="market-layout">
+            <section class="shop-scene">
+              <div class="stall">
+                <div class="stall-title">Happy Kids Market</div>
+
+                <div class="product-card">
+                  <span id="productIcon" class="product-icon">🍎</span>
+                  <span id="productName" class="product-name">Apple</span>
+                  <span id="priceTag" class="price-tag">RM1.00</span>
+                </div>
+              </div>
+            </section>
+
+            <aside class="money-panel">
+              <h3 id="panelTitle">Choose the correct money</h3>
+              <div id="walletTotal" class="wallet-total">Selected: RM0.00</div>
+              <div id="moneyGrid" class="money-grid"></div>
+              <div id="selectedList" class="selected-list">No money selected yet</div>
+            </aside>
+          </div>
+
+          <div id="answerPanel" class="answer-panel hidden"></div>
+
+          <p id="feedback" class="feedback" aria-live="polite"></p>
+
+          <div class="controls">
+            <button id="submitBtn" class="main-btn hidden">Pay Now</button>
+            <button id="clearBtn" class="small-btn hidden">Clear Selection</button>
+            <button id="soundBtn" class="small-btn">🔊 Sound On</button>
+            <button id="restartBtn" class="small-btn">↻ Restart</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="endScreen" class="end-screen hidden">
+        <div class="hero">🏆 🛒 💵</div>
+        <h2>Market Challenge Complete!</h2>
+        <div id="stars" class="stars">⭐⭐⭐</div>
+        <p id="finalMessage"></p>
+
+        <div class="certificate">
+          <h2>Junior Money Expert Certificate</h2>
+          <p>This certificate is awarded for completing</p>
+          <strong>Money Market Kids</strong>
+          <p id="certificateScore"></p>
+        </div>
+
+        <div class="controls">
+          <button id="playAgainBtn" class="main-btn">Shop Again</button>
+          <button id="homeBtn" class="main-btn orange">Choose Level</button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const money = [
+      {label:"5 sen", value:0.05, type:"coin"},
+      {label:"10 sen", value:0.10, type:"coin"},
+      {label:"20 sen", value:0.20, type:"coin"},
+      {label:"50 sen", value:0.50, type:"coin"},
+      {label:"RM1", value:1.00, type:"note", className:"one"},
+      {label:"RM5", value:5.00, type:"note", className:"five"},
+      {label:"RM10", value:10.00, type:"note", className:"ten"}
+    ];
+
+    const products = [
+      {name:"Apple", icon:"🍎", price:1.00},
+      {name:"Juice", icon:"🧃", price:1.50},
+      {name:"Bread", icon:"🍞", price:2.00},
+      {name:"Toy Car", icon:"🚗", price:3.00},
+      {name:"Book", icon:"📘", price:4.00},
+      {name:"Ball", icon:"⚽", price:5.00},
+      {name:"Lunch Box", icon:"🍱", price:6.00},
+      {name:"Puzzle", icon:"🧩", price:7.00}
+    ];
+
+    const levelConfig = {
+      easy:{label:"Easy", rounds:10, mode:"recognise"},
+      medium:{label:"Medium", rounds:10, mode:"pay"},
+      hard:{label:"Hard", rounds:12, mode:"change"}
+    };
+
+    let selectedLevel = "easy";
+    let round = 0;
+    let score = 0;
+    let lives = 3;
+    let correctCount = 0;
+    let soundOn = true;
+    let locked = false;
+    let selectedMoney = [];
+    let currentProduct = products[0];
+    let targetValue = 1;
+    let paymentValue = 0;
+    let correctAnswer = 0;
+
+    const startScreen = document.getElementById("startScreen");
+    const playScreen = document.getElementById("playScreen");
+    const endScreen = document.getElementById("endScreen");
+    const scoreEl = document.getElementById("score");
+    const livesEl = document.getElementById("lives");
+    const levelLabel = document.getElementById("levelLabel");
+    const roundLabel = document.getElementById("roundLabel");
+    const progressBar = document.getElementById("progressBar");
+    const questionEl = document.getElementById("question");
+    const productIcon = document.getElementById("productIcon");
+    const productName = document.getElementById("productName");
+    const priceTag = document.getElementById("priceTag");
+    const panelTitle = document.getElementById("panelTitle");
+    const walletTotal = document.getElementById("walletTotal");
+    const moneyGrid = document.getElementById("moneyGrid");
+    const selectedList = document.getElementById("selectedList");
+    const answerPanel = document.getElementById("answerPanel");
+    const feedback = document.getElementById("feedback");
+    const submitBtn = document.getElementById("submitBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const soundBtn = document.getElementById("soundBtn");
+    const stars = document.getElementById("stars");
+    const finalMessage = document.getElementById("finalMessage");
+    const certificateScore = document.getElementById("certificateScore");
+
+    document.querySelectorAll(".level-card").forEach(card => {
+      card.addEventListener("click", () => {
+        document.querySelectorAll(".level-card").forEach(c => c.classList.remove("selected"));
+        card.classList.add("selected");
+        selectedLevel = card.dataset.level;
+        levelLabel.textContent = levelConfig[selectedLevel].label;
+      });
+    });
+
+    document.getElementById("startBtn").addEventListener("click", startGame);
+    document.getElementById("restartBtn").addEventListener("click", startGame);
+    document.getElementById("playAgainBtn").addEventListener("click", startGame);
+    document.getElementById("homeBtn").addEventListener("click", showHome);
+    submitBtn.addEventListener("click", submitPayment);
+    clearBtn.addEventListener("click", clearSelection);
+
+    soundBtn.addEventListener("click", () => {
+      soundOn = !soundOn;
+      soundBtn.textContent = soundOn ? "🔊 Sound On" : "🔇 Sound Off";
+    });
+
+    function startGame(){
+      round = 0;
+      score = 0;
+      lives = 3;
+      correctCount = 0;
+      locked = false;
+      selectedMoney = [];
+
+      updateStats();
+      startScreen.classList.add("hidden");
+      endScreen.classList.add("hidden");
+      playScreen.classList.remove("hidden");
+
+      nextRound();
+    }
+
+    function showHome(){
+      playScreen.classList.add("hidden");
+      endScreen.classList.add("hidden");
+      startScreen.classList.remove("hidden");
+    }
+
+    function nextRound(){
+      const config = levelConfig[selectedLevel];
+
+      if(round >= config.rounds || lives <= 0){
+        finishGame();
+        return;
+      }
+
+      round++;
+      locked = false;
+      selectedMoney = [];
+      feedback.textContent = "";
+      feedback.className = "feedback";
+      answerPanel.classList.add("hidden");
+      answerPanel.innerHTML = "";
+      submitBtn.classList.add("hidden");
+      clearBtn.classList.add("hidden");
+
+      currentProduct = randomChoice(products);
+      productIcon.textContent = currentProduct.icon;
+      productName.textContent = currentProduct.name;
+      priceTag.textContent = formatRM(currentProduct.price);
+
+      if(config.mode === "recognise"){
+        setupRecogniseRound();
+      }else if(config.mode === "pay"){
+        setupPayRound();
+      }else{
+        setupChangeRound();
+      }
+
+      roundLabel.textContent = `Round ${round} / ${config.rounds}`;
+      progressBar.style.width = `${(round/config.rounds)*100}%`;
+    }
+
+    function setupRecogniseRound(){
+      const chosen = randomChoice(money);
+      targetValue = chosen.value;
+      questionEl.textContent = `Which money is worth ${chosen.label}?`;
+      panelTitle.textContent = "Choose the correct money";
+      walletTotal.textContent = "Tap one answer";
+      selectedList.textContent = "Look carefully at the value";
+      renderRecognitionOptions(chosen);
+    }
+
+    function setupPayRound(){
+      currentProduct = randomChoice(products.filter(p => p.price <= 5));
+      productIcon.textContent = currentProduct.icon;
+      productName.textContent = currentProduct.name;
+      priceTag.textContent = formatRM(currentProduct.price);
+
+      targetValue = currentProduct.price;
+      questionEl.textContent = `Pay exactly ${formatRM(targetValue)} for the ${currentProduct.name}.`;
+      panelTitle.textContent = "Choose money for payment";
+      submitBtn.classList.remove("hidden");
+      clearBtn.classList.remove("hidden");
+      renderMoneySelection();
+      updateSelectedDisplay();
+    }
+
+    function setupChangeRound(){
+      currentProduct = randomChoice(products.filter(p => p.price >= 1 && p.price <= 7));
+      productIcon.textContent = currentProduct.icon;
+      productName.textContent = currentProduct.name;
+      priceTag.textContent = formatRM(currentProduct.price);
+
+      const possiblePayments = [5,10].filter(v => v > currentProduct.price);
+      paymentValue = randomChoice(possiblePayments);
+      correctAnswer = +(paymentValue - currentProduct.price).toFixed(2);
+
+      questionEl.textContent =
+        `You pay ${formatRM(paymentValue)} for the ${currentProduct.name}. How much change?`;
+
+      panelTitle.textContent = "Choose the correct change";
+      walletTotal.textContent = `Paid: ${formatRM(paymentValue)}`;
+      selectedList.textContent = `Price: ${formatRM(currentProduct.price)}`;
+      renderChangeOptions(correctAnswer);
+    }
+
+    function renderRecognitionOptions(correctMoney){
+      moneyGrid.innerHTML = "";
+      const choices = [correctMoney];
+
+      for(const item of shuffle([...money])){
+        if(!choices.find(x => x.label === item.label)){
+          choices.push(item);
+        }
+        if(choices.length === 4) break;
+      }
+
+      shuffle(choices).forEach(item => {
+        const button = createMoneyButton(item);
+        button.addEventListener("click",() => checkRecognition(item.value));
+        moneyGrid.appendChild(button);
+      });
+    }
+
+    function renderMoneySelection(){
+      moneyGrid.innerHTML = "";
+
+      money.filter(item => item.value <= 5).forEach(item => {
+        const button = createMoneyButton(item);
+        button.addEventListener("click",() => addMoney(item));
+        moneyGrid.appendChild(button);
+      });
+    }
+
+    function renderChangeOptions(answer){
+      moneyGrid.innerHTML = "";
+      answerPanel.classList.remove("hidden");
+
+      const choices = new Set([answer]);
+      while(choices.size < 4){
+        let candidate = answer + randomChoice([-2,-1,-0.5,0.5,1,2]);
+        candidate = Math.max(0,Math.round(candidate*20)/20);
+        if(candidate !== answer) choices.add(+candidate.toFixed(2));
+      }
+
+      shuffle([...choices]).forEach(value => {
+        const button = document.createElement("button");
+        button.className = "answer-btn";
+        button.textContent = formatRM(value);
+        button.addEventListener("click",() => checkChange(value));
+        answerPanel.appendChild(button);
+      });
+    }
+
+    function createMoneyButton(item){
+      const button = document.createElement("button");
+      button.className = "money-btn";
+
+      if(item.type === "coin"){
+        button.innerHTML = `
+          <span class="coin">${item.label.replace(" sen","")}</span>
+          <span>${item.label}</span>
+        `;
+      }else{
+        button.innerHTML = `
+          <span class="note ${item.className}">${item.label}</span>
+          <span>${item.label}</span>
+        `;
+      }
+
+      return button;
+    }
+
+    function addMoney(item){
+      if(locked) return;
+      selectedMoney.push(item);
+      updateSelectedDisplay();
+      playTone(520,.06);
+    }
+
+    function updateSelectedDisplay(){
+      const total = selectedMoney.reduce((sum,item) => sum + item.value,0);
+      walletTotal.textContent = `Selected: ${formatRM(total)}`;
+
+      if(selectedMoney.length === 0){
+        selectedList.textContent = "No money selected yet";
+        return;
+      }
+
+      selectedList.innerHTML = "";
+      selectedMoney.forEach(item => {
+        const token = document.createElement("span");
+        token.className = "selected-token";
+        token.textContent = item.label;
+        selectedList.appendChild(token);
+      });
+    }
+
+    function clearSelection(){
+      if(locked) return;
+      selectedMoney = [];
+      updateSelectedDisplay();
+    }
+
+    function submitPayment(){
+      if(locked) return;
+      const total = +selectedMoney.reduce((sum,item) => sum + item.value,0).toFixed(2);
+      checkResult(total === targetValue,
+        `Correct! You paid exactly ${formatRM(targetValue)}. 🛍️`,
+        `Good try! You selected ${formatRM(total)}. The price is ${formatRM(targetValue)}.`
+      );
+    }
+
+    function checkRecognition(value){
+      if(locked) return;
+      checkResult(
+        value === targetValue,
+        "Correct! You recognised the money! 💵",
+        `Good try! The correct value is ${formatRM(targetValue)}.`
+      );
+    }
+
+    function checkChange(value){
+      if(locked) return;
+      checkResult(
+        value === correctAnswer,
+        `Correct! The change is ${formatRM(correctAnswer)}. 🧾`,
+        `Good try! The correct change is ${formatRM(correctAnswer)}.`
+      );
+    }
+
+    function checkResult(isCorrect,correctMessage,wrongMessage){
+      locked = true;
+      document.querySelectorAll("button").forEach(btn => {
+        if(btn.closest("#playScreen") && !btn.matches("#soundBtn,#restartBtn")){
+          btn.disabled = true;
+        }
+      });
+
+      if(isCorrect){
+        score += selectedLevel === "hard" ? 15 : 10;
+        correctCount++;
+        feedback.textContent = randomChoice([
+          correctMessage,
+          "Excellent shopping maths! ⭐",
+          "Great job, Money Expert! 🎉"
+        ]);
+        feedback.classList.add("correct");
+        playSuccess();
+      }else{
+        lives--;
+        feedback.textContent = wrongMessage;
+        feedback.classList.add("wrong");
+        playTone(180,.22);
+      }
+
+      updateStats();
+      setTimeout(() => nextRound(),1200);
+    }
+
+    function updateStats(){
+      scoreEl.textContent = score;
+      livesEl.textContent = lives > 0 ? "❤️".repeat(lives) : "💔";
+      levelLabel.textContent = levelConfig[selectedLevel].label;
+    }
+
+    function finishGame(){
+      playScreen.classList.add("hidden");
+      endScreen.classList.remove("hidden");
+
+      const total = levelConfig[selectedLevel].rounds;
+      const accuracy = Math.round((correctCount/total)*100);
+
+      if(accuracy >= 80){
+        stars.textContent = "⭐⭐⭐";
+        finalMessage.textContent = "Outstanding! You are a Junior Money Master!";
+      }else if(accuracy >= 50){
+        stars.textContent = "⭐⭐";
+        finalMessage.textContent = "Great work! Your shopping maths is improving.";
+      }else{
+        stars.textContent = "⭐";
+        finalMessage.textContent = "Nice effort! Keep practising money skills.";
+      }
+
+      certificateScore.textContent =
+        `Final Score: ${score} points • ${accuracy}% accuracy`;
+
+      playSuccess();
+    }
+
+    function formatRM(value){
+      return `RM${Number(value).toFixed(2)}`;
+    }
+
+    function randomChoice(items){
+      return items[Math.floor(Math.random()*items.length)];
+    }
+
+    function shuffle(items){
+      for(let i=items.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*(i+1));
+        [items[i],items[j]]=[items[j],items[i]];
+      }
+      return items;
+    }
+
+    function playSuccess(){
+      if(!soundOn) return;
+      playTone(523,.12);
+      setTimeout(() => playTone(659,.12),120);
+      setTimeout(() => playTone(784,.18),240);
+    }
+
+    function playTone(frequency,duration){
+      if(!soundOn) return;
+
+      const AudioContext=window.AudioContext||window.webkitAudioContext;
+      if(!AudioContext) return;
+
+      const context=new AudioContext();
+      const oscillator=context.createOscillator();
+      const gain=context.createGain();
+
+      oscillator.type="sine";
+      oscillator.frequency.value=frequency;
+      gain.gain.setValueAtTime(.12,context.currentTime);
+      gain.gain.exponentialRampToValueAtTime(.001,context.currentTime+duration);
+
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+
+      oscillator.start();
+      oscillator.stop(context.currentTime+duration);
+      oscillator.addEventListener("ended",()=>context.close());
+    }
+  </script>
+<a class="mth-back-link" href="../" aria-label="Back to all games">← All Games</a>
+<style>.mth-back-link{position:fixed;top:12px;left:12px;z-index:9999;padding:9px 13px;border-radius:999px;color:#fff!important;background:#0f2747;text-decoration:none;font:800 13px/1.2 "Segoe UI",Arial,sans-serif;box-shadow:0 5px 14px #0004}.mth-back-link:hover,.mth-back-link:focus{background:#1d4ed8;outline:3px solid #bfdbfe}@media(max-width:520px){.mth-back-link{top:7px;left:7px;padding:7px 10px;font-size:11px}}</style>
+</body>
+</html>

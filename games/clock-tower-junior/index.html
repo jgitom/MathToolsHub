@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clock Tower Junior</title>
+  <style>
+    :root{
+      --sky:#8ed8ff;
+      --grass:#78c85b;
+      --cream:#fff8e7;
+      --yellow:#ffd166;
+      --orange:#ff9f1c;
+      --green:#2a9d8f;
+      --blue:#277da1;
+      --red:#ef476f;
+      --purple:#9b5de5;
+      --brown:#8d6e63;
+      --dark:#263238;
+      --white:#ffffff;
+      --shadow:0 14px 30px rgba(0,0,0,.18);
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:"Trebuchet MS", Arial, sans-serif;
+      color:var(--dark);
+      background:
+        radial-gradient(circle at 14% 12%,rgba(255,255,255,.7) 0 5%,transparent 6%),
+        linear-gradient(var(--sky) 0 56%,var(--grass) 56% 100%);
+      overflow-x:hidden;
+    }
+
+    .app{
+      width:min(1120px,95vw);
+      margin:20px auto 30px;
+    }
+
+    .header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      flex-wrap:wrap;
+      background:rgba(255,255,255,.95);
+      border:5px solid #477a58;
+      border-radius:24px;
+      padding:15px 20px;
+      box-shadow:var(--shadow);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:13px;
+    }
+
+    .brand-icon{
+      font-size:clamp(2.5rem,6vw,4rem);
+    }
+
+    h1{
+      margin:0;
+      color:#315f43;
+      font-size:clamp(1.8rem,4vw,3rem);
+    }
+
+    .subtitle{
+      margin:3px 0 0;
+      color:#5f6a72;
+      font-size:.98rem;
+    }
+
+    .stats{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .stat{
+      min-width:105px;
+      text-align:center;
+      background:var(--cream);
+      border:3px solid var(--yellow);
+      border-radius:16px;
+      padding:8px 12px;
+      font-weight:900;
+    }
+
+    .stat span{
+      display:block;
+      color:#6d4c41;
+      font-size:1.2rem;
+    }
+
+    .card{
+      margin-top:18px;
+      background:rgba(255,255,255,.96);
+      border:5px solid #477a58;
+      border-radius:28px;
+      overflow:hidden;
+      box-shadow:var(--shadow);
+    }
+
+    .start-screen,
+    .end-screen{
+      padding:34px 24px 38px;
+      text-align:center;
+    }
+
+    .hero{
+      font-size:clamp(3rem,9vw,6rem);
+      margin:8px 0 14px;
+      letter-spacing:6px;
+    }
+
+    .level-grid{
+      max-width:830px;
+      margin:24px auto;
+      display:grid;
+      grid-template-columns:repeat(3,minmax(150px,1fr));
+      gap:14px;
+    }
+
+    .level-card{
+      border:none;
+      cursor:pointer;
+      font-family:inherit;
+      font-weight:900;
+      color:#5d4037;
+      background:#fff6c7;
+      border:4px solid var(--orange);
+      border-radius:20px;
+      padding:18px 12px;
+      box-shadow:0 7px 0 #d97700;
+      transition:.16s;
+      font-size:1rem;
+    }
+
+    .level-card:hover,
+    .level-card.selected{
+      transform:translateY(-4px);
+      background:#fff29f;
+      border-color:var(--green);
+      box-shadow:0 7px 0 #1f746a;
+    }
+
+    .main-btn,
+    .small-btn,
+    .answer-btn{
+      border:none;
+      font-family:inherit;
+      font-weight:900;
+      cursor:pointer;
+      transition:transform .15s ease,box-shadow .15s ease;
+    }
+
+    .main-btn{
+      background:linear-gradient(#4bc56f,#238d4f);
+      color:white;
+      border:3px solid #166b39;
+      border-radius:18px;
+      padding:13px 25px;
+      font-size:1.05rem;
+      box-shadow:0 6px 0 #166b39;
+    }
+
+    .main-btn.orange{
+      background:linear-gradient(#ffb347,#f47b20);
+      border-color:#c65010;
+      box-shadow:0 6px 0 #c65010;
+    }
+
+    .small-btn{
+      background:white;
+      color:#2c6448;
+      border:3px solid #77bc8b;
+      border-radius:15px;
+      padding:10px 14px;
+      box-shadow:0 5px 0 #4f9d69;
+    }
+
+    button:hover{transform:translateY(-3px)}
+    button:active{transform:translateY(2px);box-shadow:none!important}
+    button:disabled{opacity:.58;cursor:not-allowed}
+
+    .progress-wrap{
+      background:#edf7f0;
+      padding:12px 18px;
+      border-bottom:3px dashed #79b98c;
+    }
+
+    .progress-label{
+      display:flex;
+      justify-content:space-between;
+      font-weight:900;
+      color:#285d43;
+      margin-bottom:7px;
+    }
+
+    .progress-track{
+      height:18px;
+      background:#cce8d4;
+      border:2px solid #78b28a;
+      border-radius:999px;
+      overflow:hidden;
+    }
+
+    .progress-bar{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,#2a9d8f,#ffd166,#ef476f);
+      transition:width .3s ease;
+    }
+
+    .play-area{
+      padding:22px;
+      text-align:center;
+    }
+
+    .instruction{
+      margin:0 0 8px;
+      color:#6d4c41;
+      font-size:clamp(1.2rem,3vw,1.8rem);
+      font-weight:900;
+    }
+
+    .question{
+      margin:0 0 16px;
+      color:#315f43;
+      font-size:clamp(1.5rem,4vw,2.3rem);
+      font-weight:900;
+    }
+
+    .game-layout{
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:18px;
+      align-items:stretch;
+    }
+
+    .tower-scene,
+    .answer-panel{
+      border:4px solid #86bb92;
+      border-radius:24px;
+      padding:20px;
+    }
+
+    .tower-scene{
+      min-height:470px;
+      position:relative;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 20% 15%,white 0 6%,transparent 7%),
+        radial-gradient(circle at 76% 11%,white 0 5%,transparent 6%),
+        linear-gradient(#b8e8ff 0 70%,#8fd06f 70% 100%);
+    }
+
+    .tower{
+      position:absolute;
+      left:50%;
+      bottom:0;
+      transform:translateX(-50%);
+      width:285px;
+      height:375px;
+      background:#d9b27c;
+      border:7px solid #7a5736;
+      border-radius:16px 16px 0 0;
+      box-shadow:0 12px 0 rgba(0,0,0,.12);
+    }
+
+    .tower::before{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:-90px;
+      transform:translateX(-50%);
+      width:0;
+      height:0;
+      border-left:165px solid transparent;
+      border-right:165px solid transparent;
+      border-bottom:105px solid #b84444;
+      filter:drop-shadow(0 -5px 0 #7c2e2e);
+    }
+
+    .tower-door{
+      position:absolute;
+      left:50%;
+      bottom:0;
+      transform:translateX(-50%);
+      width:76px;
+      height:112px;
+      background:#6f472c;
+      border:5px solid #4b2f1d;
+      border-radius:10px 10px 0 0;
+    }
+
+    .clock{
+      position:absolute;
+      left:50%;
+      top:48px;
+      transform:translateX(-50%);
+      width:210px;
+      height:210px;
+      border-radius:50%;
+      background:#fffef5;
+      border:12px solid #65462d;
+      box-shadow:
+        inset 0 0 0 5px #d9c394,
+        0 10px 0 rgba(0,0,0,.1);
+    }
+
+    .clock-number{
+      position:absolute;
+      left:50%;
+      top:50%;
+      width:30px;
+      height:30px;
+      margin:-15px;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      color:#3d3026;
+      transform:
+        rotate(calc(var(--i) * 30deg))
+        translateY(-78px)
+        rotate(calc(var(--i) * -30deg));
+    }
+
+    .hand{
+      position:absolute;
+      left:50%;
+      bottom:50%;
+      transform-origin:bottom center;
+      border-radius:999px;
+      transition:transform .45s ease;
+      z-index:2;
+    }
+
+    .hour-hand{
+      width:9px;
+      height:58px;
+      background:#2e4053;
+      margin-left:-4.5px;
+    }
+
+    .minute-hand{
+      width:6px;
+      height:78px;
+      background:#ef476f;
+      margin-left:-3px;
+    }
+
+    .clock-pin{
+      position:absolute;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%);
+      width:22px;
+      height:22px;
+      border-radius:50%;
+      background:#ffd166;
+      border:5px solid #7a5d00;
+      z-index:3;
+    }
+
+    .answer-panel{
+      background:#fffaf0;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+
+    .answer-panel h3{
+      margin:0 0 14px;
+      color:#5b4636;
+    }
+
+    .answers{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    .answer-btn{
+      min-height:92px;
+      border-radius:20px;
+      border:4px solid #e59c26;
+      background:linear-gradient(#fff29d,#ffd166);
+      box-shadow:0 7px 0 #c77900;
+      color:#5d4037;
+      font-size:clamp(1.25rem,3vw,1.8rem);
+    }
+
+    .feedback{
+      min-height:44px;
+      margin:16px 0 0;
+      font-size:clamp(1.05rem,3vw,1.45rem);
+      font-weight:900;
+    }
+
+    .feedback.correct{color:#1b7f44}
+    .feedback.wrong{color:#d62828}
+
+    .controls{
+      margin-top:14px;
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .bell{
+      position:absolute;
+      top:12px;
+      right:18px;
+      font-size:42px;
+      animation:ring 2.2s ease-in-out infinite;
+      transform-origin:top center;
+    }
+
+    @keyframes ring{
+      0%,80%,100%{transform:rotate(0)}
+      85%{transform:rotate(12deg)}
+      90%{transform:rotate(-12deg)}
+      95%{transform:rotate(8deg)}
+    }
+
+    .correct-flash{
+      animation:flash .45s ease;
+    }
+
+    @keyframes flash{
+      0%,100%{filter:brightness(1)}
+      50%{filter:brightness(1.35)}
+    }
+
+    .hidden{display:none!important}
+
+    .stars{
+      font-size:clamp(2.5rem,8vw,5rem);
+      letter-spacing:8px;
+      margin:14px 0;
+    }
+
+    .certificate{
+      margin:18px auto 0;
+      max-width:650px;
+      background:#fffcec;
+      border:8px double #d99a19;
+      border-radius:18px;
+      padding:20px;
+    }
+
+    .certificate h2{
+      margin:0 0 8px;
+      color:#315f43;
+    }
+
+    @media(max-width:850px){
+      .game-layout{grid-template-columns:1fr}
+      .tower-scene{min-height:440px}
+    }
+
+    @media(max-width:650px){
+      .header{justify-content:center}
+      .brand{width:100%;justify-content:center;text-align:center}
+      .stats{justify-content:center}
+      .level-grid{grid-template-columns:1fr}
+      .answers{grid-template-columns:1fr 1fr}
+    }
+
+    @media(max-width:430px){
+      .answers{grid-template-columns:1fr}
+      .tower{width:245px;height:345px}
+      .clock{width:185px;height:185px}
+      .clock-number{
+        transform:
+          rotate(calc(var(--i) * 30deg))
+          translateY(-68px)
+          rotate(calc(var(--i) * -30deg));
+      }
+      .minute-hand{height:67px}
+      .hour-hand{height:50px}
+    }
+
+    @media(prefers-reduced-motion:reduce){
+      *{animation:none!important;transition:none!important}
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <div class="brand">
+        <div class="brand-icon">🕰️</div>
+        <div>
+          <h1>Clock Tower Junior</h1>
+          <p class="subtitle">Read the clock and choose the correct time!</p>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">Score <span id="score">0</span></div>
+        <div class="stat">Lives <span id="lives">❤️❤️❤️</span></div>
+        <div class="stat">Level <span id="levelLabel">Easy</span></div>
+      </div>
+    </header>
+
+    <section class="card">
+      <section id="startScreen" class="start-screen">
+        <div class="hero">🏰 🕰️ 🔔</div>
+        <h2>Welcome to the Clock Tower!</h2>
+        <p>Look carefully at the clock hands and choose the correct time.</p>
+
+        <div class="level-grid">
+          <button class="level-card selected" data-level="easy">
+            🌱 Hour Explorer<br><small>O'clock times</small>
+          </button>
+          <button class="level-card" data-level="medium">
+            🕧 Half-Hour Hero<br><small>O'clock and half past</small>
+          </button>
+          <button class="level-card" data-level="hard">
+            👑 Time Master<br><small>Quarter past and quarter to</small>
+          </button>
+        </div>
+
+        <button id="startBtn" class="main-btn">▶ Enter the Tower</button>
+      </section>
+
+      <section id="playScreen" class="hidden">
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span>Clock Tower Progress</span>
+            <span id="roundLabel">Round 1 / 10</span>
+          </div>
+          <div class="progress-track">
+            <div id="progressBar" class="progress-bar"></div>
+          </div>
+        </div>
+
+        <div class="play-area">
+          <p class="instruction">What time does the clock show?</p>
+          <p id="question" class="question">Choose the correct time.</p>
+
+          <div class="game-layout">
+            <section class="tower-scene">
+              <div class="bell">🔔</div>
+
+              <div class="tower">
+                <div id="clock" class="clock">
+                  <div class="clock-number" style="--i:0">12</div>
+                  <div class="clock-number" style="--i:1">1</div>
+                  <div class="clock-number" style="--i:2">2</div>
+                  <div class="clock-number" style="--i:3">3</div>
+                  <div class="clock-number" style="--i:4">4</div>
+                  <div class="clock-number" style="--i:5">5</div>
+                  <div class="clock-number" style="--i:6">6</div>
+                  <div class="clock-number" style="--i:7">7</div>
+                  <div class="clock-number" style="--i:8">8</div>
+                  <div class="clock-number" style="--i:9">9</div>
+                  <div class="clock-number" style="--i:10">10</div>
+                  <div class="clock-number" style="--i:11">11</div>
+
+                  <div id="hourHand" class="hand hour-hand"></div>
+                  <div id="minuteHand" class="hand minute-hand"></div>
+                  <div class="clock-pin"></div>
+                </div>
+
+                <div class="tower-door"></div>
+              </div>
+            </section>
+
+            <aside class="answer-panel">
+              <h3>Choose the correct time</h3>
+              <div id="answers" class="answers"></div>
+            </aside>
+          </div>
+
+          <p id="feedback" class="feedback" aria-live="polite"></p>
+
+          <div class="controls">
+            <button id="soundBtn" class="small-btn">🔊 Sound On</button>
+            <button id="restartBtn" class="small-btn">↻ Restart</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="endScreen" class="end-screen hidden">
+        <div class="hero">🏆 🕰️ 🌟</div>
+        <h2>Clock Tower Complete!</h2>
+        <div id="stars" class="stars">⭐⭐⭐</div>
+        <p id="finalMessage"></p>
+
+        <div class="certificate">
+          <h2>Junior Timekeeper Certificate</h2>
+          <p>This certificate is awarded for completing</p>
+          <strong>Clock Tower Junior</strong>
+          <p id="certificateScore"></p>
+        </div>
+
+        <div class="controls">
+          <button id="playAgainBtn" class="main-btn">Play Again</button>
+          <button id="homeBtn" class="main-btn orange">Choose Level</button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const levelConfig = {
+      easy:{
+        label:"Easy",
+        rounds:10,
+        minutes:[0]
+      },
+      medium:{
+        label:"Medium",
+        rounds:10,
+        minutes:[0,30]
+      },
+      hard:{
+        label:"Hard",
+        rounds:12,
+        minutes:[0,15,30,45]
+      }
+    };
+
+    let selectedLevel = "easy";
+    let round = 0;
+    let score = 0;
+    let lives = 3;
+    let correctCount = 0;
+    let currentHour = 1;
+    let currentMinute = 0;
+    let correctAnswer = "";
+    let soundOn = true;
+    let locked = false;
+
+    const startScreen = document.getElementById("startScreen");
+    const playScreen = document.getElementById("playScreen");
+    const endScreen = document.getElementById("endScreen");
+    const scoreEl = document.getElementById("score");
+    const livesEl = document.getElementById("lives");
+    const levelLabel = document.getElementById("levelLabel");
+    const roundLabel = document.getElementById("roundLabel");
+    const progressBar = document.getElementById("progressBar");
+    const hourHand = document.getElementById("hourHand");
+    const minuteHand = document.getElementById("minuteHand");
+    const answers = document.getElementById("answers");
+    const feedback = document.getElementById("feedback");
+    const clock = document.getElementById("clock");
+    const soundBtn = document.getElementById("soundBtn");
+    const stars = document.getElementById("stars");
+    const finalMessage = document.getElementById("finalMessage");
+    const certificateScore = document.getElementById("certificateScore");
+
+    document.querySelectorAll(".level-card").forEach(card => {
+      card.addEventListener("click", () => {
+        document.querySelectorAll(".level-card").forEach(c => c.classList.remove("selected"));
+        card.classList.add("selected");
+        selectedLevel = card.dataset.level;
+        levelLabel.textContent = levelConfig[selectedLevel].label;
+      });
+    });
+
+    document.getElementById("startBtn").addEventListener("click", startGame);
+    document.getElementById("restartBtn").addEventListener("click", startGame);
+    document.getElementById("playAgainBtn").addEventListener("click", startGame);
+    document.getElementById("homeBtn").addEventListener("click", showHome);
+
+    soundBtn.addEventListener("click", () => {
+      soundOn = !soundOn;
+      soundBtn.textContent = soundOn ? "🔊 Sound On" : "🔇 Sound Off";
+    });
+
+    function startGame(){
+      round = 0;
+      score = 0;
+      lives = 3;
+      correctCount = 0;
+      locked = false;
+
+      updateStats();
+      startScreen.classList.add("hidden");
+      endScreen.classList.add("hidden");
+      playScreen.classList.remove("hidden");
+
+      nextRound();
+    }
+
+    function showHome(){
+      playScreen.classList.add("hidden");
+      endScreen.classList.add("hidden");
+      startScreen.classList.remove("hidden");
+    }
+
+    function nextRound(){
+      const config = levelConfig[selectedLevel];
+
+      if(round >= config.rounds || lives <= 0){
+        finishGame();
+        return;
+      }
+
+      round++;
+      locked = false;
+      feedback.textContent = "";
+      feedback.className = "feedback";
+
+      currentHour = randomInt(1,12);
+      currentMinute = randomChoice(config.minutes);
+      correctAnswer = formatTime(currentHour,currentMinute);
+
+      setClock(currentHour,currentMinute);
+      renderAnswers();
+
+      roundLabel.textContent = `Round ${round} / ${config.rounds}`;
+      progressBar.style.width = `${(round/config.rounds)*100}%`;
+    }
+
+    function setClock(hour,minute){
+      const minuteDegrees = minute * 6;
+      const hourDegrees = (hour % 12) * 30 + minute * .5;
+
+      minuteHand.style.transform = `rotate(${minuteDegrees}deg)`;
+      hourHand.style.transform = `rotate(${hourDegrees}deg)`;
+    }
+
+    function renderAnswers(){
+      answers.innerHTML = "";
+
+      const choices = new Set([correctAnswer]);
+
+      while(choices.size < 4){
+        let hour = currentHour + randomInt(-3,3);
+
+        while(hour < 1) hour += 12;
+        while(hour > 12) hour -= 12;
+
+        const minutes = levelConfig[selectedLevel].minutes;
+        const minute = randomChoice(minutes);
+        choices.add(formatTime(hour,minute));
+      }
+
+      shuffle([...choices]).forEach(time => {
+        const button = document.createElement("button");
+        button.className = "answer-btn";
+        button.textContent = time;
+        button.addEventListener("click",() => checkAnswer(time));
+        answers.appendChild(button);
+      });
+    }
+
+    function checkAnswer(selected){
+      if(locked) return;
+      locked = true;
+
+      document.querySelectorAll(".answer-btn").forEach(btn => btn.disabled = true);
+
+      if(selected === correctAnswer){
+        score += selectedLevel === "hard" ? 15 : 10;
+        correctCount++;
+
+        feedback.textContent = randomChoice([
+          "Correct! The clock tower bell rings! 🔔",
+          "Excellent time reading! 🕰️",
+          "Great job, Junior Timekeeper! ⭐"
+        ]);
+        feedback.classList.add("correct");
+        clock.classList.add("correct-flash");
+
+        playBell();
+        setTimeout(() => clock.classList.remove("correct-flash"),500);
+      }else{
+        lives--;
+        feedback.textContent = `Good try! The correct time is ${correctAnswer}.`;
+        feedback.classList.add("wrong");
+        playTone(180,.22);
+      }
+
+      updateStats();
+      setTimeout(() => nextRound(),1100);
+    }
+
+    function formatTime(hour,minute){
+      return `${hour}:${String(minute).padStart(2,"0")}`;
+    }
+
+    function updateStats(){
+      scoreEl.textContent = score;
+      livesEl.textContent = lives > 0 ? "❤️".repeat(lives) : "💔";
+      levelLabel.textContent = levelConfig[selectedLevel].label;
+    }
+
+    function finishGame(){
+      playScreen.classList.add("hidden");
+      endScreen.classList.remove("hidden");
+
+      const total = levelConfig[selectedLevel].rounds;
+      const accuracy = Math.round((correctCount/total)*100);
+
+      if(accuracy >= 80){
+        stars.textContent = "⭐⭐⭐";
+        finalMessage.textContent = "Outstanding! You are a Clock Tower Master!";
+      }else if(accuracy >= 50){
+        stars.textContent = "⭐⭐";
+        finalMessage.textContent = "Great work! Your time-reading skills are growing.";
+      }else{
+        stars.textContent = "⭐";
+        finalMessage.textContent = "Nice effort! Keep practising how to read clocks.";
+      }
+
+      certificateScore.textContent =
+        `Final Score: ${score} points • ${accuracy}% accuracy`;
+
+      playTone(523,.14);
+      setTimeout(() => playTone(659,.14),140);
+      setTimeout(() => playTone(784,.25),280);
+    }
+
+    function randomInt(min,max){
+      return Math.floor(Math.random()*(max-min+1))+min;
+    }
+
+    function randomChoice(items){
+      return items[Math.floor(Math.random()*items.length)];
+    }
+
+    function shuffle(items){
+      for(let i=items.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*(i+1));
+        [items[i],items[j]]=[items[j],items[i]];
+      }
+      return items;
+    }
+
+    function playBell(){
+      if(!soundOn) return;
+      playTone(784,.18);
+      setTimeout(() => playTone(988,.22),150);
+    }
+
+    function playTone(frequency,duration){
+      if(!soundOn) return;
+
+      const AudioContext=window.AudioContext||window.webkitAudioContext;
+      if(!AudioContext) return;
+
+      const context=new AudioContext();
+      const oscillator=context.createOscillator();
+      const gain=context.createGain();
+
+      oscillator.type="sine";
+      oscillator.frequency.value=frequency;
+      gain.gain.setValueAtTime(.12,context.currentTime);
+      gain.gain.exponentialRampToValueAtTime(.001,context.currentTime+duration);
+
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+
+      oscillator.start();
+      oscillator.stop(context.currentTime+duration);
+      oscillator.addEventListener("ended",()=>context.close());
+    }
+  </script>
+<a class="mth-back-link" href="../" aria-label="Back to all games">← All Games</a>
+<style>.mth-back-link{position:fixed;top:12px;left:12px;z-index:9999;padding:9px 13px;border-radius:999px;color:#fff!important;background:#0f2747;text-decoration:none;font:800 13px/1.2 "Segoe UI",Arial,sans-serif;box-shadow:0 5px 14px #0004}.mth-back-link:hover,.mth-back-link:focus{background:#1d4ed8;outline:3px solid #bfdbfe}@media(max-width:520px){.mth-back-link{top:7px;left:7px;padding:7px 10px;font-size:11px}}</style>
+</body>
+</html>
