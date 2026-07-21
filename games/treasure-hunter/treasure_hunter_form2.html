@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Treasure Hunter: Counting Adventure — Tingkatan 2</title>
+<style>
+:root{
+  --navy:#0f2d4d;--blue:#1d5b79;--gold:#ffc857;--sand:#f3d47b;
+  --sky:#7fd8f5;--green:#43b96e;--red:#e46d6d;--ink:#17314d;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;color:var(--ink);
+  background:linear-gradient(#7ed8f4 0 33%,#f3d278 33% 100%);
+}
+header{
+  background:linear-gradient(90deg,var(--navy),var(--blue));color:#fff;
+  text-align:center;padding:18px 12px;box-shadow:0 5px 14px #0003;
+}
+header h1{margin:0;font-size:clamp(1.4rem,4vw,2.5rem)}
+header p{margin:.45rem 0 0}
+.topbar{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding:12px}
+.pill{
+  background:#fff;border:3px solid var(--navy);border-radius:999px;
+  padding:8px 14px;font-weight:900;
+}
+main{width:min(1140px,94%);margin:auto;padding-bottom:35px}
+.panel{
+  background:#ffffffef;border:4px solid var(--navy);border-radius:22px;
+  box-shadow:0 10px 0 #0f2d4d2d;padding:18px;margin:16px 0;
+}
+.center{text-align:center}
+.mapline{
+  text-align:center;white-space:nowrap;overflow:auto;font-size:2rem;
+  letter-spacing:4px;padding:10px;
+}
+.worlds{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:14px;margin-top:16px;
+}
+.world{
+  background:#fff;border:3px solid var(--navy);border-radius:18px;
+  padding:15px;text-align:center;cursor:pointer;transition:.2s;min-height:155px;
+}
+.world:hover{transform:translateY(-4px)}
+.world.locked{filter:grayscale(1);opacity:.55;cursor:not-allowed}
+.icon{font-size:2.9rem}
+.levels{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(76px,1fr));
+  gap:10px;margin:18px 0;
+}
+.level{
+  border:3px solid var(--navy);border-radius:14px;background:#fff7d8;
+  padding:13px 6px;font-weight:900;cursor:pointer;
+}
+.level.done{background:#b9efc8}
+.level.locked{opacity:.45;cursor:not-allowed}
+.game{display:none}
+.progress{
+  height:20px;background:#dbe5eb;border:2px solid var(--navy);
+  border-radius:999px;overflow:hidden;
+}
+.progress>div{
+  height:100%;width:0;background:linear-gradient(90deg,#42b96d,#ffd34f);
+  transition:.35s;
+}
+.badge{
+  display:inline-block;background:#e9f7ff;border:2px solid var(--navy);
+  border-radius:12px;padding:6px 10px;margin:6px 3px;font-weight:800;
+}
+.question{
+  font-size:clamp(1.25rem,3vw,2rem);font-weight:900;text-align:center;
+  margin:22px 0;
+}
+.answers{
+  display:grid;grid-template-columns:repeat(2,minmax(145px,1fr));
+  gap:12px;max-width:760px;margin:auto;
+}
+.answer{
+  background:#fff;border:3px solid var(--navy);border-radius:15px;
+  padding:16px;font-size:1.15rem;font-weight:800;cursor:pointer;
+}
+.answer:hover{background:#fff0b9}
+.feedback{
+  min-height:44px;margin-top:14px;text-align:center;
+  font-size:1.2rem;font-weight:900;
+}
+button.mainbtn{
+  background:var(--gold);border:3px solid var(--navy);border-radius:14px;
+  padding:12px 18px;font-weight:900;cursor:pointer;margin:5px;
+}
+button.secondary{background:#fff}
+.modal{
+  position:fixed;inset:0;background:#0008;display:none;align-items:center;
+  justify-content:center;padding:20px;z-index:30;
+}
+.modal .box{
+  width:min(540px,92%);background:#fff;border:5px solid var(--gold);
+  border-radius:24px;padding:26px;text-align:center;
+}
+.big{font-size:4rem}
+footer{text-align:center;padding:25px;font-weight:700}
+@media(max-width:580px){
+  .answers{grid-template-columns:1fr}
+  .worlds{grid-template-columns:1fr 1fr}
+  .panel{padding:13px}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>🏴‍☠️ Treasure Hunter: Counting Adventure — Tingkatan 2</h1>
+  <p>Takluk tujuh wilayah dan temui Kristal Koordinat Diraja!</p>
+</header>
+
+<div class="topbar">
+  <div class="pill">🪙 Syiling: <span id="coins">0</span></div>
+  <div class="pill">⭐ Bintang: <span id="stars">0</span></div>
+  <div class="pill">🗝️ Kunci: <span id="keys">0</span>/7</div>
+  <div class="pill">🏆 Tahap: <span id="doneCount">0</span>/35</div>
+</div>
+
+<main>
+<section id="home" class="panel">
+  <div class="center">
+    <h2>🗺️ Peta Pengembaraan Tingkatan 2</h2>
+    <p>Selesaikan lima cabaran dalam setiap wilayah untuk membuka laluan baharu.</p>
+    <div class="mapline">🔢 ➜ 𝑥² ➜ 📏 ➜ 🔄 ➜ 📐 ➜ 📊 ➜ 💠</div>
+  </div>
+  <div id="worlds" class="worlds"></div>
+  <div class="center">
+    <button class="mainbtn secondary" onclick="resetGame()">🔄 Padam Kemajuan</button>
+  </div>
+</section>
+
+<section id="levelSelect" class="panel" style="display:none">
+  <div class="center">
+    <h2 id="worldTitle"></h2>
+    <p id="worldDesc"></p>
+  </div>
+  <div id="levels" class="levels"></div>
+  <div class="center">
+    <button class="mainbtn secondary" onclick="goHome()">⬅ Kembali ke Peta</button>
+  </div>
+</section>
+
+<section id="game" class="panel game">
+  <div class="progress"><div id="progressBar"></div></div>
+  <div class="center">
+    <span class="badge" id="gameWorld"></span>
+    <span class="badge" id="gameLevel"></span>
+  </div>
+  <div id="question" class="question"></div>
+  <div id="answers" class="answers"></div>
+  <div id="feedback" class="feedback"></div>
+  <div class="center">
+    <button id="nextBtn" class="mainbtn" style="display:none" onclick="nextQuestion()">Soalan Seterusnya ➜</button>
+  </div>
+</section>
+</main>
+
+<div id="modal" class="modal">
+  <div class="box">
+    <div id="modalIcon" class="big">🎉</div>
+    <h2 id="modalTitle"></h2>
+    <p id="modalText"></p>
+    <button class="mainbtn" onclick="closeModal()">Teruskan</button>
+  </div>
+</div>
+
+<footer>MathToolsHub • Permainan Matematik Interaktif Tingkatan 2</footer>
+
+<script>
+const worlds=[
+  {icon:"🔢",name:"Pulau Pola & Jujukan",desc:"Pola nombor, jujukan dan ungkapan sebutan ke-n."},
+  {icon:"𝑥²",name:"Kota Algebra Lanjutan",desc:"Pemfaktoran, pengembangan dan persamaan algebra."},
+  {icon:"📏",name:"Teluk Nisbah & Formula",desc:"Kadaran, kadar, formula dan penukaran subjek formula."},
+  {icon:"🔄",name:"Pulau Transformasi",desc:"Translasi, pantulan, putaran dan koordinat."},
+  {icon:"📐",name:"Kuil Geometri",desc:"Poligon, sudut, perimeter, luas dan bulatan asas."},
+  {icon:"📊",name:"Pulau Statistik",desc:"Min, median, mod, julat dan kebarangkalian."},
+  {icon:"💠",name:"Gua Kristal Koordinat",desc:"Penyelesaian masalah pelbagai langkah dan bos akhir."}
+];
+
+const Q=[
+[
+  {q:"Lengkapkan jujukan: 5, 9, 13, 17, ____",a:["19","20","21","22"],c:2},
+  {q:"Jujukan 3, 7, 11, 15 mempunyai beza sepunya...",a:["3","4","5","7"],c:1},
+  {q:"Sebutan ke-n bagi jujukan 2, 5, 8, 11 ialah...",a:["2n+1","3n−1","3n+1","n+3"],c:1},
+  {q:"Apakah sebutan ke-10 bagi jujukan 4, 7, 10, 13?",a:["28","29","30","31"],c:3},
+  {q:"Pola: 1, 4, 9, 16, ____",a:["20","24","25","27"],c:2}
+],
+[
+  {q:"Kembangkan: 3(x + 4)",a:["3x + 4","3x + 12","x + 12","7x"],c:1},
+  {q:"Kembangkan: 2(3a − 5)",a:["6a − 5","6a − 10","5a − 10","6a + 10"],c:1},
+  {q:"Faktorkan: 6x + 12",a:["6(x + 2)","3(2x + 12)","2(3x + 12)","6(x + 12)"],c:0},
+  {q:"Selesaikan: 2x + 5 = 17",a:["5","6","7","11"],c:1},
+  {q:"Selesaikan: 3y − 4 = 20",a:["6","7","8","9"],c:2}
+],
+[
+  {q:"Jika 4 buku berharga RM28, 7 buku berharga...",a:["RM42","RM45","RM49","RM56"],c:2},
+  {q:"Sebuah mesin menghasilkan 180 botol dalam 6 minit. Kadarnya ialah...",a:["20 botol/min","25 botol/min","30 botol/min","36 botol/min"],c:2},
+  {q:"Formula luas segi tiga ialah...",a:["bh","1/2 bh","2bh","b+h"],c:1},
+  {q:"Jika v = u + at, cari a.",a:["(v−u)/t","(v+u)/t","vt−u","u−v/t"],c:0},
+  {q:"Jika P = 2l + 2w, dan P=30, l=9, nilai w ialah...",a:["5","6","7","8"],c:1}
+],
+[
+  {q:"Titik A(2,3) ditranslasi oleh vektor (4,−1). Imej A ialah...",a:["(6,2)","(6,4)","(−2,2)","(4,−1)"],c:0},
+  {q:"Pantulan titik (5,−2) pada paksi-x ialah...",a:["(−5,−2)","(5,2)","(−5,2)","(2,5)"],c:1},
+  {q:"Pantulan titik (−3,4) pada paksi-y ialah...",a:["(3,4)","(−3,−4)","(4,−3)","(3,−4)"],c:0},
+  {q:"Putaran 90° lawan jam bagi titik (2,1) tentang asalan ialah...",a:["(1,−2)","(−1,2)","(−2,−1)","(2,−1)"],c:1},
+  {q:"Translasi oleh vektor (−2,3) menggerakkan titik...",a:["2 kiri, 3 atas","2 kanan, 3 atas","2 kiri, 3 bawah","3 kiri, 2 atas"],c:0}
+],
+[
+  {q:"Jumlah sudut dalam sebuah pentagon ialah...",a:["360°","540°","720°","900°"],c:1},
+  {q:"Sudut luar sebuah poligon sekata ialah 45°. Bilangan sisinya ialah...",a:["6","7","8","9"],c:2},
+  {q:"Luas bulatan berjari-jari 7 cm, guna π=22/7 ialah...",a:["44 cm²","77 cm²","154 cm²","308 cm²"],c:2},
+  {q:"Lilitan bulatan berjari-jari 7 cm, guna π=22/7 ialah...",a:["22 cm","44 cm","77 cm","154 cm"],c:1},
+  {q:"Luas trapezium dengan sisi selari 8 cm dan 14 cm, tinggi 5 cm ialah...",a:["45 cm²","50 cm²","55 cm²","60 cm²"],c:2}
+],
+[
+  {q:"Data: 4, 6, 6, 8, 11. Mod ialah...",a:["4","6","8","11"],c:1},
+  {q:"Data: 3, 5, 7, 9, 11. Median ialah...",a:["5","6","7","8"],c:2},
+  {q:"Min bagi 12, 14, 16, 18 ialah...",a:["14","15","16","17"],c:1},
+  {q:"Julat bagi 6, 10, 15, 18, 21 ialah...",a:["13","14","15","16"],c:2},
+  {q:"Sebuah syiling adil dilambung sekali. Kebarangkalian mendapat kepala ialah...",a:["0","1/4","1/2","1"],c:2}
+],
+[
+  {q:"Sebuah kapal membawa 36 peti. Setiap peti ada 48 syiling. 275 syiling digunakan. Baki?",a:["1,353","1,453","1,553","1,653"],c:1},
+  {q:"Jika 3x + 7 = 31, nilai x ialah...",a:["6","7","8","9"],c:2},
+  {q:"Luas bulatan ialah 154 cm², guna π=22/7. Jejari ialah...",a:["5 cm","6 cm","7 cm","8 cm"],c:2},
+  {q:"Titik P(1,2) ditranslasi (3,−4), kemudian dipantul pada paksi-x. Imej akhir?",a:["(4,−2)","(4,2)","(−4,2)","(−4,−2)"],c:1},
+  {q:"BOS: Sebutan ke-n ialah 4n−1. Sebutan ke-25 ialah...",a:["95","97","99","101"],c:2}
+]
+];
+
+let save=JSON.parse(localStorage.getItem("th_f2")||'{"coins":0,"stars":0,"keys":0,"completed":[],"unlockedWorld":0}');
+let currentWorld=0,currentLevel=0,answered=false;
+
+function sync(){
+  coins.textContent=save.coins;
+  stars.textContent=save.stars;
+  keys.textContent=save.keys;
+  doneCount.textContent=save.completed.length;
+  localStorage.setItem("th_f2",JSON.stringify(save));
+}
+function renderWorlds(){
+  const box=document.getElementById("worlds");
+  box.innerHTML="";
+  worlds.forEach((w,i)=>{
+    const d=document.createElement("div");
+    d.className="world"+(i>save.unlockedWorld?" locked":"");
+    d.innerHTML=`<div class="icon">${w.icon}</div><h3>${w.name}</h3><p>${w.desc}</p><b>${i<=save.unlockedWorld?"Dibuka":"🔒 Terkunci"}</b>`;
+    if(i<=save.unlockedWorld)d.onclick=()=>openWorld(i);
+    box.appendChild(d);
+  });
+}
+function openWorld(i){
+  currentWorld=i;
+  home.style.display="none";
+  levelSelect.style.display="block";
+  worldTitle.textContent=worlds[i].icon+" "+worlds[i].name;
+  worldDesc.textContent=worlds[i].desc;
+  levels.innerHTML="";
+  for(let j=0;j<5;j++){
+    const id=`${i}-${j}`;
+    const open=j===0||save.completed.includes(`${i}-${j-1}`);
+    const b=document.createElement("button");
+    b.className="level"+(save.completed.includes(id)?" done":"")+(open?"":" locked");
+    b.textContent=save.completed.includes(id)?`✅ ${j+1}`:`${j+1}`;
+    if(open)b.onclick=()=>startLevel(j);
+    levels.appendChild(b);
+  }
+}
+function startLevel(j){
+  currentLevel=j;
+  answered=false;
+  levelSelect.style.display="none";
+  game.style.display="block";
+  gameWorld.textContent=worlds[currentWorld].icon+" "+worlds[currentWorld].name;
+  gameLevel.textContent="Tahap "+(j+1);
+  progressBar.style.width=((j+1)/5*100)+"%";
+  showQuestion();
+}
+function showQuestion(){
+  const item=Q[currentWorld][currentLevel];
+  question.textContent=item.q;
+  answers.innerHTML="";
+  feedback.textContent="";
+  nextBtn.style.display="none";
+  answered=false;
+  item.a.forEach((x,i)=>{
+    const b=document.createElement("button");
+    b.className="answer";
+    b.textContent=x;
+    b.onclick=()=>choose(i,b);
+    answers.appendChild(b);
+  });
+}
+function choose(i,b){
+  if(answered)return;
+  answered=true;
+  const item=Q[currentWorld][currentLevel];
+  [...answers.children].forEach((el,k)=>{
+    el.disabled=true;
+    if(k===item.c)el.style.background="#b9efc8";
+  });
+  if(i===item.c){
+    feedback.textContent="✅ Tepat! Anda mendapat 40 syiling dan 1 bintang.";
+    save.coins+=40;
+    save.stars+=1;
+    beep(800);
+  }else{
+    b.style.background="#ffc7c7";
+    feedback.textContent="❌ Belum tepat. Jawapan betul telah ditunjukkan.";
+    beep(220);
+  }
+  const id=`${currentWorld}-${currentLevel}`;
+  if(!save.completed.includes(id))save.completed.push(id);
+  nextBtn.style.display="inline-block";
+  sync();
+}
+function nextQuestion(){
+  if(currentLevel<4){
+    currentLevel++;
+    gameLevel.textContent="Tahap "+(currentLevel+1);
+    progressBar.style.width=((currentLevel+1)/5*100)+"%";
+    showQuestion();
+  }else{
+    finishWorld();
+  }
+}
+function finishWorld(){
+  game.style.display="none";
+  if(save.keys<currentWorld+1)save.keys=currentWorld+1;
+  if(currentWorld<6)save.unlockedWorld=Math.max(save.unlockedWorld,currentWorld+1);
+  sync();
+  renderWorlds();
+  modalIcon.textContent=currentWorld===6?"💠":"🗝️";
+  modalTitle.textContent=currentWorld===6?"Kristal Koordinat Diraja Ditemui!":"Wilayah Selesai!";
+  modalText.textContent=currentWorld===6
+    ?"Tahniah! Anda berjaya menamatkan Treasure Hunter Tingkatan 2."
+    :"Anda memperoleh satu kunci dan membuka wilayah seterusnya.";
+  modal.style.display="flex";
+}
+function closeModal(){
+  modal.style.display="none";
+  goHome();
+}
+function goHome(){
+  game.style.display="none";
+  levelSelect.style.display="none";
+  home.style.display="block";
+  renderWorlds();
+}
+function resetGame(){
+  if(confirm("Padam semua kemajuan permainan?")){
+    save={coins:0,stars:0,keys:0,completed:[],unlockedWorld:0};
+    sync();
+    renderWorlds();
+  }
+}
+function beep(freq){
+  try{
+    const a=new(window.AudioContext||window.webkitAudioContext)();
+    const o=a.createOscillator();
+    const g=a.createGain();
+    o.frequency.value=freq;
+    o.connect(g);
+    g.connect(a.destination);
+    g.gain.setValueAtTime(.08,a.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.18);
+    o.start();
+    o.stop(a.currentTime+.18);
+  }catch(e){}
+}
+sync();
+renderWorlds();
+</script>
+<a class="mth-back-link" href="index.html" aria-label="Back to Treasure Hunter levels">← All Treasure Hunter Levels</a>
+<style>.mth-back-link{position:fixed;top:12px;left:12px;z-index:9999;padding:9px 13px;border-radius:999px;color:#fff!important;background:#0f2747;text-decoration:none;font:800 13px/1.2 "Segoe UI",Arial,sans-serif;box-shadow:0 5px 14px #0004}.mth-back-link:hover,.mth-back-link:focus{background:#1d4ed8;outline:3px solid #bfdbfe}@media(max-width:520px){.mth-back-link{top:7px;left:7px;padding:7px 10px;font-size:11px}}</style>
+</body>
+</html>

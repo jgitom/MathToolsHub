@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Treasure Hunter: Number Quest — Year 1</title>
+  <style>
+    :root {
+      --sky: #72d7ff;
+      --sea: #1fa8e5;
+      --sand: #ffd978;
+      --brown: #6f3b18;
+      --gold: #ffd438;
+      --green: #35b96f;
+      --red: #ff5b5b;
+      --ink: #17324d;
+      --panel: rgba(255,255,255,.94);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Trebuchet MS", Arial, sans-serif;
+      color: var(--ink);
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 15% 12%, rgba(255,255,255,.9) 0 4%, transparent 5%),
+        radial-gradient(circle at 32% 10%, rgba(255,255,255,.85) 0 5%, transparent 6%),
+        linear-gradient(var(--sky) 0 58%, var(--sea) 58% 75%, var(--sand) 75% 100%);
+    }
+
+    body::before {
+      content: "☁️      ☁️                 ☁️";
+      position: fixed;
+      inset: 24px 0 auto 0;
+      font-size: clamp(30px, 5vw, 70px);
+      opacity: .9;
+      white-space: pre;
+      animation: drift 18s linear infinite alternate;
+      pointer-events: none;
+    }
+
+    @keyframes drift { from { transform: translateX(-4%); } to { transform: translateX(5%); } }
+
+    .app {
+      width: min(1000px, 94vw);
+      margin: 0 auto;
+      padding: 18px 0 36px;
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      background: rgba(255,255,255,.9);
+      border: 5px solid #fff;
+      border-radius: 24px;
+      box-shadow: 0 10px 0 rgba(28,92,124,.22);
+      padding: 14px 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.35rem, 3vw, 2.3rem);
+      color: #7b2e18;
+      text-shadow: 1px 2px 0 #ffd88c;
+    }
+
+    .subtitle { margin: 4px 0 0; font-weight: 800; color: #35617c; }
+
+    .sound-btn, .small-btn {
+      border: 0;
+      border-radius: 14px;
+      min-width: 50px;
+      min-height: 50px;
+      font-size: 1.45rem;
+      cursor: pointer;
+      background: #fff3b6;
+      box-shadow: 0 5px 0 #d69f22;
+    }
+
+    .hud {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 15px 0;
+    }
+
+    .hud-card {
+      background: var(--panel);
+      border-radius: 18px;
+      padding: 10px;
+      text-align: center;
+      font-weight: 900;
+      box-shadow: 0 7px 0 rgba(51,81,102,.18);
+      border: 3px solid rgba(255,255,255,.8);
+    }
+    .hud-card span { display: block; font-size: 1.25rem; margin-top: 3px; }
+
+    .map {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .map-node {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.88);
+      border: 3px solid #fff;
+      font-weight: 900;
+      box-shadow: 0 4px 0 rgba(0,0,0,.15);
+      opacity: .65;
+    }
+    .map-node.active { background: var(--gold); transform: scale(1.15); opacity: 1; }
+    .map-node.done { background: #6ee59b; opacity: 1; }
+
+    .game-card {
+      background: var(--panel);
+      border-radius: 28px;
+      border: 6px solid white;
+      box-shadow: 0 12px 0 rgba(22,74,105,.24);
+      padding: clamp(18px, 4vw, 34px);
+      min-height: 460px;
+      display: grid;
+      align-content: center;
+      text-align: center;
+    }
+
+    .mascot { font-size: clamp(58px, 10vw, 95px); animation: bounce 1.8s ease-in-out infinite; }
+    @keyframes bounce { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-9px) rotate(2deg)} }
+
+    .story {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      font-weight: 800;
+      max-width: 700px;
+      margin: 8px auto 18px;
+      line-height: 1.45;
+    }
+
+    .primary-btn {
+      border: 0;
+      border-radius: 18px;
+      padding: 15px 28px;
+      font-size: clamp(1.1rem, 2vw, 1.35rem);
+      font-weight: 900;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(#ff8b45,#f05b2e);
+      box-shadow: 0 7px 0 #a83b20;
+      transition: .12s;
+    }
+    .primary-btn:hover { transform: translateY(-2px); }
+    .primary-btn:active { transform: translateY(4px); box-shadow: 0 3px 0 #a83b20; }
+
+    .question-title { margin: 0 0 12px; font-size: clamp(1.35rem, 3vw, 2rem); }
+    .objects {
+      min-height: 110px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 12px auto 22px;
+      max-width: 760px;
+      font-size: clamp(46px, 7vw, 72px);
+      line-height: 1;
+    }
+
+    .sequence {
+      font-size: clamp(2rem, 6vw, 4rem);
+      letter-spacing: 10px;
+      margin: 20px 0;
+      font-weight: 900;
+      color: #5b2d89;
+    }
+
+    .answers {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(90px, 160px));
+      gap: 14px;
+      justify-content: center;
+      margin: 10px auto;
+    }
+
+    .answer-btn {
+      border: 4px solid white;
+      border-radius: 20px;
+      min-height: 86px;
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      font-weight: 900;
+      cursor: pointer;
+      color: var(--ink);
+      background: linear-gradient(#fff7b5,#ffd866);
+      box-shadow: 0 7px 0 #cf9c23;
+      transition: .12s;
+    }
+    .answer-btn:hover { transform: translateY(-3px) scale(1.02); }
+    .answer-btn:disabled { cursor: default; }
+    .answer-btn.correct { background: #85efab; box-shadow: 0 7px 0 #2d9a57; }
+    .answer-btn.wrong { background: #ff9b9b; box-shadow: 0 7px 0 #c84444; animation: shake .35s; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-7px)} 75%{transform:translateX(7px)} }
+
+    .feedback {
+      min-height: 40px;
+      margin-top: 14px;
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      font-weight: 900;
+    }
+
+    .progress-wrap {
+      height: 22px;
+      background: rgba(255,255,255,.7);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 18px;
+      border: 3px solid white;
+    }
+    .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg,#37d17d,#f5df44); transition: width .35s; }
+
+    .treasure {
+      font-size: clamp(70px, 14vw, 130px);
+      cursor: pointer;
+      display: inline-block;
+      animation: glow 1s ease-in-out infinite alternate;
+    }
+    @keyframes glow { from { filter: drop-shadow(0 0 2px gold); transform:scale(1)} to {filter:drop-shadow(0 0 18px gold); transform:scale(1.06)} }
+
+    .footer-actions { display: flex; justify-content: center; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+    .secondary-btn {
+      border: 0;
+      padding: 11px 18px;
+      border-radius: 14px;
+      font-weight: 900;
+      cursor: pointer;
+      background: #eaf6ff;
+      color: #244d66;
+      box-shadow: 0 5px 0 #9abbd0;
+    }
+
+    .confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 10; }
+    .confetti i { position:absolute; top:-30px; font-style:normal; animation:fall 2s linear forwards; }
+    @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+
+    @media (max-width: 620px) {
+      .hud { grid-template-columns: repeat(2, 1fr); }
+      header { grid-template-columns: 1fr auto; }
+      .answers { grid-template-columns: repeat(3, 1fr); }
+      .game-card { min-height: 500px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <h1>🏴‍☠️ Treasure Hunter: Number Quest</h1>
+        <p class="subtitle">Year 1 Mathematics • Ages 7–8</p>
+      </div>
+      <button class="sound-btn" id="soundBtn" aria-label="Toggle sound">🔊</button>
+    </header>
+
+    <section class="hud" aria-label="Game score">
+      <div class="hud-card">🪙 Coins<span id="coins">0</span></div>
+      <div class="hud-card">⭐ Stars<span id="stars">0</span></div>
+      <div class="hud-card">🗝️ Keys<span id="keys">0</span></div>
+      <div class="hud-card">🏝️ Level<span id="level">1</span></div>
+    </section>
+
+    <div class="map" id="map"></div>
+
+    <main class="game-card" id="gameCard"></main>
+
+    <div class="progress-wrap" aria-label="Progress">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="footer-actions">
+      <button class="secondary-btn" id="restartBtn">🔄 Restart Game</button>
+      <button class="secondary-btn" id="resetBtn">🧹 Reset Saved Progress</button>
+    </div>
+  </div>
+  <div class="confetti" id="confetti"></div>
+
+  <script>
+    const TOTAL_LEVELS = 20;
+    const gameCard = document.getElementById('gameCard');
+    const coinsEl = document.getElementById('coins');
+    const starsEl = document.getElementById('stars');
+    const keysEl = document.getElementById('keys');
+    const levelEl = document.getElementById('level');
+    const mapEl = document.getElementById('map');
+    const progressBar = document.getElementById('progressBar');
+    const soundBtn = document.getElementById('soundBtn');
+
+    let soundOn = true;
+    let state = loadState();
+    let currentAnswer = 0;
+    let locked = false;
+
+    function defaultState() {
+      return { level: 1, coins: 0, stars: 0, keys: 0, started: false, complete: false };
+    }
+
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('treasureHunterYear1'));
+        return saved ? { ...defaultState(), ...saved } : defaultState();
+      } catch { return defaultState(); }
+    }
+
+    function saveState() {
+      localStorage.setItem('treasureHunterYear1', JSON.stringify(state));
+    }
+
+    function updateHUD() {
+      coinsEl.textContent = state.coins;
+      starsEl.textContent = state.stars;
+      keysEl.textContent = state.keys;
+      levelEl.textContent = Math.min(state.level, TOTAL_LEVELS);
+      progressBar.style.width = `${Math.min(100, ((state.level - 1) / TOTAL_LEVELS) * 100)}%`;
+      drawMap();
+    }
+
+    function drawMap() {
+      mapEl.innerHTML = '';
+      for (let i = 1; i <= TOTAL_LEVELS; i++) {
+        const node = document.createElement('div');
+        node.className = 'map-node' + (i < state.level ? ' done' : i === state.level ? ' active' : '');
+        node.textContent = i < state.level ? '✓' : i;
+        mapEl.appendChild(node);
+      }
+    }
+
+    function startScreen() {
+      updateHUD();
+      gameCard.innerHTML = `
+        <div class="mascot">🐒🏴‍☠️</div>
+        <h2>Ahoy, Year 1 Explorer!</h2>
+        <p class="story">Captain Coco needs your help! Complete 20 Year 1 mathematics missions involving numbers, addition, subtraction, place value, money, time and patterns. Collect four keys to open the Pirate King’s treasure chest!</p>
+        <button class="primary-btn" id="startBtn">🗺️ Begin Year 1 Quest</button>
+      `;
+      document.getElementById('startBtn').onclick = () => {
+        state.started = true;
+        state.complete = false;
+        saveState();
+        playTone(520, .12);
+        showLevel();
+      };
+    }
+
+    function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function shuffle(arr) { return [...arr].sort(() => Math.random() - .5); }
+
+    function getQuestion(level) {
+      const symbols = ['🪙','💎','🐚','🥥','⭐','🐠','🍌','🦀'];
+      const symbol = symbols[(level - 1) % symbols.length];
+
+      // Levels 1–4: Numbers to 100
+      if (level <= 4) {
+        const kind = level % 4;
+        if (kind === 1) {
+          const answer = randomInt(10, 50);
+          return { type:'number', answer, title:'Find the number Captain Coco calls!', visual:`<strong>${answer}</strong>` };
+        }
+        if (kind === 2) {
+          const a = randomInt(10, 89), b = randomInt(a + 1, 99);
+          return { type:'compare', answer:b, title:'Which number is greater?', visual:`<strong>${a}</strong> &nbsp; or &nbsp; <strong>${b}</strong>` };
+        }
+        if (kind === 3) {
+          const start = randomInt(10, 70);
+          const seq = [start, start+1, start+2, start+3, start+4];
+          const missingIndex = randomInt(1,3);
+          const answer = seq[missingIndex];
+          return { type:'missing', answer, title:'What number is missing?', visual:seq.map((n,i)=>i===missingIndex?'?':n).join(' ') };
+        }
+        const tens = randomInt(1,9), ones = randomInt(0,9);
+        const number = tens*10+ones;
+        return { type:'place', answer:tens, title:`How many tens are in ${number}?`, visual:`${number} = <strong>${tens} tens</strong> and ${ones} ones` };
+      }
+
+      // Levels 5–9: Addition and subtraction
+      if (level <= 9) {
+        if (level % 2 === 1) {
+          const a = randomInt(5,35), b = randomInt(1,20);
+          const answer = a+b;
+          return { type:'operation', answer, title:'Add the treasure numbers!', visual:`<strong>${a} + ${b} = ?</strong>` };
+        }
+        const a = randomInt(20,70), b = randomInt(1,Math.min(20,a));
+        const answer = a-b;
+        return { type:'operation', answer, title:'Some treasure was taken away. Subtract!', visual:`<strong>${a} − ${b} = ?</strong>` };
+      }
+
+      // Levels 10–12: Place value and number patterns
+      if (level <= 12) {
+        if (level === 10) {
+          const tens=randomInt(2,9), ones=randomInt(0,9), answer=tens*10+ones;
+          return { type:'place', answer, title:'Build the number!', visual:`${tens} tens + ${ones} ones = ?` };
+        }
+        const step = level === 11 ? 2 : 5;
+        const start = randomInt(1,10)*step;
+        const answer = start + step*3;
+        return { type:'missing', answer, title:`Continue the pattern. Count by ${step}s!`, visual:`${start} &nbsp; ${start+step} &nbsp; ${start+step*2} &nbsp; ? &nbsp; ${start+step*4}` };
+      }
+
+      // Levels 13–15: Money
+      if (level <= 15) {
+        const a=randomInt(1,8), b=randomInt(1,8), answer=a+b;
+        return { type:'money', answer, title:'How much money altogether?', visual:`RM${a} + RM${b} = <strong>RM?</strong>`, suffix:'RM' };
+      }
+
+      // Levels 16–17: Time
+      if (level <= 17) {
+        const answer=randomInt(1,12);
+        return { type:'time', answer, title:'What time is shown?', visual:`🕐 The hour hand points to <strong>${answer}</strong> and the minute hand points to 12.`, suffix:':00' };
+      }
+
+      // Levels 18–19: Simple word problems
+      if (level <= 19) {
+        if (level === 18) {
+          const a=randomInt(5,20), b=randomInt(2,10), answer=a+b;
+          return { type:'story', answer, title:'Solve Captain Coco’s story problem!', visual:`Captain Coco has ${a} ${symbol}. He finds ${b} more. How many does he have now?` };
+        }
+        const a=randomInt(12,30), b=randomInt(2,10), answer=a-b;
+        return { type:'story', answer, title:'Solve the pirate story problem!', visual:`There are ${a} gold coins. A pirate spends ${b}. How many coins remain?` };
+      }
+
+      // Level 20: Boss challenge
+      const a=randomInt(15,40), b=randomInt(5,20), c=randomInt(1,8);
+      const answer=a+b-c;
+      return { type:'boss', answer, title:'Final Treasure Boss!', visual:`Captain Coco finds ${a} coins, earns ${b} more, then gives away ${c}.<br><strong>${a} + ${b} − ${c} = ?</strong>` };
+    }
+
+    function makeOptions(answer) {
+      const set = new Set([answer]);
+      const spread = answer <= 12 ? 3 : answer <= 30 ? 6 : 10;
+      while (set.size < 3) {
+        const candidate = Math.max(0, answer + randomInt(-spread, spread));
+        set.add(candidate);
+      }
+      return shuffle([...set]);
+    }
+
+    function showLevel() {
+      if (state.level > TOTAL_LEVELS) return showTreasure();
+      locked = false;
+      updateHUD();
+      const q = getQuestion(state.level);
+      currentAnswer = q.answer;
+      const visualClass = q.type === 'missing' ? 'sequence' : 'objects';
+      const options = makeOptions(q.answer);
+
+      gameCard.innerHTML = `
+        <div class="mascot">${state.level % 3 === 0 ? '🦜' : '🐒🏴‍☠️'}</div>
+        <h2 class="question-title">${q.title}</h2>
+        <div class="${visualClass}">${q.visual}</div>
+        <div class="answers">
+          ${options.map(n => `<button class="answer-btn" data-answer="${n}">${q.suffix === 'RM' ? 'RM' + n : q.suffix === ':00' ? n + ':00' : n}</button>`).join('')}
+        </div>
+        <div class="feedback" id="feedback">Choose an answer!</div>
+      `;
+
+      gameCard.querySelectorAll('.answer-btn').forEach(btn => {
+        btn.addEventListener('click', () => checkAnswer(btn, Number(btn.dataset.answer)));
+      });
+    }
+
+    function checkAnswer(button, answer) {
+      if (locked) return;
+      const feedback = document.getElementById('feedback');
+      if (answer === currentAnswer) {
+        locked = true;
+        button.classList.add('correct');
+        gameCard.querySelectorAll('.answer-btn').forEach(b => b.disabled = true);
+        state.coins += 10;
+        state.stars += 1;
+        if ([5,10,15,20].includes(state.level)) state.keys += 1;
+        feedback.textContent = [5,10,15,20].includes(state.level)
+          ? 'Excellent! You found a treasure key! 🗝️'
+          : 'Correct! You earned 10 gold coins! 🎉';
+        playSuccess();
+        burstConfetti();
+        state.level++;
+        saveState();
+        updateHUD();
+        setTimeout(showLevel, 1200);
+      } else {
+        button.classList.add('wrong');
+        button.disabled = true;
+        feedback.textContent = 'Not quite. Check the numbers and try again! 💪';
+        playWrong();
+      }
+    }
+
+    function showTreasure() {
+      state.complete = true;
+      saveState();
+      updateHUD();
+      progressBar.style.width = '100%';
+      gameCard.innerHTML = `
+        <div class="mascot">🐒🏴‍☠️</div>
+        <h2 class="question-title">You Found the Pirate King's Treasure!</h2>
+        <p class="story">You completed all 20 missions and collected ${state.keys} keys, ${state.stars} stars, and ${state.coins} gold coins. Tap the treasure chest to open it!</p>
+        <div class="treasure" id="treasure">🧰</div>
+        <div class="feedback" id="feedback">Tap the chest!</div>
+      `;
+      document.getElementById('treasure').onclick = () => {
+        document.getElementById('treasure').textContent = '💰💎👑';
+        document.getElementById('feedback').textContent = 'Amazing! You are a Year 1 Mathematics Treasure Master! 🏆';
+        burstConfetti(55);
+        playFanfare();
+      };
+    }
+
+    function restartGame() {
+      state = defaultState();
+      state.started = true;
+      saveState();
+      showLevel();
+    }
+
+    document.getElementById('restartBtn').onclick = restartGame;
+    document.getElementById('resetBtn').onclick = () => {
+      localStorage.removeItem('treasureHunterYear1');
+      state = defaultState();
+      startScreen();
+    };
+
+    soundBtn.onclick = () => {
+      soundOn = !soundOn;
+      soundBtn.textContent = soundOn ? '🔊' : '🔇';
+      if (soundOn) playTone(620, .08);
+    };
+
+    function playTone(freq, duration, type='sine') {
+      if (!soundOn) return;
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + duration);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(); osc.stop(ctx.currentTime + duration);
+      } catch {}
+    }
+
+    function playSuccess() {
+      playTone(523, .15);
+      setTimeout(() => playTone(659, .15), 120);
+      setTimeout(() => playTone(784, .22), 240);
+    }
+    function playWrong() { playTone(180, .22, 'square'); }
+    function playFanfare() {
+      [523,659,784,1046].forEach((f,i) => setTimeout(() => playTone(f,.3), i*170));
+    }
+
+    function burstConfetti(count=28) {
+      const box = document.getElementById('confetti');
+      const pieces = ['⭐','🪙','💎','🎉','✨'];
+      for (let i=0;i<count;i++) {
+        const el = document.createElement('i');
+        el.textContent = pieces[randomInt(0,pieces.length-1)];
+        el.style.left = `${Math.random()*100}%`;
+        el.style.fontSize = `${randomInt(18,34)}px`;
+        el.style.animationDelay = `${Math.random()*.5}s`;
+        el.style.animationDuration = `${1.5+Math.random()*1.4}s`;
+        box.appendChild(el);
+        setTimeout(() => el.remove(), 3200);
+      }
+    }
+
+    if (!state.started) startScreen();
+    else if (state.complete || state.level > TOTAL_LEVELS) showTreasure();
+    else showLevel();
+  </script>
+<a class="mth-back-link" href="index.html" aria-label="Back to Treasure Hunter levels">← All Treasure Hunter Levels</a>
+<style>.mth-back-link{position:fixed;top:12px;left:12px;z-index:9999;padding:9px 13px;border-radius:999px;color:#fff!important;background:#0f2747;text-decoration:none;font:800 13px/1.2 "Segoe UI",Arial,sans-serif;box-shadow:0 5px 14px #0004}.mth-back-link:hover,.mth-back-link:focus{background:#1d4ed8;outline:3px solid #bfdbfe}@media(max-width:520px){.mth-back-link{top:7px;left:7px;padding:7px 10px;font-size:11px}}</style>
+</body>
+</html>

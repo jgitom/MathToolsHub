@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Treasure Hunter: Counting Adventure — Tahun 3</title>
+  <style>
+    :root{
+      --sand:#fff2c7; --sea:#39b8d6; --deep:#075985; --gold:#fbbf24;
+      --brown:#7c3f00; --cream:#fffaf0; --green:#22c55e; --red:#ef4444;
+      --ink:#17324d; --purple:#7c3aed;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:Trebuchet MS,Arial,sans-serif; color:var(--ink);
+      background:linear-gradient(#7dd3fc 0 32%, #0ea5e9 32% 54%, #fde68a 54% 100%);
+      min-height:100vh; overflow-x:hidden;
+    }
+    .cloud{position:fixed; font-size:3rem; opacity:.8; animation:float 14s linear infinite; z-index:0}
+    .c1{top:5%; left:-10%}.c2{top:17%; left:-20%; animation-delay:5s}.c3{top:29%; left:-15%; animation-delay:9s}
+    @keyframes float{to{transform:translateX(125vw)}}
+    .app{position:relative; z-index:2; width:min(1000px,94%); margin:auto; padding:18px 0 40px}
+    header{
+      background:rgba(255,250,240,.95); border:5px solid var(--brown); border-radius:24px;
+      padding:16px; box-shadow:0 10px 0 rgba(124,63,0,.25); text-align:center;
+    }
+    h1{margin:0; color:var(--brown); font-size:clamp(1.7rem,4vw,3rem)}
+    .subtitle{font-weight:800; margin-top:6px}
+    .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:14px}
+    .stat{background:#fff; border:3px solid var(--gold); border-radius:15px; padding:8px; font-weight:900}
+    .map{display:grid; grid-template-columns:repeat(6,1fr); gap:10px; margin:20px 0}
+    .island{
+      border:none; border-radius:18px; min-height:82px; padding:8px; cursor:pointer;
+      background:#fff7db; border:4px solid #d97706; font-weight:900; box-shadow:0 6px 0 #92400e;
+      transition:.2s; font-size:.92rem;
+    }
+    .island:hover:not(:disabled){transform:translateY(-3px)}
+    .island.active{background:#dcfce7; border-color:#16a34a}
+    .island.done{background:#fef3c7}
+    .island:disabled{filter:grayscale(1); opacity:.55; cursor:not-allowed}
+    .game{
+      background:rgba(255,250,240,.97); border:5px solid var(--brown); border-radius:26px;
+      padding:22px; box-shadow:0 12px 0 rgba(124,63,0,.25); text-align:center;
+    }
+    .world{font-weight:900; color:var(--purple); font-size:1.1rem}
+    .question{font-size:clamp(1.45rem,4vw,2.4rem); font-weight:900; margin:18px 0 12px; min-height:72px; display:flex; align-items:center; justify-content:center}
+    .visual{font-size:clamp(2rem,6vw,4rem); min-height:60px; margin:8px 0}
+    .answers{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; max-width:650px; margin:15px auto}
+    .answer{
+      border:none; background:#fff; border:4px solid var(--deep); border-radius:18px; padding:16px;
+      font-size:1.3rem; font-weight:900; cursor:pointer; box-shadow:0 6px 0 #0c4a6e; transition:.15s;
+    }
+    .answer:hover{transform:translateY(-3px); background:#e0f2fe}
+    .answer.correct{background:#dcfce7; border-color:#16a34a; box-shadow:0 6px 0 #15803d}
+    .answer.wrong{background:#fee2e2; border-color:#dc2626; box-shadow:0 6px 0 #991b1b}
+    .feedback{min-height:42px; font-size:1.25rem; font-weight:900; margin-top:10px}
+    .controls{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:16px}
+    .btn{border:none; border-radius:14px; padding:12px 18px; font-weight:900; font-size:1rem; cursor:pointer; box-shadow:0 5px 0 rgba(0,0,0,.25)}
+    .primary{background:var(--gold); color:#5b3300}.secondary{background:#dbeafe;color:#1e3a8a}.danger{background:#fecaca;color:#7f1d1d}
+    .progress-shell{height:22px; background:#e5e7eb; border-radius:20px; overflow:hidden; border:3px solid #fff; margin:18px 0 5px}
+    .progress{height:100%; width:0; background:linear-gradient(90deg,#22c55e,#facc15); transition:.4s}
+    .treasure{display:none; padding:20px; border-radius:20px; background:linear-gradient(135deg,#fff7cc,#fbbf24); border:5px solid #92400e; margin-top:18px}
+    .treasure.show{display:block; animation:pop .5s ease}
+    @keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+    .chest{font-size:6rem; animation:bounce 1s infinite alternate}
+    @keyframes bounce{to{transform:translateY(-8px)}}
+    .small{font-size:.88rem; opacity:.85}
+    footer{text-align:center; font-weight:800; margin-top:18px; color:#4a2d00}
+    @media(max-width:700px){
+      .stats{grid-template-columns:repeat(2,1fr)}
+      .map{grid-template-columns:repeat(2,1fr)}
+      .answers{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="cloud c1">☁️</div><div class="cloud c2">☁️</div><div class="cloud c3">☁️</div>
+  <main class="app">
+    <header>
+      <h1>🏴‍☠️ Treasure Hunter: Counting Adventure</h1>
+      <div class="subtitle">Matematik Tahun 3 • Ekspedisi Pulau Misteri</div>
+      <div class="stats">
+        <div class="stat">🪙 Syiling: <span id="coins">0</span></div>
+        <div class="stat">⭐ Bintang: <span id="stars">0</span></div>
+        <div class="stat">🗝️ Kunci: <span id="keys">0</span>/6</div>
+        <div class="stat">🏝️ Tahap: <span id="levelLabel">1</span>/30</div>
+      </div>
+    </header>
+
+    <section class="map" id="map"></section>
+
+    <section class="game">
+      <div class="world" id="worldLabel">Pantai Nombor</div>
+      <div class="progress-shell"><div class="progress" id="progress"></div></div>
+      <div class="small" id="objective">Selesaikan soalan untuk mencari peta harta karun.</div>
+      <div class="question" id="question"></div>
+      <div class="visual" id="visual"></div>
+      <div class="answers" id="answers"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="controls">
+        <button class="btn primary" id="nextBtn" style="display:none">Soalan Seterusnya ➜</button>
+        <button class="btn secondary" id="soundBtn">🔊 Bunyi: Hidup</button>
+        <button class="btn danger" id="resetBtn">↻ Mula Semula</button>
+      </div>
+      <div class="treasure" id="treasure">
+        <div class="chest">🧰✨</div>
+        <h2>Tahniah, Kapten Matematik!</h2>
+        <p>Anda telah membuka Peti Harta Karun Pulau Misteri.</p>
+        <p><strong>Ganjaran akhir: 750 syiling dan Lencana Pemburu Harta Tahun 3!</strong></p>
+      </div>
+    </section>
+    <footer>MathToolsHub • Belajar Matematik melalui pengembaraan 🎮</footer>
+  </main>
+
+<script>
+const levels = [
+ {w:'Pantai Nombor',o:'Nombor bulat hingga 10 000',q:'Apakah nilai nombor ini?',v:'🗺️ 7 406',a:['7 046','7 406','7 460','7 604'],c:'7 406'},
+ {w:'Pantai Nombor',o:'Banding dan susun nombor',q:'Nombor manakah paling besar?',v:'',a:['4 895','4 985','4 598','4 859'],c:'4 985'},
+ {w:'Pantai Nombor',o:'Nombor sebelum dan selepas',q:'Apakah nombor selepas 5 999?',v:'',a:['5 998','6 000','6 001','5 909'],c:'6 000'},
+ {w:'Pantai Nombor',o:'Pola nombor',q:'Lengkapkan pola: 2 450, 2 550, 2 650, __',v:'',a:['2 700','2 750','2 850','3 650'],c:'2 750'},
+ {w:'Pantai Nombor',o:'Pembundaran',q:'Bundarkan 3 647 kepada ratus terdekat.',v:'',a:['3 600','3 650','3 700','4 000'],c:'3 600'},
+
+ {w:'Hutan Nilai Tempat',o:'Nilai digit',q:'Dalam 8 352, apakah nilai digit 3?',v:'🌴',a:['3','30','300','3 000'],c:'300'},
+ {w:'Hutan Nilai Tempat',o:'Cerakinkan nombor',q:'Cerakinkan 6 284.',v:'',a:['6 000 + 200 + 80 + 4','600 + 20 + 8 + 4','6 000 + 20 + 800 + 4','6 000 + 280 + 40'],c:'6 000 + 200 + 80 + 4'},
+ {w:'Hutan Nilai Tempat',o:'Bina nombor',q:'9 ribu + 5 ratus + 7 puluh + 3 sa =',v:'',a:['9 573','9 753','9 537','9 375'],c:'9 573'},
+ {w:'Hutan Nilai Tempat',o:'Banding nombor',q:'Pilih simbol yang betul: 6 205 __ 6 250',v:'',a:['<','>','=','+'],c:'<'},
+ {w:'Hutan Nilai Tempat',o:'Susunan menurun',q:'Susunan menurun yang betul ialah',v:'',a:['3 999, 4 090, 4 900','4 900, 4 090, 3 999','4 090, 3 999, 4 900','3 999, 4 900, 4 090'],c:'4 900, 4 090, 3 999'},
+
+ {w:'Teluk Operasi',o:'Tambah hingga 10 000',q:'2 468 + 1 357 =',v:'⚓',a:['3 725','3 825','3 925','4 825'],c:'3 825'},
+ {w:'Teluk Operasi',o:'Tolak hingga 10 000',q:'7 000 − 2 846 =',v:'🏝️',a:['4 054','4 154','4 254','5 154'],c:'4 154'},
+ {w:'Teluk Operasi',o:'Darab',q:'8 × 7 =',v:'🪙',a:['48','54','56','64'],c:'56'},
+ {w:'Teluk Operasi',o:'Bahagi',q:'72 ÷ 8 =',v:'💎',a:['8','9','10','12'],c:'9'},
+ {w:'Teluk Operasi',o:'Operasi bergabung',q:'5 × 6 + 12 =',v:'🧭',a:['30','36','42','48'],c:'42'},
+
+ {w:'Pasar Lanun',o:'Wang Malaysia',q:'RM12.50 + RM7.30 =',v:'💵',a:['RM18.80','RM19.80','RM20.70','RM19.70'],c:'RM19.80'},
+ {w:'Pasar Lanun',o:'Baki wang',q:'Harga topi RM18. Bayar RM50. Berapakah baki?',v:'🎩',a:['RM22','RM28','RM32','RM38'],c:'RM32'},
+ {w:'Pasar Lanun',o:'Masa dan waktu',q:'2 jam 30 minit selepas 9:15 pagi ialah',v:'🕘',a:['10:45 pagi','11:15 pagi','11:45 pagi','12:15 tengah hari'],c:'11:45 pagi'},
+ {w:'Pasar Lanun',o:'Tempoh masa',q:'Sebuah pelayaran bermula 1:20 petang dan tamat 3:05 petang. Tempohnya?',v:'⛵',a:['1 jam 35 minit','1 jam 45 minit','2 jam 15 minit','2 jam 45 minit'],c:'1 jam 45 minit'},
+ {w:'Pasar Lanun',o:'Kalendar',q:'Bulan selepas September ialah',v:'📅',a:['Ogos','Oktober','November','Disember'],c:'Oktober'},
+
+ {w:'Lembah Pecahan',o:'Pecahan setara',q:'Pecahan manakah setara dengan 1/2?',v:'🍕',a:['2/3','2/4','3/5','4/6'],c:'2/4'},
+ {w:'Lembah Pecahan',o:'Tambah pecahan mudah',q:'1/4 + 2/4 =',v:'🥥',a:['2/8','3/4','3/8','1/2'],c:'3/4'},
+ {w:'Lembah Pecahan',o:'Pecahan daripada kuantiti',q:'1/3 daripada 12 syiling ialah',v:'🪙🪙🪙🪙🪙🪙🪙🪙🪙🪙🪙🪙',a:['3','4','6','9'],c:'4'},
+ {w:'Lembah Pecahan',o:'Perpuluhan mudah',q:'0.5 bersamaan dengan pecahan',v:'',a:['1/5','1/2','2/5','5/2'],c:'1/2'},
+ {w:'Lembah Pecahan',o:'Banding pecahan',q:'Pecahan manakah lebih besar?',v:'',a:['1/4','2/4','1/3','1/5'],c:'2/4'},
+
+ {w:'Gua Harta Karun',o:'Panjang',q:'2 m 35 cm bersamaan dengan berapa sentimeter?',v:'📏',a:['235 cm','250 cm','2035 cm','205 cm'],c:'235 cm'},
+ {w:'Gua Harta Karun',o:'Jisim dan isipadu',q:'3 kg 500 g bersamaan dengan',v:'⚖️',a:['305 g','3 050 g','3 500 g','35 000 g'],c:'3 500 g'},
+ {w:'Gua Harta Karun',o:'Geometri',q:'Bentuk 3D manakah mempunyai 6 permukaan segi empat sama?',v:'',a:['Kubus','Kon','Silinder','Sfera'],c:'Kubus'},
+ {w:'Gua Harta Karun',o:'Data',q:'Carta menunjukkan Isnin 4 peti, Selasa 6 peti, Rabu 5 peti. Hari paling banyak?',v:'📦📦📦📦  |  📦📦📦📦📦📦  |  📦📦📦📦📦',a:['Isnin','Selasa','Rabu','Sama banyak'],c:'Selasa'},
+ {w:'Gua Harta Karun',o:'Tahap Bos',q:'Kapten mempunyai 6 peti. Setiap peti berisi 24 syiling. Dia membelanjakan 35 syiling. Berapa syiling tinggal?',v:'🧰🧰🧰🧰🧰🧰',a:['99','109','119','129'],c:'109'}
+];
+
+const worldNames = ['Pantai Nombor','Hutan Nilai Tempat','Teluk Operasi','Pasar Lanun','Lembah Pecahan','Gua Harta Karun'];
+let state = JSON.parse(localStorage.getItem('treasureY3')) || {level:0,coins:0,stars:0,keys:0,sound:true,unlocked:0};
+let answered=false;
+const $=id=>document.getElementById(id);
+
+function save(){localStorage.setItem('treasureY3',JSON.stringify(state));}
+function tone(freq=600,dur=.12){
+ if(!state.sound) return;
+ const ctx=new (window.AudioContext||window.webkitAudioContext)();
+ const osc=ctx.createOscillator(), gain=ctx.createGain();
+ osc.frequency.value=freq; osc.connect(gain); gain.connect(ctx.destination);
+ gain.gain.setValueAtTime(.12,ctx.currentTime); gain.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+dur);
+ osc.start(); osc.stop(ctx.currentTime+dur);
+}
+function updateStats(){
+ $('coins').textContent=state.coins; $('stars').textContent=state.stars; $('keys').textContent=state.keys;
+ $('levelLabel').textContent=Math.min(state.level+1,30);
+ $('progress').style.width=((state.level+1)/30*100)+'%';
+ $('soundBtn').textContent=state.sound?'🔊 Bunyi: Hidup':'🔇 Bunyi: Mati';
+}
+function renderMap(){
+ const map=$('map'); map.innerHTML='';
+ worldNames.forEach((name,i)=>{
+   const btn=document.createElement('button'); btn.className='island';
+   const start=i*5, end=start+4;
+   btn.innerHTML=`${['🏖️','🌴','⚓','🏪','🍕','💎'][i]}<br>${name}<br><span class="small">Tahap ${start+1}-${end+1}</span>`;
+   if(state.level> end) btn.classList.add('done');
+   if(state.level>=start && state.level<=end) btn.classList.add('active');
+   btn.disabled=start>state.unlocked;
+   btn.onclick=()=>{ if(start<=state.unlocked){state.level=start; answered=false; render();} };
+   map.appendChild(btn);
+ });
+}
+function shuffle(arr){return [...arr].sort(()=>Math.random()-.5)}
+function render(){
+ updateStats(); renderMap();
+ if(state.level>=levels.length){showTreasure(); return;}
+ answered=false; $('nextBtn').style.display='none'; $('feedback').textContent=''; $('treasure').classList.remove('show');
+ const L=levels[state.level]; $('worldLabel').textContent=L.w; $('objective').textContent=L.o;
+ $('question').textContent=L.q; $('visual').textContent=L.v||''; $('answers').innerHTML='';
+ shuffle(L.a).forEach(ans=>{
+   const b=document.createElement('button'); b.className='answer'; b.textContent=ans;
+   b.onclick=()=>checkAnswer(b,ans,L.c); $('answers').appendChild(b);
+ });
+}
+function checkAnswer(btn,ans,correct){
+ if(answered)return; answered=true;
+ document.querySelectorAll('.answer').forEach(b=>b.disabled=true);
+ if(ans===correct){
+   btn.classList.add('correct'); $('feedback').textContent='✅ Betul! Anda menemui syiling emas!';
+   state.coins+=20; state.stars+=1; tone(780,.18);
+ }else{
+   btn.classList.add('wrong');
+   document.querySelectorAll('.answer').forEach(b=>{if(b.textContent===correct)b.classList.add('correct')});
+   $('feedback').textContent='💡 Belum tepat. Jawapan betul telah ditunjukkan.'; tone(220,.22);
+ }
+ $('nextBtn').style.display='inline-block'; save(); updateStats();
+}
+$('nextBtn').onclick=()=>{
+ const completed=state.level;
+ state.level++;
+ if(state.level%5===0 && completed<30){state.keys=Math.min(6,state.keys+1); state.coins+=50; tone(980,.25);}
+ state.unlocked=Math.max(state.unlocked,state.level);
+ save(); render();
+};
+$('soundBtn').onclick=()=>{state.sound=!state.sound; save(); updateStats(); tone(600,.1)};
+$('resetBtn').onclick=()=>{
+ if(confirm('Mula semula semua kemajuan permainan?')){
+   state={level:0,coins:0,stars:0,keys:0,sound:true,unlocked:0}; save(); render();
+ }
+};
+function showTreasure(){
+ $('question').textContent='Misi Selesai!'; $('visual').textContent='🏴‍☠️🗺️✨'; $('answers').innerHTML='';
+ $('feedback').textContent='Anda berjaya menamatkan semua 30 tahap.';
+ $('treasure').classList.add('show'); $('nextBtn').style.display='none'; $('progress').style.width='100%';
+ if(!state.rewarded){state.coins+=750; state.rewarded=true; save(); updateStats();}
+}
+render();
+</script>
+<a class="mth-back-link" href="index.html" aria-label="Back to Treasure Hunter levels">← All Treasure Hunter Levels</a>
+<style>.mth-back-link{position:fixed;top:12px;left:12px;z-index:9999;padding:9px 13px;border-radius:999px;color:#fff!important;background:#0f2747;text-decoration:none;font:800 13px/1.2 "Segoe UI",Arial,sans-serif;box-shadow:0 5px 14px #0004}.mth-back-link:hover,.mth-back-link:focus{background:#1d4ed8;outline:3px solid #bfdbfe}@media(max-width:520px){.mth-back-link{top:7px;left:7px;padding:7px 10px;font-size:11px}}</style>
+</body>
+</html>
