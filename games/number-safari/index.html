@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Number Safari</title>
+  <style>
+    :root {
+      --green: #2e7d32;
+      --green-dark: #1b5e20;
+      --yellow: #ffd54f;
+      --orange: #ff9800;
+      --cream: #fff8e1;
+      --brown: #6d4c41;
+      --red: #e53935;
+      --blue: #1976d2;
+      --white: #ffffff;
+      --shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Trebuchet MS", Arial, sans-serif;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(255,255,255,.45) 0 4%, transparent 5%),
+        linear-gradient(#78d7ff 0 38%, #8bc34a 38% 100%);
+      color: #263238;
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      bottom: -30px;
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      background: rgba(46, 125, 50, .35);
+      z-index: -1;
+    }
+
+    body::before { left: -80px; }
+    body::after { right: -70px; }
+
+    .app {
+      width: min(1050px, 94vw);
+      margin: 24px auto;
+    }
+
+    .topbar {
+      background: rgba(255, 255, 255, 0.92);
+      border: 4px solid var(--green-dark);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--green-dark);
+      font-size: clamp(1.7rem, 4vw, 2.8rem);
+    }
+
+    .subtitle {
+      margin: 3px 0 0;
+      color: #546e7a;
+      font-size: .95rem;
+    }
+
+    .stats {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      min-width: 105px;
+      background: var(--cream);
+      border: 3px solid var(--yellow);
+      border-radius: 16px;
+      padding: 8px 12px;
+      text-align: center;
+      font-weight: 800;
+    }
+
+    .stat span {
+      display: block;
+      color: var(--brown);
+      font-size: 1.2rem;
+    }
+
+    .game-card {
+      margin-top: 20px;
+      background: rgba(255,255,255,.95);
+      border: 5px solid var(--green-dark);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .progress-wrap {
+      background: #e8f5e9;
+      padding: 12px 18px;
+      border-bottom: 3px dashed #66bb6a;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 800;
+      margin-bottom: 7px;
+      color: var(--green-dark);
+    }
+
+    .progress-track {
+      height: 18px;
+      background: #c8e6c9;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 2px solid #81c784;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #43a047, #fdd835);
+      transition: width .35s ease;
+    }
+
+    .game-area {
+      padding: 24px;
+      text-align: center;
+    }
+
+    .instruction {
+      margin: 0 0 14px;
+      color: var(--brown);
+      font-size: clamp(1.25rem, 3vw, 1.8rem);
+      font-weight: 900;
+    }
+
+    .animal-zone {
+      min-height: 230px;
+      background:
+        linear-gradient(rgba(255,255,255,.3), rgba(255,255,255,.3)),
+        repeating-linear-gradient(
+          90deg,
+          #dcedc8 0 36px,
+          #c5e1a5 36px 72px
+        );
+      border: 4px dashed #7cb342;
+      border-radius: 24px;
+      padding: 22px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .animal {
+      font-size: clamp(2.2rem, 6vw, 4.3rem);
+      display: inline-block;
+      animation: pop .35s ease both, bounce 2.2s ease-in-out infinite;
+      filter: drop-shadow(0 4px 2px rgba(0,0,0,.15));
+      user-select: none;
+    }
+
+    @keyframes pop {
+      from { transform: scale(0); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0) rotate(-2deg); }
+      50% { transform: translateY(-8px) rotate(2deg); }
+    }
+
+    .answers {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(95px, 1fr));
+      gap: 14px;
+    }
+
+    .answer-btn,
+    .main-btn,
+    .icon-btn {
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 900;
+      transition: transform .15s ease, box-shadow .15s ease, opacity .2s;
+    }
+
+    .answer-btn {
+      min-height: 86px;
+      border-radius: 20px;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      color: #3e2723;
+      background: linear-gradient(#fff176, #fbc02d);
+      border: 4px solid #f57f17;
+      box-shadow: 0 7px 0 #e65100;
+    }
+
+    .answer-btn:hover,
+    .main-btn:hover,
+    .icon-btn:hover {
+      transform: translateY(-3px) scale(1.02);
+    }
+
+    .answer-btn:active,
+    .main-btn:active,
+    .icon-btn:active {
+      transform: translateY(2px);
+      box-shadow: none;
+    }
+
+    .answer-btn:disabled {
+      opacity: .65;
+      cursor: not-allowed;
+    }
+
+    .feedback {
+      min-height: 46px;
+      margin: 16px 0 0;
+      font-size: clamp(1.1rem, 3vw, 1.5rem);
+      font-weight: 900;
+    }
+
+    .feedback.correct { color: var(--green); }
+    .feedback.wrong { color: var(--red); }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .main-btn {
+      background: linear-gradient(#66bb6a, #2e7d32);
+      color: white;
+      border: 3px solid var(--green-dark);
+      border-radius: 18px;
+      padding: 12px 24px;
+      font-size: 1.05rem;
+      box-shadow: 0 6px 0 #1b5e20;
+    }
+
+    .main-btn.orange {
+      background: linear-gradient(#ffb74d, #fb8c00);
+      border-color: #e65100;
+      box-shadow: 0 6px 0 #e65100;
+    }
+
+    .icon-btn {
+      background: #ffffff;
+      color: var(--green-dark);
+      border: 3px solid #81c784;
+      border-radius: 16px;
+      padding: 10px 15px;
+      font-size: 1rem;
+      box-shadow: 0 5px 0 #66bb6a;
+    }
+
+    .start-screen,
+    .end-screen {
+      padding: 34px 24px 38px;
+      text-align: center;
+    }
+
+    .hero-animals {
+      font-size: clamp(3rem, 10vw, 6rem);
+      margin: 12px 0;
+      letter-spacing: 8px;
+    }
+
+    .level-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(130px, 1fr));
+      gap: 14px;
+      margin: 24px auto;
+      max-width: 760px;
+    }
+
+    .level-card {
+      background: var(--cream);
+      border: 4px solid var(--orange);
+      border-radius: 20px;
+      padding: 18px 10px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 900;
+      color: var(--brown);
+      font-size: 1rem;
+      box-shadow: 0 6px 0 #ef6c00;
+      transition: .18s;
+    }
+
+    .level-card:hover,
+    .level-card.selected {
+      transform: translateY(-4px);
+      background: #fff59d;
+      border-color: var(--green);
+      box-shadow: 0 7px 0 var(--green-dark);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .stars {
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      letter-spacing: 8px;
+      margin: 15px 0;
+    }
+
+    .certificate {
+      margin: 18px auto 0;
+      max-width: 620px;
+      background: #fffde7;
+      border: 8px double #f9a825;
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .certificate h2 {
+      color: var(--green-dark);
+      margin: 0 0 8px;
+    }
+
+    .small-note {
+      color: #607d8b;
+      font-size: .9rem;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 700px) {
+      .topbar {
+        justify-content: center;
+      }
+
+      .brand {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .stats {
+        justify-content: center;
+      }
+
+      .answers,
+      .level-buttons {
+        grid-template-columns: 1fr;
+      }
+
+      .answer-btn {
+        min-height: 70px;
+      }
+
+      .animal-zone {
+        min-height: 200px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="topbar">
+      <div class="brand">
+        <div class="brand-icon">🦁</div>
+        <div>
+          <h1>Number Safari</h1>
+          <p class="subtitle">Count the animals and choose the correct number!</p>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">Score <span id="score">0</span></div>
+        <div class="stat">Lives <span id="lives">❤️❤️❤️</span></div>
+        <div class="stat">Level <span id="levelLabel">1–5</span></div>
+      </div>
+    </section>
+
+    <section class="game-card">
+      <section id="startScreen" class="start-screen">
+        <div class="hero-animals">🦁 🐘 🦓</div>
+        <h2>Welcome, Safari Explorer!</h2>
+        <p>Choose your counting level and begin the adventure.</p>
+
+        <div class="level-buttons">
+          <button class="level-card selected" data-min="1" data-max="5">
+            🌱 Little Explorer<br><small>Numbers 1–5</small>
+          </button>
+          <button class="level-card" data-min="1" data-max="10">
+            🦒 Safari Ranger<br><small>Numbers 1–10</small>
+          </button>
+          <button class="level-card" data-min="1" data-max="20">
+            🦁 Safari Master<br><small>Numbers 1–20</small>
+          </button>
+        </div>
+
+        <button id="startBtn" class="main-btn">▶ Start Adventure</button>
+        <p class="small-note">Tip: Turn on sound for animal celebration effects.</p>
+      </section>
+
+      <section id="playScreen" class="hidden">
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span>Safari Journey</span>
+            <span id="questionCounter">1 / 10</span>
+          </div>
+          <div class="progress-track">
+            <div id="progressBar" class="progress-bar"></div>
+          </div>
+        </div>
+
+        <div class="game-area">
+          <p class="instruction">How many animals can you count?</p>
+
+          <div id="animalZone" class="animal-zone" aria-label="Animals to count"></div>
+
+          <div id="answers" class="answers"></div>
+
+          <p id="feedback" class="feedback" aria-live="polite"></p>
+
+          <div class="controls">
+            <button id="soundBtn" class="icon-btn" aria-label="Toggle sound">🔊 Sound On</button>
+            <button id="restartBtn" class="icon-btn">↻ Restart</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="endScreen" class="end-screen hidden">
+        <div class="hero-animals">🏆 🦁 🌿</div>
+        <h2>Safari Complete!</h2>
+        <div id="stars" class="stars">⭐⭐⭐</div>
+        <p id="finalMessage"></p>
+
+        <div class="certificate">
+          <h2>Safari Explorer Certificate</h2>
+          <p>This certificate is awarded for completing the</p>
+          <strong>Number Safari Counting Adventure</strong>
+          <p id="certificateScore"></p>
+        </div>
+
+        <div class="controls">
+          <button id="playAgainBtn" class="main-btn">Play Again</button>
+          <button id="homeBtn" class="main-btn orange">Choose Level</button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const animals = ["🦁", "🐘", "🦓", "🦒", "🐒", "🦏", "🐊", "🦜"];
+    const totalQuestions = 10;
+
+    let minNumber = 1;
+    let maxNumber = 5;
+    let currentQuestion = 0;
+    let correctAnswer = 1;
+    let score = 0;
+    let lives = 3;
+    let soundOn = true;
+    let locked = false;
+
+    const startScreen = document.getElementById("startScreen");
+    const playScreen = document.getElementById("playScreen");
+    const endScreen = document.getElementById("endScreen");
+    const animalZone = document.getElementById("animalZone");
+    const answers = document.getElementById("answers");
+    const feedback = document.getElementById("feedback");
+    const scoreEl = document.getElementById("score");
+    const livesEl = document.getElementById("lives");
+    const levelLabel = document.getElementById("levelLabel");
+    const questionCounter = document.getElementById("questionCounter");
+    const progressBar = document.getElementById("progressBar");
+    const soundBtn = document.getElementById("soundBtn");
+    const stars = document.getElementById("stars");
+    const finalMessage = document.getElementById("finalMessage");
+    const certificateScore = document.getElementById("certificateScore");
+
+    document.querySelectorAll(".level-card").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".level-card").forEach(b => b.classList.remove("selected"));
+        button.classList.add("selected");
+        minNumber = Number(button.dataset.min);
+        maxNumber = Number(button.dataset.max);
+        levelLabel.textContent = `${minNumber}–${maxNumber}`;
+      });
+    });
+
+    document.getElementById("startBtn").addEventListener("click", startGame);
+    document.getElementById("restartBtn").addEventListener("click", startGame);
+    document.getElementById("playAgainBtn").addEventListener("click", startGame);
+    document.getElementById("homeBtn").addEventListener("click", showHome);
+
+    soundBtn.addEventListener("click", () => {
+      soundOn = !soundOn;
+      soundBtn.textContent = soundOn ? "🔊 Sound On" : "🔇 Sound Off";
+    });
+
+    function startGame() {
+      currentQuestion = 0;
+      score = 0;
+      lives = 3;
+      locked = false;
+      updateStats();
+
+      startScreen.classList.add("hidden");
+      endScreen.classList.add("hidden");
+      playScreen.classList.remove("hidden");
+
+      nextQuestion();
+    }
+
+    function showHome() {
+      playScreen.classList.add("hidden");
+      endScreen.classList.add("hidden");
+      startScreen.classList.remove("hidden");
+    }
+
+    function nextQuestion() {
+      if (currentQuestion >= totalQuestions || lives <= 0) {
+        finishGame();
+        return;
+      }
+
+      locked = false;
+      currentQuestion++;
+      feedback.textContent = "";
+      feedback.className = "feedback";
+
+      correctAnswer = randomInt(minNumber, maxNumber);
+      const animal = animals[randomInt(0, animals.length - 1)];
+
+      renderAnimals(animal, correctAnswer);
+      renderAnswers();
+      updateProgress();
+    }
+
+    function renderAnimals(animal, count) {
+      animalZone.innerHTML = "";
+
+      for (let i = 0; i < count; i++) {
+        const span = document.createElement("span");
+        span.className = "animal";
+        span.textContent = animal;
+        span.style.animationDelay = `${i * 0.04}s`;
+        span.setAttribute("aria-hidden", "true");
+        animalZone.appendChild(span);
+      }
+
+      animalZone.setAttribute("aria-label", `${count} animals`);
+    }
+
+    function renderAnswers() {
+      answers.innerHTML = "";
+
+      const choices = new Set([correctAnswer]);
+      while (choices.size < 3) {
+        const spread = maxNumber <= 5 ? 2 : maxNumber <= 10 ? 3 : 5;
+        let candidate = correctAnswer + randomInt(-spread, spread);
+        candidate = Math.max(minNumber, Math.min(maxNumber, candidate));
+
+        if (candidate === correctAnswer && choices.size > 0) {
+          candidate = randomInt(minNumber, maxNumber);
+        }
+        choices.add(candidate);
+      }
+
+      shuffle([...choices]).forEach(number => {
+        const button = document.createElement("button");
+        button.className = "answer-btn";
+        button.textContent = number;
+        button.setAttribute("aria-label", `Answer ${number}`);
+        button.addEventListener("click", () => checkAnswer(number));
+        answers.appendChild(button);
+      });
+    }
+
+    function checkAnswer(selected) {
+      if (locked) return;
+      locked = true;
+
+      [...answers.children].forEach(button => button.disabled = true);
+
+      if (selected === correctAnswer) {
+        score += 10;
+        feedback.textContent = randomChoice([
+          "Excellent! You counted correctly! 🎉",
+          "Great job, Safari Explorer! 🦁",
+          "Correct! Amazing counting! ⭐"
+        ]);
+        feedback.classList.add("correct");
+        playTone(660, 0.12);
+        setTimeout(() => playTone(880, 0.16), 120);
+      } else {
+        lives--;
+        feedback.textContent = `Good try! The correct answer is ${correctAnswer}.`;
+        feedback.classList.add("wrong");
+        playTone(190, 0.22);
+      }
+
+      updateStats();
+
+      setTimeout(() => {
+        nextQuestion();
+      }, 1100);
+    }
+
+    function finishGame() {
+      playScreen.classList.add("hidden");
+      endScreen.classList.remove("hidden");
+
+      const answered = currentQuestion > totalQuestions ? totalQuestions : currentQuestion;
+      const accuracy = Math.round((score / (totalQuestions * 10)) * 100);
+
+      if (accuracy >= 80) {
+        stars.textContent = "⭐⭐⭐";
+        finalMessage.textContent = "Outstanding! You are a Number Safari Master!";
+      } else if (accuracy >= 50) {
+        stars.textContent = "⭐⭐";
+        finalMessage.textContent = "Great work! Keep practising your counting skills.";
+      } else {
+        stars.textContent = "⭐";
+        finalMessage.textContent = "Nice effort! Every explorer improves with practice.";
+      }
+
+      certificateScore.textContent = `Final Score: ${score} points • ${accuracy}% accuracy`;
+      playTone(523, 0.14);
+      setTimeout(() => playTone(659, 0.14), 140);
+      setTimeout(() => playTone(784, 0.25), 280);
+    }
+
+    function updateStats() {
+      scoreEl.textContent = score;
+      livesEl.textContent = lives > 0 ? "❤️".repeat(lives) : "💔";
+    }
+
+    function updateProgress() {
+      questionCounter.textContent = `${currentQuestion} / ${totalQuestions}`;
+      progressBar.style.width = `${(currentQuestion / totalQuestions) * 100}%`;
+    }
+
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function randomChoice(items) {
+      return items[randomInt(0, items.length - 1)];
+    }
+
+    function shuffle(items) {
+      for (let i = items.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [items[i], items[j]] = [items[j], items[i]];
+      }
+      return items;
+    }
+
+    function playTone(frequency, duration) {
+      if (!soundOn) return;
+
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+
+      const context = new AudioContext();
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+
+      oscillator.type = "sine";
+      oscillator.frequency.value = frequency;
+      gain.gain.setValueAtTime(0.12, context.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + duration);
+
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+
+      oscillator.start();
+      oscillator.stop(context.currentTime + duration);
+      oscillator.addEventListener("ended", () => context.close());
+    }
+  </script>
+<a class="mth-back-link" href="../" aria-label="Back to all games">← All Games</a>
+<style>.mth-back-link{position:fixed;top:12px;left:12px;z-index:9999;padding:9px 13px;border-radius:999px;color:#fff!important;background:#0f2747;text-decoration:none;font:800 13px/1.2 "Segoe UI",Arial,sans-serif;box-shadow:0 5px 14px #0004}.mth-back-link:hover,.mth-back-link:focus{background:#1d4ed8;outline:3px solid #bfdbfe}@media(max-width:520px){.mth-back-link{top:7px;left:7px;padding:7px 10px;font-size:11px}}</style>
+</body>
+</html>
