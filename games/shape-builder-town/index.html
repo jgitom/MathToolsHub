@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shape Builder Town</title>
+  <style>
+    :root{
+      --sky:#8ed8ff;
+      --grass:#79c45b;
+      --road:#686868;
+      --cream:#fff8e7;
+      --orange:#ff9f1c;
+      --yellow:#ffd166;
+      --green:#2a9d8f;
+      --blue:#277da1;
+      --red:#e63946;
+      --purple:#8e5bd9;
+      --brown:#8d6e63;
+      --dark:#24323d;
+      --white:#ffffff;
+      --shadow:0 14px 30px rgba(0,0,0,.18);
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:"Trebuchet MS", Arial, sans-serif;
+      color:var(--dark);
+      background:
+        linear-gradient(var(--sky) 0 46%, var(--grass) 46% 100%);
+      overflow-x:hidden;
+    }
+
+    body::before{
+      content:"☀️";
+      position:fixed;
+      top:22px;
+      right:30px;
+      font-size:72px;
+      filter:drop-shadow(0 5px 3px rgba(0,0,0,.12));
+      z-index:-1;
+    }
+
+    .app{
+      width:min(1120px,95vw);
+      margin:20px auto 30px;
+    }
+
+    .header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      flex-wrap:wrap;
+      background:rgba(255,255,255,.94);
+      border:5px solid #3b7a57;
+      border-radius:24px;
+      padding:15px 20px;
+      box-shadow:var(--shadow);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:13px;
+    }
+
+    .brand-icon{
+      font-size:clamp(2.5rem,6vw,4rem);
+    }
+
+    h1{
+      margin:0;
+      color:#2d6a4f;
+      font-size:clamp(1.8rem,4vw,3rem);
+    }
+
+    .subtitle{
+      margin:3px 0 0;
+      color:#5e6a73;
+      font-size:.98rem;
+    }
+
+    .stats{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .stat{
+      min-width:105px;
+      text-align:center;
+      background:var(--cream);
+      border:3px solid var(--yellow);
+      border-radius:16px;
+      padding:8px 12px;
+      font-weight:900;
+    }
+
+    .stat span{
+      display:block;
+      color:#6d4c41;
+      font-size:1.2rem;
+    }
+
+    .game-card{
+      margin-top:18px;
+      background:rgba(255,255,255,.96);
+      border:5px solid #3b7a57;
+      border-radius:28px;
+      overflow:hidden;
+      box-shadow:var(--shadow);
+    }
+
+    .start-screen,
+    .end-screen{
+      padding:34px 24px 38px;
+      text-align:center;
+    }
+
+    .hero{
+      font-size:clamp(3rem,9vw,6rem);
+      letter-spacing:7px;
+      margin:8px 0 15px;
+    }
+
+    .level-grid{
+      max-width:780px;
+      margin:24px auto;
+      display:grid;
+      grid-template-columns:repeat(3,minmax(150px,1fr));
+      gap:14px;
+    }
+
+    .level-card{
+      border:none;
+      cursor:pointer;
+      font-family:inherit;
+      font-weight:900;
+      color:#5d4037;
+      background:#fff7cc;
+      border:4px solid var(--orange);
+      border-radius:20px;
+      padding:18px 12px;
+      box-shadow:0 7px 0 #d66f00;
+      transition:.16s;
+      font-size:1rem;
+    }
+
+    .level-card:hover,
+    .level-card.selected{
+      transform:translateY(-4px);
+      background:#fff19b;
+      border-color:#2a9d8f;
+      box-shadow:0 7px 0 #1f746a;
+    }
+
+    .main-btn,
+    .small-btn,
+    .shape-btn{
+      border:none;
+      font-family:inherit;
+      font-weight:900;
+      cursor:pointer;
+      transition:transform .15s ease, box-shadow .15s ease;
+    }
+
+    .main-btn{
+      background:linear-gradient(#49c26f,#218c4d);
+      color:white;
+      border:3px solid #176936;
+      border-radius:18px;
+      padding:13px 25px;
+      font-size:1.05rem;
+      box-shadow:0 6px 0 #176936;
+    }
+
+    .main-btn.orange{
+      background:linear-gradient(#ffb347,#f47b20);
+      border-color:#c65010;
+      box-shadow:0 6px 0 #c65010;
+    }
+
+    .small-btn{
+      background:white;
+      color:#26624a;
+      border:3px solid #72ba8c;
+      border-radius:15px;
+      padding:10px 14px;
+      box-shadow:0 5px 0 #4f9c69;
+    }
+
+    button:hover{transform:translateY(-3px)}
+    button:active{transform:translateY(2px);box-shadow:none!important}
+
+    .progress-wrap{
+      background:#e8f7ed;
+      padding:12px 18px;
+      border-bottom:3px dashed #77b98c;
+    }
+
+    .progress-label{
+      display:flex;
+      justify-content:space-between;
+      font-weight:900;
+      color:#24563f;
+      margin-bottom:7px;
+    }
+
+    .progress-track{
+      height:18px;
+      background:#cde9d5;
+      border:2px solid #75b389;
+      border-radius:999px;
+      overflow:hidden;
+    }
+
+    .progress-bar{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,#2a9d8f,#ffd166);
+      transition:width .3s ease;
+    }
+
+    .play-area{
+      padding:22px;
+    }
+
+    .instruction{
+      margin:0 0 16px;
+      text-align:center;
+      color:#6d4c41;
+      font-size:clamp(1.2rem,3vw,1.8rem);
+      font-weight:900;
+    }
+
+    .builder-layout{
+      display:grid;
+      grid-template-columns:1.5fr .8fr;
+      gap:18px;
+      align-items:stretch;
+    }
+
+    .town-panel,
+    .tool-panel{
+      background:#fdfdfd;
+      border:4px solid #8bc59c;
+      border-radius:22px;
+      padding:18px;
+    }
+
+    .town-panel{
+      position:relative;
+      min-height:430px;
+      background:
+        linear-gradient(#bde8ff 0 62%, #8fd36b 62% 78%, #777 78% 100%);
+      overflow:hidden;
+    }
+
+    .cloud{
+      position:absolute;
+      font-size:46px;
+      opacity:.95;
+      user-select:none;
+    }
+
+    .cloud.one{left:8%;top:6%}
+    .cloud.two{right:10%;top:10%}
+
+    .building{
+      position:absolute;
+      left:50%;
+      bottom:22%;
+      transform:translateX(-50%);
+      width:min(330px,72%);
+      height:250px;
+      background:#f2b66d;
+      border:5px solid #7c4c2e;
+      border-radius:10px 10px 0 0;
+      box-shadow:0 10px 0 rgba(0,0,0,.08);
+    }
+
+    .roof{
+      position:absolute;
+      left:50%;
+      top:-83px;
+      transform:translateX(-50%);
+      width:0;
+      height:0;
+      border-left:185px solid transparent;
+      border-right:185px solid transparent;
+      border-bottom:95px solid #c83e3e;
+      filter:drop-shadow(0 -4px 0 #7c2a2a);
+    }
+
+    .door{
+      position:absolute;
+      left:50%;
+      bottom:0;
+      transform:translateX(-50%);
+      width:68px;
+      height:112px;
+      background:#7a4b2b;
+      border:4px solid #4f2f1c;
+      border-radius:8px 8px 0 0;
+    }
+
+    .window{
+      position:absolute;
+      width:70px;
+      height:70px;
+      background:#a9e5ff;
+      border:5px solid #5a7890;
+      display:grid;
+      place-items:center;
+    }
+
+    .window.left{left:28px;top:65px}
+    .window.right{right:28px;top:65px}
+
+    .target{
+      position:absolute;
+      border:4px dashed rgba(255,255,255,.95);
+      background:rgba(255,255,255,.22);
+      display:grid;
+      place-items:center;
+      color:white;
+      font-weight:900;
+      text-align:center;
+      padding:4px;
+      transition:.2s;
+      animation:pulse 1.5s infinite;
+    }
+
+    @keyframes pulse{
+      0%,100%{filter:brightness(1)}
+      50%{filter:brightness(1.25)}
+    }
+
+    .target.circle{
+      width:70px;
+      height:70px;
+      border-radius:50%;
+      left:50%;
+      top:40px;
+      transform:translateX(-50%);
+    }
+
+    .target.square{
+      width:75px;
+      height:75px;
+      left:25px;
+      top:65px;
+    }
+
+    .target.rectangle{
+      width:68px;
+      height:112px;
+      left:50%;
+      bottom:0;
+      transform:translateX(-50%);
+      border-radius:7px 7px 0 0;
+    }
+
+    .target.triangle{
+      width:0;
+      height:0;
+      left:50%;
+      top:-83px;
+      transform:translateX(-50%);
+      border-left:95px solid transparent;
+      border-right:95px solid transparent;
+      border-bottom:82px solid rgba(255,255,255,.22);
+      border-top:none;
+      background:transparent;
+      outline:none;
+    }
+
+    .target.filled{
+      animation:none;
+      border-style:solid;
+      color:transparent;
+    }
+
+    .target.circle.filled{background:#ffd166;border-color:#c28c00}
+    .target.square.filled{background:#55b6e8;border-color:#266a8b}
+    .target.rectangle.filled{background:#7a4b2b;border-color:#4f2f1c}
+    .target.triangle.filled{
+      border-left-color:transparent;
+      border-right-color:transparent;
+      border-bottom-color:#c83e3e;
+    }
+
+    .side-title{
+      margin:0 0 12px;
+      text-align:center;
+      color:#315d49;
+    }
+
+    .shape-bank{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .shape-btn{
+      min-height:105px;
+      background:#fff8dc;
+      border:4px solid #f0a33a;
+      border-radius:18px;
+      box-shadow:0 6px 0 #d87800;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:7px;
+      color:#5d4037;
+      font-size:.95rem;
+    }
+
+    .shape-icon{
+      display:block;
+      width:52px;
+      height:52px;
+    }
+
+    .shape-icon.circle{
+      border-radius:50%;
+      background:#ffd166;
+      border:4px solid #c28c00;
+    }
+
+    .shape-icon.square{
+      background:#55b6e8;
+      border:4px solid #266a8b;
+    }
+
+    .shape-icon.rectangle{
+      width:42px;
+      height:62px;
+      background:#9b6b43;
+      border:4px solid #5e3e29;
+    }
+
+    .shape-icon.triangle{
+      width:0;
+      height:0;
+      border-left:31px solid transparent;
+      border-right:31px solid transparent;
+      border-bottom:56px solid #e45454;
+    }
+
+    .shape-btn.used{
+      opacity:.42;
+      pointer-events:none;
+      filter:grayscale(.4);
+    }
+
+    .feedback{
+      min-height:42px;
+      margin:16px 0 0;
+      text-align:center;
+      font-size:clamp(1.05rem,3vw,1.45rem);
+      font-weight:900;
+    }
+
+    .feedback.correct{color:#1b7f44}
+    .feedback.wrong{color:#d62828}
+
+    .controls{
+      margin-top:14px;
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .mini-task{
+      margin-top:15px;
+      background:#fff7d6;
+      border:3px solid #e6b13f;
+      border-radius:16px;
+      padding:11px;
+      text-align:center;
+      font-weight:900;
+      color:#705027;
+    }
+
+    .hidden{display:none!important}
+
+    .stars{
+      font-size:clamp(2.5rem,8vw,5rem);
+      letter-spacing:8px;
+      margin:14px 0;
+    }
+
+    .certificate{
+      margin:18px auto 0;
+      max-width:640px;
+      background:#fffcec;
+      border:8px double #d99a19;
+      border-radius:18px;
+      padding:20px;
+    }
+
+    .certificate h2{
+      margin:0 0 8px;
+      color:#2d6a4f;
+    }
+
+    @media(max-width:820px){
+      .builder-layout{grid-template-columns:1fr}
+      .town-panel{min-height:390px}
+    }
+
+    @media(max-width:650px){
+      .header{justify-content:center}
+      .brand{width:100%;justify-content:center;text-align:center}
+      .stats{justify-content:center}
+      .level-grid{grid-template-columns:1fr}
+      .shape-bank{grid-template-columns:1fr 1fr}
+      .building{width:78%;height:220px}
+      .roof{
+        border-left-width:145px;
+        border-right-width:145px;
+      }
+    }
+
+    @media(max-width:430px){
+      .shape-bank{grid-template-columns:1fr}
+      .town-panel{min-height:350px}
+      .building{width:82%;height:205px}
+      .window{width:58px;height:58px}
+      .window.left{left:14px}
+      .window.right{right:14px}
+    }
+
+    @media(prefers-reduced-motion:reduce){
+      *{animation:none!important;transition:none!important}
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <div class="brand">
+        <div class="brand-icon">🏘️</div>
+        <div>
+          <h1>Shape Builder Town</h1>
+          <p class="subtitle">Choose the correct shapes and build a happy town!</p>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">Score <span id="score">0</span></div>
+        <div class="stat">Lives <span id="lives">❤️❤️❤️</span></div>
+        <div class="stat">Level <span id="levelLabel">Easy</span></div>
+      </div>
+    </header>
+
+    <section class="game-card">
+      <section id="startScreen" class="start-screen">
+        <div class="hero">🔺 🟦 ⚪</div>
+        <h2>Welcome, Little Architect!</h2>
+        <p>Identify shapes and place them in the correct part of the building.</p>
+
+        <div class="level-grid">
+          <button class="level-card selected" data-level="easy">
+            🌱 Easy Builder<br><small>Circle, square and triangle</small>
+          </button>
+          <button class="level-card" data-level="medium">
+            🏗️ Town Builder<br><small>Add rectangles and mixed tasks</small>
+          </button>
+          <button class="level-card" data-level="hard">
+            🏙️ Master Architect<br><small>Faster rounds and more buildings</small>
+          </button>
+        </div>
+
+        <button id="startBtn" class="main-btn">▶ Start Building</button>
+      </section>
+
+      <section id="playScreen" class="hidden">
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span>Town Progress</span>
+            <span id="roundLabel">Round 1 / 6</span>
+          </div>
+          <div class="progress-track">
+            <div id="progressBar" class="progress-bar"></div>
+          </div>
+        </div>
+
+        <div class="play-area">
+          <p id="instruction" class="instruction">Choose the shape for the roof.</p>
+
+          <div class="builder-layout">
+            <section class="town-panel">
+              <div class="cloud one">☁️</div>
+              <div class="cloud two">☁️</div>
+
+              <div class="building">
+                <div class="roof"></div>
+                <div class="window left"></div>
+                <div class="window right"></div>
+                <div class="door"></div>
+
+                <div class="target triangle" data-shape="triangle"></div>
+                <div class="target circle" data-shape="circle"></div>
+                <div class="target square" data-shape="square"></div>
+                <div class="target rectangle" data-shape="rectangle"></div>
+              </div>
+            </section>
+
+            <aside class="tool-panel">
+              <h3 class="side-title">Shape Toolbox</h3>
+
+              <div class="shape-bank">
+                <button class="shape-btn" data-shape="circle">
+                  <span class="shape-icon circle"></span>
+                  Circle
+                </button>
+
+                <button class="shape-btn" data-shape="square">
+                  <span class="shape-icon square"></span>
+                  Square
+                </button>
+
+                <button class="shape-btn" data-shape="triangle">
+                  <span class="shape-icon triangle"></span>
+                  Triangle
+                </button>
+
+                <button class="shape-btn" data-shape="rectangle">
+                  <span class="shape-icon rectangle"></span>
+                  Rectangle
+                </button>
+              </div>
+
+              <div id="miniTask" class="mini-task">
+                Find the shape named above.
+              </div>
+            </aside>
+          </div>
+
+          <p id="feedback" class="feedback" aria-live="polite"></p>
+
+          <div class="controls">
+            <button id="soundBtn" class="small-btn">🔊 Sound On</button>
+            <button id="restartBtn" class="small-btn">↻ Restart</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="endScreen" class="end-screen hidden">
+        <div class="hero">🏆 🏘️ 🌟</div>
+        <h2>Your Town Is Complete!</h2>
+        <div id="stars" class="stars">⭐⭐⭐</div>
+        <p id="finalMessage"></p>
+
+        <div class="certificate">
+          <h2>Little Architect Certificate</h2>
+          <p>This certificate is awarded for completing</p>
+          <strong>Shape Builder Town</strong>
+          <p id="certificateScore"></p>
+        </div>
+
+        <div class="controls">
+          <button id="playAgainBtn" class="main-btn">Build Again</button>
+          <button id="homeBtn" class="main-btn orange">Choose Level</button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const levelConfig = {
+      easy: {
+        label: "Easy",
+        rounds: 6,
+        shapes: ["circle", "square", "triangle"]
+      },
+      medium: {
+        label: "Medium",
+        rounds: 8,
+        shapes: ["circle", "square", "triangle", "rectangle"]
+      },
+      hard: {
+        label: "Hard",
+        rounds: 10,
+        shapes: ["circle", "square", "triangle", "rectangle"]
+      }
+    };
+
+    const shapeClues = {
+      circle: [
+        "Choose the shape for the round window.",
+        "Find the shape with no corners.",
+        "Which shape looks like a wheel?"
+      ],
+      square: [
+        "Choose the shape for the square window.",
+        "Find the shape with 4 equal sides.",
+        "Which shape has 4 equal corners?"
+      ],
+      triangle: [
+        "Choose the shape for the roof.",
+        "Find the shape with 3 sides.",
+        "Which shape looks like a mountain?"
+      ],
+      rectangle: [
+        "Choose the shape for the door.",
+        "Find the shape with 2 long and 2 short sides.",
+        "Which shape looks like a tall door?"
+      ]
+    };
+
+    let selectedLevel = "easy";
+    let round = 0;
+    let score = 0;
+    let lives = 3;
+    let targetShape = "circle";
+    let soundOn = true;
+    let locked = false;
+    let correctCount = 0;
+
+    const startScreen = document.getElementById("startScreen");
+    const playScreen = document.getElementById("playScreen");
+    const endScreen = document.getElementById("endScreen");
+    const scoreEl = document.getElementById("score");
+    const livesEl = document.getElementById("lives");
+    const levelLabel = document.getElementById("levelLabel");
+    const instruction = document.getElementById("instruction");
+    const feedback = document.getElementById("feedback");
+    const roundLabel = document.getElementById("roundLabel");
+    const progressBar = document.getElementById("progressBar");
+    const miniTask = document.getElementById("miniTask");
+    const soundBtn = document.getElementById("soundBtn");
+    const stars = document.getElementById("stars");
+    const finalMessage = document.getElementById("finalMessage");
+    const certificateScore = document.getElementById("certificateScore");
+
+    document.querySelectorAll(".level-card").forEach(card => {
+      card.addEventListener("click", () => {
+        document.querySelectorAll(".level-card").forEach(c => c.classList.remove("selected"));
+        card.classList.add("selected");
+        selectedLevel = card.dataset.level;
+        levelLabel.textContent = levelConfig[selectedLevel].label;
+      });
+    });
+
+    document.querySelectorAll(".shape-btn").forEach(button => {
+      button.addEventListener("click", () => checkShape(button.dataset.shape, button));
+    });
+
+    document.getElementById("startBtn").addEventListener("click", startGame);
+    document.getElementById("restartBtn").addEventListener("click", startGame);
+    document.getElementById("playAgainBtn").addEventListener("click", startGame);
+    document.getElementById("homeBtn").addEventListener("click", showHome);
+
+    soundBtn.addEventListener("click", () => {
+      soundOn = !soundOn;
+      soundBtn.textContent = soundOn ? "🔊 Sound On" : "🔇 Sound Off";
+    });
+
+    function startGame(){
+      round = 0;
+      score = 0;
+      lives = 3;
+      correctCount = 0;
+      locked = false;
+
+      resetBuilding();
+      updateStats();
+
+      startScreen.classList.add("hidden");
+      endScreen.classList.add("hidden");
+      playScreen.classList.remove("hidden");
+
+      nextRound();
+    }
+
+    function showHome(){
+      playScreen.classList.add("hidden");
+      endScreen.classList.add("hidden");
+      startScreen.classList.remove("hidden");
+    }
+
+    function nextRound(){
+      const config = levelConfig[selectedLevel];
+
+      if(round >= config.rounds || lives <= 0){
+        finishGame();
+        return;
+      }
+
+      round++;
+      locked = false;
+      feedback.textContent = "";
+      feedback.className = "feedback";
+
+      document.querySelectorAll(".shape-btn").forEach(btn => {
+        btn.disabled = false;
+        btn.classList.remove("used");
+      });
+
+      const availableShapes = config.shapes;
+      targetShape = availableShapes[Math.floor(Math.random() * availableShapes.length)];
+
+      const clues = shapeClues[targetShape];
+      instruction.textContent = clues[Math.floor(Math.random() * clues.length)];
+      miniTask.textContent = `Build with the correct ${targetShape}.`;
+
+      roundLabel.textContent = `Round ${round} / ${config.rounds}`;
+      progressBar.style.width = `${(round / config.rounds) * 100}%`;
+    }
+
+    function checkShape(selectedShape, button){
+      if(locked) return;
+      locked = true;
+
+      document.querySelectorAll(".shape-btn").forEach(btn => btn.disabled = true);
+
+      if(selectedShape === targetShape){
+        score += selectedLevel === "hard" ? 15 : 10;
+        correctCount++;
+        feedback.textContent = randomChoice([
+          "Correct! The town is looking great! 🎉",
+          "Excellent building, Little Architect! 🏠",
+          "Perfect shape! Keep building! ⭐"
+        ]);
+        feedback.classList.add("correct");
+        fillTarget(targetShape);
+        button.classList.add("used");
+
+        playTone(660,.12);
+        setTimeout(() => playTone(880,.16),120);
+      }else{
+        lives--;
+        feedback.textContent = `Good try! The correct shape is ${targetShape}.`;
+        feedback.classList.add("wrong");
+        playTone(180,.22);
+      }
+
+      updateStats();
+
+      setTimeout(() => nextRound(), 1100);
+    }
+
+    function fillTarget(shape){
+      const target = document.querySelector(`.target.${shape}`);
+      if(target) target.classList.add("filled");
+    }
+
+    function resetBuilding(){
+      document.querySelectorAll(".target").forEach(target => {
+        target.classList.remove("filled");
+      });
+    }
+
+    function updateStats(){
+      scoreEl.textContent = score;
+      livesEl.textContent = lives > 0 ? "❤️".repeat(lives) : "💔";
+      levelLabel.textContent = levelConfig[selectedLevel].label;
+    }
+
+    function finishGame(){
+      playScreen.classList.add("hidden");
+      endScreen.classList.remove("hidden");
+
+      const total = levelConfig[selectedLevel].rounds;
+      const accuracy = Math.round((correctCount / total) * 100);
+
+      if(accuracy >= 80){
+        stars.textContent = "⭐⭐⭐";
+        finalMessage.textContent = "Amazing! You are a Shape Builder Master!";
+      }else if(accuracy >= 50){
+        stars.textContent = "⭐⭐";
+        finalMessage.textContent = "Great work! Your town is growing beautifully.";
+      }else{
+        stars.textContent = "⭐";
+        finalMessage.textContent = "Nice effort! Keep practising your shapes.";
+      }
+
+      certificateScore.textContent =
+        `Final Score: ${score} points • ${accuracy}% accuracy`;
+
+      playTone(523,.14);
+      setTimeout(() => playTone(659,.14),140);
+      setTimeout(() => playTone(784,.25),280);
+    }
+
+    function randomChoice(items){
+      return items[Math.floor(Math.random() * items.length)];
+    }
+
+    function playTone(frequency,duration){
+      if(!soundOn) return;
+
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if(!AudioContext) return;
+
+      const context = new AudioContext();
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+
+      oscillator.type = "sine";
+      oscillator.frequency.value = frequency;
+      gain.gain.setValueAtTime(.12,context.currentTime);
+      gain.gain.exponentialRampToValueAtTime(.001,context.currentTime + duration);
+
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+
+      oscillator.start();
+      oscillator.stop(context.currentTime + duration);
+      oscillator.addEventListener("ended",() => context.close());
+    }
+  </script>
+<a class="mth-back-link" href="../" aria-label="Back to all games">← All Games</a>
+<style>.mth-back-link{position:fixed;top:12px;left:12px;z-index:9999;padding:9px 13px;border-radius:999px;color:#fff!important;background:#0f2747;text-decoration:none;font:800 13px/1.2 "Segoe UI",Arial,sans-serif;box-shadow:0 5px 14px #0004}.mth-back-link:hover,.mth-back-link:focus{background:#1d4ed8;outline:3px solid #bfdbfe}@media(max-width:520px){.mth-back-link{top:7px;left:7px;padding:7px 10px;font-size:11px}}</style>
+</body>
+</html>
