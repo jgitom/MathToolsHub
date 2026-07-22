@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Algebra Battle Arena</title>
+<style>
+:root{
+  --bg1:#10243b;--bg2:#07111f;--panel:#ffffff;--ink:#23313d;
+  --primary:#2a9d8f;--secondary:#ffd166;--accent:#ef476f;
+  --orange:#ff9f1c;--blue:#277da1;--purple:#8f5bd9;
+  --shadow:0 14px 30px rgba(0,0,0,.22);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;font-family:"Trebuchet MS",Arial,sans-serif;color:var(--ink);
+  background:
+    radial-gradient(circle at 12% 10%,rgba(255,255,255,.75) 0 2px,transparent 3px),
+    radial-gradient(circle at 82% 18%,rgba(255,255,255,.55) 0 2px,transparent 3px),
+    linear-gradient(145deg,var(--bg1),var(--bg2));
+  background-size:160px 160px,220px 220px,cover;
+}
+button{font-family:inherit}
+.app{width:min(1140px,95vw);margin:20px auto 32px}
+.header{
+  display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
+  background:rgba(255,255,255,.96);border:5px solid var(--primary);border-radius:24px;
+  padding:15px 20px;box-shadow:var(--shadow)
+}
+.brand{display:flex;align-items:center;gap:13px}.brand-icon{font-size:clamp(2.5rem,6vw,4rem)}
+h1{margin:0;color:var(--primary);font-size:clamp(1.75rem,4vw,2.9rem)}
+.subtitle{margin:3px 0 0;color:#64727c}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{min-width:105px;text-align:center;background:#fff8e7;border:3px solid var(--secondary);border-radius:16px;padding:8px 12px;font-weight:900}
+.stat span{display:block;color:#6d4c41;font-size:1.2rem}
+.card{margin-top:18px;background:rgba(255,255,255,.97);border:5px solid var(--primary);border-radius:28px;overflow:hidden;box-shadow:var(--shadow)}
+.start-screen,.end-screen{padding:34px 24px 38px;text-align:center}
+.hero{font-size:clamp(3rem,9vw,6rem);margin:8px 0 14px;letter-spacing:5px}
+.level-grid{max-width:880px;margin:24px auto;display:grid;grid-template-columns:repeat(3,minmax(160px,1fr));gap:14px}
+.level-card{
+  border:none;cursor:pointer;font-weight:900;color:#5d4037;background:#fff6c7;
+  border:4px solid var(--orange);border-radius:20px;padding:18px 12px;
+  box-shadow:0 7px 0 #d97700;transition:.16s;font-size:1rem
+}
+.level-card:hover,.level-card.selected{transform:translateY(-4px);background:#fff29f;border-color:var(--primary);box-shadow:0 7px 0 #1f746a}
+.main-btn,.small-btn,.answer-btn{border:none;font-weight:900;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.main-btn{background:linear-gradient(#4bc56f,#238d4f);color:white;border:3px solid #166b39;border-radius:18px;padding:13px 25px;font-size:1.05rem;box-shadow:0 6px 0 #166b39}
+.main-btn.orange{background:linear-gradient(#ffb347,#f47b20);border-color:#c65010;box-shadow:0 6px 0 #c65010}
+.small-btn{background:white;color:#315d4a;border:3px solid #79bd91;border-radius:15px;padding:10px 14px;box-shadow:0 5px 0 #4f9d69}
+button:hover{transform:translateY(-3px)}button:active{transform:translateY(2px);box-shadow:none!important}button:disabled{opacity:.58;cursor:not-allowed}
+.progress-wrap{background:#edf7f0;padding:12px 18px;border-bottom:3px dashed #79b98c}
+.progress-label{display:flex;justify-content:space-between;font-weight:900;color:#285d43;margin-bottom:7px}
+.progress-track{height:18px;background:#cce8d4;border:2px solid #78b28a;border-radius:999px;overflow:hidden}
+.progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--primary),var(--secondary),var(--accent));transition:width .3s}
+.play-area{padding:22px;text-align:center}
+.instruction{margin:0 0 8px;color:#6d4c41;font-size:clamp(1.15rem,3vw,1.7rem);font-weight:900}
+.question{margin:0 0 16px;color:#315f43;font-size:clamp(1.5rem,4vw,2.5rem);font-weight:900}
+.game-layout{display:grid;grid-template-columns:1.08fr .92fr;gap:18px;align-items:stretch}
+.visual-panel,.answer-panel{border:4px solid #86bb92;border-radius:24px;padding:20px}
+.visual-panel{min-height:430px;position:relative;overflow:hidden;background:linear-gradient(#b8e8ff 0 62%,#8fd06f 62% 100%)}
+.answer-panel{background:#fffaf0;display:flex;flex-direction:column;justify-content:center}
+.answer-panel h3{margin:0 0 14px;color:#5b4636}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.answer-btn{min-height:92px;border-radius:20px;border:4px solid #e59c26;background:linear-gradient(#fff29d,#ffd166);box-shadow:0 7px 0 #c77900;color:#5d4037;font-size:clamp(1.15rem,3vw,1.75rem);padding:10px}
+.tip{margin-top:16px;background:#eef9f2;border:3px solid #65ad7b;border-radius:16px;padding:12px;color:#285d43;font-weight:900}
+.feedback{min-height:44px;margin:16px 0 0;font-size:clamp(1.05rem,3vw,1.45rem);font-weight:900}
+.feedback.correct{color:#1b7f44}.feedback.wrong{color:#d62828}
+.controls{margin-top:14px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.hidden{display:none!important}
+.stars{font-size:clamp(2.5rem,8vw,5rem);letter-spacing:8px;margin:14px 0}
+.certificate{margin:18px auto 0;max-width:650px;background:#fffcec;border:8px double #d99a19;border-radius:18px;padding:20px}
+.certificate h2{margin:0 0 8px;color:#315f43}
+.big-display{width:min(430px,88%);min-height:245px;background:rgba(255,255,255,.94);border:5px solid rgba(0,0,0,.18);border-radius:24px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;flex-direction:column;padding:22px;box-shadow:0 12px 0 rgba(0,0,0,.1)}
+.big-icon{font-size:clamp(4rem,10vw,7rem);line-height:1;margin-bottom:12px}
+.big-value{font-size:clamp(2rem,6vw,4rem);font-weight:900;color:#315f43}
+.meter{height:18px;background:#d9e8df;border-radius:999px;overflow:hidden;border:2px solid #7fb291;width:80%;margin:12px auto}
+.meter>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--secondary),var(--primary));width:0;transition:width .3s}
+@media(max-width:860px){.game-layout{grid-template-columns:1fr}.visual-panel{min-height:390px}}
+@media(max-width:650px){.header{justify-content:center}.brand{width:100%;justify-content:center;text-align:center}.stats{justify-content:center}.level-grid{grid-template-columns:1fr}.answers{grid-template-columns:1fr 1fr}}
+@media(max-width:430px){.answers{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+
+.arena{position:absolute;inset:0;background:linear-gradient(#7752a8 0 65%,#62432f 65%);overflow:hidden}
+.fighter{position:absolute;bottom:70px;font-size:110px;transition:transform .4s}.hero-fighter{left:12%}.enemy-fighter{right:12%}
+.battle-display{position:absolute;top:14%;left:50%;transform:translateX(-50%);background:#fff;border:6px solid #6d44a3;border-radius:20px;padding:14px 28px;font-size:2.7rem;font-weight:900;color:#4d2f75}
+.health{position:absolute;left:20%;right:20%;bottom:22px;height:24px;background:#402c2c;border:4px solid #251616;border-radius:999px;overflow:hidden}.health div{height:100%;width:100%;background:linear-gradient(90deg,#ef476f,#ffd166,#2a9d8f)}
+.attack{animation:attack .55s ease}@keyframes attack{50%{transform:translateX(150px) scale(1.15)}}
+.hit{animation:hit .5s ease}@keyframes hit{50%{transform:translateX(20px) rotate(12deg)}}
+</style>
+</head>
+<body><a class="mth-back" href="./">← Games 21–30</a><style>.mth-back{position:fixed;left:12px;top:12px;z-index:9999;padding:8px 12px;border-radius:999px;background:#10243b;color:#fff!important;text-decoration:none;font:800 12px/1.2 Arial,sans-serif;box-shadow:0 4px 12px #0005}@media(max-width:520px){.mth-back{position:static;display:inline-block;margin:8px 0 0 3vw}}</style>
+<main class="app">
+<header class="header">
+  <div class="brand"><div class="brand-icon">⚔️</div><div><h1>Algebra Battle Arena</h1><p class="subtitle">Battle opponents by evaluating expressions and solving equations.</p></div></div>
+  <div class="stats">
+    <div class="stat">Score<span id="score">0</span></div>
+    <div class="stat">Lives<span id="lives">❤️❤️❤️</span></div>
+    <div class="stat">Level<span id="levelLabel">Easy</span></div>
+  </div>
+</header>
+<section class="card">
+  <section id="startScreen" class="start-screen">
+    <div class="hero">⚔️ 𝑥 🛡️</div><h2>Choose Your Challenge</h2><p>Battle opponents by evaluating expressions and solving equations.</p>
+    <div class="level-grid"><button class="level-card selected" data-level="easy">🥉 Arena Rookie<br><small>Evaluate expressions</small></button>
+<button class="level-card" data-level="medium">🥈 Equation Fighter<br><small>Solve one-step equations</small></button>
+<button class="level-card" data-level="hard">🥇 Algebra Champion<br><small>Solve two-step equations</small></button></div><button id="startBtn" class="main-btn">▶ Start Game</button>
+  </section>
+  <section id="playScreen" class="hidden">
+    <div class="progress-wrap"><div class="progress-label"><span>Game Progress</span><span id="roundLabel">Round 1 / 10</span></div><div class="progress-track"><div id="progressBar" class="progress-bar"></div></div></div>
+    <div class="play-area">
+      <p class="instruction">Defeat the opponent by solving the algebra challenge.</p><p id="question" class="question">Question</p>
+      <div class="game-layout">
+        <section class="visual-panel"><div class="arena"><div id="heroFighter" class="fighter hero-fighter">🧙</div><div id="enemyFighter" class="fighter enemy-fighter">👹</div><div id="battleDisplay" class="battle-display">2x + 3</div><div class="health"><div id="enemyHealth"></div></div></div></section>
+        <aside class="answer-panel"><h3>Choose the correct answer</h3><div id="answers" class="answers"></div><div id="tip" class="tip">Substitute carefully and use inverse operations.</div></aside>
+      </div>
+      <p id="feedback" class="feedback" aria-live="polite"></p>
+      <div class="controls"><button id="soundBtn" class="small-btn">🔊 Sound On</button><button id="restartBtn" class="small-btn">↻ Restart</button></div>
+    </div>
+  </section>
+  <section id="endScreen" class="end-screen hidden">
+    <div class="hero">🏆 ⭐ 🎉</div><h2>Challenge Complete!</h2><div id="stars" class="stars">⭐⭐⭐</div><p id="finalMessage"></p>
+    <div class="certificate"><h2>Algebra Battle Arena Certificate</h2><p>This certificate is awarded for completing</p><strong>Algebra Battle Arena</strong><p id="certificateScore"></p></div>
+    <div class="controls"><button id="playAgainBtn" class="main-btn">Play Again</button><button id="homeBtn" class="main-btn orange">Choose Level</button></div>
+  </section>
+</section>
+</main>
+<script>
+
+let selectedLevel="easy",round=0,score=0,lives=3,correctCount=0,correctAnswer=null,soundOn=true,locked=false;
+const startScreen=document.getElementById("startScreen");
+const playScreen=document.getElementById("playScreen");
+const endScreen=document.getElementById("endScreen");
+const scoreEl=document.getElementById("score");
+const livesEl=document.getElementById("lives");
+const levelLabel=document.getElementById("levelLabel");
+const roundLabel=document.getElementById("roundLabel");
+const progressBar=document.getElementById("progressBar");
+const questionEl=document.getElementById("question");
+const answers=document.getElementById("answers");
+const feedback=document.getElementById("feedback");
+const tip=document.getElementById("tip");
+const soundBtn=document.getElementById("soundBtn");
+const stars=document.getElementById("stars");
+const finalMessage=document.getElementById("finalMessage");
+const certificateScore=document.getElementById("certificateScore");
+
+document.querySelectorAll(".level-card").forEach(card=>{
+  card.addEventListener("click",()=>{
+    document.querySelectorAll(".level-card").forEach(c=>c.classList.remove("selected"));
+    card.classList.add("selected");
+    selectedLevel=card.dataset.level;
+    levelLabel.textContent=levelConfig[selectedLevel].label;
+  });
+});
+document.getElementById("startBtn").addEventListener("click",startGame);
+document.getElementById("restartBtn").addEventListener("click",startGame);
+document.getElementById("playAgainBtn").addEventListener("click",startGame);
+document.getElementById("homeBtn").addEventListener("click",showHome);
+soundBtn.addEventListener("click",()=>{soundOn=!soundOn;soundBtn.textContent=soundOn?"🔊 Sound On":"🔇 Sound Off"});
+
+function startGame(){
+  round=0;score=0;lives=3;correctCount=0;locked=false;
+  onGameStart();updateStats();startScreen.classList.add("hidden");endScreen.classList.add("hidden");
+  playScreen.classList.remove("hidden");nextRound();
+}
+function showHome(){playScreen.classList.add("hidden");endScreen.classList.add("hidden");startScreen.classList.remove("hidden")}
+function nextRound(){
+  const config=levelConfig[selectedLevel];
+  if(round>=config.rounds||lives<=0){finishGame();return}
+  round++;locked=false;feedback.textContent="";feedback.className="feedback";
+  buildRound(config);
+  roundLabel.textContent=`Round ${round} / ${config.rounds}`;
+  progressBar.style.width=`${(round/config.rounds)*100}%`;
+}
+function renderAnswers(choices){
+  answers.innerHTML="";
+  shuffle([...new Set(choices.map(String))]).forEach(value=>{
+    const button=document.createElement("button");button.className="answer-btn";button.textContent=value;
+    button.addEventListener("click",()=>checkAnswer(value));answers.appendChild(button);
+  });
+}
+function checkAnswer(selected){
+  if(locked)return;locked=true;document.querySelectorAll(".answer-btn").forEach(btn=>btn.disabled=true);
+  const ok=isCorrect(selected,correctAnswer);
+  if(ok){
+    score+=selectedLevel==="hard"?15:10;correctCount++;feedback.textContent=randomChoice(successMessages);
+    feedback.classList.add("correct");onCorrect();playSuccess();
+  }else{
+    lives--;feedback.textContent=`Good try! The correct answer is ${displayAnswer(correctAnswer)}.`;
+    feedback.classList.add("wrong");onWrong();playTone(180,.22);
+  }
+  updateStats();setTimeout(()=>nextRound(),1150);
+}
+function updateStats(){scoreEl.textContent=score;livesEl.textContent=lives>0?"❤️".repeat(lives):"💔";levelLabel.textContent=levelConfig[selectedLevel].label}
+function finishGame(){
+  onFinish();playScreen.classList.add("hidden");endScreen.classList.remove("hidden");
+  const total=levelConfig[selectedLevel].rounds;const accuracy=Math.round((correctCount/total)*100);
+  if(accuracy>=80){stars.textContent="⭐⭐⭐";finalMessage.textContent=endMessages[0]}
+  else if(accuracy>=50){stars.textContent="⭐⭐";finalMessage.textContent=endMessages[1]}
+  else{stars.textContent="⭐";finalMessage.textContent=endMessages[2]}
+  certificateScore.textContent=`Final Score: ${score} points • ${accuracy}% accuracy`;playSuccess();
+}
+function isCorrect(selected,answer){return String(selected)===String(answer)}
+function displayAnswer(answer){return String(answer)}
+function onCorrect(){}function onWrong(){}function onGameStart(){}function onFinish(){}
+function randomInt(min,max){return Math.floor(Math.random()*(max-min+1))+min}
+function randomChoice(items){return items[Math.floor(Math.random()*items.length)]}
+function shuffle(items){for(let i=items.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[items[i],items[j]]=[items[j],items[i]]}return items}
+function playSuccess(){if(!soundOn)return;playTone(523,.11);setTimeout(()=>playTone(659,.11),110);setTimeout(()=>playTone(784,.17),220)}
+function playTone(frequency,duration){
+  if(!soundOn)return;const AudioContext=window.AudioContext||window.webkitAudioContext;if(!AudioContext)return;
+  const context=new AudioContext(),osc=context.createOscillator(),gain=context.createGain();
+  osc.type="sine";osc.frequency.value=frequency;gain.gain.setValueAtTime(.12,context.currentTime);
+  gain.gain.exponentialRampToValueAtTime(.001,context.currentTime+duration);
+  osc.connect(gain);gain.connect(context.destination);osc.start();osc.stop(context.currentTime+duration);
+  osc.addEventListener("ended",()=>context.close());
+}
+
+
+
+const levelConfig={easy:{label:"Easy",rounds:10},medium:{label:"Medium",rounds:10},hard:{label:"Hard",rounds:12}};
+const successMessages=["Correct! Powerful algebra strike! ⚔️","Excellent equation solving! 🛡️","Arena victory point earned! ⭐"];
+const endMessages=["Outstanding! You are the Algebra Battle Champion!","Great work! Your algebra skills are growing.","Nice effort! Keep training with equations."];
+const battleDisplay=document.getElementById("battleDisplay"),heroFighter=document.getElementById("heroFighter"),enemyFighter=document.getElementById("enemyFighter"),enemyHealth=document.getElementById("enemyHealth");
+function buildRound(){
+  let choices=[];
+  if(selectedLevel==="easy"){
+    const x=randomInt(1,10),a=randomInt(2,6),b=randomInt(0,10);correctAnswer=a*x+b;
+    questionEl.textContent=`Evaluate ${a}x + ${b} when x = ${x}.`;battleDisplay.textContent=`${a}x + ${b}`;
+    choices=[correctAnswer,correctAnswer+a,Math.max(0,correctAnswer-b),a+b];
+  }else if(selectedLevel==="medium"){
+    const x=randomInt(-8,12),a=randomInt(2,9),add=Math.random()<.5;
+    if(add){const b=x+a;correctAnswer=x;questionEl.textContent=`Solve x + ${a} = ${b}.`;battleDisplay.textContent=`x + ${a} = ${b}`}
+    else{const b=x-a;correctAnswer=x;questionEl.textContent=`Solve x − ${a} = ${b}.`;battleDisplay.textContent=`x − ${a} = ${b}`}
+    choices=[correctAnswer,correctAnswer+1,correctAnswer-1,-correctAnswer];
+  }else{
+    const x=randomInt(-6,10),a=randomInt(2,6),b=randomInt(1,10),c=a*x+b;correctAnswer=x;
+    questionEl.textContent=`Solve ${a}x + ${b} = ${c}.`;battleDisplay.textContent=`${a}x + ${b} = ${c}`;
+    choices=[correctAnswer,correctAnswer+1,correctAnswer-1,Math.round(c/a)];
+  }
+  renderAnswers(choices);
+}
+function onGameStart(){enemyHealth.style.width="100%"}
+function onCorrect(){heroFighter.classList.add("attack");enemyFighter.classList.add("hit");enemyHealth.style.width=`${Math.max(0,100-correctCount*8)}%`;setTimeout(()=>{heroFighter.classList.remove("attack");enemyFighter.classList.remove("hit")},600)}
+
+</script>
+</body>
+</html>
