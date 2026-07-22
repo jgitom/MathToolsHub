@@ -54,7 +54,7 @@
         .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
         .catalogue-overview{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 24px}
         .catalogue-overview span{display:inline-flex;align-items:center;gap:6px;padding:9px 13px;border:1px solid #cbd8e8;border-radius:999px;color:#52657a;background:#fff;font-size:.82rem}
-        .catalogue-overview strong{color:var(--navy);font-weight:850}
+        .catalogue-overview strong{color:var(--navy);font-weight:850}.curriculum-guide{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 24px}.curriculum-status{padding:16px;border:1px solid var(--line);border-left:4px solid var(--status);border-radius:12px;background:#fff}.curriculum-status strong{display:block;margin-bottom:5px;color:var(--navy);font-size:.86rem}.curriculum-status span{color:var(--muted);font-size:.78rem;line-height:1.45}.curriculum-status.aligned{--status:#16a34a}.curriculum-status.stem{--status:#e11d48}.curriculum-status.enrichment{--status:#7c3aed}
         .catalogue-tools{margin-bottom:50px;padding:22px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 10px 28px rgba(15,39,71,.07)}
         .search-box{height:50px;display:flex;align-items:center;gap:10px;padding:0 16px;border:1px solid #cbd8e8;border-radius:12px;color:#50708f;background:#f8fafc}
         .search-box:focus-within{border-color:#60a5fa;box-shadow:0 0 0 3px #dbeafe}
@@ -78,7 +78,7 @@
         .game-card:nth-child(n+9) .game-icon,.game-icon{width:56px;height:56px;margin-bottom:22px;border-radius:14px;color:var(--category,#2563eb);background:color-mix(in srgb,var(--category,#2563eb) 10%,white);font-size:1.7rem}
         .game-card h2{min-height:0;margin-bottom:10px;font-size:1.25rem}.game-card p{font-size:.92rem;line-height:1.62}.tags{margin-top:16px}.tag{padding:5px 8px;font-size:.68rem}.play{padding-top:22px}
         .empty-state{display:none;padding:44px;border:1px dashed #aebed0;border-radius:16px;text-align:center;color:var(--muted);background:#fff}.empty-state.show{display:block}
-        @media(max-width:900px){.group-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+        @media(max-width:900px){.group-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.curriculum-guide{grid-template-columns:1fr}}
         @media(max-width:620px){.catalogue-tools{padding:15px;margin-bottom:38px}.filter-list{flex-wrap:nowrap;overflow-x:auto;padding-bottom:5px;scrollbar-width:thin}.filter-button{flex:0 0 auto}.group-grid{grid-template-columns:1fr}.game-card,.game-card:nth-child(n+3){min-height:0!important}.group-heading{align-items:flex-start}.group-count{margin-top:3px}.catalogue-group{margin-bottom:44px}}
 </style>
   <meta name="author" content="Juil Gitom">
@@ -113,6 +113,7 @@
             <div class="catalogue-overview" aria-label="Catalogue summary">
                 <span><strong>54</strong> activities</span><span><strong>5</strong> learning paths</span><span><strong>All levels</strong> preschool to SPM</span>
             </div>
+            <div class="curriculum-guide" aria-label="Curriculum status guide"><div class="curriculum-status aligned"><strong>KPM-aligned practice</strong><span>Level or topic practice mapped broadly to KSSR/KSSM Mathematics.</span></div><div class="curriculum-status stem"><strong>KPM STEM application</strong><span>Applied mathematics and interdisciplinary STEM enrichment, not a standalone DSKP topic sequence.</span></div><div class="curriculum-status enrichment"><strong>Mathematical enrichment</strong><span>Logic, strategy, simulation, and puzzle activities that support learning beyond a specific syllabus standard.</span></div></div>
             <div class="catalogue-tools" aria-label="Game catalogue controls">
                 <label class="search-box"><span aria-hidden="true">⌕</span><span class="sr-only">Search games</span><input id="gameSearch" type="search" placeholder="Search by title, topic, or skill…" autocomplete="off"></label>
                 <div class="filter-list" role="group" aria-label="Filter by learning path">
@@ -195,7 +196,7 @@
                     <div class="game-icon" aria-hidden="true">🕵️</div>
                     <h2>Math Detective Academy</h2>
                     <p>Investigate mathematics mysteries across Junior, Years 1–6, and Forms 1–5 in twelve level-specific detective games.</p>
-                    <div class="tags"><span class="tag">12 Levels</span><span class="tag">Problem solving</span><span class="tag">Mystery</span></div>
+                    <div class="tags"><span class="tag">KPM-aligned practice</span><span class="tag">12 Levels</span><span class="tag">Mystery</span></div>
                     <span class="play">Enter Math Detective Academy <span aria-hidden="true">→</span></span>
                 </a>                <a class="game-card" href="nation-builder/">
                     <div class="game-icon" aria-hidden="true">🌍</div>
@@ -250,7 +251,7 @@
                     <div class="game-icon" aria-hidden="true">🗺️</div>
                     <h2>Treasure Hunter</h2>
                     <p>Choose from twelve mathematics treasure adventures for Preschool, Years 1–6, and Forms 1–5.</p>
-                    <div class="tags"><span class="tag">12 Levels</span><span class="tag">Mathematics</span><span class="tag">Adventure</span></div>
+                    <div class="tags"><span class="tag">KPM-aligned practice</span><span class="tag">12 Levels</span><span class="tag">Adventure</span></div>
                     <span class="play">Enter Treasure Hunter <span aria-hidden="true">→</span></span>
                 </a>
                 <a class="game-card" href="number-safari/">
@@ -352,9 +353,9 @@
                 <a class="game-card" href="speed-distance-rally/"><div class="game-icon" aria-hidden="true">🏁</div><h2>Speed Distance Rally</h2><p>Connect speed, distance, and time to complete rally stages.</p><div class="tags"><span class="tag">Speed</span><span class="tag">Distance</span><span class="tag">Secondary maths</span></div><span class="play">Start the Rally <span aria-hidden="true">→</span></span></a>
                 <a class="game-card" href="math-learning-games-31-40/">
                     <div class="game-icon" aria-hidden="true">🎮</div>
-                    <h2>Math Learning Games 31–40</h2>
-                    <p>Explore ten advanced games covering quadratics, trigonometry, functions, matrices, vectors, probability, statistics, finance, graphs, and SPM revision.</p>
-                    <div class="tags"><span class="tag">Advanced maths</span><span class="tag">SPM</span><span class="tag">10-game collection</span></div>
+                    <h2>SPM Mathematics &amp; Additional Mathematics Games 31–40</h2>
+                    <p>Explore ten advanced KSSM practice games spanning core Mathematics and Additional Mathematics topics for upper secondary and SPM revision.</p>
+                    <div class="tags"><span class="tag">KSSM practice</span><span class="tag">Mathematics + Add Maths</span><span class="tag">10-game collection</span></div>
                     <span class="play">Open Games 31–40 <span aria-hidden="true">→</span></span>
                 </a>
                 <a class="game-card" href="math-learning-games-21-30/">
@@ -368,14 +369,14 @@
                     <div class="game-icon" aria-hidden="true">🧭</div>
                     <h2>STEM Discovery Academy</h2>
                     <p>Connect mathematics with engineering, science, coding, business, geography, sustainability, robotics, and real-world decision-making.</p>
-                    <div class="tags"><span class="tag">STEM</span><span class="tag">Project learning</span><span class="tag">10-program collection</span></div>
+                    <div class="tags"><span class="tag">KPM STEM application</span><span class="tag">Project learning</span><span class="tag">10-program collection</span></div>
                     <span class="play">Enter STEM Discovery Academy <span aria-hidden="true">→</span></span>
                 </a>
                 <a class="game-card" href="integrated-stem-programs-11-20/">
                     <div class="game-icon" aria-hidden="true">💡</div>
                     <h2>STEM Innovation Academy</h2>
                     <p>Explore ten new STEM activities connecting mathematics with solar energy, oceans, drones, water, space, nutrition, cybersecurity, transport, and Sabah tourism.</p>
-                    <div class="tags"><span class="tag">STEM</span><span class="tag">Applied maths</span><span class="tag">10-program collection</span></div>
+                    <div class="tags"><span class="tag">KPM STEM application</span><span class="tag">Applied maths</span><span class="tag">10-program collection</span></div>
                     <span class="play">Enter STEM Innovation Academy <span aria-hidden="true">→</span></span>
                 </a>
             </div>
@@ -388,11 +389,11 @@
   const root=document.getElementById("gameCatalogue");
   const cards=[...root.querySelectorAll(".game-card")];
   const groups=[
-    {id:"strategy",title:"Strategy & Puzzles",description:"Develop logic, number sense, planning, and decision-making through puzzles and simulations.",items:["math-crush/","math-kingdom-defender/","crypt-of-equation/","chess/","sudoku/","kenken/","kakuro/","logic-puzzles/","mathcity-builder/","school-management-simulator/","nation-builder/"]},
-    {id:"curriculum",title:"Curriculum Adventures",description:"Explore structured, level-based mathematics journeys from Year 1 through secondary school.",items:["math-detective-academy/","escape-room-mathematics-year1/","escape-room-mathematics-year2/","escape-room-mathematics-year3/","escape-room-mathematics-year4/","escape-room-mathematics-year5/","escape_room_mathematics_year6.html","treasure-hunter/"]},
+    {id:"strategy",title:"Strategy & Puzzles",description:"Develop logic, number sense, planning, and decision-making through mathematical enrichment.",items:["math-crush/","math-kingdom-defender/","crypt-of-equation/","chess/","sudoku/","kenken/","kakuro/","logic-puzzles/","mathcity-builder/","school-management-simulator/","nation-builder/"]},
+    {id:"curriculum",title:"Curriculum Adventures",description:"Practise level-based content broadly mapped to KPM KSSR and KSSM Mathematics.",items:["math-detective-academy/","escape-room-mathematics-year1/","escape-room-mathematics-year2/","escape-room-mathematics-year3/","escape-room-mathematics-year4/","escape-room-mathematics-year5/","escape_room_mathematics_year6.html","treasure-hunter/"]},
     {id:"primary",title:"Early & Primary Mathematics",description:"Build confidence with numbers, shapes, patterns, time, money, fractions, measurement, and operations.",items:["number-safari/","shape-builder-town/","colour-pattern-train/","feed-hungry-monster/","balloon-number-pop/","math-fishing-adventure/","clock-tower-junior/","money-market-kids/","fraction-pizza-party/","measurement-kitchen/","math-space-mission/"]},
     {id:"secondary",title:"Secondary Mathematics Skills",description:"Practise core secondary topics through focused, three-level challenges with immediate feedback.",items:["integer-ice-climb/","fraction-lab/","ratio-racer/","percentage-market/","algebra-codebreaker/","coordinate-quest/","geometry-architect/","statistics-stadium/","probability-carnival/","sequence-signal/","pythagoras-rescue/","linear-graph-flight/","exponent-power-up/","factor-factory/","equation-balance-lab/","angle-detective/","transformation-portal/","trigonometry-tower/","financial-math-tycoon/","speed-distance-rally/"]},
-    {id:"collections",title:"Advanced Collections & STEM",description:"Open multi-activity collections for advanced mathematics, SPM preparation, and integrated STEM learning.",items:["math-learning-games-21-30/","math-learning-games-31-40/","integrated-stem-programs/","integrated-stem-programs-11-20/"]}
+    {id:"collections",title:"Advanced Collections & STEM",description:"Explore KSSM Mathematics, Additional Mathematics, and KPM-related STEM enrichment collections.",items:["math-learning-games-21-30/","math-learning-games-31-40/","integrated-stem-programs/","integrated-stem-programs-11-20/"]}
   ];
   const byHref=new Map(cards.map(card=>[card.getAttribute("href"),card]));
   root.innerHTML="";
