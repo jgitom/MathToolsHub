@@ -1,4 +1,4 @@
-Integrated STEM Programs 11–20
+STEM Innovation Academy
 
 Keep every file in the same directory:
 - program_style.css
