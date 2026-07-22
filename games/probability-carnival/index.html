@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Calculate simple probabilities to win carnival challenges.">
+  <title>Probability Carnival</title>
+  <link rel="stylesheet" href="../math-arcade.css">
+</head>
+<body data-game="probability">
+  <a class="back" href="../">← All Games</a>
+  <main class="shell">
+    <header class="hero"><div class="icon" aria-hidden="true">🎡</div><div><h1 id="title">Probability Carnival</h1><p>Calculate simple probabilities to win carnival challenges.</p></div></header>
+    <section class="panel" id="startScreen">
+      <h2>Choose your challenge</h2>
+      <p class="note">Complete ten questions. Harder levels earn more points.</p>
+      <div class="levels" aria-label="Difficulty">
+        <button class="selected" data-level="0">Explorer<br><small>Foundation</small></button>
+        <button data-level="1">Challenger<br><small>Intermediate</small></button>
+        <button data-level="2">Master<br><small>Advanced</small></button>
+      </div>
+      <button class="primary" id="start">Start Game</button>
+    </section>
+    <section class="panel hidden" id="playScreen">
+      <div class="stats"><span class="pill" id="round">Question 1/10</span><span class="pill">Score: <b id="score">0</b></span><span class="pill">Lives: <b id="lives">♥♥♥</b></span></div>
+      <div class="progress" aria-label="Progress"><div class="bar" id="bar"></div></div>
+      <p class="mission" id="mission"></p>
+      <div class="question" id="question"></div>
+      <div class="answers" id="answers"></div>
+      <p class="feedback" id="feedback" aria-live="polite"></p>
+      <div class="actions"><button class="secondary" id="restart">Restart</button></div>
+    </section>
+    <section class="panel hidden" id="endScreen">
+      <div class="stars" id="stars">★★★</div><h2>Challenge Complete!</h2>
+      <p id="result"></p><p id="message"></p>
+      <div class="actions"><button class="primary" id="again">Play Again</button><button class="secondary" id="levels">Choose Level</button></div>
+    </section>
+  </main>
+  <script src="../math-arcade.js"></script>
+</body>
+</html>
