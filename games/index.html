@@ -50,7 +50,37 @@
         @media (max-width:900px) { .game-card, .game-card:nth-child(n+3) { grid-column:span 3; margin-top:0; } }
         @media (max-width:700px) { .game-card, .game-card:nth-child(n+5) { grid-column:1/-1; min-height:0; margin-top:0; } .game-card h2 { min-height:0; } .hero-inner { padding:54px 0; } .content { padding:44px 0 60px; } }
         @media (max-width:480px) { .nav,.hero-inner,.content,.footer-inner { width:min(100% - 24px,1120px); } .nav { gap:10px; } .brand { flex:1 1 150px; } .nav-actions { flex:1 1 auto; gap:7px; } .home-link { white-space:nowrap; } .game-card { padding:24px; } }
-    </style>
+
+        .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+        .catalogue-overview{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 24px}
+        .catalogue-overview span{display:inline-flex;align-items:center;gap:6px;padding:9px 13px;border:1px solid #cbd8e8;border-radius:999px;color:#52657a;background:#fff;font-size:.82rem}
+        .catalogue-overview strong{color:var(--navy);font-weight:850}
+        .catalogue-tools{margin-bottom:50px;padding:22px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 10px 28px rgba(15,39,71,.07)}
+        .search-box{height:50px;display:flex;align-items:center;gap:10px;padding:0 16px;border:1px solid #cbd8e8;border-radius:12px;color:#50708f;background:#f8fafc}
+        .search-box:focus-within{border-color:#60a5fa;box-shadow:0 0 0 3px #dbeafe}
+        .search-box input{width:100%;border:0;outline:0;color:var(--ink);background:transparent;font:600 1rem Inter,"Segoe UI",Arial,sans-serif}
+        .filter-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
+        .filter-button{padding:9px 13px;border:1px solid #cbd8e8;border-radius:999px;color:#40566d;background:#fff;font:750 .8rem Inter,"Segoe UI",Arial,sans-serif;cursor:pointer}
+        .filter-button:hover,.filter-button:focus-visible{border-color:#7ea7d8;color:var(--navy);outline:none}
+        .filter-button.active{border-color:var(--navy);color:#fff;background:var(--navy)}
+        .results-count{margin:14px 2px 0;color:var(--muted);font-size:.82rem;font-weight:700}
+        .game-grid{display:block}
+        .catalogue-group{margin:0 0 58px}
+        .catalogue-group[hidden]{display:none}
+        .group-heading{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+        .group-heading h3{margin:0;color:var(--navy);font-size:clamp(1.45rem,3vw,2rem);letter-spacing:-.02em}
+        .group-heading p{max-width:620px;margin:6px 0 0;color:var(--muted);line-height:1.55}
+        .group-count{flex:0 0 auto;padding:7px 11px;border-radius:999px;color:#1d4ed8;background:#eff6ff;font-size:.75rem;font-weight:850}
+        .group-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;align-items:stretch}
+        .game-card,.game-card:nth-child(n+3),.game-card:nth-child(n+9){grid-column:auto!important;min-height:300px!important;height:100%;margin-top:0!important;padding:26px;border:1px solid var(--line);border-top:4px solid var(--category,#60a5fa);border-radius:16px;box-shadow:0 8px 24px rgba(15,39,71,.07)}
+        .game-card[hidden]{display:none!important}
+        .game-card[data-category="strategy"]{--category:#7c3aed}.game-card[data-category="curriculum"]{--category:#f59e0b}.game-card[data-category="primary"]{--category:#10b981}.game-card[data-category="secondary"]{--category:#2563eb}.game-card[data-category="collections"]{--category:#e11d48}
+        .game-card:nth-child(n+9) .game-icon,.game-icon{width:56px;height:56px;margin-bottom:22px;border-radius:14px;color:var(--category,#2563eb);background:color-mix(in srgb,var(--category,#2563eb) 10%,white);font-size:1.7rem}
+        .game-card h2{min-height:0;margin-bottom:10px;font-size:1.25rem}.game-card p{font-size:.92rem;line-height:1.62}.tags{margin-top:16px}.tag{padding:5px 8px;font-size:.68rem}.play{padding-top:22px}
+        .empty-state{display:none;padding:44px;border:1px dashed #aebed0;border-radius:16px;text-align:center;color:var(--muted);background:#fff}.empty-state.show{display:block}
+        @media(max-width:900px){.group-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+        @media(max-width:620px){.catalogue-tools{padding:15px;margin-bottom:38px}.filter-list{flex-wrap:nowrap;overflow-x:auto;padding-bottom:5px;scrollbar-width:thin}.filter-button{flex:0 0 auto}.group-grid{grid-template-columns:1fr}.game-card,.game-card:nth-child(n+3){min-height:0!important}.group-heading{align-items:flex-start}.group-count{margin-top:3px}.catalogue-group{margin-bottom:44px}}
+</style>
   <meta name="author" content="Juil Gitom">
   <style id="creator-credit-style">
     .creator-credit{position:fixed;left:12px;bottom:10px;z-index:9998;display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border:1px solid rgba(148,163,184,.38);border-radius:999px;color:#334155;background:rgba(255,255,255,.9);box-shadow:0 5px 16px rgba(15,23,42,.13);font:600 11px/1.2 Inter,"Segoe UI",Arial,sans-serif;letter-spacing:.01em;backdrop-filter:blur(8px);pointer-events:none}
@@ -77,10 +107,20 @@
         </section>
         <section class="content" aria-labelledby="games-heading">
             <div class="section-heading">
-                <h2 id="games-heading">Choose your game</h2>
-                <p>Each game turns mathematics practice into a different kind of challenge.</p>
+                <h2 id="games-heading">Find your next challenge</h2>
+                <p>Browse by learning path or search the complete collection to find the right activity.</p>
             </div>
-            <div class="game-grid">
+            <div class="catalogue-overview" aria-label="Catalogue summary">
+                <span><strong>53</strong> activities</span><span><strong>5</strong> learning paths</span><span><strong>All levels</strong> preschool to SPM</span>
+            </div>
+            <div class="catalogue-tools" aria-label="Game catalogue controls">
+                <label class="search-box"><span aria-hidden="true">⌕</span><span class="sr-only">Search games</span><input id="gameSearch" type="search" placeholder="Search by title, topic, or skill…" autocomplete="off"></label>
+                <div class="filter-list" role="group" aria-label="Filter by learning path">
+                    <button class="filter-button active" type="button" data-filter="all">All</button><button class="filter-button" type="button" data-filter="strategy">Strategy &amp; puzzles</button><button class="filter-button" type="button" data-filter="curriculum">Curriculum adventures</button><button class="filter-button" type="button" data-filter="primary">Early &amp; primary</button><button class="filter-button" type="button" data-filter="secondary">Secondary skills</button><button class="filter-button" type="button" data-filter="collections">Collections &amp; STEM</button>
+                </div>
+                <p class="results-count" id="gameResults" aria-live="polite">Showing all 53 activities</p>
+            </div>
+            <div class="game-grid" id="gameCatalogue">
                 <a class="game-card" href="math-crush/">
                     <div class="game-icon" aria-hidden="true">×</div>
                     <h2>CJMath EquaGems</h2>
@@ -335,6 +375,40 @@
         </section>
     </main>
     <footer><div class="footer-inner"><span>© 2026 MathToolsHub</span><a class="footer-contact" href="mailto:admin@mathtoolshub.com" aria-label="Email MathToolsHub at admin@mathtoolshub.com">admin@mathtoolshub.com</a></div></footer>
+
+<script>
+(() => {
+  const root=document.getElementById("gameCatalogue");
+  const cards=[...root.querySelectorAll(".game-card")];
+  const groups=[
+    {id:"strategy",title:"Strategy & Puzzles",description:"Develop logic, number sense, planning, and decision-making through puzzles and simulations.",items:["math-crush/","math-kingdom-defender/","crypt-of-equation/","chess/","sudoku/","kenken/","kakuro/","logic-puzzles/","mathcity-builder/","school-management-simulator/","nation-builder/"]},
+    {id:"curriculum",title:"Curriculum Adventures",description:"Explore structured, level-based mathematics journeys from Year 1 through secondary school.",items:["math-detective-academy/","escape-room-mathematics-year1/","escape-room-mathematics-year2/","escape-room-mathematics-year3/","escape-room-mathematics-year4/","escape-room-mathematics-year5/","escape_room_mathematics_year6.html","treasure-hunter/"]},
+    {id:"primary",title:"Early & Primary Mathematics",description:"Build confidence with numbers, shapes, patterns, time, money, fractions, measurement, and operations.",items:["number-safari/","shape-builder-town/","colour-pattern-train/","feed-hungry-monster/","balloon-number-pop/","math-fishing-adventure/","clock-tower-junior/","money-market-kids/","fraction-pizza-party/","measurement-kitchen/","math-space-mission/"]},
+    {id:"secondary",title:"Secondary Mathematics Skills",description:"Practise core secondary topics through focused, three-level challenges with immediate feedback.",items:["integer-ice-climb/","fraction-lab/","ratio-racer/","percentage-market/","algebra-codebreaker/","coordinate-quest/","geometry-architect/","statistics-stadium/","probability-carnival/","sequence-signal/","pythagoras-rescue/","linear-graph-flight/","exponent-power-up/","factor-factory/","equation-balance-lab/","angle-detective/","transformation-portal/","trigonometry-tower/","financial-math-tycoon/","speed-distance-rally/"]},
+    {id:"collections",title:"Advanced Collections & STEM",description:"Open multi-activity collections for advanced mathematics, SPM preparation, and integrated STEM learning.",items:["math-learning-games-31-40/","integrated-stem-programs/","integrated-stem-programs-11-20/"]}
+  ];
+  const byHref=new Map(cards.map(card=>[card.getAttribute("href"),card]));
+  root.innerHTML="";
+  groups.forEach(group=>{
+    const section=document.createElement("section");section.className="catalogue-group";section.dataset.category=group.id;
+    section.innerHTML='<div class="group-heading"><div><h3>'+group.title+'</h3><p>'+group.description+'</p></div><span class="group-count">'+group.items.length+' activities</span></div><div class="group-grid"></div>';
+    const grid=section.querySelector(".group-grid");
+    group.items.forEach(href=>{const card=byHref.get(href);if(card){card.dataset.category=group.id;grid.appendChild(card);byHref.delete(href)}});
+    root.appendChild(section);
+  });
+  if(byHref.size){const fallback=root.querySelector('[data-category="strategy"] .group-grid');byHref.forEach(card=>{card.dataset.category="strategy";fallback.appendChild(card)})}
+  const empty=document.createElement("div");empty.className="empty-state";empty.innerHTML="<strong>No activities found.</strong><br>Try another search or learning path.";root.appendChild(empty);
+  const search=document.getElementById("gameSearch"),buttons=[...document.querySelectorAll(".filter-button")],result=document.getElementById("gameResults");let filter="all";
+  function update(){
+    const term=search.value.trim().toLowerCase();let shown=0;
+    root.querySelectorAll(".catalogue-group").forEach(section=>{let count=0;section.querySelectorAll(".game-card").forEach(card=>{const visible=(filter==="all"||card.dataset.category===filter)&&(!term||card.textContent.toLowerCase().includes(term));card.hidden=!visible;if(visible){count++;shown++}});section.hidden=count===0});
+    empty.classList.toggle("show",shown===0);const lang=document.documentElement.lang;result.textContent=lang.startsWith("ms")?(shown===53?"Menunjukkan semua 53 aktiviti":"Menunjukkan "+shown+" daripada 53 aktiviti"):lang.startsWith("zh")?(shown===53?"显示全部 53 项活动":"显示 53 项活动中的 "+shown+" 项"):(shown===53?"Showing all 53 activities":"Showing "+shown+" of 53 activities");
+  }
+  buttons.forEach(button=>button.addEventListener("click",()=>{buttons.forEach(b=>b.classList.remove("active"));button.classList.add("active");filter=button.dataset.filter;update()}));
+  search.addEventListener("input",update);document.addEventListener("DOMContentLoaded",()=>{const picker=document.querySelector(".site-language-picker");if(picker)picker.addEventListener("change",()=>setTimeout(()=>{const lang=document.documentElement.lang;search.placeholder=lang.startsWith("ms")?"Cari mengikut tajuk, topik atau kemahiran…":lang.startsWith("zh")?"按标题、主题或技能搜索…":"Search by title, topic, or skill…";update()},0));const lang=document.documentElement.lang;search.placeholder=lang.startsWith("ms")?"Cari mengikut tajuk, topik atau kemahiran…":lang.startsWith("zh")?"按标题、主题或技能搜索…":"Search by title, topic, or skill…";update()});update();
+})();
+</script>
+
 <script src="../site-language.js"></script>
 </body>
 </html>
