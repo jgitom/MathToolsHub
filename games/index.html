@@ -111,14 +111,14 @@
                 <p>Browse by learning path or search the complete collection to find the right activity.</p>
             </div>
             <div class="catalogue-overview" aria-label="Catalogue summary">
-                <span><strong>53</strong> activities</span><span><strong>5</strong> learning paths</span><span><strong>All levels</strong> preschool to SPM</span>
+                <span><strong>54</strong> activities</span><span><strong>5</strong> learning paths</span><span><strong>All levels</strong> preschool to SPM</span>
             </div>
             <div class="catalogue-tools" aria-label="Game catalogue controls">
                 <label class="search-box"><span aria-hidden="true">⌕</span><span class="sr-only">Search games</span><input id="gameSearch" type="search" placeholder="Search by title, topic, or skill…" autocomplete="off"></label>
                 <div class="filter-list" role="group" aria-label="Filter by learning path">
                     <button class="filter-button active" type="button" data-filter="all">All</button><button class="filter-button" type="button" data-filter="strategy">Strategy &amp; puzzles</button><button class="filter-button" type="button" data-filter="curriculum">Curriculum adventures</button><button class="filter-button" type="button" data-filter="primary">Early &amp; primary</button><button class="filter-button" type="button" data-filter="secondary">Secondary skills</button><button class="filter-button" type="button" data-filter="collections">Collections &amp; STEM</button>
                 </div>
-                <p class="results-count" id="gameResults" aria-live="polite">Showing all 53 activities</p>
+                <p class="results-count" id="gameResults" aria-live="polite">Showing all 54 activities</p>
             </div>
             <div class="game-grid" id="gameCatalogue">
                 <a class="game-card" href="math-crush/">
@@ -357,6 +357,13 @@
                     <div class="tags"><span class="tag">Advanced maths</span><span class="tag">SPM</span><span class="tag">10-game collection</span></div>
                     <span class="play">Open Games 31–40 <span aria-hidden="true">→</span></span>
                 </a>
+                <a class="game-card" href="math-learning-games-21-30/">
+                    <div class="game-icon" aria-hidden="true">🎯</div>
+                    <h2>Math Learning Games 21–30</h2>
+                    <p>Explore algebra, integers, ratio, geometry, statistics, finance, Pythagoras, transformations, probability, and linear equations in a ten-game sequence.</p>
+                    <div class="tags"><span class="tag">Secondary maths</span><span class="tag">Advanced practice</span><span class="tag">10-game collection</span></div>
+                    <span class="play">Open Games 21–30 <span aria-hidden="true">→</span></span>
+                </a>
                 <a class="game-card" href="integrated-stem-programs/">
                     <div class="game-icon" aria-hidden="true">🌐</div>
                     <h2>Integrated STEM Programs</h2>
@@ -385,7 +392,7 @@
     {id:"curriculum",title:"Curriculum Adventures",description:"Explore structured, level-based mathematics journeys from Year 1 through secondary school.",items:["math-detective-academy/","escape-room-mathematics-year1/","escape-room-mathematics-year2/","escape-room-mathematics-year3/","escape-room-mathematics-year4/","escape-room-mathematics-year5/","escape_room_mathematics_year6.html","treasure-hunter/"]},
     {id:"primary",title:"Early & Primary Mathematics",description:"Build confidence with numbers, shapes, patterns, time, money, fractions, measurement, and operations.",items:["number-safari/","shape-builder-town/","colour-pattern-train/","feed-hungry-monster/","balloon-number-pop/","math-fishing-adventure/","clock-tower-junior/","money-market-kids/","fraction-pizza-party/","measurement-kitchen/","math-space-mission/"]},
     {id:"secondary",title:"Secondary Mathematics Skills",description:"Practise core secondary topics through focused, three-level challenges with immediate feedback.",items:["integer-ice-climb/","fraction-lab/","ratio-racer/","percentage-market/","algebra-codebreaker/","coordinate-quest/","geometry-architect/","statistics-stadium/","probability-carnival/","sequence-signal/","pythagoras-rescue/","linear-graph-flight/","exponent-power-up/","factor-factory/","equation-balance-lab/","angle-detective/","transformation-portal/","trigonometry-tower/","financial-math-tycoon/","speed-distance-rally/"]},
-    {id:"collections",title:"Advanced Collections & STEM",description:"Open multi-activity collections for advanced mathematics, SPM preparation, and integrated STEM learning.",items:["math-learning-games-31-40/","integrated-stem-programs/","integrated-stem-programs-11-20/"]}
+    {id:"collections",title:"Advanced Collections & STEM",description:"Open multi-activity collections for advanced mathematics, SPM preparation, and integrated STEM learning.",items:["math-learning-games-21-30/","math-learning-games-31-40/","integrated-stem-programs/","integrated-stem-programs-11-20/"]}
   ];
   const byHref=new Map(cards.map(card=>[card.getAttribute("href"),card]));
   root.innerHTML="";
@@ -402,7 +409,7 @@
   function update(){
     const term=search.value.trim().toLowerCase();let shown=0;
     root.querySelectorAll(".catalogue-group").forEach(section=>{let count=0;section.querySelectorAll(".game-card").forEach(card=>{const visible=(filter==="all"||card.dataset.category===filter)&&(!term||card.textContent.toLowerCase().includes(term));card.hidden=!visible;if(visible){count++;shown++}});section.hidden=count===0});
-    empty.classList.toggle("show",shown===0);const lang=document.documentElement.lang;result.textContent=lang.startsWith("ms")?(shown===53?"Menunjukkan semua 53 aktiviti":"Menunjukkan "+shown+" daripada 53 aktiviti"):lang.startsWith("zh")?(shown===53?"显示全部 53 项活动":"显示 53 项活动中的 "+shown+" 项"):(shown===53?"Showing all 53 activities":"Showing "+shown+" of 53 activities");
+    empty.classList.toggle("show",shown===0);const lang=document.documentElement.lang;result.textContent=lang.startsWith("ms")?(shown===54?"Menunjukkan semua 54 aktiviti":"Menunjukkan "+shown+" daripada 54 aktiviti"):lang.startsWith("zh")?(shown===54?"显示全部 54 项活动":"显示 54 项活动中的 "+shown+" 项"):(shown===54?"Showing all 54 activities":"Showing "+shown+" of 54 activities");
   }
   buttons.forEach(button=>button.addEventListener("click",()=>{buttons.forEach(b=>b.classList.remove("active"));button.classList.add("active");filter=button.dataset.filter;update()}));
   search.addEventListener("input",update);document.addEventListener("DOMContentLoaded",()=>{const picker=document.querySelector(".site-language-picker");if(picker)picker.addEventListener("change",()=>setTimeout(()=>{const lang=document.documentElement.lang;search.placeholder=lang.startsWith("ms")?"Cari mengikut tajuk, topik atau kemahiran…":lang.startsWith("zh")?"按标题、主题或技能搜索…":"Search by title, topic, or skill…";update()},0));const lang=document.documentElement.lang;search.placeholder=lang.startsWith("ms")?"Cari mengikut tajuk, topik atau kemahiran…":lang.startsWith("zh")?"按标题、主题或技能搜索…":"Search by title, topic, or skill…";update()});update();
