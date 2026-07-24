@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#071b12" />
+  <title>Sabah Football Manager</title>
+  <style>
+    :root {
+      --bg: #07140d;
+      --panel: #0d2418;
+      --panel-2: #12301f;
+      --line: rgba(255,255,255,0.12);
+      --text: #f4fff7;
+      --muted: #a9c4b3;
+      --accent: #3ed17d;
+      --accent-dark: #1c8e50;
+      --gold: #f2c94c;
+      --danger: #e45858;
+      --blue: #58a6ff;
+      --shadow: 0 16px 38px rgba(0,0,0,0.28);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 0%, rgba(62,209,125,0.14), transparent 30%),
+        linear-gradient(180deg, #07140d, #030905);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button, select, input { font: inherit; }
+
+    button {
+      cursor: pointer;
+      border: 0;
+      transition: transform .15s ease, opacity .15s ease, background .15s ease;
+    }
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+    .app {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 18px 14px;
+      background: rgba(5,18,11,.97);
+      border-right: 1px solid var(--line);
+      overflow-y: auto;
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      gap: 11px;
+      align-items: center;
+      margin-bottom: 18px;
+      padding: 8px;
+    }
+
+    .crest {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), #0d7f44);
+      color: #042012;
+      font-size: 24px;
+      box-shadow: 0 8px 24px rgba(62,209,125,.2);
+    }
+
+    .brand strong { display: block; }
+    .brand span { color: var(--muted); font-size: 11px; }
+
+    .nav {
+      display: grid;
+      gap: 7px;
+    }
+
+    .nav button {
+      width: 100%;
+      padding: 11px 12px;
+      text-align: left;
+      color: var(--muted);
+      background: transparent;
+      border-radius: 11px;
+      font-weight: 700;
+    }
+
+    .nav button.active,
+    .nav button:hover {
+      color: var(--text);
+      background: rgba(62,209,125,.12);
+    }
+
+    .side-footer {
+      margin-top: 20px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: rgba(255,255,255,.025);
+    }
+
+    .side-footer b { display: block; color: var(--gold); }
+    .side-footer span { color: var(--muted); font-size: 11px; }
+
+    .main {
+      min-width: 0;
+      padding: 18px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .club-title h1 { margin: 0; font-size: clamp(22px, 4vw, 31px); }
+    .club-title p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+
+    .metric {
+      min-width: 105px;
+      padding: 10px 12px;
+      text-align: center;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: rgba(13,36,24,.95);
+    }
+
+    .metric b { display: block; color: var(--gold); font-size: 17px; }
+    .metric small { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .grid {
+      display: grid;
+      gap: 12px;
+    }
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .card {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(18,48,31,.96), rgba(11,31,20,.96));
+      box-shadow: var(--shadow);
+    }
+
+    .card h2, .card h3 {
+      margin: 0 0 10px;
+    }
+
+    .card p {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .section-title h2 { margin: 0; }
+
+    .primary, .secondary, .danger {
+      padding: 10px 13px;
+      border-radius: 11px;
+      font-weight: 800;
+    }
+    .primary { color: #042012; background: linear-gradient(135deg, #78eead, var(--accent)); }
+    .secondary { color: var(--text); background: rgba(255,255,255,.07); border: 1px solid var(--line); }
+    .danger { color: white; background: #983535; }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 22px;
+      min-height: 220px;
+      display: grid;
+      align-content: end;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(rgba(3,16,9,.15), rgba(3,16,9,.92)),
+        repeating-linear-gradient(90deg, #167941 0 80px, #117038 80px 160px);
+      box-shadow: var(--shadow);
+    }
+
+    .pitch-lines {
+      position: absolute;
+      inset: 18px;
+      border: 2px solid rgba(255,255,255,.42);
+      border-radius: 7px;
+      pointer-events: none;
+    }
+    .pitch-lines::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: rgba(255,255,255,.42);
+    }
+    .pitch-lines::after {
+      content: "";
+      position: absolute;
+      width: 90px;
+      height: 90px;
+      border: 2px solid rgba(255,255,255,.42);
+      border-radius: 50%;
+      left: calc(50% - 45px);
+      top: calc(50% - 45px);
+    }
+
+    .hero-content { position: relative; z-index: 2; }
+    .hero h2 { margin: 0 0 5px; font-size: 28px; }
+    .hero p { margin: 0 0 14px; color: #d6f2df; }
+
+    .next-match {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .versus {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--gold);
+    }
+
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 650px;
+    }
+    th, td {
+      padding: 10px 9px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+    }
+    th { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+    tr:hover td { background: rgba(255,255,255,.025); }
+
+    .rating {
+      display: inline-grid;
+      place-items: center;
+      min-width: 34px;
+      padding: 4px 7px;
+      border-radius: 999px;
+      color: #06180e;
+      background: var(--accent);
+      font-weight: 900;
+    }
+    .rating.mid { background: var(--gold); }
+    .rating.low { background: #ee7a7a; }
+
+    .status {
+      display: inline-block;
+      padding: 4px 7px;
+      border-radius: 999px;
+      background: rgba(88,166,255,.16);
+      color: #a9d2ff;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .bar {
+      height: 9px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+    }
+    .bar > span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--accent);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    select, input[type="text"] {
+      width: 100%;
+      padding: 10px 11px;
+      color: var(--text);
+      background: #092016;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      outline: none;
+    }
+
+    .formation {
+      position: relative;
+      min-height: 520px;
+      border-radius: 18px;
+      border: 3px solid rgba(255,255,255,.55);
+      background:
+        repeating-linear-gradient(90deg, #14773f 0 70px, #106d39 70px 140px);
+      overflow: hidden;
+    }
+    .formation::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: rgba(255,255,255,.45);
+    }
+    .formation::after {
+      content: "";
+      position: absolute;
+      left: calc(50% - 55px);
+      top: calc(50% - 55px);
+      width: 110px;
+      height: 110px;
+      border: 2px solid rgba(255,255,255,.45);
+      border-radius: 50%;
+    }
+
+    .player-dot {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      width: 72px;
+      padding: 7px 5px;
+      text-align: center;
+      color: white;
+      background: rgba(4,25,14,.9);
+      border: 2px solid #70efab;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 800;
+      z-index: 2;
+    }
+
+    .event-log {
+      display: grid;
+      gap: 7px;
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .event {
+      padding: 9px 10px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      font-size: 12px;
+      border-left: 3px solid var(--accent);
+    }
+
+    .match-score {
+      text-align: center;
+      padding: 16px;
+    }
+    .match-score .score {
+      font-size: 42px;
+      font-weight: 950;
+      color: var(--gold);
+      margin: 8px 0;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      background: rgba(0,0,0,.72);
+      backdrop-filter: blur(7px);
+      z-index: 100;
+    }
+    .modal.hidden { display: none; }
+    .modal-card {
+      width: min(720px, 100%);
+      max-height: 88vh;
+      overflow-y: auto;
+      padding: 20px;
+      border-radius: 18px;
+      background: #0d2418;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(62,209,125,.15);
+      color: #88efb6;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .message {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 150;
+      max-width: 340px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #0d2418;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      color: var(--text);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(12px);
+      transition: .2s ease;
+    }
+    .message.show { opacity: 1; transform: translateY(0); }
+
+    .mobile-menu { display: none; }
+
+    @media (max-width: 950px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 250px;
+        transform: translateX(-105%);
+        transition: transform .2s ease;
+        box-shadow: var(--shadow);
+      }
+      .sidebar.open { transform: translateX(0); }
+      .mobile-menu {
+        display: inline-block;
+        margin-bottom: 10px;
+      }
+      .grid.two, .grid.three { grid-template-columns: 1fr; }
+      .topbar { grid-template-columns: 1fr 1fr 1fr; }
+      .club-title { grid-column: 1 / -1; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 620px) {
+      .main { padding: 10px; }
+      .topbar { grid-template-columns: 1fr 1fr; }
+      .metric { min-width: 0; }
+      .metric:last-child { grid-column: 1 / -1; }
+      .formation { min-height: 620px; }
+    }
+    .mth-back{position:fixed;left:12px;top:10px;z-index:10000;padding:9px 13px;border:1px solid rgba(255,255,255,.18);border-radius:999px;color:#fff;background:rgba(4,25,14,.92);box-shadow:0 5px 18px rgba(0,0,0,.35);text-decoration:none;font-size:12px;font-weight:850}.mth-back:hover,.mth-back:focus-visible{background:#0d7f44;outline:2px solid #78eead;outline-offset:2px}@media(max-width:700px){.mth-back{left:7px;top:6px;padding:7px 9px}}
+  </style>
+</head>
+<body>
+  <a class="mth-back" href="../">← All Games</a>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="crest">⚽</div>
+      <div>
+        <strong>Sabah FM</strong>
+        <span>Football Management Simulator</span>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="active" data-screen="dashboard">🏠 Dashboard</button>
+      <button data-screen="squad">👥 Squad</button>
+      <button data-screen="tactics">🧠 Tactics</button>
+      <button data-screen="training">🏋️ Training</button>
+      <button data-screen="transfers">💼 Transfers</button>
+      <button data-screen="fixtures">📅 Fixtures</button>
+      <button data-screen="league">🏆 League Table</button>
+      <button data-screen="finance">💰 Finance</button>
+    </nav>
+
+    <div class="side-footer">
+      <b id="sideSeason">Season 1</b>
+      <span id="sideWeek">Week 1 of 18</span>
+    </div>
+  </aside>
+
+  <main class="main">
+    <button class="secondary mobile-menu" id="mobileMenuBtn" type="button">☰ Menu</button>
+
+    <header class="topbar">
+      <div class="club-title">
+        <h1 id="clubName">Sabah Hornbills FC</h1>
+        <p id="managerLine">Manager: Juil Gitom · Malaysian Community League</p>
+      </div>
+      <div class="metric"><b id="budgetStat">RM 2.50m</b><small>Transfer Budget</small></div>
+      <div class="metric"><b id="moraleStat">78%</b><small>Squad Morale</small></div>
+      <div class="metric"><b id="positionStat">1st</b><small>League Position</small></div>
+    </header>
+
+    <section class="screen active" id="dashboard">
+      <div class="hero">
+        <div class="pitch-lines"></div>
+        <div class="hero-content">
+          <span class="badge" id="dashboardRound">League Week 1</span>
+          <h2>Next Match</h2>
+          <div class="next-match">
+            <strong id="nextHome">Sabah Hornbills FC</strong>
+            <span class="versus">VS</span>
+            <strong id="nextAway">Kinabalu United</strong>
+            <button class="primary" id="playMatchBtn" type="button">Play Match</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid three" style="margin-top:12px">
+        <div class="card">
+          <h3>Club Form</h3>
+          <div id="formDisplay" style="display:flex; gap:7px; flex-wrap:wrap"></div>
+        </div>
+        <div class="card">
+          <h3>Team Strength</h3>
+          <div class="bar"><span id="strengthBar" style="width:72%"></span></div>
+          <p><strong id="strengthText">72</strong> overall rating</p>
+        </div>
+        <div class="card">
+          <h3>Board Confidence</h3>
+          <div class="bar"><span id="confidenceBar" style="width:76%"></span></div>
+          <p><strong id="confidenceText">76%</strong> approval</p>
+        </div>
+      </div>
+
+      <div class="grid two" style="margin-top:12px">
+        <div class="card">
+          <div class="section-title">
+            <h2>Club News</h2>
+            <span class="badge">Latest</span>
+          </div>
+          <div id="newsList" class="event-log"></div>
+        </div>
+        <div class="card">
+          <div class="section-title">
+            <h2>Top Performers</h2>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Player</th><th>Pos</th><th>Rating</th><th>Goals</th></tr></thead>
+              <tbody id="topPerformersBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="squad">
+      <div class="card">
+        <div class="section-title">
+          <h2>First Team Squad</h2>
+          <button class="secondary" id="autoSelectBtn" type="button">Auto Select XI</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Player</th><th>Pos</th><th>Age</th><th>Rating</th><th>Fitness</th><th>Morale</th><th>Goals</th><th>Status</th></tr>
+            </thead>
+            <tbody id="squadBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="tactics">
+      <div class="grid two">
+        <div class="card">
+          <div class="section-title"><h2>Tactical Setup</h2></div>
+          <div class="form-grid">
+            <label>Formation
+              <select id="formationSelect">
+                <option>4-3-3</option>
+                <option>4-4-2</option>
+                <option>4-2-3-1</option>
+                <option>3-5-2</option>
+              </select>
+            </label>
+            <label>Mentality
+              <select id="mentalitySelect">
+                <option>Balanced</option>
+                <option>Attacking</option>
+                <option>Defensive</option>
+                <option>Counter Attack</option>
+              </select>
+            </label>
+            <label>Pressing
+              <select id="pressingSelect">
+                <option>Standard</option>
+                <option>High Press</option>
+                <option>Low Block</option>
+              </select>
+            </label>
+          </div>
+          <p id="tacticSummary">Balanced 4-3-3 with standard pressing.</p>
+          <button class="primary" id="saveTacticsBtn" type="button">Save Tactics</button>
+        </div>
+        <div class="formation" id="formationPitch" aria-label="Selected formation"></div>
+      </div>
+    </section>
+
+    <section class="screen" id="training">
+      <div class="grid three">
+        <div class="card">
+          <h3>Fitness Session</h3>
+          <p>Improves fitness but may reduce morale slightly.</p>
+          <button class="primary training-btn" data-type="fitness" type="button">Run Fitness Training</button>
+        </div>
+        <div class="card">
+          <h3>Technical Session</h3>
+          <p>Small chance to improve player ratings.</p>
+          <button class="primary training-btn" data-type="technical" type="button">Run Technical Training</button>
+        </div>
+        <div class="card">
+          <h3>Team Building</h3>
+          <p>Raises squad morale and board confidence.</p>
+          <button class="primary training-btn" data-type="morale" type="button">Run Team Building</button>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h2>Training Report</h2>
+        <div id="trainingReport" class="event-log"></div>
+      </div>
+    </section>
+
+    <section class="screen" id="transfers">
+      <div class="card">
+        <div class="section-title">
+          <h2>Transfer Market</h2>
+          <span class="badge" id="transferBudgetBadge">Budget RM 2.50m</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Player</th><th>Pos</th><th>Age</th><th>Rating</th><th>Value</th><th>Wage</th><th>Action</th></tr></thead>
+            <tbody id="transferBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="fixtures">
+      <div class="card">
+        <div class="section-title">
+          <h2>Season Fixtures</h2>
+          <button class="primary" id="fixturePlayBtn" type="button">Play Next Match</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Week</th><th>Home</th><th>Away</th><th>Result</th><th>Status</th></tr></thead>
+            <tbody id="fixturesBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="league">
+      <div class="card">
+        <h2>Malaysian Community League</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Club</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr></thead>
+            <tbody id="leagueBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="finance">
+      <div class="grid three">
+        <div class="card"><h3>Club Balance</h3><p style="font-size:26px;color:var(--gold)" id="balanceText">RM 5.00m</p></div>
+        <div class="card"><h3>Weekly Wage</h3><p style="font-size:26px;color:var(--gold)" id="wageText">RM 95k</p></div>
+        <div class="card"><h3>Season Revenue</h3><p style="font-size:26px;color:var(--gold)" id="revenueText">RM 0</p></div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h2>Finance Activity</h2>
+        <div id="financeLog" class="event-log"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="modal hidden" id="matchModal">
+  <div class="modal-card">
+    <div class="section-title">
+      <h2>Live Match Simulation</h2>
+      <span class="badge" id="matchMinute">0'</span>
+    </div>
+    <div class="match-score">
+      <div><strong id="matchHome">Sabah Hornbills FC</strong></div>
+      <div class="score" id="liveScore">0 - 0</div>
+      <div><strong id="matchAway">Kinabalu United</strong></div>
+    </div>
+    <div class="bar"><span id="matchProgressBar" style="width:0%"></span></div>
+    <div id="matchEvents" class="event-log" style="margin-top:14px"></div>
+    <button class="secondary" id="skipMatchBtn" type="button" style="margin-top:12px;width:100%">Skip to Full Time</button>
+  </div>
+</div>
+
+<div class="message" id="toast"></div>
+
+<script>
+(() => {
+  "use strict";
+
+  const CLUB = "Sabah Hornbills FC";
+  const opponents = [
+    "Kinabalu United", "North Borneo FC", "Tuaran Strikers",
+    "Sandakan City", "Tawau Rangers", "Kudat Mariners",
+    "Ranau Mountaineers", "Beaufort Athletic", "Lahad Datu Warriors"
+  ];
+
+  const defaultPlayers = [
+    {id:1,name:"Hafiz Rahman",pos:"GK",age:27,rating:72,fitness:94,morale:78,goals:0,wage:9000,starter:true},
+    {id:2,name:"Daniel Goh",pos:"RB",age:24,rating:70,fitness:92,morale:76,goals:0,wage:7200,starter:true},
+    {id:3,name:"Rizal Karim",pos:"CB",age:29,rating:74,fitness:89,morale:80,goals:1,wage:11000,starter:true},
+    {id:4,name:"Marcus Lim",pos:"CB",age:26,rating:71,fitness:91,morale:77,goals:0,wage:8800,starter:true},
+    {id:5,name:"Amirul Nizam",pos:"LB",age:23,rating:69,fitness:95,morale:74,goals:0,wage:6500,starter:true},
+    {id:6,name:"Jonathan Lee",pos:"CM",age:28,rating:75,fitness:90,morale:82,goals:2,wage:13000,starter:true},
+    {id:7,name:"Faizal Hamid",pos:"CM",age:25,rating:73,fitness:93,morale:79,goals:1,wage:10500,starter:true},
+    {id:8,name:"Kelvin Wong",pos:"AM",age:22,rating:76,fitness:94,morale:84,goals:3,wage:14500,starter:true},
+    {id:9,name:"Azlan Yusuf",pos:"RW",age:24,rating:74,fitness:92,morale:81,goals:4,wage:12500,starter:true},
+    {id:10,name:"Joseph Kitingan",pos:"LW",age:23,rating:73,fitness:96,morale:83,goals:3,wage:11800,starter:true},
+    {id:11,name:"Syafiq Ismail",pos:"ST",age:27,rating:77,fitness:88,morale:85,goals:7,wage:16000,starter:true},
+    {id:12,name:"Adrian Peter",pos:"GK",age:21,rating:65,fitness:98,morale:72,goals:0,wage:4200,starter:false},
+    {id:13,name:"Fikri Jalil",pos:"CB",age:22,rating:66,fitness:96,morale:70,goals:0,wage:4500,starter:false},
+    {id:14,name:"Raymond Tan",pos:"CM",age:20,rating:67,fitness:97,morale:75,goals:0,wage:4800,starter:false},
+    {id:15,name:"Eddy Madin",pos:"LW",age:21,rating:68,fitness:94,morale:73,goals:1,wage:5200,starter:false},
+    {id:16,name:"Khairul Anwar",pos:"ST",age:19,rating:66,fitness:99,morale:76,goals:1,wage:5000,starter:false}
+  ];
+
+  const marketPlayers = [
+    {id:101,name:"Arif Zainal",pos:"ST",age:25,rating:79,value:1450000,wage:19000},
+    {id:102,name:"Brandon Ong",pos:"CB",age:27,rating:78,value:1320000,wage:17500},
+    {id:103,name:"Mikael Japar",pos:"CM",age:22,rating:76,value:980000,wage:14000},
+    {id:104,name:"Rahman Idris",pos:"GK",age:26,rating:77,value:1100000,wage:15500},
+    {id:105,name:"Vincent Chong",pos:"RW",age:21,rating:75,value:850000,wage:12500},
+    {id:106,name:"Nordin Salim",pos:"LB",age:24,rating:74,value:720000,wage:11000},
+    {id:107,name:"Elijah Jumin",pos:"AM",age:23,rating:80,value:1750000,wage:21000}
+  ];
+
+  const els = {};
+  document.querySelectorAll("[id]").forEach(el => els[el.id] = el);
+
+  const saved = loadGame();
+  const state = saved || {
+    season: 1,
+    week: 1,
+    balance: 5000000,
+    budget: 2500000,
+    revenue: 0,
+    morale: 78,
+    boardConfidence: 76,
+    formation: "4-3-3",
+    mentality: "Balanced",
+    pressing: "Standard",
+    form: [],
+    players: structuredClone(defaultPlayers),
+    market: structuredClone(marketPlayers),
+    news: [
+      "The board expects a top-four finish this season.",
+      "Supporters are excited about the new management team.",
+      "Season tickets have generated RM 420,000."
+    ],
+    trainingLog: ["No training session completed this week."],
+    financeLog: ["Initial club balance: RM 5,000,000."],
+    fixtures: [],
+    table: []
+  };
+
+  if (!state.fixtures.length || !state.table.length) initialiseSeason();
+
+  function initialiseSeason() {
+    const clubs = [CLUB, ...opponents];
+    state.table = clubs.map(name => ({name,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));
+    state.fixtures = createSchedule(clubs);
+  }
+
+  function createSchedule(clubs) {
+    let arr = [...clubs];
+    if (arr.length % 2) arr.push("BYE");
+    const rounds = [];
+    const n = arr.length;
+    const fixed = arr[0];
+    let rotating = arr.slice(1);
+
+    for (let r = 0; r < n - 1; r++) {
+      const roundTeams = [fixed, ...rotating];
+      const pairings = [];
+      for (let i = 0; i < n / 2; i++) {
+        const a = roundTeams[i];
+        const b = roundTeams[n - 1 - i];
+        if (a !== "BYE" && b !== "BYE") {
+          const flip = r % 2 === 1;
+          pairings.push({week:r+1, home:flip ? b : a, away:flip ? a : b, played:false, homeGoals:null, awayGoals:null});
+        }
+      }
+      rounds.push(...pairings);
+      rotating = [rotating[rotating.length - 1], ...rotating.slice(0, -1)];
+    }
+
+    const secondLeg = rounds.map(f => ({
+      week: f.week + (n - 1), home: f.away, away: f.home,
+      played:false, homeGoals:null, awayGoals:null
+    }));
+    return [...rounds, ...secondLeg];
+  }
+
+  function loadGame() {
+    try {
+      const raw = localStorage.getItem("sabahFootballManagerSave");
+      return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+  }
+
+  function saveGame() {
+    localStorage.setItem("sabahFootballManagerSave", JSON.stringify(state));
+  }
+
+  function money(v) {
+    if (v >= 1000000) return `RM ${(v/1000000).toFixed(2)}m`;
+    if (v >= 1000) return `RM ${(v/1000).toFixed(0)}k`;
+    return `RM ${Math.round(v)}`;
+  }
+
+  function ordinal(n) {
+    const mod100 = n % 100;
+    if ([11,12,13].includes(mod100)) return n + "th";
+    return n + ({1:"st",2:"nd",3:"rd"}[n%10] || "th");
+  }
+
+  function squadAverage() {
+    const starters = state.players.filter(p => p.starter).slice(0,11);
+    return Math.round(starters.reduce((s,p)=>s+p.rating*(p.fitness/100)*(0.8+p.morale/500),0) / Math.max(starters.length,1));
+  }
+
+  function weeklyWage() {
+    return state.players.reduce((s,p)=>s+p.wage,0);
+  }
+
+  function leaguePosition() {
+    const sorted = sortedTable();
+    return sorted.findIndex(t => t.name === CLUB) + 1;
+  }
+
+  function sortedTable() {
+    return [...state.table].sort((a,b) =>
+      b.pts - a.pts || (b.gf-b.ga)-(a.gf-a.ga) || b.gf-a.gf
+    );
+  }
+
+  function getNextFixture() {
+    return state.fixtures.find(f => !f.played && (f.home === CLUB || f.away === CLUB));
+  }
+
+  function renderAll() {
+    renderHeader();
+    renderDashboard();
+    renderSquad();
+    renderTactics();
+    renderTransfers();
+    renderFixtures();
+    renderLeague();
+    renderFinance();
+    renderTraining();
+    saveGame();
+  }
+
+  function renderHeader() {
+    els.budgetStat.textContent = money(state.budget);
+    els.moraleStat.textContent = `${Math.round(state.morale)}%`;
+    els.positionStat.textContent = ordinal(leaguePosition());
+    els.sideSeason.textContent = `Season ${state.season}`;
+    els.sideWeek.textContent = `Week ${state.week} of 18`;
+    els.transferBudgetBadge.textContent = `Budget ${money(state.budget)}`;
+  }
+
+  function renderDashboard() {
+    const next = getNextFixture();
+    els.dashboardRound.textContent = next ? `League Week ${next.week}` : "Season Complete";
+    els.nextHome.textContent = next ? next.home : "No fixture";
+    els.nextAway.textContent = next ? next.away : "—";
+    els.playMatchBtn.disabled = !next;
+    els.formDisplay.innerHTML = state.form.length
+      ? state.form.slice(-5).map(x => `<span class="status" style="background:${x==="W"?"rgba(62,209,125,.16)":x==="D"?"rgba(242,201,76,.16)":"rgba(228,88,88,.16)"}">${x}</span>`).join("")
+      : '<span style="color:var(--muted)">No matches played</span>';
+
+    const strength = squadAverage();
+    els.strengthBar.style.width = `${Math.min(100,strength)}%`;
+    els.strengthText.textContent = strength;
+    els.confidenceBar.style.width = `${state.boardConfidence}%`;
+    els.confidenceText.textContent = `${Math.round(state.boardConfidence)}%`;
+
+    els.newsList.innerHTML = state.news.slice(0,8).map(n => `<div class="event">${n}</div>`).join("");
+    const top = [...state.players].sort((a,b)=>b.goals-a.goals || b.rating-a.rating).slice(0,5);
+    els.topPerformersBody.innerHTML = top.map(p => `
+      <tr><td>${p.name}</td><td>${p.pos}</td><td>${ratingBadge(p.rating)}</td><td>${p.goals}</td></tr>
+    `).join("");
+  }
+
+  function ratingBadge(r) {
+    const c = r >= 75 ? "" : r >= 68 ? "mid" : "low";
+    return `<span class="rating ${c}">${r}</span>`;
+  }
+
+  function renderSquad() {
+    const sorted = [...state.players].sort((a,b)=>Number(b.starter)-Number(a.starter) || b.rating-a.rating);
+    els.squadBody.innerHTML = sorted.map(p => `
+      <tr>
+        <td>${p.name}</td><td>${p.pos}</td><td>${p.age}</td><td>${ratingBadge(p.rating)}</td>
+        <td>${Math.round(p.fitness)}%</td><td>${Math.round(p.morale)}%</td><td>${p.goals}</td>
+        <td><button class="secondary toggle-starter" data-id="${p.id}" type="button">${p.starter ? "Starting XI" : "Bench"}</button></td>
+      </tr>
+    `).join("");
+
+    document.querySelectorAll(".toggle-starter").forEach(btn => {
+      btn.addEventListener("click", () => toggleStarter(Number(btn.dataset.id)));
+    });
+  }
+
+  function toggleStarter(id) {
+    const p = state.players.find(x=>x.id===id);
+    if (!p) return;
+    const starters = state.players.filter(x=>x.starter).length;
+    if (!p.starter && starters >= 11) {
+      toast("Starting XI already has 11 players.");
+      return;
+    }
+    if (p.starter && starters <= 11) {
+      toast("You must keep 11 starting players.");
+      return;
+    }
+    p.starter = !p.starter;
+    renderAll();
+  }
+
+  function autoSelectXI() {
+    state.players.forEach(p=>p.starter=false);
+    const roles = [
+      ["GK",1],["RB",1],["LB",1],["CB",2],["CM",2],["AM",1],["RW",1],["LW",1],["ST",1]
+    ];
+    const chosen = [];
+    roles.forEach(([pos,count])=>{
+      const available = state.players.filter(p=>p.pos===pos && !chosen.includes(p)).sort((a,b)=>effective(b)-effective(a));
+      chosen.push(...available.slice(0,count));
+    });
+    const remaining = state.players.filter(p=>!chosen.includes(p)).sort((a,b)=>effective(b)-effective(a));
+    chosen.push(...remaining.slice(0,11-chosen.length));
+    chosen.slice(0,11).forEach(p=>p.starter=true);
+    toast("Best available Starting XI selected.");
+    renderAll();
+  }
+
+  function effective(p) {
+    return p.rating * (p.fitness/100) * (0.85+p.morale/600);
+  }
+
+  function renderTactics() {
+    els.formationSelect.value = state.formation;
+    els.mentalitySelect.value = state.mentality;
+    els.pressingSelect.value = state.pressing;
+    els.tacticSummary.textContent = `${state.mentality} ${state.formation} with ${state.pressing.toLowerCase()}.`;
+    renderFormationPitch();
+  }
+
+  function renderFormationPitch() {
+    const starters = state.players.filter(p=>p.starter).sort((a,b)=>positionOrder(a.pos)-positionOrder(b.pos));
+    const layouts = {
+      "4-3-3":[[50,92],[15,72],[38,74],[62,74],[85,72],[25,49],[50,52],[75,49],[18,23],[50,17],[82,23]],
+      "4-4-2":[[50,92],[15,72],[38,74],[62,74],[85,72],[15,46],[38,50],[62,50],[85,46],[36,18],[64,18]],
+      "4-2-3-1":[[50,92],[15,72],[38,74],[62,74],[85,72],[35,54],[65,54],[18,34],[50,31],[82,34],[50,12]],
+      "3-5-2":[[50,92],[25,72],[50,75],[75,72],[12,48],[32,52],[50,43],[68,52],[88,48],[35,17],[65,17]]
+    };
+    els.formationPitch.innerHTML = "";
+    const coords = layouts[state.formation] || layouts["4-3-3"];
+    starters.slice(0,11).forEach((p,i)=>{
+      const d=document.createElement("div");
+      d.className="player-dot";
+      d.style.left=coords[i][0]+"%";
+      d.style.top=coords[i][1]+"%";
+      d.textContent=`${p.name.split(" ")[0]} · ${p.pos}`;
+      els.formationPitch.appendChild(d);
+    });
+  }
+
+  function positionOrder(pos) {
+    return ({GK:0,RB:1,CB:2,LB:3,CM:4,AM:5,RW:6,LW:7,ST:8})[pos] ?? 9;
+  }
+
+  function saveTactics() {
+    state.formation = els.formationSelect.value;
+    state.mentality = els.mentalitySelect.value;
+    state.pressing = els.pressingSelect.value;
+    state.news.unshift(`Tactical plan updated: ${state.mentality} ${state.formation}, ${state.pressing}.`);
+    toast("Tactics saved.");
+    renderAll();
+  }
+
+  function renderTraining() {
+    els.trainingReport.innerHTML = state.trainingLog.slice(0,10).map(x=>`<div class="event">${x}</div>`).join("");
+  }
+
+  function runTraining(type) {
+    if (state.trainingDoneWeek === state.week) {
+      toast("Only one training session can be completed each week.");
+      return;
+    }
+    state.trainingDoneWeek = state.week;
+    let report = "";
+
+    if (type === "fitness") {
+      state.players.forEach(p=>{
+        p.fitness = Math.min(100, p.fitness + 5 + Math.random()*4);
+        p.morale = Math.max(45, p.morale - Math.random()*2);
+      });
+      report = "Fitness session completed. Average fitness improved.";
+    } else if (type === "technical") {
+      const improvers = [];
+      state.players.forEach(p=>{
+        p.fitness = Math.max(55,p.fitness-2);
+        if (Math.random()<0.22 && p.rating<84) { p.rating += 1; improvers.push(p.name); }
+      });
+      report = improvers.length ? `Technical gains: ${improvers.join(", ")} improved by 1 rating.` : "Technical session completed; no immediate rating increases.";
+    } else {
+      state.players.forEach(p=>p.morale=Math.min(100,p.morale+5+Math.random()*3));
+      state.morale=Math.min(100,state.morale+6);
+      state.boardConfidence=Math.min(100,state.boardConfidence+2);
+      report="Team-building day raised squad morale and club confidence.";
+    }
+
+    state.trainingLog.unshift(`Week ${state.week}: ${report}`);
+    state.news.unshift(report);
+    toast("Training completed.");
+    renderAll();
+  }
+
+  function renderTransfers() {
+    els.transferBody.innerHTML = state.market.map(p=>`
+      <tr>
+        <td>${p.name}</td><td>${p.pos}</td><td>${p.age}</td><td>${ratingBadge(p.rating)}</td>
+        <td>${money(p.value)}</td><td>${money(p.wage)}</td>
+        <td><button class="primary buy-player" data-id="${p.id}" type="button">Sign</button></td>
+      </tr>
+    `).join("");
+
+    document.querySelectorAll(".buy-player").forEach(btn=>{
+      btn.addEventListener("click",()=>buyPlayer(Number(btn.dataset.id)));
+    });
+  }
+
+  function buyPlayer(id) {
+    const p = state.market.find(x=>x.id===id);
+    if (!p) return;
+    if (state.budget < p.value || state.balance < p.value) {
+      toast("Insufficient transfer budget or club balance.");
+      return;
+    }
+    state.budget -= p.value;
+    state.balance -= p.value;
+    state.players.push({...p,id:Date.now(),fitness:92,morale:82,goals:0,starter:false});
+    state.market = state.market.filter(x=>x.id!==id);
+    state.financeLog.unshift(`Signed ${p.name} for ${money(p.value)}.`);
+    state.news.unshift(`${p.name} has joined ${CLUB}.`);
+    toast(`${p.name} signed successfully.`);
+    renderAll();
+  }
+
+  function renderFixtures() {
+    const clubFixtures = state.fixtures.filter(f=>f.home===CLUB || f.away===CLUB);
+    els.fixturesBody.innerHTML = clubFixtures.map(f=>`
+      <tr>
+        <td>${f.week}</td><td>${f.home}</td><td>${f.away}</td>
+        <td>${f.played ? `${f.homeGoals} - ${f.awayGoals}` : "—"}</td>
+        <td><span class="status">${f.played ? "Played" : f.week===state.week ? "Next" : "Scheduled"}</span></td>
+      </tr>
+    `).join("");
+    els.fixturePlayBtn.disabled = !getNextFixture();
+  }
+
+  function renderLeague() {
+    els.leagueBody.innerHTML = sortedTable().map((t,i)=>`
+      <tr style="${t.name===CLUB?"background:rgba(62,209,125,.08)":""}">
+        <td>${i+1}</td><td><strong>${t.name}</strong></td><td>${t.p}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td>
+        <td>${t.gf}</td><td>${t.ga}</td><td>${t.gf-t.ga}</td><td><strong>${t.pts}</strong></td>
+      </tr>
+    `).join("");
+  }
+
+  function renderFinance() {
+    els.balanceText.textContent = money(state.balance);
+    els.wageText.textContent = money(weeklyWage());
+    els.revenueText.textContent = money(state.revenue);
+    els.financeLog.innerHTML = state.financeLog.slice(0,14).map(x=>`<div class="event">${x}</div>`).join("");
+  }
+
+  function playNextMatch() {
+    const fixture = getNextFixture();
+    if (!fixture) { toast("No remaining fixture."); return; }
+
+    const wage = weeklyWage();
+    state.balance -= wage;
+    state.financeLog.unshift(`Weekly wages paid: ${money(wage)}.`);
+
+    els.matchModal.classList.remove("hidden");
+    els.matchHome.textContent = fixture.home;
+    els.matchAway.textContent = fixture.away;
+    els.liveScore.textContent = "0 - 0";
+    els.matchEvents.innerHTML = '<div class="event">Kick-off!</div>';
+    els.matchProgressBar.style.width = "0%";
+    els.matchMinute.textContent = "0'";
+
+    let minute = 0, hg = 0, ag = 0, done = false;
+    const ourHome = fixture.home === CLUB;
+    const ourStrength = squadAverage() + tacticBonus();
+    const oppStrength = 67 + Math.floor(Math.random()*10) + Math.min(state.week/3,4);
+
+    const interval = setInterval(()=>{
+      if (done) return;
+      minute += 5;
+      simulateSlice();
+      updateLive();
+      if (minute>=90) finish();
+    }, 250);
+
+    function simulateSlice() {
+      const homeStrength = ourHome ? ourStrength : oppStrength;
+      const awayStrength = ourHome ? oppStrength : ourStrength;
+      const homeChance = 0.055 + (homeStrength-awayStrength)/900;
+      const awayChance = 0.048 + (awayStrength-homeStrength)/900;
+
+      if (Math.random()<homeChance) {
+        hg++;
+        addEvent(`${minute}' GOAL — ${fixture.home}!`);
+        if (ourHome) addPlayerGoal();
+      } else if (Math.random()<awayChance) {
+        ag++;
+        addEvent(`${minute}' GOAL — ${fixture.away}!`);
+        if (!ourHome) addPlayerGoal();
+      } else if (Math.random()<0.23) {
+        const events=["A powerful shot is saved.","A dangerous counterattack breaks down.","The referee awards a free kick.","A header flies just wide.","Excellent defending inside the box."];
+        addEvent(`${minute}' ${events[Math.floor(Math.random()*events.length)]}`);
+      }
+    }
+
+    function addEvent(text) {
+      const d=document.createElement("div");
+      d.className="event";
+      d.textContent=text;
+      els.matchEvents.prepend(d);
+    }
+
+    function updateLive() {
+      els.liveScore.textContent=`${hg} - ${ag}`;
+      els.matchMinute.textContent=`${Math.min(90,minute)}'`;
+      els.matchProgressBar.style.width=`${Math.min(100,minute/90*100)}%`;
+    }
+
+    function finish() {
+      done=true;
+      clearInterval(interval);
+      els.matchMinute.textContent="FT";
+      fixture.played=true;
+      fixture.homeGoals=hg;
+      fixture.awayGoals=ag;
+      applyResult(fixture);
+
+      const gate = 150000 + Math.floor(Math.random()*110000);
+      state.balance += gate;
+      state.revenue += gate;
+      state.financeLog.unshift(`Matchday revenue received: ${money(gate)}.`);
+      state.news.unshift(`${fixture.home} ${hg}-${ag} ${fixture.away}.`);
+
+      state.players.forEach(p=>{
+        p.fitness=Math.max(55,p.fitness-(p.starter?7:2)+Math.random()*2);
+        p.morale=Math.max(45,Math.min(100,p.morale + (resultForClub(fixture)==="W"?4:resultForClub(fixture)==="D"?1:-3)));
+      });
+      state.morale=Math.round(state.players.reduce((s,p)=>s+p.morale,0)/state.players.length);
+
+      simulateOtherFixtures(fixture.week);
+      state.form.push(resultForClub(fixture));
+      state.week += 1;
+      state.trainingDoneWeek = null;
+      state.boardConfidence = Math.max(20,Math.min(100,state.boardConfidence + (resultForClub(fixture)==="W"?3:resultForClub(fixture)==="D"?0:-2)));
+
+      if (!getNextFixture()) endSeason();
+
+      saveGame();
+      renderAll();
+      setTimeout(()=>{
+        els.matchEvents.prepend(Object.assign(document.createElement("div"),{className:"event",textContent:"Full time. Close this window to continue."}));
+      },100);
+    }
+
+    function addPlayerGoal() {
+      const candidates=state.players.filter(p=>p.starter && ["ST","LW","RW","AM","CM"].includes(p.pos));
+      if (candidates.length) candidates[Math.floor(Math.random()*candidates.length)].goals++;
+    }
+
+    els.skipMatchBtn.onclick=()=>{
+      if (done) {
+        els.matchModal.classList.add("hidden");
+        return;
+      }
+      while (minute<90) {
+        minute += 5;
+        simulateSlice();
+      }
+      updateLive();
+      finish();
+      els.skipMatchBtn.textContent="Close Match";
+    };
+  }
+
+  function tacticBonus() {
+    let b=0;
+    if (state.mentality==="Attacking") b+=2;
+    if (state.mentality==="Counter Attack") b+=1;
+    if (state.pressing==="High Press") b+=2;
+    if (state.pressing==="Low Block") b-=1;
+    if (state.formation==="4-2-3-1") b+=1;
+    return b;
+  }
+
+  function resultForClub(f) {
+    const ours = f.home===CLUB ? f.homeGoals : f.awayGoals;
+    const theirs = f.home===CLUB ? f.awayGoals : f.homeGoals;
+    return ours>theirs?"W":ours===theirs?"D":"L";
+  }
+
+  function applyResult(f) {
+    const h=state.table.find(t=>t.name===f.home);
+    const a=state.table.find(t=>t.name===f.away);
+    if (!h||!a) return;
+    h.p++;a.p++; h.gf+=f.homeGoals;h.ga+=f.awayGoals; a.gf+=f.awayGoals;a.ga+=f.homeGoals;
+    if (f.homeGoals>f.awayGoals){h.w++;a.l++;h.pts+=3;}
+    else if (f.homeGoals<f.awayGoals){a.w++;h.l++;a.pts+=3;}
+    else {h.d++;a.d++;h.pts++;a.pts++;}
+  }
+
+  function simulateOtherFixtures(week) {
+    state.fixtures.filter(f=>f.week===week && !f.played).forEach(f=>{
+      f.homeGoals=poissonGoal(1.45);
+      f.awayGoals=poissonGoal(1.2);
+      f.played=true;
+      applyResult(f);
+    });
+  }
+
+  function poissonGoal(avg) {
+    const L=Math.exp(-avg);
+    let p=1,k=0;
+    do{k++;p*=Math.random();}while(p>L);
+    return Math.max(0,k-1);
+  }
+
+  function endSeason() {
+    const pos=leaguePosition();
+    let prize=200000;
+    if(pos===1) prize=1500000;
+    else if(pos<=3) prize=900000;
+    else if(pos<=5) prize=500000;
+    state.balance+=prize;
+    state.budget+=Math.round(prize*.7);
+    state.revenue+=prize;
+    state.financeLog.unshift(`Season prize money: ${money(prize)}.`);
+    state.news.unshift(`Season ${state.season} completed in ${ordinal(pos)} place.`);
+    state.season+=1;
+    state.week=1;
+    state.form=[];
+    state.players.forEach(p=>{
+      p.age+=1;
+      p.fitness=94;
+      p.morale=Math.max(65,p.morale);
+      if(p.age<=23 && Math.random()<.45 && p.rating<84) p.rating++;
+      if(p.age>=31 && Math.random()<.35 && p.rating>60) p.rating--;
+    });
+    initialiseSeason();
+  }
+
+  function resetGame() {
+    if (!confirm("Reset all Football Manager progress?")) return;
+    localStorage.removeItem("sabahFootballManagerSave");
+    location.reload();
+  }
+
+  function toast(msg) {
+    els.toast.textContent=msg;
+    els.toast.classList.add("show");
+    clearTimeout(toast.t);
+    toast.t=setTimeout(()=>els.toast.classList.remove("show"),2200);
+  }
+
+  document.querySelectorAll(".nav button").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+      document.getElementById(btn.dataset.screen).classList.add("active");
+      els.sidebar.classList.remove("open");
+    });
+  });
+
+  els.mobileMenuBtn.addEventListener("click",()=>els.sidebar.classList.toggle("open"));
+  els.playMatchBtn.addEventListener("click",playNextMatch);
+  els.fixturePlayBtn.addEventListener("click",playNextMatch);
+  els.autoSelectBtn.addEventListener("click",autoSelectXI);
+  els.saveTacticsBtn.addEventListener("click",saveTactics);
+  els.formationSelect.addEventListener("change",()=>{state.formation=els.formationSelect.value;renderFormationPitch();});
+  document.querySelectorAll(".training-btn").forEach(btn=>btn.addEventListener("click",()=>runTraining(btn.dataset.type)));
+
+  const resetBtn=document.createElement("button");
+  resetBtn.className="danger";
+  resetBtn.style.width="100%";
+  resetBtn.style.marginTop="10px";
+  resetBtn.textContent="Reset Game";
+  resetBtn.addEventListener("click",resetGame);
+  document.querySelector(".side-footer").appendChild(resetBtn);
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
