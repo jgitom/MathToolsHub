@@ -47,6 +47,8 @@ function tree(x,z,s=1){
 for(let i=0;i<34;i++){const rock=new THREE.Mesh(new THREE.DodecahedronGeometry(.25+Math.random()*.65,0),new THREE.MeshStandardMaterial({color:0x766950,roughness:1}));rock.scale.y=.55;rock.position.set((Math.random()-.5)*55,.2,-5-Math.random()*55);rock.rotation.set(Math.random(),Math.random(),Math.random());rock.castShadow=true;scene.add(rock)}
 for(let i=0;i<8;i++){const grass=new THREE.Mesh(new THREE.ConeGeometry(.18,.9,5),new THREE.MeshStandardMaterial({color:0x405a25}));grass.position.set((Math.random()-.5)*25,.45,-5-Math.random()*25);scene.add(grass)}
 
+const photographicTextures={Lion:new THREE.TextureLoader().load("./assets/realistic-lion.png",texture=>texture.colorSpace=THREE.SRGBColorSpace),Elephant:new THREE.TextureLoader().load("./assets/realistic-elephant.png",texture=>texture.colorSpace=THREE.SRGBColorSpace)};
+function photographicAnimal(def){const root=new THREE.Group(),sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:photographicTextures[def.name],transparent:true,alphaTest:.08,depthWrite:false}));const size=def.name==="Elephant"?5.1:4.7;sprite.scale.set(size,size*(def.name==="Elephant"?.73:.57),1);sprite.position.y=sprite.scale.y*.5;root.add(sprite);root.userData={def,legs:[],phase:Math.random()*6.28,head:null,tail:null,photographic:true};sprite.userData.animalRoot=root;return root}
 const matCache=new Map();
 function material(colour,roughness=.88){const key=`${colour}-${roughness}`;if(!matCache.has(key))matCache.set(key,new THREE.MeshStandardMaterial({color:colour,roughness,metalness:0}));return matCache.get(key)}
 function mesh(geometry,colour,parent,x,y,z,sx=1,sy=1,sz=1){
@@ -64,6 +66,7 @@ function addLeg(parent,x,z,colour,hoofColour,long=false,heavy=false){
 }
 function addSpots(parent,colour,bodyLength=2.5,count=16){for(let i=0;i<count;i++){const angle=(i%4)*Math.PI/2,x=-bodyLength*.42+(i%5)*(bodyLength*.2),y=1.58+Math.floor(i/5)*.32,z=Math.sin(angle)*.68;const spot=mesh(sphere,colour,parent,x,y,z,.09,.09,.045);spot.castShadow=false}}
 function animalModel(def){
+  if(def.name==="Lion"||def.name==="Elephant")return photographicAnimal(def);
   const root=new THREE.Group(),body=new THREE.Group();root.add(body);
   root.userData={def,legs:[],phase:Math.random()*6.28,head:null,tail:null};
   const name=def.name,elephant=name==="Elephant",rhino=name==="Rhino",giraffe=name==="Giraffe",lion=name==="Lion",zebra=name==="Zebra",cheetah=name==="Cheetah";
@@ -113,6 +116,7 @@ let running=false,last=0,remaining=60,score=0,combo=1,lastHit=0,spawnTimer=0,aim
 function spawn(first=false){
   const ranger=!first&&Math.random()<.14,def=species[Math.floor(Math.random()*species.length)],root=ranger?rangerModel():animalModel(def);
   const left=Math.random()<.5;root.position.set(left?-24:24,0,-8-Math.random()*22);root.rotation.y=left?Math.PI/2:-Math.PI/2;
+  if(root.userData.photographic&&!left)root.children[0].scale.x*=-1;
   root.userData.speed=(ranger?4:def.speed)*(.85+Math.random()*.25)*(left?1:-1);root.userData.def=ranger?null:def;
   scene.add(root);targets.push(root)
 }
