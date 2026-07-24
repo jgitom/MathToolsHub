@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#1b321d">
   <title>Wild Hunt Safari | MathToolsHub</title>
-  <meta name="description" content="Explore the savanna, photograph wildlife, and build fast combos in this family-friendly arcade safari game.">
+  <meta name="description" content="Explore an animated 3D savanna, photograph wildlife, and build fast combos in this family-friendly arcade safari game.">
   <style>
     :root{color-scheme:dark;--cream:#fff5d7;--green:#173c24;--lime:#b7e44b;--orange:#ff9f1c}
     *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:#0e2014;color:#fff}
@@ -31,7 +31,7 @@
 <body>
   <header class="topbar"><a class="back" href="../">← All Games</a><span class="brand">Safari Arcade</span></header>
   <main>
-    <div class="intro"><h1>Wild Hunt Safari</h1><p>Track wildlife. Frame the perfect photo. Protect the savanna.</p></div>
+    <div class="intro"><h1>Wild Hunt Safari</h1><p>Explore a living 3D savanna. Track wildlife. Frame the perfect photo.</p></div>
     <section class="game" aria-label="Wild Hunt Safari arcade game">
       <canvas id="safari" width="960" height="540" aria-label="Interactive safari landscape"></canvas>
       <div class="hud" aria-live="polite">
@@ -45,7 +45,7 @@
         <div class="card">
           <div class="icon">📸🦁</div>
           <h2>Wildlife Photo Hunt</h2>
-          <p>Find moving animals and photograph them before they leave the scene. Rare wildlife earns more points.</p>
+          <p>Explore the 3D savanna and photograph animated animals before they leave the scene. Rare wildlife earns more points.</p>
           <div class="rules"><div class="rule"><b>🎯</b>Tap animals</div><div class="rule"><b>⚡</b>Build combos</div><div class="rule"><b>🌿</b>Skip ranger jeeps</div></div>
           <button class="primary" id="startButton" type="button">Start Safari</button>
         </div>
@@ -57,69 +57,6 @@
     <div class="camera-bar"><button class="camera-button" id="cameraButton" type="button">📸 Take Photo</button></div>
     <p class="tip">Move the pointer to aim · Tap an animal or press the camera button · Keyboard: arrows + Space</p>
   </main>
-  <script>
-  (() => {
-    "use strict";
-    const canvas=document.querySelector("#safari"),ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height;
-    const ui={score:document.querySelector("#score"),time:document.querySelector("#time"),combo:document.querySelector("#combo"),album:document.querySelector("#album"),toast:document.querySelector("#toast"),start:document.querySelector("#startScreen"),finish:document.querySelector("#finishScreen"),finishTitle:document.querySelector("#finishTitle"),finishText:document.querySelector("#finishText")};
-    const species=[
-      {name:"Zebra",emoji:"🦓",points:100,size:70,speed:90},
-      {name:"Lion",emoji:"🦁",points:180,size:76,speed:72},
-      {name:"Elephant",emoji:"🐘",points:130,size:88,speed:58},
-      {name:"Giraffe",emoji:"🦒",points:150,size:82,speed:64},
-      {name:"Rhino",emoji:"🦏",points:200,size:82,speed:76},
-      {name:"Cheetah",emoji:"🐆",points:240,size:70,speed:145}
-    ];
-    let animals=[],running=false,last=0,remaining=60,score=0,combo=1,lastHit=0,spawnTimer=0,album=new Set(),aim={x:W/2,y:H/2},raf=0;
-    const ranger={emoji:"🚙",name:"Ranger jeep",points:0,size:80,speed:100};
-    function reset(){animals=[];remaining=60;score=0;combo=1;lastHit=0;spawnTimer=0;album=new Set();aim={x:W/2,y:H/2};updateHud();draw()}
-    function start(){reset();ui.start.hidden=true;ui.finish.hidden=true;running=true;last=performance.now();spawn(true);raf=requestAnimationFrame(loop)}
-    function spawn(first=false){
-      const isRanger=!first&&Math.random()<.15,item=isRanger?ranger:species[Math.floor(Math.random()*species.length)];
-      const left=Math.random()<.5,x=left?-90:W+90,y=H*(.48+Math.random()*.36),scale=.75+(y/H)*.45;
-      animals.push({item,x,y,scale,vx:(left?1:-1)*item.speed*(.85+Math.random()*.45),wave:Math.random()*6.28,shot:false});
-    }
-    function background(){
-      const sky=ctx.createLinearGradient(0,0,0,H*.65);sky.addColorStop(0,"#65b9db");sky.addColorStop(.65,"#ffc857");sky.addColorStop(1,"#e9832f");ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
-      ctx.fillStyle="#f9d778";ctx.beginPath();ctx.arc(W*.78,H*.17,48,0,Math.PI*2);ctx.fill();
-      ctx.fillStyle="#344f2c";ctx.beginPath();ctx.moveTo(0,H*.53);for(let x=0;x<=W;x+=80)ctx.lineTo(x,H*.49+Math.sin(x*.027)*22);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.fill();
-      ctx.fillStyle="#6d8533";ctx.fillRect(0,H*.59,W,H*.41);
-      for(let x=35;x<W;x+=145){const shift=(x*17)%70;ctx.fillStyle="#3e5727";ctx.fillRect(x,H*.42+shift*.15,9,105);ctx.beginPath();ctx.arc(x+4,H*.42+shift*.15,34,0,Math.PI*2);ctx.arc(x-22,H*.44+shift*.15,27,0,Math.PI*2);ctx.arc(x+28,H*.45+shift*.15,25,0,Math.PI*2);ctx.fill()}
-      ctx.fillStyle="#53642c";for(let x=0;x<W;x+=18){ctx.fillRect(x,H*.9-(x%5)*4,3,18)}
-    }
-    function drawAnimal(a){ctx.save();ctx.translate(a.x,a.y+Math.sin(a.wave)*4);if(a.vx<0)ctx.scale(-1,1);ctx.font=`${a.item.size*a.scale}px serif`;ctx.textAlign="center";ctx.textBaseline="bottom";ctx.shadowColor="#0008";ctx.shadowBlur=8;ctx.fillText(a.item.emoji,0,0);ctx.restore()}
-    function reticle(){ctx.save();ctx.strokeStyle="#fff";ctx.lineWidth=3;ctx.shadowColor="#000";ctx.shadowBlur=4;ctx.beginPath();ctx.arc(aim.x,aim.y,34,0,Math.PI*2);ctx.moveTo(aim.x-48,aim.y);ctx.lineTo(aim.x-18,aim.y);ctx.moveTo(aim.x+18,aim.y);ctx.lineTo(aim.x+48,aim.y);ctx.moveTo(aim.x,aim.y-48);ctx.lineTo(aim.x,aim.y-18);ctx.moveTo(aim.x,aim.y+18);ctx.lineTo(aim.x,aim.y+48);ctx.stroke();ctx.restore()}
-    function draw(){background();animals.sort((a,b)=>a.y-b.y).forEach(drawAnimal);reticle()}
-    function update(dt,now){
-      remaining-=dt;spawnTimer-=dt;
-      if(spawnTimer<=0){spawn();spawnTimer=.55+Math.random()*.85}
-      animals.forEach(a=>{a.x+=a.vx*dt;a.wave+=dt*3});
-      animals=animals.filter(a=>a.x>-150&&a.x<W+150&&!a.shot);
-      if(now-lastHit>1900)combo=1;
-      if(remaining<=0){remaining=0;finish()}updateHud()
-    }
-    function loop(now){if(!running)return;const dt=Math.min(.04,(now-last)/1000);last=now;update(dt,now);draw();raf=requestAnimationFrame(loop)}
-    function takePhoto(x=aim.x,y=aim.y){
-      if(!running)return;aim={x,y};
-      const hit=[...animals].reverse().find(a=>Math.hypot(a.x-x,(a.y-a.item.size*a.scale*.48)-y)<a.item.size*a.scale*.55);
-      if(!hit){combo=1;show("Missed! Keep tracking",false);return}
-      hit.shot=true;
-      if(hit.item===ranger){score=Math.max(0,score-150);combo=1;show("Ranger jeep — no photo! −150",false)}
-      else {const now=performance.now();combo=now-lastHit<1900?Math.min(5,combo+1):1;lastHit=now;const earned=hit.item.points*combo;score+=earned;album.add(hit.item.name);show(`${hit.item.emoji} ${hit.item.name} +${earned}`,true)}
-      updateHud();draw()
-    }
-    function show(text,good){ui.toast.textContent=text;ui.toast.style.color=good?"#efff91":"#ffd1d1";ui.toast.classList.remove("show");void ui.toast.offsetWidth;ui.toast.classList.add("show")}
-    function updateHud(){ui.score.textContent=score.toLocaleString();ui.time.textContent=Math.ceil(remaining);ui.combo.textContent=`×${combo}`;ui.album.textContent=`${album.size} / ${species.length}`}
-    function finish(){running=false;cancelAnimationFrame(raf);const complete=album.size===species.length;ui.finishTitle.textContent=complete?"Safari Album Complete!":"Safari Complete!";ui.finishText.textContent=`You scored ${score.toLocaleString()} points and photographed ${album.size} of ${species.length} species. ${complete?"Outstanding wildlife tracking!":"Play again to photograph every species."}`;ui.finish.hidden=false}
-    function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
-    canvas.addEventListener("pointermove",e=>{aim=pointer(e)});
-    canvas.addEventListener("pointerdown",e=>{e.preventDefault();const p=pointer(e);takePhoto(p.x,p.y)});
-    document.querySelector("#cameraButton").addEventListener("click",()=>takePhoto());
-    document.querySelector("#startButton").addEventListener("click",start);document.querySelector("#againButton").addEventListener("click",start);
-    addEventListener("keydown",e=>{const step=22;if(e.key==="ArrowLeft")aim.x-=step;if(e.key==="ArrowRight")aim.x+=step;if(e.key==="ArrowUp")aim.y-=step;if(e.key==="ArrowDown")aim.y+=step;aim.x=Math.max(0,Math.min(W,aim.x));aim.y=Math.max(0,Math.min(H,aim.y));if(e.key===" "){takePhoto();e.preventDefault()}});
-    addEventListener("blur",()=>{});document.addEventListener("visibilitychange",()=>{if(document.hidden&&running){last=performance.now()}});
-    reset();window.__safariGameReady=true;
-  })();
-  </script>
+  <script type="module" src="safari-3d.js"></script>
 </body>
 </html>
