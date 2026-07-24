@@ -62,7 +62,16 @@
       outline-offset: 2px;
     }
 
-    #mth-note-launcher.mth-note-above-assistant { bottom: 94px; }
+    #mth-note-launcher.mth-note-above-assistant {
+      left: 24px;
+      right: auto;
+      bottom: 24px;
+    }
+
+    #mth-note-panel.mth-note-above-assistant {
+      left: 22px;
+      right: auto;
+    }
 
     #mth-note-launcher .mth-note-dot {
       width: 9px;
@@ -278,7 +287,7 @@
 
     @media (max-width: 640px) {
       #mth-note-launcher { right: 14px; bottom: 14px; min-height: 44px; padding: 11px 14px; }
-      #mth-note-launcher.mth-note-above-assistant { bottom: 82px; }
+      #mth-note-launcher.mth-note-above-assistant { left: 14px; right: auto; bottom: 14px; }
       .mth-note-icon-btn { width: 44px; height: 44px; }
       .mth-note-tool-btn { min-height: 44px; }
       #mth-note-panel {
@@ -313,6 +322,7 @@
   panel.id = "mth-note-panel";
   panel.setAttribute("aria-label", "Student writing pad");
   panel.setAttribute("role", "dialog");
+  panel.classList.toggle("mth-note-above-assistant", Boolean(document.querySelector(".ai-assistant")));
   panel.innerHTML = `
     <header class="mth-note-header" id="mth-note-drag-handle">
       <span aria-hidden="true">📝</span>
