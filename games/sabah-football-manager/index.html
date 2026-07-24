@@ -299,6 +299,7 @@
       background: var(--accent);
     }
 
+    .squad-actions{display:flex;align-items:end;justify-content:flex-end;gap:8px;flex-wrap:wrap}.squad-actions label{min-width:145px}.number-input{width:58px;padding:7px 6px;border:1px solid var(--line);border-radius:9px;color:var(--text);background:#092016;text-align:center;font-weight:900}.number-input:disabled{color:#9bb7a7;background:#07170f;opacity:.72}.shirt-number{display:inline-grid;place-items:center;min-width:30px;height:30px;padding:0 6px;border:2px solid #70efab;border-radius:9px;color:#fff;background:#0a2b1b;font-weight:950}.player-dot .formation-number{display:block;color:#f7c948;font-size:13px;line-height:1.1}.live-player{display:grid;place-items:center;color:#fff;font-size:8px;font-weight:950}.live-player.keeper{color:#422006}
     .form-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -585,12 +586,16 @@
       <div class="card">
         <div class="section-title">
           <h2>First Team Squad</h2>
-          <button class="secondary" id="autoSelectBtn" type="button">Auto Select XI</button>
+          <div class="squad-actions">
+            <label>Player numbers<select id="numberModeSelect"><option value="auto">Automatic</option><option value="manual">Manual editing</option></select></label>
+            <button class="secondary" id="autoNumbersBtn" type="button">Auto Assign Numbers</button>
+            <button class="secondary" id="autoSelectBtn" type="button">Auto Select XI</button>
+          </div>
         </div>
         <div class="table-wrap">
           <table>
             <thead>
-              <tr><th>Player</th><th>Pos</th><th>Age</th><th>Rating</th><th>Fitness</th><th>Morale</th><th>Goals</th><th>Status</th></tr>
+              <tr><th>No.</th><th>Player</th><th>Pos</th><th>Age</th><th>Rating</th><th>Fitness</th><th>Morale</th><th>Goals</th><th>Status</th></tr>
             </thead>
             <tbody id="squadBody"></tbody>
           </table>
@@ -814,6 +819,8 @@
     table: []
   };
 
+  state.numberMode = state.numberMode === "manual" ? "manual" : "auto";
+  ensurePlayerNumbers();
   if (!state.fixtures.length || !state.table.length) initialiseSeason();
 
   function initialiseSeason() {
@@ -861,6 +868,41 @@
 
   function saveGame() {
     localStorage.setItem("sabahFootballManagerSave", JSON.stringify(state));
+  }
+
+  function numberPreference(pos){
+    return ({GK:[1,13,22,30],RB:[2,12,24],LB:[3,14,23],CB:[4,5,15,16,25,26],CM:[6,8,18,20,28],AM:[10,19,27],RW:[7,17,29],LW:[11,21,31],ST:[9,19,27,33]})[pos]||[];
+  }
+
+  function nextAvailableNumber(){
+    const used=new Set(state.players.map(p=>Number(p.number)).filter(n=>Number.isInteger(n)&&n>=1&&n<=99));
+    for(let number=1;number<=99;number++)if(!used.has(number))return number;
+    return 99;
+  }
+
+  function autoAssignNumbers(showMessage=false){
+    const used=new Set(),ordered=[...state.players].sort((a,b)=>positionOrder(a.pos)-positionOrder(b.pos)||Number(b.starter)-Number(a.starter)||b.rating-a.rating);
+    ordered.forEach(player=>{
+      const preferred=numberPreference(player.pos).find(number=>!used.has(number));
+      const number=preferred||Array.from({length:99},(_,index)=>index+1).find(value=>!used.has(value));
+      player.number=number;used.add(number);
+    });
+    state.numberMode="auto";
+    if(showMessage)toast("Unique squad numbers assigned automatically.");
+  }
+
+  function ensurePlayerNumbers(){
+    const numbers=state.players.map(player=>Number(player.number));
+    const valid=numbers.every(number=>Number.isInteger(number)&&number>=1&&number<=99)&&new Set(numbers).size===numbers.length;
+    if(!valid)autoAssignNumbers(false);
+  }
+
+  function updateManualNumber(playerId,value){
+    const player=state.players.find(item=>item.id===playerId),number=Number(value);
+    if(!player)return;
+    if(!Number.isInteger(number)||number<1||number>99){toast("Player number must be from 1 to 99.");renderSquad();return}
+    if(state.players.some(item=>item.id!==playerId&&Number(item.number)===number)){toast(`Number ${number} is already assigned.`);renderSquad();return}
+    player.number=number;saveGame();renderSquad();renderFormationPitch();toast(`${player.name} will wear number ${number}.`);
   }
 
   function money(v) {
@@ -950,9 +992,11 @@
   }
 
   function renderSquad() {
+    els.numberModeSelect.value=state.numberMode;
     const sorted = [...state.players].sort((a,b)=>Number(b.starter)-Number(a.starter) || b.rating-a.rating);
     els.squadBody.innerHTML = sorted.map(p => `
       <tr>
+        <td><input class="number-input" type="number" min="1" max="99" inputmode="numeric" aria-label="Player number for ${p.name}" data-id="${p.id}" value="${p.number}" ${state.numberMode==="auto"?"disabled":""}></td>
         <td>${p.name}</td><td>${p.pos}</td><td>${p.age}</td><td>${ratingBadge(p.rating)}</td>
         <td>${Math.round(p.fitness)}%</td><td>${Math.round(p.morale)}%</td><td>${p.goals}</td>
         <td><button class="secondary toggle-starter" data-id="${p.id}" type="button">${p.starter ? "Starting XI" : "Bench"}</button></td>
@@ -962,6 +1006,7 @@
     document.querySelectorAll(".toggle-starter").forEach(btn => {
       btn.addEventListener("click", () => toggleStarter(Number(btn.dataset.id)));
     });
+    document.querySelectorAll(".number-input").forEach(input=>input.addEventListener("change",()=>updateManualNumber(Number(input.dataset.id),input.value)));
   }
 
   function toggleStarter(id) {
@@ -1024,7 +1069,7 @@
       d.className="player-dot";
       d.style.left=coords[i][0]+"%";
       d.style.top=coords[i][1]+"%";
-      d.textContent=`${p.name.split(" ")[0]} · ${p.pos}`;
+      d.innerHTML=`<span class="formation-number">#${p.number}</span>${p.name.split(" ")[0]} - ${p.pos}`;
       els.formationPitch.appendChild(d);
     });
   }
@@ -1103,10 +1148,11 @@
     }
     state.budget -= p.value;
     state.balance -= p.value;
-    state.players.push({...p,id:Date.now(),fitness:92,morale:82,goals:0,starter:false});
+    state.players.push({...p,id:Date.now(),number:nextAvailableNumber(),fitness:92,morale:82,goals:0,starter:false});
     state.market = state.market.filter(x=>x.id!==id);
     state.financeLog.unshift(`Signed ${p.name} for ${money(p.value)}.`);
     state.news.unshift(`${p.name} has joined ${CLUB}.`);
+    if(state.numberMode==="auto")autoAssignNumbers(false);
     toast(`${p.name} signed successfully.`);
     renderAll();
   }
@@ -1165,11 +1211,12 @@
     const pitchPlayers={home:[],away:[]};
     const homeShape=[[5,50],[20,17],[20,39],[20,61],[20,83],[42,24],[42,50],[42,76],[63,22],[66,50],[63,78]];
     const awayShape=homeShape.map(([x,y])=>[100-x,y]);
+    const ourNumbers=state.players.filter(player=>player.starter).sort((a,b)=>positionOrder(a.pos)-positionOrder(b.pos)).slice(0,11).map(player=>player.number);
 
     function setupLivePitch(){
       els.livePitch.querySelectorAll(".live-player,.live-ball").forEach(node=>node.remove());
       [["home",homeShape],["away",awayShape]].forEach(([team,shape])=>shape.forEach(([x,y],index)=>{
-        const dot=document.createElement("span");dot.className=`live-player ${team}${index===0?" keeper":""}`;dot.dataset.x=x;dot.dataset.y=y;dot.setAttribute("aria-hidden","true");dot.style.left=x+"%";dot.style.top=y+"%";els.livePitch.appendChild(dot);pitchPlayers[team].push(dot);
+        const dot=document.createElement("span");dot.className=`live-player ${team}${index===0?" keeper":""}`;dot.dataset.x=x;dot.dataset.y=y;dot.textContent=team===(ourHome?"home":"away")?(ourNumbers[index]||index+1):index+1;dot.setAttribute("aria-hidden","true");dot.style.left=x+"%";dot.style.top=y+"%";els.livePitch.appendChild(dot);pitchPlayers[team].push(dot);
       }));
       const ball=document.createElement("span");ball.className="live-ball";ball.id="liveBall";ball.setAttribute("aria-hidden","true");els.livePitch.appendChild(ball);
       updateLivePitch("kickoff");
@@ -1401,6 +1448,12 @@
   els.mobileMenuBtn.addEventListener("click",()=>els.sidebar.classList.toggle("open"));
   els.playMatchBtn.addEventListener("click",playNextMatch);
   els.fixturePlayBtn.addEventListener("click",playNextMatch);
+  els.numberModeSelect.addEventListener("change",()=>{
+    state.numberMode=els.numberModeSelect.value;
+    if(state.numberMode==="auto"){autoAssignNumbers(true)}else{toast("Manual player-number editing enabled.")}
+    renderAll();
+  });
+  els.autoNumbersBtn.addEventListener("click",()=>{autoAssignNumbers(true);renderAll()});
   els.autoSelectBtn.addEventListener("click",autoSelectXI);
   els.saveTacticsBtn.addEventListener("click",saveTactics);
   els.formationSelect.addEventListener("change",()=>{state.formation=els.formationSelect.value;renderFormationPitch();});
