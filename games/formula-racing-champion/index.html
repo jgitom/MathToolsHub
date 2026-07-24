@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#070b19">
+  <title>Formula Racing Champion | MathToolsHub</title>
+  <meta name="description" content="Race AI rivals, master every corner, and become the Formula Racing Champion in this free mobile-friendly arcade racing game.">
+  <style>
+    :root{color-scheme:dark;--ink:#f8fafc;--muted:#aeb9d4;--panel:#11182ad9;--red:#ff3158;--cyan:#27e5ff;--gold:#ffd43b}
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:#050814;color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+    body{background:radial-gradient(circle at 50% -20%,#273a73 0,#0b1023 42%,#04060d 100%);overflow-x:hidden}
+    button,a{font:inherit}
+    .topbar{width:min(1080px,100%);margin:auto;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .back{color:#dce7ff;text-decoration:none;font-weight:800}.back:hover{text-decoration:underline}
+    .brand{font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}
+    main{width:min(1080px,100%);margin:auto;padding:0 14px 24px}
+    .title{text-align:center;margin:2px 0 12px}.title h1{font-size:clamp(1.65rem,5vw,2.8rem);margin:0;line-height:1}.title p{margin:8px 0;color:var(--muted)}
+    .game-shell{position:relative;border:1px solid #536083;border-radius:22px;overflow:hidden;background:#090d18;box-shadow:0 20px 70px #0009,0 0 40px #27e5ff18}
+    canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;max-height:68vh;background:#10182d;touch-action:none}
+    .hud{position:absolute;inset:12px 12px auto;display:grid;grid-template-columns:repeat(4,1fr);gap:7px;pointer-events:none}
+    .stat{background:#070b19c9;border:1px solid #ffffff24;border-radius:10px;padding:7px 9px;text-align:center;backdrop-filter:blur(5px)}
+    .stat small{display:block;color:#aab6d3;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em}.stat strong{font-size:clamp(.88rem,2.8vw,1.2rem)}
+    .overlay{position:absolute;inset:0;display:grid;place-items:center;padding:18px;background:linear-gradient(#060a15b8,#060a15ec);z-index:3}
+    .overlay[hidden]{display:none}.card{width:min(470px,100%);padding:clamp(18px,4vw,30px);border:1px solid #ffffff2b;border-radius:22px;background:#0d1429ed;text-align:center;box-shadow:0 16px 60px #000b}
+    .flag{font-size:2.5rem}.card h2{font-size:clamp(1.55rem,5vw,2.4rem);margin:5px 0}.card p{color:#c2cae0;line-height:1.5}
+    .difficulty{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0}
+    .difficulty button,.primary,.secondary{border:0;border-radius:12px;padding:12px 10px;font-weight:900;cursor:pointer}
+    .difficulty button{background:#202a45;color:#fff;border:1px solid #ffffff18}.difficulty button.active{background:var(--cyan);color:#041019;box-shadow:0 0 20px #27e5ff66}
+    .primary{width:100%;color:white;background:linear-gradient(100deg,var(--red),#ff6b24);box-shadow:0 8px 25px #ff31584c;font-size:1.08rem}
+    .primary:hover{filter:brightness(1.12)}.secondary{margin-top:9px;background:#28324d;color:#fff}
+    .controls{display:grid;grid-template-columns:1fr 1fr 1.1fr 1.1fr;gap:9px;padding:11px;background:#080c18;user-select:none}
+    .control{min-height:58px;border:1px solid #ffffff26;border-radius:14px;background:linear-gradient(#25304a,#151b2d);color:#fff;font-size:1.3rem;font-weight:900;touch-action:none;cursor:pointer}
+    .control[data-key=up]{background:linear-gradient(#00b978,#08764f)}.control[data-key=down]{background:linear-gradient(#ef476f,#9a2340)}
+    .control.pressed{transform:translateY(2px);filter:brightness(1.3)}
+    .tips{text-align:center;color:#9da9c5;font-size:.88rem;margin:12px 0 0}
+    .countdown{position:absolute;inset:0;display:grid;place-items:center;z-index:2;font-size:clamp(5rem,20vw,11rem);font-weight:1000;color:white;text-shadow:0 0 30px var(--cyan),5px 7px 0 #ff3158;pointer-events:none}.countdown:empty{display:none}
+    @media(min-width:800px){.controls{width:520px;margin:auto;border-radius:0 0 18px 18px}.game-shell{border-radius:26px}.tips{font-size:.95rem}}
+    @media(max-width:560px){main{padding:0 0 16px}.game-shell{border-radius:0;border-left:0;border-right:0}.topbar{padding:11px 12px}.brand{font-size:.78rem}.title{padding:0 12px}.title p{font-size:.86rem}.hud{inset:6px 6px auto;gap:4px}.stat{padding:4px 3px;border-radius:7px}.stat small{font-size:.51rem}.controls{gap:6px;padding:8px}.control{min-height:62px}.card{padding:17px}.difficulty{margin:13px 0}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.control{transition:none}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="back" href="../">← All Games</a>
+    <span class="brand">MathToolsHub Racing</span>
+  </header>
+  <main>
+    <div class="title">
+      <h1>Formula Racing Champion</h1>
+      <p>Pure racing. No questions—just speed, skill, and the chequered flag.</p>
+    </div>
+    <section class="game-shell" aria-label="Formula Racing Champion game">
+      <canvas id="track" width="960" height="540" aria-label="Racing track"></canvas>
+      <div class="hud" aria-live="polite">
+        <div class="stat"><small>Position</small><strong id="position">1 / 8</strong></div>
+        <div class="stat"><small>Lap</small><strong id="lap">1 / 3</strong></div>
+        <div class="stat"><small>Speed</small><strong id="speed">0 km/h</strong></div>
+        <div class="stat"><small>Time</small><strong id="time">00:00.0</strong></div>
+      </div>
+      <div class="countdown" id="countdown"></div>
+      <div class="overlay" id="startScreen">
+        <div class="card">
+          <div class="flag">🏁</div>
+          <h2>Take the Pole Position</h2>
+          <p>Choose your challenge, overtake seven AI rivals, and finish three high-speed laps.</p>
+          <div class="difficulty" aria-label="Difficulty">
+            <button type="button" data-level="rookie">Rookie</button>
+            <button type="button" class="active" data-level="pro">Pro</button>
+            <button type="button" data-level="champion">Champion</button>
+          </div>
+          <button type="button" class="primary" id="startButton">Start Race</button>
+        </div>
+      </div>
+      <div class="overlay" id="finishScreen" hidden>
+        <div class="card">
+          <div class="flag">🏆</div>
+          <h2 id="finishTitle">Race Complete!</h2>
+          <p id="finishText"></p>
+          <button type="button" class="primary" id="raceAgain">Race Again</button>
+          <a href="../" class="secondary" style="display:block;text-decoration:none">Explore More Games</a>
+        </div>
+      </div>
+    </section>
+    <div class="controls" aria-label="Touch racing controls">
+      <button class="control" data-key="left" aria-label="Steer left">◀</button>
+      <button class="control" data-key="right" aria-label="Steer right">▶</button>
+      <button class="control" data-key="down" aria-label="Brake">BRAKE</button>
+      <button class="control" data-key="up" aria-label="Accelerate">GO</button>
+    </div>
+    <p class="tips">Keyboard: Arrow keys or WASD · Avoid collisions · Pass rivals on the straights</p>
+  </main>
+  <script>
+  (() => {
+    "use strict";
+    const canvas = document.querySelector("#track"), ctx = canvas.getContext("2d");
+    const ui = {
+      position: document.querySelector("#position"), lap: document.querySelector("#lap"),
+      speed: document.querySelector("#speed"), time: document.querySelector("#time"),
+      countdown: document.querySelector("#countdown"), start: document.querySelector("#startScreen"),
+      finish: document.querySelector("#finishScreen"), finishTitle: document.querySelector("#finishTitle"),
+      finishText: document.querySelector("#finishText")
+    };
+    const W = canvas.width, H = canvas.height, LAPS = 3, TRACK = 6200;
+    const keys = {left:false,right:false,up:false,down:false};
+    const levels = {
+      rookie:{max:265, accel:105, rivals:.78},
+      pro:{max:315, accel:118, rivals:.9},
+      champion:{max:350, accel:126, rivals:.99}
+    };
+    let level = "pro", running = false, last = 0, elapsed = 0, player, rivals = [], scenery = [], collisionFlash = 0, frame = 0;
+    const colours = ["#27e5ff","#ffd43b","#9b5de5","#00e676","#ff7b00","#f72585","#ffffff"];
+
+    function reset() {
+      const cfg = levels[level];
+      player = {x:0,speed:0,distance:0,max:cfg.max};
+      elapsed = 0; collisionFlash = 0;
+      rivals = Array.from({length:7},(_,i)=>({
+        x:[-.66,0,.66][i%3] + (Math.random()-.5)*.12,
+        distance: 180 + i*260,
+        speed: cfg.max*(cfg.rivals + Math.random()*.08),
+        colour: colours[i],
+        weave: Math.random()*Math.PI*2
+      }));
+      scenery = Array.from({length:32},(_,i)=>({z:i/32,side:i%2?-1:1,type:i%4}));
+      updateHud();
+    }
+
+    function startRace() {
+      reset(); ui.start.hidden = true; ui.finish.hidden = true;
+      let count = 3; ui.countdown.textContent = count;
+      const timer = setInterval(() => {
+        count--;
+        if (count > 0) ui.countdown.textContent = count;
+        else if (count === 0) ui.countdown.textContent = "GO!";
+        else { clearInterval(timer); ui.countdown.textContent = ""; running = true; last = performance.now(); requestAnimationFrame(loop); }
+      },700);
+    }
+
+    function roadCentre(y, distance=player.distance) {
+      const depth = 1-y/H;
+      return W/2 + Math.sin(distance/850 + depth*2.8)*115*depth + Math.sin(distance/1900)*55;
+    }
+
+    function roadWidth(y) { return 115 + (y/H)*610; }
+    function drawRoad() {
+      const sky = ctx.createLinearGradient(0,0,0,H*.43);
+      sky.addColorStop(0,"#061027"); sky.addColorStop(1,"#f25f5c");
+      ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle="#152d31";ctx.fillRect(0,H*.38,W,H*.62);
+      ctx.fillStyle="#07080d";ctx.beginPath();
+      for(let y=H*.34;y<=H;y+=6){const c=roadCentre(y),w=roadWidth(y); if(y===H*.34)ctx.moveTo(c-w/2,y);else ctx.lineTo(c-w/2,y)}
+      for(let y=H;y>=H*.34;y-=6){const c=roadCentre(y),w=roadWidth(y);ctx.lineTo(c+w/2,y)}
+      ctx.closePath();ctx.fill();
+      for(let y=H*.36;y<H;y+=18){
+        const segment=Math.floor((y+player.distance*.24)%72/18);
+        const c=roadCentre(y),w=roadWidth(y);
+        ctx.strokeStyle=segment%2?"#fff":"#ff3158";ctx.lineWidth=Math.max(3,w*.035);
+        ctx.beginPath();ctx.moveTo(c-w/2,y);ctx.lineTo(c-w/2,y+19);ctx.moveTo(c+w/2,y);ctx.lineTo(c+w/2,y+19);ctx.stroke();
+      }
+      ctx.setLineDash([24,26]);ctx.lineDashOffset=player.distance*.35;
+      ctx.strokeStyle="#ffffff88";ctx.lineWidth=3;
+      [-1/6,1/6].forEach(f=>{ctx.beginPath();for(let y=H*.39;y<=H;y+=8){const x=roadCentre(y)+roadWidth(y)*f;y===H*.39?ctx.moveTo(x,y):ctx.lineTo(x,y)}ctx.stroke()});
+      ctx.setLineDash([]);
+      drawScenery();
+    }
+
+    function drawScenery(){
+      scenery.forEach((s,i)=>{
+        let z=(s.z + (player.distance/TRACK)*5)%1, y=H*.39+Math.pow(z,1.8)*H*.64;
+        const size=8+z*32,c=roadCentre(y),side=roadWidth(y)*(.65+z*.08)*s.side;
+        ctx.fillStyle=s.type===0?"#ffd43b":s.type===1?"#27e5ff":"#e8edf8";
+        if(s.type<2){ctx.fillRect(c+side-size*.08,y-size,size*.16,size);ctx.fillRect(c+side-size*.45,y-size,size*.9,size*.42)}
+        else {ctx.beginPath();ctx.arc(c+side,y-size*.4,size*.38,0,Math.PI*2);ctx.fill()}
+      });
+    }
+
+    function drawCar(x,y,scale,colour,isPlayer=false){
+      ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
+      ctx.shadowColor=colour;ctx.shadowBlur=isPlayer?18:7;
+      ctx.fillStyle="#090b10";ctx.fillRect(-31,-3,62,11);ctx.fillRect(-27,-44,12,35);ctx.fillRect(15,-44,12,35);
+      ctx.fillStyle=colour;ctx.beginPath();ctx.moveTo(-24,0);ctx.lineTo(-18,-52);ctx.lineTo(-9,-72);ctx.lineTo(9,-72);ctx.lineTo(18,-52);ctx.lineTo(24,0);ctx.closePath();ctx.fill();
+      ctx.fillStyle="#c9f4ff";ctx.fillRect(-10,-54,20,18);ctx.fillStyle="#10131c";ctx.fillRect(-21,-10,42,8);
+      ctx.fillStyle=isPlayer?"#ffd43b":"#fff";ctx.beginPath();ctx.arc(0,-30,6,0,Math.PI*2);ctx.fill();
+      ctx.restore();
+    }
+
+    function relativeDistance(rival){
+      const total=TRACK*LAPS, d=((rival.distance-player.distance)%total+total)%total;
+      return d>total/2?d-total:d;
+    }
+
+    function drawRivals(){
+      const visible=[];
+      rivals.forEach(r=>{
+        const rel=relativeDistance(r);
+        if(rel>-180&&rel<1500){
+          const z=1-Math.max(0,rel)/1500, y=H*.40+Math.pow(z,1.8)*H*.44;
+          const x=roadCentre(y)+r.x*roadWidth(y)*.38, scale=.28+z*.68;
+          visible.push({r,rel,x,y,scale});
+        }
+      });
+      visible.sort((a,b)=>a.y-b.y).forEach(v=>drawCar(v.x,v.y,v.scale,v.r.colour));
+      return visible;
+    }
+
+    function update(dt){
+      const cfg=levels[level];
+      if(keys.up) player.speed+=cfg.accel*dt; else player.speed-=36*dt;
+      if(keys.down) player.speed-=160*dt;
+      player.speed=Math.max(0,Math.min(player.max,player.speed));
+      const steering=(.75+player.speed/player.max)*dt;
+      if(keys.left)player.x-=steering;if(keys.right)player.x+=steering;
+      player.x=Math.max(-1.05,Math.min(1.05,player.x));
+      if(Math.abs(player.x)>.88)player.speed=Math.max(90,player.speed-125*dt);
+      player.distance+=player.speed*dt;
+      rivals.forEach((r,i)=>{
+        r.distance+=r.speed*dt;
+        r.x+=Math.sin(elapsed*.00075+r.weave+i)*.025*dt;
+        r.x=Math.max(-.72,Math.min(.72,r.x));
+      });
+      const playerY=H*.83, playerX=roadCentre(playerY)+player.x*roadWidth(playerY)*.36;
+      rivals.forEach(r=>{
+        const rel=relativeDistance(r);
+        if(rel>-22&&rel<48){
+          const rx=roadCentre(playerY)+r.x*roadWidth(playerY)*.36;
+          if(Math.abs(rx-playerX)<48&&collisionFlash<=0){player.speed*=.48;collisionFlash=.45;player.x+=(playerX<rx?-1:1)*.13}
+        }
+      });
+      collisionFlash=Math.max(0,collisionFlash-dt);
+      elapsed+=dt*1000;
+      if(player.distance>=TRACK*LAPS)finish();
+      updateHud();
+    }
+
+    function position(){
+      const playerProgress=player.distance;
+      return 1+rivals.filter(r=>r.distance>playerProgress).length;
+    }
+    function formatTime(ms){
+      const m=Math.floor(ms/60000),s=Math.floor(ms%60000/1000),t=Math.floor(ms%1000/100);
+      return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}.${t}`;
+    }
+    function updateHud(){
+      if(!player)return;
+      ui.position.textContent=`${position()} / 8`;
+      ui.lap.textContent=`${Math.min(LAPS,Math.floor(player.distance/TRACK)+1)} / ${LAPS}`;
+      ui.speed.textContent=`${Math.round(player.speed)} km/h`;ui.time.textContent=formatTime(elapsed);
+    }
+    function render(){
+      drawRoad();drawRivals();
+      const py=H*.83,px=roadCentre(py)+player.x*roadWidth(py)*.36;
+      drawCar(px,py,1.05,collisionFlash>0?"#fff":"#ff3158",true);
+      if(collisionFlash>0){ctx.fillStyle=`rgba(255,49,88,${collisionFlash})`;ctx.fillRect(0,0,W,H)}
+      const lapProgress=(player.distance%TRACK)/TRACK;
+      ctx.fillStyle="#ffffff28";ctx.fillRect(W*.15,H-13,W*.7,5);ctx.fillStyle="#27e5ff";ctx.fillRect(W*.15,H-13,W*.7*lapProgress,5);
+    }
+    function loop(now){
+      if(!running)return;
+      const dt=Math.min(.035,(now-last)/1000);last=now;update(dt);render();frame=requestAnimationFrame(loop);
+    }
+    function finish(){
+      running=false;cancelAnimationFrame(frame);
+      const pos=position(),won=pos===1;
+      ui.finishTitle.textContent=won?"Formula Racing Champion!":"Race Complete!";
+      ui.finishText.textContent=`You finished ${ordinal(pos)} of 8 in ${formatTime(elapsed)}. ${won?"A flawless drive—the trophy is yours!":"Race again, find the fastest line, and chase the championship."}`;
+      ui.finish.hidden=false;
+    }
+    function ordinal(n){return n+(n===1?"st":n===2?"nd":n===3?"rd":"th")}
+
+    document.querySelectorAll("[data-level]").forEach(button=>button.addEventListener("click",()=>{
+      level=button.dataset.level;document.querySelectorAll("[data-level]").forEach(b=>b.classList.toggle("active",b===button));
+    }));
+    document.querySelector("#startButton").addEventListener("click",startRace);
+    document.querySelector("#raceAgain").addEventListener("click",startRace);
+    const keyMap={ArrowLeft:"left",a:"left",A:"left",ArrowRight:"right",d:"right",D:"right",ArrowUp:"up",w:"up",W:"up",ArrowDown:"down",s:"down",S:"down"};
+    addEventListener("keydown",e=>{if(keyMap[e.key]){keys[keyMap[e.key]]=true;e.preventDefault()}});
+    addEventListener("keyup",e=>{if(keyMap[e.key]){keys[keyMap[e.key]]=false;e.preventDefault()}});
+    document.querySelectorAll(".control").forEach(button=>{
+      const set=value=>{keys[button.dataset.key]=value;button.classList.toggle("pressed",value)};
+      button.addEventListener("pointerdown",e=>{e.preventDefault();button.setPointerCapture(e.pointerId);set(true)});
+      ["pointerup","pointercancel","lostpointercapture"].forEach(type=>button.addEventListener(type,()=>set(false)));
+    });
+    addEventListener("blur",()=>Object.keys(keys).forEach(k=>keys[k]=false));
+    document.addEventListener("visibilitychange",()=>{if(document.hidden)Object.keys(keys).forEach(k=>keys[k]=false)});
+    reset();render();window.__racingGameReady=true;
+  })();
+  </script>
+</body>
+</html>
