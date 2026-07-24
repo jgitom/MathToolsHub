@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#070b19">
   <title>Formula Racing Champion | MathToolsHub</title>
-  <meta name="description" content="Race AI rivals, master every corner, and become the Formula Racing Champion in this free mobile-friendly arcade racing game.">
+  <meta name="description" content="Race realistic Formula-style cars against AI rivals, master every corner, and become the Formula Racing Champion in this free mobile-friendly arcade game.">
   <style>
     :root{color-scheme:dark;--ink:#f8fafc;--muted:#aeb9d4;--panel:#11182ad9;--red:#ff3158;--cyan:#27e5ff;--gold:#ffd43b}
     *{box-sizing:border-box}
@@ -111,6 +111,7 @@
     };
     let level = "pro", running = false, last = 0, elapsed = 0, player, rivals = [], scenery = [], collisionFlash = 0, frame = 0;
     const colours = ["#27e5ff","#ffd43b","#9b5de5","#00e676","#ff7b00","#f72585","#ffffff"];
+    const carSprite = new Image(); carSprite.src = "assets/formula-car-realistic.png"; carSprite.onload = () => { if(player) render(); };
 
     function reset() {
       const cfg = levels[level];
@@ -178,14 +179,17 @@
 
     function drawCar(x,y,scale,colour,isPlayer=false){
       ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
-      ctx.shadowColor=colour;ctx.shadowBlur=isPlayer?18:7;
-      ctx.fillStyle="#090b10";ctx.fillRect(-31,-3,62,11);ctx.fillRect(-27,-44,12,35);ctx.fillRect(15,-44,12,35);
-      ctx.fillStyle=colour;ctx.beginPath();ctx.moveTo(-24,0);ctx.lineTo(-18,-52);ctx.lineTo(-9,-72);ctx.lineTo(9,-72);ctx.lineTo(18,-52);ctx.lineTo(24,0);ctx.closePath();ctx.fill();
-      ctx.fillStyle="#c9f4ff";ctx.fillRect(-10,-54,20,18);ctx.fillStyle="#10131c";ctx.fillRect(-21,-10,42,8);
-      ctx.fillStyle=isPlayer?"#ffd43b":"#fff";ctx.beginPath();ctx.arc(0,-30,6,0,Math.PI*2);ctx.fill();
+      ctx.shadowColor=colour;ctx.shadowBlur=isPlayer?20:10;
+      if(carSprite.complete&&carSprite.naturalWidth){
+        ctx.drawImage(carSprite,-34,-94,68,102);
+        ctx.shadowBlur=0;ctx.globalAlpha=.88;ctx.fillStyle=colour;
+        ctx.fillRect(-3,-69,6,35);ctx.fillRect(-23,-88,46,4);ctx.fillRect(-20,-2,40,3);
+        ctx.globalAlpha=1;ctx.fillStyle=isPlayer?"#ffd43b":"#f8fafc";ctx.beginPath();ctx.arc(0,-48,4.5,0,Math.PI*2);ctx.fill();
+      }else{
+        ctx.fillStyle=colour;ctx.beginPath();ctx.moveTo(-24,0);ctx.lineTo(-18,-52);ctx.lineTo(-9,-72);ctx.lineTo(9,-72);ctx.lineTo(18,-52);ctx.lineTo(24,0);ctx.closePath();ctx.fill();
+      }
       ctx.restore();
     }
-
     function relativeDistance(rival){
       const total=TRACK*LAPS, d=((rival.distance-player.distance)%total+total)%total;
       return d>total/2?d-total:d;
