@@ -10,7 +10,7 @@ button,input,textarea{font:inherit}
 button{cursor:pointer}
 a{color:inherit}
 .app{width:min(1180px,calc(100% - 24px));margin:0 auto;padding:18px 0 42px}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}.site-language-slot{display:flex;align-items:center;margin-left:auto}
 .back{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--muted)}
 .status-pill{padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.04);font-size:12px;color:var(--muted)}
 .hero{position:relative;overflow:hidden;padding:26px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 22%,#0f172a),#0f172a);box-shadow:0 20px 50px rgba(0,0,0,.24)}
