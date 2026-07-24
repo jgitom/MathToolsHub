@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101827">
+  <meta name="description" content="Race through applied mathematics challenges involving formulas, speed, fuel, percentages, averages, and strategy.">
+  <title>Formula Racing Championship | MathToolsHub</title>
+  <style>
+    :root{--navy:#101827;--panel:#17243a;--ink:#f8fafc;--muted:#bac8dc;--red:#ef233c;--cyan:#35c7e8;--gold:#ffd166;--green:#37d67a;--line:#31435e}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;color:var(--ink);background:radial-gradient(circle at 75% 5%,#263a5b 0,transparent 32%),linear-gradient(145deg,#0b1220,#111d31 58%,#090f1a);font-family:Inter,"Segoe UI",Arial,sans-serif}
+    button{font:inherit}
+    .back{position:fixed;top:12px;left:12px;z-index:10;padding:9px 13px;border:1px solid #ffffff38;border-radius:999px;color:#fff;background:#101827e8;text-decoration:none;font-weight:800;box-shadow:0 5px 18px #0007}
+    .shell{width:min(1080px,calc(100% - 28px));margin:0 auto;padding:34px 0 54px}
+    .hero{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end;padding:38px 0 28px}
+    .eyebrow{margin:0 0 10px;color:var(--cyan);font-size:.76rem;font-weight:900;letter-spacing:.15em;text-transform:uppercase}
+    h1{max-width:760px;margin:0;font-size:clamp(2.35rem,7vw,5.4rem);line-height:.93;letter-spacing:-.055em}
+    .hero p:last-child{max-width:680px;margin:18px 0 0;color:var(--muted);font-size:1rem;line-height:1.65}
+    .flag{font-size:clamp(4rem,9vw,7rem);filter:drop-shadow(0 14px 16px #0007)}
+    .panel{padding:clamp(20px,4vw,34px);border:1px solid var(--line);border-radius:24px;background:linear-gradient(155deg,#1b2b45f2,#111d30f5);box-shadow:0 24px 70px #0006}
+    .hidden{display:none!important}
+    .level-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0}
+    .level{min-height:112px;padding:17px;border:2px solid var(--line);border-radius:17px;color:var(--ink);background:#111c2e;text-align:left;cursor:pointer}
+    .level strong{display:block;margin-bottom:7px;font-size:1.05rem}.level span{color:var(--muted);font-size:.82rem;line-height:1.45}
+    .level.selected{border-color:var(--cyan);background:#153247;box-shadow:0 0 0 3px #35c7e824}
+    .primary,.secondary{min-height:48px;padding:11px 18px;border:0;border-radius:12px;font-weight:900;cursor:pointer}
+    .primary{color:#101827;background:linear-gradient(90deg,var(--gold),#ff9f1c);box-shadow:0 7px 0 #a64f00}.primary:active{transform:translateY(4px);box-shadow:0 3px 0 #a64f00}
+    .secondary{color:#fff;background:#2a3b55}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+    .race-top{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start}
+    .stats{display:flex;gap:9px;flex-wrap:wrap}.pill{padding:8px 11px;border:1px solid #ffffff24;border-radius:999px;color:#dce8f6;background:#0b1422;font-size:.78rem;font-weight:850}
+    .track{position:relative;height:124px;margin:20px 0 25px;overflow:hidden;border:5px solid #b8c4d2;border-radius:60px;background:repeating-linear-gradient(90deg,#313c4d 0 58px,#374456 58px 116px);box-shadow:inset 0 0 0 4px #101827,0 12px 25px #0005}
+    .track:before,.track:after{content:"";position:absolute;left:0;right:0;height:4px;background:repeating-linear-gradient(90deg,#fff 0 22px,transparent 22px 44px)}
+    .track:before{top:36px}.track:after{bottom:36px}
+    .car{position:absolute;left:5%;top:39px;z-index:2;font-size:2.7rem;filter:drop-shadow(7px 7px 5px #0008);transition:left .7s cubic-bezier(.22,.85,.32,1)}
+    .finish{position:absolute;right:18px;top:0;bottom:0;width:16px;background:repeating-linear-gradient(0deg,#fff 0 12px,#111 12px 24px)}
+    .progress{height:10px;overflow:hidden;border-radius:999px;background:#0b1422}.bar{height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--gold));transition:width .35s}
+    .stage{margin:22px 0 8px;color:var(--cyan);font-size:.78rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+    .question{margin:0;padding:18px;border-left:4px solid var(--gold);border-radius:0 14px 14px 0;background:#0f1929;font-size:clamp(1.08rem,3vw,1.4rem);font-weight:800;line-height:1.55}
+    .formula{margin:13px 0 0;color:#c9d6e8;font-family:Consolas,monospace;font-size:.86rem}
+    .answers{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:20px}
+    .answer{min-height:58px;padding:13px;border:2px solid var(--line);border-radius:14px;color:#fff;background:#1c2d46;font-weight:850;cursor:pointer}
+    .answer:hover,.answer:focus-visible{border-color:var(--cyan);outline:none}.answer:disabled{cursor:default}.answer.correct{border-color:var(--green);background:#123d2a}.answer.wrong{border-color:#ff6b7a;background:#4a1e29}
+    .feedback{min-height:52px;margin:15px 0 0;color:#dce8f6;font-weight:750;line-height:1.5}
+    .podium{text-align:center}.trophy{font-size:5rem}.stars{color:var(--gold);font-size:2rem;letter-spacing:6px}.summary{color:var(--muted);line-height:1.65}
+    @media(max-width:680px){.back{position:static;display:inline-block;margin:8px 0 0 14px}.shell{padding-top:4px}.hero{grid-template-columns:1fr}.flag{display:none}.level-grid{grid-template-columns:1fr}.answers{grid-template-columns:1fr}.race-top{grid-template-columns:1fr}.track{height:106px}.car{top:31px}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <a class="back" href="../">← All Games</a>
+  <main class="shell">
+    <header class="hero">
+      <div><p class="eyebrow">KPM applied mathematics · Secondary</p><h1>Formula Racing Championship</h1><p>Build your race strategy with formulas, speed–distance–time, fuel calculations, percentages, averages, and accurate decision-making.</p></div>
+      <div class="flag" aria-hidden="true">🏎️🏁</div>
+    </header>
+
+    <section class="panel" id="startScreen">
+      <h2>Choose your racing division</h2>
+      <p class="summary">Complete ten race challenges. Correct answers move your car towards the chequered flag.</p>
+      <div class="level-grid" role="group" aria-label="Difficulty">
+        <button class="level selected" data-level="rookie"><strong>🏎️ Rookie Cup</strong><span>Formula substitution, basic speed and lap calculations.</span></button>
+        <button class="level" data-level="pro"><strong>⚙️ Pro Series</strong><span>Fuel, percentages, averages and multi-step strategy.</span></button>
+        <button class="level" data-level="champion"><strong>🏆 Championship</strong><span>Advanced mixed formulas and precision race engineering.</span></button>
+      </div>
+      <button class="primary" id="startButton">Start Championship</button>
+    </section>
+
+    <section class="panel hidden" id="playScreen">
+      <div class="race-top"><div class="stats"><span class="pill" id="roundLabel">Round 1 / 10</span><span class="pill">Points: <b id="score">0</b></span><span class="pill">Tyres: <b id="lives">●●●</b></span></div><span class="pill" id="divisionLabel">Rookie Cup</span></div>
+      <div class="track" aria-label="Race progress"><div class="car" id="car">🏎️</div><div class="finish"></div></div>
+      <div class="progress"><div class="bar" id="progressBar"></div></div>
+      <p class="stage" id="stageLabel">Qualifying</p>
+      <p class="question" id="question"></p>
+      <p class="formula" id="formula"></p>
+      <div class="answers" id="answers"></div>
+      <p class="feedback" id="feedback" aria-live="polite"></p>
+      <div class="actions"><button class="secondary" id="restartButton">Restart race</button></div>
+    </section>
+
+    <section class="panel podium hidden" id="endScreen">
+      <div class="trophy" id="trophy">🏆</div><div class="stars" id="stars">★★★</div>
+      <h2 id="resultTitle">Championship complete!</h2><p class="summary" id="resultText"></p>
+      <div class="actions" style="justify-content:center"><button class="primary" id="againButton">Race again</button><button class="secondary" id="levelsButton">Change division</button></div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const $=id=>document.getElementById(id),rounds=10;
+      const divisions={rookie:{label:"Rookie Cup",points:100},pro:{label:"Pro Series",points:150},champion:{label:"Championship",points:200}};
+      let level="rookie",round=0,score=0,lives=3,locked=false,current;
+      const stages=["Qualifying","Starting Grid","Race Pace","Fuel Strategy","Tyre Management","Pit Window","Sector Analysis","Final Stint","Last Lap","Chequered Flag"];
+      const ri=(min,max)=>Math.floor(Math.random()*(max-min+1))+min;
+      const shuffle=array=>array.map(value=>({value,key:Math.random()})).sort((a,b)=>a.key-b.key).map(item=>item.value);
+      const fmt=value=>Number.isInteger(value)?String(value):Number(value.toFixed(2)).toString();
+      const make=(question,answer,distractors,formula)=>({question,answer:String(answer),choices:shuffle([String(answer),...distractors.map(String)]).slice(0,4),formula});
+      function buildRookie(){
+        const type=round%5;
+        if(type===0){const speed=ri(60,110),time=ri(2,5),answer=speed*time;return make(`A car travels at ${speed} km/h for ${time} hours. What distance does it cover?`,`${answer} km`,[`${answer+speed} km`,`${answer-time} km`,`${Math.round(speed/time)} km`],"Distance = speed × time");}
+        if(type===1){const distance=ri(3,8)*40,speed=ri(2,5)*20,time=distance/speed;if(!Number.isInteger(time))return buildRookie();return make(`A test distance is ${distance} km at ${speed} km/h. Find the time.`,`${time} h`,[`${time+1} h`,`${Math.max(1,time-1)} h`,`${distance+speed} h`],"Time = distance ÷ speed");}
+        if(type===2){const laps=ri(4,9),lap=ri(70,105),answer=laps*lap;return make(`${laps} qualifying laps each take ${lap} seconds. Find the total time.`,`${answer} s`,[`${answer+lap} s`,`${answer-lap} s`,`${laps+lap} s`],"Total time = number of laps × time per lap");}
+        if(type===3){const distance=ri(12,30)*5,time=ri(1,3),answer=distance/time;if(!Number.isInteger(answer))return buildRookie();return make(`The race car covers ${distance} km in ${time} hours. What is its average speed?`,`${answer} km/h`,[`${answer+10} km/h`,`${answer-10} km/h`,`${distance*time} km/h`],"Speed = distance ÷ time");}
+        const fuel=ri(30,55),used=ri(10,fuel-5),answer=fuel-used;return make(`The fuel tank starts with ${fuel} L and the car uses ${used} L. How much remains?`,`${answer} L`,[`${answer+5} L`,`${used} L`,`${fuel+used} L`],"Remaining fuel = starting fuel − fuel used");
+      }
+      function buildPro(){
+        const type=round%5;
+        if(type===0){const capacity=ri(40,70),percent=randomFrom([20,25,40,50]),answer=capacity*percent/100;return make(`A ${capacity} L tank is ${percent}% full. How much fuel is in it?`,`${fmt(answer)} L`,[`${fmt(answer+5)} L`,`${fmt(capacity-answer)} L`,`${percent} L`],"Fuel = percentage × tank capacity");}
+        if(type===1){const a=ri(72,88),b=ri(72,88),c=ri(72,88),answer=(a+b+c)/3;return make(`Lap times are ${a} s, ${b} s and ${c} s. Find the mean lap time.`,`${fmt(answer)} s`,[`${fmt(answer+2)} s`,`${fmt(Math.max(a,b))} s`,`${a+b+c} s`],"Mean = total lap time ÷ number of laps");}
+        if(type===2){const original=ri(80,120),gain=randomFrom([5,10,15,20]),answer=original*(1-gain/100);return make(`A setup reduces a ${original} s lap time by ${gain}%. Find the new lap time.`,`${fmt(answer)} s`,[`${fmt(original-original/gain)} s`,`${fmt(original+gain)} s`,`${fmt(original*(1+gain/100))} s`],"New time = original × (1 − percentage reduction)");}
+        if(type===3){const laps=ri(12,24),rate=randomFrom([1.5,2,2.5]),reserve=ri(2,5),answer=laps*rate+reserve;return make(`${laps} laps use ${rate} L per lap. Add a ${reserve} L reserve. Required fuel?`,`${fmt(answer)} L`,[`${fmt(laps*rate)} L`,`${fmt(answer+rate)} L`,`${fmt(laps+rate+reserve)} L`],"Fuel required = laps × rate + reserve");}
+        const total=ri(300,500),pit=ri(18,30),answer=(pit/total)*100;return make(`A ${pit} s pit stop is part of a ${total} s race segment. What percentage is pit time?`,`${fmt(answer)}%`,[`${fmt(answer+5)}%`,`${fmt(total/pit)}%`,`${pit}%`],"Percentage = part ÷ whole × 100%");
+      }
+      function buildChampion(){
+        const type=round%5;
+        if(type===0){const distance=ri(4,8)*15,timeMin=ri(30,50),answer=distance/(timeMin/60);return make(`A car covers ${distance} km in ${timeMin} minutes. Find average speed in km/h.`,`${fmt(answer)} km/h`,[`${fmt(distance/timeMin)} km/h`,`${fmt(answer+15)} km/h`,`${fmt(distance*timeMin/60)} km/h`],"Convert minutes to hours, then speed = distance ÷ time");}
+        if(type===1){const dry=ri(78,94),increase=randomFrom([5,10,12.5,15]),answer=dry*(1+increase/100);return make(`A wet lap is ${increase}% slower than a ${dry} s dry lap. Find the wet lap time.`,`${fmt(answer)} s`,[`${fmt(dry-increase)} s`,`${fmt(dry*(1-increase/100))} s`,`${fmt(answer+5)} s`],"Wet time = dry time × (1 + percentage increase)");}
+        if(type===2){const total=ri(18,30),completed=ri(5,total-6),rate=randomFrom([1.8,2.2,2.5]),fuel=ri(30,55),needed=(total-completed)*rate,answer=fuel>=needed?"Finish without refuelling":"Pit for fuel";return make(`${completed} of ${total} laps are complete. Fuel: ${fuel} L; use: ${rate} L/lap. Best decision?`,answer,[answer==="Pit for fuel"?"Finish without refuelling":"Pit for fuel","Change tyres only","Stop the race"],"Fuel needed = remaining laps × fuel per lap");}
+        if(type===3){const sector1=ri(24,32),sector2=ri(25,34),target=ri(78,92),answer=target-sector1-sector2;return make(`Target lap: ${target} s. First sectors: ${sector1} s and ${sector2} s. Maximum final-sector time?`,`${answer} s`,[`${answer+2} s`,`${answer-2} s`,`${sector1+sector2} s`],"Final sector = target − sector 1 − sector 2");}
+        const speed=ri(180,260),drag=randomFrom([4,5,8,10]),answer=speed*(1-drag/100);return make(`Aero drag reduces a theoretical ${speed} km/h speed by ${drag}%. Find actual speed.`,`${fmt(answer)} km/h`,[`${fmt(speed-drag)} km/h`,`${fmt(speed*(1+drag/100))} km/h`,`${fmt(answer-10)} km/h`],"Actual speed = theoretical speed × (1 − loss percentage)");
+      }
+      function randomFrom(values){return values[Math.floor(Math.random()*values.length)]}
+      function generate(){return level==="rookie"?buildRookie():level==="pro"?buildPro():buildChampion()}
+      function show(id){["startScreen","playScreen","endScreen"].forEach(name=>$(name).classList.toggle("hidden",name!==id))}
+      function render(){
+        locked=false;current=generate();$("roundLabel").textContent=`Round ${round+1} / ${rounds}`;$("score").textContent=score;$("lives").textContent="●".repeat(lives)+"○".repeat(3-lives);$("stageLabel").textContent=stages[round];$("question").textContent=current.question;$("formula").textContent=current.formula;$("feedback").textContent="";$("progressBar").style.width=`${round/rounds*100}%`;$("car").style.left=`${5+round*8.2}%`;
+        $("answers").innerHTML="";current.choices.forEach(choice=>{const button=document.createElement("button");button.className="answer";button.textContent=choice;button.onclick=()=>answer(button,choice);$("answers").appendChild(button)});
+      }
+      function answer(button,choice){
+        if(locked)return;locked=true;const correct=choice===current.answer;document.querySelectorAll(".answer").forEach(item=>{item.disabled=true;if(item.textContent===current.answer)item.classList.add("correct")});
+        if(correct){score+=divisions[level].points;button.classList.add("correct");$("feedback").textContent=`Correct — ${current.formula}. Your race pace improves!`;}else{lives=Math.max(0,lives-1);button.classList.add("wrong");$("feedback").textContent=`The correct answer is ${current.answer}. Use: ${current.formula}.`;}
+        $("score").textContent=score;$("lives").textContent="●".repeat(lives)+"○".repeat(3-lives);setTimeout(()=>{round++;if(round>=rounds||lives===0)finish();else render()},1050);
+      }
+      function finish(){
+        $("progressBar").style.width="100%";$("car").style.left=lives? "86%":"58%";show("endScreen");const maximum=rounds*divisions[level].points,ratio=score/maximum,stars=ratio>=.8?3:ratio>=.5?2:1;$("stars").textContent="★".repeat(stars)+"☆".repeat(3-stars);$("trophy").textContent=ratio>=.8?"🏆":lives?"🏁":"🔧";$("resultTitle").textContent=ratio>=.8?"Championship winner!":lives?"Race complete!":"Return to the garage";$("resultText").textContent=`You scored ${score} of ${maximum} points in the ${divisions[level].label}. ${ratio>=.8?"Excellent formula control and race strategy.":"Review the formulas and challenge the championship again."}`;
+      }
+      function start(){round=0;score=0;lives=3;$("divisionLabel").textContent=divisions[level].label;show("playScreen");render()}
+      document.querySelectorAll(".level").forEach(button=>button.onclick=()=>{document.querySelectorAll(".level").forEach(item=>item.classList.remove("selected"));button.classList.add("selected");level=button.dataset.level});
+      $("startButton").onclick=start;$("restartButton").onclick=start;$("againButton").onclick=start;$("levelsButton").onclick=()=>show("startScreen");
+    })();
+  </script>
+</body>
+</html>
