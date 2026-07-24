@@ -1,5 +1,11 @@
 (() => {
   "use strict";
+  const sharedScript = document.currentScript;
+  if (!window.__MTH_STUDENT_NOTEPAD_LOADED__ && sharedScript?.src) {
+    const notepadScript = document.createElement("script");
+    notepadScript.src = new URL("tools/student-notepad/student-notepad.js", sharedScript.src).href;
+    document.head.appendChild(notepadScript);
+  }
   if (document.getElementById("languageSelect")) return;
 
   const STORAGE_KEY = "mathToolsHubLanguage";
