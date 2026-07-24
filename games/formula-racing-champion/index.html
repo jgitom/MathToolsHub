@@ -111,7 +111,15 @@
     };
     let level = "pro", running = false, last = 0, elapsed = 0, player, rivals = [], scenery = [], collisionFlash = 0, frame = 0;
     const colours = ["#27e5ff","#ffd43b","#9b5de5","#00e676","#ff7b00","#f72585","#ffffff"];
-    const carSprite = new Image(); carSprite.src = "assets/formula-car-realistic.png"; carSprite.onload = () => { if(player) render(); };
+    const carSprite = new Image();
+    let carSpriteReady = false;
+    carSprite.onload = async () => {
+      try { if (carSprite.decode) await carSprite.decode(); } catch (_) {}
+      carSpriteReady = carSprite.naturalWidth > 0;
+      if (player) render();
+    };
+    carSprite.onerror = () => { carSpriteReady = false; };
+    carSprite.src = new URL("assets/formula-car-realistic.png?v=20260724b", document.baseURI).href;
 
     function reset() {
       const cfg = levels[level];
@@ -180,13 +188,21 @@
     function drawCar(x,y,scale,colour,isPlayer=false){
       ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
       ctx.shadowColor=colour;ctx.shadowBlur=isPlayer?20:10;
-      if(carSprite.complete&&carSprite.naturalWidth){
+      if(carSpriteReady){
         ctx.drawImage(carSprite,-34,-94,68,102);
         ctx.shadowBlur=0;ctx.globalAlpha=.88;ctx.fillStyle=colour;
         ctx.fillRect(-3,-69,6,35);ctx.fillRect(-23,-88,46,4);ctx.fillRect(-20,-2,40,3);
         ctx.globalAlpha=1;ctx.fillStyle=isPlayer?"#ffd43b":"#f8fafc";ctx.beginPath();ctx.arc(0,-48,4.5,0,Math.PI*2);ctx.fill();
       }else{
-        ctx.fillStyle=colour;ctx.beginPath();ctx.moveTo(-24,0);ctx.lineTo(-18,-52);ctx.lineTo(-9,-72);ctx.lineTo(9,-72);ctx.lineTo(18,-52);ctx.lineTo(24,0);ctx.closePath();ctx.fill();
+        ctx.shadowBlur=0;ctx.fillStyle="#080a0d";
+        [[-29,-78,10,25],[19,-78,10,25],[-31,-29,11,27],[20,-29,11,27]].forEach(t=>ctx.fillRect(...t));
+        ctx.strokeStyle="#aeb7c2";ctx.lineWidth=2;
+        [[-20,-65,-8,-54],[20,-65,8,-54],[-21,-17,-8,-28],[21,-17,8,-28]].forEach(a=>{ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(a[2],a[3]);ctx.stroke()});
+        ctx.fillStyle="#151a22";ctx.fillRect(-26,-91,52,7);ctx.fillRect(-27,-2,54,7);
+        ctx.fillStyle=colour;ctx.beginPath();ctx.moveTo(0,-88);ctx.bezierCurveTo(-8,-80,-10,-61,-13,-43);ctx.lineTo(-20,-21);ctx.lineTo(-13,-7);ctx.lineTo(13,-7);ctx.lineTo(20,-21);ctx.lineTo(13,-43);ctx.bezierCurveTo(10,-61,8,-80,0,-88);ctx.closePath();ctx.fill();
+        ctx.fillStyle="#232a33";ctx.beginPath();ctx.ellipse(0,-48,8,13,0,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle="#d7dde5";ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,-49,9,Math.PI*.95,Math.PI*2.05);ctx.stroke();
+        ctx.fillStyle=isPlayer?"#ffd43b":"#f8fafc";ctx.fillRect(-3,-75,6,23);
       }
       ctx.restore();
     }
