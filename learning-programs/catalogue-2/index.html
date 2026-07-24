@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#07111f">
   <meta name="description" content="Explore 24 curriculum-themed learning programme concepts from Preschool to Form 5.">
-  <title>Learning Quest Catalogue 2 | Programmes 49–72</title>
+  <title>Interactive Learning Quests 49–72 | MathToolsHub</title>
   <style>
     :root {
       --bg: #07111f;
@@ -155,7 +155,7 @@
     .blueprint > div { padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.03); }
     .modal-actions { display: flex; gap: 8px; margin-top: 18px; }
     .modal-actions button { padding: 10px 13px; border-radius: 10px; font-weight: 800; }
-    .primary { border: 0; color: white; background: var(--accent); }
+    .primary { border: 0; color: white; background: var(--accent); } .launch-program { display:inline-flex;align-items:center;padding:10px 13px;border-radius:10px;color:white;background:#16a34a;text-decoration:none;font-weight:800; }
     .secondary { color: white; background: rgba(255,255,255,.06); border: 1px solid var(--line); }
     @media(max-width: 940px) {
       .catalogue { grid-template-columns: repeat(2,minmax(0,1fr)); }
@@ -178,7 +178,7 @@
     <nav class="catalog-nav" aria-label="Learning catalogue navigation"><a href="../">← Learning Quest Universe</a><a href="../../">MathToolsHub Home</a></nav>
     <section class="hero">
       <span class="hero-tag">MathToolsHub · Catalogue Two</span>
-      <h1>24 More Learning Programmes</h1>
+      <h1>24 Interactive Learning Quests</h1>
       <p>
         Programme concepts 49–72, covering Preschool through Form 5.
         This catalogue expands into language, digital literacy, design, civic decision-making,
@@ -210,7 +210,7 @@
 
     <div class="footer-row">
       <div class="note">
-        The catalogue provides thematic curriculum-focused programme blueprints. Before formal classroom use,
+        Each programme is now developed as an interactive learning quest with guided learning, activities, project work, assessment, progress saving and a certificate. Before formal classroom use,
         complete a final mapping to the latest official DSKP, including Content Standards,
         Learning Standards and Performance Standards.
       </div>
@@ -243,6 +243,7 @@
       </div>
 
       <div class="modal-actions">
+        <a class="launch-program" id="launchProgramme" href="#">Launch Interactive Programme →</a>
         <button class="primary" id="modalSave" type="button">Add to Shortlist</button>
         <button class="secondary" id="modalCloseBottom" type="button">Close</button>
       </div>
@@ -298,7 +299,7 @@
           </div>
           <div></div>
           <div class="card-actions">
-            <button class="details-btn" data-details="${p.no}" type="button">View Blueprint</button>
+            <button class="details-btn" data-details="${p.no}" type="button">View Programme</button>
             <button class="save-btn ${shortlist.includes(p.no) ? "saved" : ""}" data-save="${p.no}" type="button">
               ${shortlist.includes(p.no) ? "✓ Saved" : "☆ Shortlist"}
             </button>
@@ -315,6 +316,8 @@
         button.addEventListener("click", () => toggleShortlist(Number(button.dataset.save)));
       });
     }
+
+    function slugify(value) { return value.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""); }
 
     function colourFor(no) {
       const colours = ["#7c3aed","#db2777","#2563eb","#0891b2","#16a34a","#ea580c","#9333ea","#0f766e"];
@@ -339,6 +342,7 @@
       document.getElementById("modalProduct").textContent = selectedProgramme.product;
       document.getElementById("modalFocus").textContent = selectedProgramme.focus;
       updateModalSave();
+      document.getElementById("launchProgramme").href = `programs/${slugify(selectedProgramme.title)}.html`;
       modal.classList.add("open");
     }
 
