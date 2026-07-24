@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#07111f">
+  <meta name="description" content="Explore 24 curriculum-themed learning programme concepts from Preschool to Form 5.">
+  <title>Learning Quest Catalogue 2 | Programmes 49–72</title>
+  <style>
+    :root {
+      --bg: #07111f;
+      --panel: #0f172a;
+      --panel-soft: #162033;
+      --text: #f8fafc;
+      --muted: #a8b6c8;
+      --line: rgba(255,255,255,.11);
+      --accent: #3b82f6;
+      --gold: #f4c95d;
+      --success: #34d399;
+      --shadow: 0 20px 55px rgba(0,0,0,.28);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 90% 0%, rgba(59,130,246,.20), transparent 30%),
+        radial-gradient(circle at 0% 30%, rgba(124,58,237,.12), transparent 28%),
+        var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .shell { width: min(1220px, calc(100% - 24px)); margin: auto; padding: 24px 0 50px; }
+    .catalog-nav { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+    .catalog-nav a { padding:9px 12px; border:1px solid var(--line); border-radius:999px; color:#fff; background:rgba(255,255,255,.06); text-decoration:none; font-size:12px; font-weight:800; }
+    .catalog-nav a:hover, .catalog-nav a:focus-visible { background:var(--accent); outline:2px solid #93c5fd; outline-offset:2px; }
+    .hero {
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background: linear-gradient(135deg, rgba(59,130,246,.17), rgba(15,23,42,.96));
+      box-shadow: var(--shadow);
+    }
+    .hero-tag {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(52,211,153,.12);
+      color: #86efac;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    h1 { max-width: 900px; margin: 12px 0 10px; font-size: clamp(34px, 7vw, 68px); line-height: 1.02; }
+    .hero p { max-width: 830px; margin: 0; color: var(--muted); line-height: 1.7; }
+    .stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; margin-top: 20px; }
+    .stat { padding: 13px; border: 1px solid var(--line); border-radius: 13px; background: rgba(255,255,255,.04); }
+    .stat strong { display: block; color: var(--gold); font-size: 22px; }
+    .stat span { color: var(--muted); font-size: 11px; }
+    .controls {
+      position: sticky;
+      top: 0;
+      z-index: 15;
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) auto auto;
+      gap: 9px;
+      margin: 17px 0;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(7,17,31,.92);
+      backdrop-filter: blur(12px);
+    }
+    input, select {
+      width: 100%;
+      padding: 11px 12px;
+      color: var(--text);
+      background: #0b1422;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      outline: none;
+    }
+    input:focus, select:focus { border-color: var(--accent); }
+    .catalogue { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
+    .programme {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 310px;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(180deg, color-mix(in srgb, var(--c) 13%, var(--panel-soft)), var(--panel));
+      box-shadow: 0 14px 34px rgba(0,0,0,.17);
+      transition: transform .16s ease, border-color .16s ease;
+    }
+    .programme:hover { transform: translateY(-2px); border-color: var(--c); }
+    .programme-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .programme-icon { font-size: 39px; }
+    .number {
+      padding: 5px 8px;
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255,255,255,.05);
+      font-size: 11px;
+    }
+    .level { display: block; margin-top: 11px; color: color-mix(in srgb,var(--c) 75%,white); font-size: 12px; font-weight: 850; }
+    .programme h2 { margin: 5px 0 8px; font-size: 20px; }
+    .programme p { color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+    .chip { padding: 5px 7px; border-radius: 999px; background: rgba(255,255,255,.055); color: #cbd5e1; font-size: 10px; }
+    .card-actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 15px; }
+    .details-btn, .save-btn, .export-btn {
+      padding: 9px 11px;
+      border: 0;
+      border-radius: 10px;
+      font-weight: 800;
+    }
+    .details-btn { color: white; background: var(--c); }
+    .save-btn { color: var(--text); background: rgba(255,255,255,.06); border: 1px solid var(--line); }
+    .save-btn.saved { color: #86efac; border-color: rgba(52,211,153,.45); }
+    .empty { display: none; padding: 30px; text-align: center; border: 1px dashed var(--line); border-radius: 17px; color: var(--muted); }
+    .footer-row { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
+    .note { flex: 1; min-width: 260px; padding: 13px 15px; border: 1px solid rgba(244,201,93,.32); border-radius: 13px; background: rgba(244,201,93,.07); color: #fde9a9; font-size: 12px; line-height: 1.55; }
+    .export-btn { color: #07111f; background: var(--gold); }
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      place-items: center;
+      padding: 16px;
+      background: rgba(0,0,0,.74);
+      backdrop-filter: blur(8px);
+    }
+    .modal.open { display: grid; }
+    .modal-card {
+      width: min(760px, 100%);
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: #0d1727;
+      box-shadow: var(--shadow);
+    }
+    .modal-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+    .modal-icon { font-size: 48px; }
+    .close { width: 38px; height: 38px; border: 1px solid var(--line); border-radius: 10px; color: white; background: rgba(255,255,255,.05); }
+    .modal h2 { margin: 4px 0 7px; font-size: 29px; }
+    .modal h3 { margin: 18px 0 8px; }
+    .modal p, .modal li { color: var(--muted); line-height: 1.6; }
+    .blueprint { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+    .blueprint > div { padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.03); }
+    .modal-actions { display: flex; gap: 8px; margin-top: 18px; }
+    .modal-actions button { padding: 10px 13px; border-radius: 10px; font-weight: 800; }
+    .primary { border: 0; color: white; background: var(--accent); }
+    .secondary { color: white; background: rgba(255,255,255,.06); border: 1px solid var(--line); }
+    @media(max-width: 940px) {
+      .catalogue { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    }
+    @media(max-width: 650px) {
+      .shell { width: min(100% - 14px,1220px); padding-top: 8px; }
+      .catalog-nav { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+    .catalog-nav a { padding:9px 12px; border:1px solid var(--line); border-radius:999px; color:#fff; background:rgba(255,255,255,.06); text-decoration:none; font-size:12px; font-weight:800; }
+    .catalog-nav a:hover, .catalog-nav a:focus-visible { background:var(--accent); outline:2px solid #93c5fd; outline-offset:2px; }
+    .hero { padding: 21px; }
+      .controls { grid-template-columns: 1fr; }
+      .catalogue { grid-template-columns: 1fr; }
+      .blueprint { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <nav class="catalog-nav" aria-label="Learning catalogue navigation"><a href="../">← Learning Quest Universe</a><a href="../../">MathToolsHub Home</a></nav>
+    <section class="hero">
+      <span class="hero-tag">MathToolsHub · Catalogue Two</span>
+      <h1>24 More Learning Programmes</h1>
+      <p>
+        Programme concepts 49–72, covering Preschool through Form 5.
+        This catalogue expands into language, digital literacy, design, civic decision-making,
+        applied science, entrepreneurship, cybersecurity, artificial intelligence and climate adaptation.
+      </p>
+      <div class="stats">
+        <div class="stat"><strong>24</strong><span>New programme concepts</span></div>
+        <div class="stat"><strong>12</strong><span>Learning levels</span></div>
+        <div class="stat"><strong>72</strong><span>Proposed interactive activities</span></div>
+        <div class="stat"><strong>49–72</strong><span>Catalogue numbering</span></div>
+      </div>
+    </section>
+
+    <section class="controls" aria-label="Catalogue filters">
+      <input id="searchInput" type="search" placeholder="Search programme, subject or skill...">
+      <select id="phaseFilter" aria-label="Filter by education phase">
+        <option value="All">All phases</option>
+        <option value="Preschool">Preschool</option>
+        <option value="Primary">Primary</option>
+        <option value="Secondary">Secondary</option>
+      </select>
+      <select id="subjectFilter" aria-label="Filter by subject">
+        <option value="All">All subjects</option>
+      </select>
+    </section>
+
+    <section class="catalogue" id="catalogue"></section>
+    <div class="empty" id="emptyState">No programme matches the selected filters.</div>
+
+    <div class="footer-row">
+      <div class="note">
+        The catalogue provides thematic curriculum-focused programme blueprints. Before formal classroom use,
+        complete a final mapping to the latest official DSKP, including Content Standards,
+        Learning Standards and Performance Standards.
+      </div>
+      <button class="export-btn" id="exportSaved" type="button">Export Shortlist</button>
+    </div>
+  </main>
+
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <article class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="modal-icon" id="modalIcon"></div>
+          <span class="level" id="modalLevel"></span>
+          <h2 id="modalTitle"></h2>
+        </div>
+        <button class="close" id="closeModal" type="button" aria-label="Close">✕</button>
+      </div>
+      <p id="modalSummary"></p>
+      <div class="chips" id="modalSubjects"></div>
+
+      <h3>Learning outcomes</h3>
+      <ul id="modalOutcomes"></ul>
+
+      <h3>Programme blueprint</h3>
+      <div class="blueprint">
+        <div><strong>Interactive activities</strong><p id="modalActivities"></p></div>
+        <div><strong>Assessment</strong><p id="modalAssessment"></p></div>
+        <div><strong>Student product</strong><p id="modalProduct"></p></div>
+        <div><strong>Curriculum focus</strong><p id="modalFocus"></p></div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="primary" id="modalSave" type="button">Add to Shortlist</button>
+        <button class="secondary" id="modalCloseBottom" type="button">Close</button>
+      </div>
+    </article>
+  </div>
+
+  <script>
+    const programmes = [{"no": 49, "level": "Preschool", "phase": "Preschool", "title": "Story Garden Adventure", "icon": "🌼", "subjects": ["Language", "Creativity", "Social-Emotional"], "focus": "Listening, speaking, story sequence, emotions and creative expression", "summary": "Children grow a magical story garden by listening to short stories, arranging picture events and expressing feelings.", "outcomes": ["Retell a simple story using beginning, middle and ending.", "Recognise basic emotions shown by characters.", "Use words, drawings or movement to respond creatively."], "activities": ["Picture-sequence garden", "Character emotion matching", "Create-a-story flower"], "assessment": "Oral retelling, picture sequencing and teacher observation.", "product": "A personalised three-scene digital story."}, {"no": 50, "level": "Preschool", "phase": "Preschool", "title": "Shape and Motion Playground", "icon": "🛝", "subjects": ["Early Mathematics", "Physical Development", "Science"], "focus": "Shapes, positions, movement, balance and spatial vocabulary", "summary": "Learners design a virtual playground using shapes and test how objects move, roll and balance.", "outcomes": ["Identify common two-dimensional and three-dimensional shapes.", "Use position words such as above, below, beside and between.", "Describe simple movement such as rolling, sliding and spinning."], "activities": ["Build the playground", "Rolling-object test", "Position-word treasure hunt"], "assessment": "Shape identification and guided movement challenge.", "product": "A labelled virtual playground."}, {"no": 51, "level": "Year 1", "phase": "Primary", "title": "Phonics Rescue Station", "icon": "🔤", "subjects": ["English", "Language"], "focus": "Letter-sound relationships, blending, vocabulary and simple sentence reading", "summary": "Students rescue lost word robots by matching sounds, blending letters and reading short sentences.", "outcomes": ["Match selected letters and common sounds.", "Blend sounds to read simple words.", "Understand short instructions and sentences."], "activities": ["Sound scanner", "Word-blending conveyor", "Sentence rescue mission"], "assessment": "Sound matching, word reading and sentence comprehension.", "product": "A rescued-word collection."}, {"no": 52, "level": "Year 1", "phase": "Primary", "title": "Mini Makers Workshop", "icon": "🧰", "subjects": ["Design and Technology", "Mathematics", "Science"], "focus": "Materials, simple construction, measurement and safe tool habits", "summary": "Young makers choose materials and build simple objects such as bridges, containers and toy vehicles.", "outcomes": ["Recognise common materials and their basic properties.", "Measure and compare length using appropriate units or non-standard units.", "Follow a simple design-and-build sequence safely."], "activities": ["Material sorter", "Measure before building", "Mini bridge challenge"], "assessment": "Material selection and design-sequence task.", "product": "A digital model with a short explanation."}, {"no": 53, "level": "Year 2", "phase": "Primary", "title": "Community Helpers Mission", "icon": "🚒", "subjects": ["Language", "Civic Education", "Health"], "focus": "Community roles, communication, responsibility and emergency awareness", "summary": "Students solve community problems by selecting the correct helper and communicating clear requests.", "outcomes": ["Identify common community helpers and their roles.", "Use polite and clear language to ask for help.", "Recognise appropriate responses to simple emergencies."], "activities": ["Who can help?", "Emergency call builder", "Community duty map"], "assessment": "Role matching and scenario-response selection.", "product": "A community helper guide."}, {"no": 54, "level": "Year 2", "phase": "Primary", "title": "Pattern and Coding Trail", "icon": "🤖", "subjects": ["Mathematics", "Computational Thinking"], "focus": "Patterns, sequences, direction, algorithms and debugging", "summary": "Guide a friendly robot along a jungle trail by recognising patterns and arranging movement instructions.", "outcomes": ["Continue visual and number patterns.", "Arrange step-by-step instructions in the correct order.", "Identify and correct a simple error in a sequence."], "activities": ["Pattern bridge", "Arrow-code trail", "Fix-the-robot challenge"], "assessment": "Pattern completion and algorithm ordering.", "product": "A working route algorithm."}, {"no": 55, "level": "Year 3", "phase": "Primary", "title": "Sabah River Explorer", "icon": "🏞️", "subjects": ["Science", "Geography", "Language"], "focus": "Freshwater habitats, observation, conservation and descriptive reporting", "summary": "Students explore a fictional Sabah river, identify organisms and investigate how human actions affect water quality.", "outcomes": ["Identify selected living and non-living river components.", "Record simple field observations in a table.", "Suggest actions that protect freshwater environments."], "activities": ["River organism survey", "Water-quality clue hunt", "Conservation message"], "assessment": "Observation table and environmental decision task.", "product": "A one-page river health report."}, {"no": 56, "level": "Year 3", "phase": "Primary", "title": "Storybook Creator Studio", "icon": "📖", "subjects": ["Malay Language", "English", "Visual Arts"], "focus": "Narrative structure, vocabulary, dialogue, illustration and editing", "summary": "Learners create a short illustrated story using a beginning, problem, solution and ending.", "outcomes": ["Organise a story into a logical sequence.", "Use descriptive vocabulary and simple dialogue.", "Review writing for basic spelling and punctuation."], "activities": ["Character builder", "Plot-card organiser", "Illustrated page creator"], "assessment": "Narrative checklist and peer review.", "product": "A four-page digital storybook."}, {"no": 57, "level": "Year 4", "phase": "Primary", "title": "Safe Internet Junior", "icon": "🛡️", "subjects": ["Digital Literacy", "Civic Education", "Language"], "focus": "Passwords, privacy, online communication, scams and responsible behaviour", "summary": "Students protect a virtual school network by making safe online decisions.", "outcomes": ["Recognise characteristics of a stronger password.", "Identify personal information that should not be shared publicly.", "Respond appropriately to suspicious messages and cyberbullying."], "activities": ["Password strength lab", "Share-or-protect sorter", "Suspicious message detector"], "assessment": "Online-safety scenarios and response justification.", "product": "A student internet-safety pledge."}, {"no": 58, "level": "Year 4", "phase": "Primary", "title": "Plant Growth Research Station", "icon": "🪴", "subjects": ["Science", "Mathematics", "Language"], "focus": "Plant needs, variables, measurement, data tables and scientific reporting", "summary": "Students conduct a simulated plant-growth investigation by controlling light, water and soil conditions.", "outcomes": ["Identify variables in a simple investigation.", "Measure and record plant growth over time.", "Draw a conclusion using collected evidence."], "activities": ["Choose investigation variables", "Growth-data recorder", "Evidence conclusion builder"], "assessment": "Fair-test design and graph interpretation.", "product": "A short plant investigation report."}, {"no": 59, "level": "Year 5", "phase": "Primary", "title": "Young Inventor Design Lab", "icon": "⚙️", "subjects": ["Design and Technology", "Science", "Mathematics"], "focus": "Problem identification, sketches, mechanisms, testing and improvement", "summary": "Students invent a simple product to solve an everyday school or home problem.", "outcomes": ["Define a practical user problem.", "Produce and label a design sketch.", "Evaluate a prototype and recommend improvements."], "activities": ["Problem finder", "Mechanism selector", "Prototype test dashboard"], "assessment": "Design brief, labelled sketch and evaluation.", "product": "A digital invention portfolio."}, {"no": 60, "level": "Year 5", "phase": "Primary", "title": "Local Economy Market Challenge", "icon": "🧺", "subjects": ["Mathematics", "Geography", "Financial Literacy"], "focus": "Local products, supply and demand, pricing, profit and responsible consumption", "summary": "Students manage a virtual local market stall while balancing stock, price, customer demand and waste.", "outcomes": ["Calculate revenue, cost and simple profit.", "Explain how supply and demand may influence price.", "Make choices that reduce waste and support local producers."], "activities": ["Stock purchase", "Price-setting simulation", "End-of-day profit review"], "assessment": "Market decisions and calculation challenge.", "product": "A market performance summary."}, {"no": 61, "level": "Year 6", "phase": "Primary", "title": "Civic Decision Lab", "icon": "🗳️", "subjects": ["Civic Education", "Language", "Mathematics"], "focus": "Representation, respectful discussion, voting, data and community decisions", "summary": "Students debate school-community proposals and use fair voting processes to reach decisions.", "outcomes": ["Differentiate facts, opinions and reasons.", "Participate in respectful discussion and decision-making.", "Interpret vote totals and percentages."], "activities": ["Evidence sorter", "Mini debate", "Vote-count dashboard"], "assessment": "Reasoned statement and election-data interpretation.", "product": "A community decision report."}, {"no": 62, "level": "Year 6", "phase": "Primary", "title": "Earth and Space Observatory", "icon": "🔭", "subjects": ["Science", "Mathematics", "Technology"], "focus": "Solar system, rotation, revolution, scale and scientific models", "summary": "Students operate a virtual observatory and investigate day, night, seasons and planetary relationships.", "outcomes": ["Describe rotation and revolution using a model.", "Identify selected objects in the Solar System.", "Interpret simplified scale and orbital data."], "activities": ["Day-night simulator", "Planet identification", "Orbit-data mission"], "assessment": "Model explanation and data interpretation.", "product": "A digital observatory log."}, {"no": 63, "level": "Form 1", "phase": "Secondary", "title": "Digital Storytelling Studio", "icon": "🎬", "subjects": ["Language", "Digital Literacy", "Visual Arts"], "focus": "Script writing, media language, storyboarding, copyright and presentation", "summary": "Students plan a short educational video using responsible media and storytelling techniques.", "outcomes": ["Develop a clear audience, purpose and message.", "Create a storyboard using shots, narration and dialogue.", "Apply basic copyright and attribution practices."], "activities": ["Audience-and-purpose planner", "Storyboard editor", "Copyright decision lab"], "assessment": "Storyboard rubric and media-literacy quiz.", "product": "A six-scene digital storyboard."}, {"no": 64, "level": "Form 1", "phase": "Secondary", "title": "Food Science Investigation", "icon": "🧪", "subjects": ["Science", "Health", "Mathematics"], "focus": "Nutrients, food tests, experimental variables, data and balanced nutrition", "summary": "Students test fictional food samples and use evidence to design a balanced meal.", "outcomes": ["Describe functions of major nutrient groups.", "Interpret outcomes of selected food-test simulations.", "Evaluate a meal using nutritional evidence."], "activities": ["Nutrient function match", "Virtual food tests", "Balanced meal analysis"], "assessment": "Laboratory-data interpretation and meal justification.", "product": "A food science lab report."}, {"no": 65, "level": "Form 2", "phase": "Secondary", "title": "Renewable Island Operations", "icon": "🏝️", "subjects": ["Science", "Geography", "Mathematics"], "focus": "Renewable resources, energy demand, storage, weather and system reliability", "summary": "Students manage an island energy system using solar, wind, hydro and battery storage.", "outcomes": ["Compare selected renewable-energy sources.", "Interpret energy demand and generation data.", "Design a more reliable low-carbon energy mix."], "activities": ["Energy-source comparison", "Demand balancing simulation", "Battery emergency mission"], "assessment": "Energy-mix decision and graph interpretation.", "product": "An island energy operations plan."}, {"no": 66, "level": "Form 2", "phase": "Secondary", "title": "Language Debate Arena", "icon": "🎙️", "subjects": ["Malay Language", "English", "Civic Education"], "focus": "Claims, evidence, rebuttal, persuasive language and respectful communication", "summary": "Students prepare and deliver structured arguments on age-appropriate school and community issues.", "outcomes": ["Construct a claim supported by relevant evidence.", "Differentiate strong reasoning from unsupported assertion.", "Respond respectfully to an opposing argument."], "activities": ["Claim-evidence builder", "Rebuttal challenge", "Virtual debate round"], "assessment": "Argument quality rubric and reflection.", "product": "A written debate brief."}, {"no": 67, "level": "Form 3", "phase": "Secondary", "title": "Cyber Safety Operations Centre", "icon": "💻", "subjects": ["Computer Science", "Digital Literacy", "Civic Education"], "focus": "Phishing, malware, authentication, backups, incident response and digital ethics", "summary": "Students respond to simulated cyber incidents affecting a fictional school network.", "outcomes": ["Recognise common indicators of phishing and malicious activity.", "Explain the purpose of authentication, updates and backups.", "Prioritise safe and ethical incident-response actions."], "activities": ["Phishing inbox triage", "Security-control matcher", "Incident response timeline"], "assessment": "Cyber incident scenarios and response plan.", "product": "A school cyber-safety playbook."}, {"no": 68, "level": "Form 3", "phase": "Secondary", "title": "Sustainable Agriculture Simulator", "icon": "🚜", "subjects": ["Science", "Geography", "Mathematics"], "focus": "Soil, water, crop planning, productivity, biodiversity and sustainable farming", "summary": "Students manage a virtual farm while balancing crop yield, soil quality, water and environmental impact.", "outcomes": ["Relate soil, water and climate factors to crop growth.", "Interpret yield and resource-use data.", "Recommend farming practices that improve sustainability."], "activities": ["Crop selection", "Water allocation dashboard", "Soil-health intervention"], "assessment": "Farm outcome analysis and recommendation.", "product": "A sustainable farm management plan."}, {"no": 69, "level": "Form 4", "phase": "Secondary", "title": "Entrepreneurship and E-Commerce Lab", "icon": "🛒", "subjects": ["Business", "Mathematics", "Digital Literacy"], "focus": "Customer needs, digital storefronts, pricing, marketing metrics and consumer protection", "summary": "Students launch a fictional online product and manage costs, pricing, promotion and customer service.", "outcomes": ["Develop a customer profile and value proposition.", "Calculate cost, revenue, profit and conversion rate.", "Apply responsible advertising and consumer-protection principles."], "activities": ["Customer persona builder", "Online store simulator", "Campaign analytics"], "assessment": "Business dashboard and strategic recommendation.", "product": "A mini e-commerce business plan."}, {"no": 70, "level": "Form 4", "phase": "Secondary", "title": "Chemistry in Everyday Life Lab", "icon": "⚗️", "subjects": ["Chemistry", "Science", "Health"], "focus": "Acids and alkalis, reaction evidence, household chemicals, concentration and safety", "summary": "Students analyse fictional household substances and make evidence-based safety decisions.", "outcomes": ["Classify selected substances using simple chemical evidence.", "Recognise indicators of chemical change.", "Apply safe handling and labelling practices."], "activities": ["Virtual pH testing", "Reaction evidence analyser", "Safety label audit"], "assessment": "Laboratory scenario interpretation.", "product": "A household chemical safety guide."}, {"no": 71, "level": "Form 5", "phase": "Secondary", "title": "AI Ethics and Society Forum", "icon": "🧠", "subjects": ["Computer Science", "Civic Education", "Language"], "focus": "AI systems, bias, privacy, transparency, accountability and evidence-based discussion", "summary": "Students examine fictional AI use cases in schools, workplaces and public services.", "outcomes": ["Explain at a basic level how data influences AI outputs.", "Identify risks involving bias, privacy and over-reliance.", "Develop a balanced recommendation for responsible AI use."], "activities": ["AI decision case study", "Bias and data audit", "Ethics panel simulation"], "assessment": "Position paper and scenario-based evaluation.", "product": "A responsible AI policy brief."}, {"no": 72, "level": "Form 5", "phase": "Secondary", "title": "Climate Adaptation City Planner", "icon": "🌧️", "subjects": ["Geography", "Science", "Mathematics"], "focus": "Climate risk, flooding, heat, infrastructure, data and adaptation planning", "summary": "Students redesign a fictional city to reduce flood and heat risks under budget constraints.", "outcomes": ["Interpret simplified climate and hazard data.", "Compare structural and nature-based adaptation options.", "Prioritise interventions using risk, cost and social impact."], "activities": ["Risk-map analysis", "Adaptation budget simulator", "Community impact review"], "assessment": "City plan justification and trade-off analysis.", "product": "A climate adaptation master plan."}];
+    const catalogue = document.getElementById("catalogue");
+    const searchInput = document.getElementById("searchInput");
+    const phaseFilter = document.getElementById("phaseFilter");
+    const subjectFilter = document.getElementById("subjectFilter");
+    const emptyState = document.getElementById("emptyState");
+    const modal = document.getElementById("modal");
+    let selectedProgramme = null;
+    let shortlist = readShortlist();
+
+    const allSubjects = [...new Set(programmes.flatMap(p => p.subjects))].sort();
+    allSubjects.forEach(subject => {
+      const option = document.createElement("option");
+      option.value = subject;
+      option.textContent = subject;
+      subjectFilter.appendChild(option);
+    });
+
+    function render() {
+      const query = searchInput.value.trim().toLowerCase();
+      const phase = phaseFilter.value;
+      const subject = subjectFilter.value;
+
+      const filtered = programmes.filter(p => {
+        const haystack = [
+          p.title, p.level, p.phase, p.focus, p.summary,
+          ...p.subjects, ...p.outcomes, ...p.activities
+        ].join(" ").toLowerCase();
+
+        return (!query || haystack.includes(query))
+          && (phase === "All" || p.phase === phase)
+          && (subject === "All" || p.subjects.includes(subject));
+      });
+
+      catalogue.innerHTML = filtered.map(p => `
+        <article class="programme" style="--c:${colourFor(p.no)}">
+          <div>
+            <div class="programme-top">
+              <div class="programme-icon">${p.icon}</div>
+              <span class="number">Programme ${p.no}</span>
+            </div>
+            <span class="level">${escapeHtml(p.level)}</span>
+            <h2>${escapeHtml(p.title)}</h2>
+            <p>${escapeHtml(p.summary)}</p>
+            <div class="chips">${p.subjects.map(s => `<span class="chip">${escapeHtml(s)}</span>`).join("")}</div>
+          </div>
+          <div></div>
+          <div class="card-actions">
+            <button class="details-btn" data-details="${p.no}" type="button">View Blueprint</button>
+            <button class="save-btn ${shortlist.includes(p.no) ? "saved" : ""}" data-save="${p.no}" type="button">
+              ${shortlist.includes(p.no) ? "✓ Saved" : "☆ Shortlist"}
+            </button>
+          </div>
+        </article>
+      `).join("");
+
+      emptyState.style.display = filtered.length ? "none" : "block";
+
+      document.querySelectorAll("[data-details]").forEach(button => {
+        button.addEventListener("click", () => openModal(Number(button.dataset.details)));
+      });
+      document.querySelectorAll("[data-save]").forEach(button => {
+        button.addEventListener("click", () => toggleShortlist(Number(button.dataset.save)));
+      });
+    }
+
+    function colourFor(no) {
+      const colours = ["#7c3aed","#db2777","#2563eb","#0891b2","#16a34a","#ea580c","#9333ea","#0f766e"];
+      return colours[(no - 49) % colours.length];
+    }
+
+    function openModal(no) {
+      selectedProgramme = programmes.find(p => p.no === no);
+      if (!selectedProgramme) return;
+
+      document.getElementById("modalIcon").textContent = selectedProgramme.icon;
+      document.getElementById("modalLevel").textContent =
+        `${selectedProgramme.level} · Programme ${selectedProgramme.no}`;
+      document.getElementById("modalTitle").textContent = selectedProgramme.title;
+      document.getElementById("modalSummary").textContent = selectedProgramme.summary;
+      document.getElementById("modalSubjects").innerHTML =
+        selectedProgramme.subjects.map(s => `<span class="chip">${escapeHtml(s)}</span>`).join("");
+      document.getElementById("modalOutcomes").innerHTML =
+        selectedProgramme.outcomes.map(o => `<li>${escapeHtml(o)}</li>`).join("");
+      document.getElementById("modalActivities").textContent = selectedProgramme.activities.join(" · ");
+      document.getElementById("modalAssessment").textContent = selectedProgramme.assessment;
+      document.getElementById("modalProduct").textContent = selectedProgramme.product;
+      document.getElementById("modalFocus").textContent = selectedProgramme.focus;
+      updateModalSave();
+      modal.classList.add("open");
+    }
+
+    function closeModal() {
+      modal.classList.remove("open");
+      selectedProgramme = null;
+    }
+
+    function toggleShortlist(no) {
+      shortlist = shortlist.includes(no)
+        ? shortlist.filter(item => item !== no)
+        : [...shortlist, no];
+      localStorage.setItem("learning_catalogue_2_shortlist", JSON.stringify(shortlist));
+      render();
+      updateModalSave();
+    }
+
+    function updateModalSave() {
+      if (!selectedProgramme) return;
+      const saved = shortlist.includes(selectedProgramme.no);
+      const button = document.getElementById("modalSave");
+      button.textContent = saved ? "Remove from Shortlist" : "Add to Shortlist";
+    }
+
+    function exportShortlist() {
+      const selected = programmes.filter(p => shortlist.includes(p.no));
+      if (!selected.length) {
+        alert("Your shortlist is empty.");
+        return;
+      }
+
+      const text = selected.map(p =>
+        `Programme ${p.no} — ${p.title}\nLevel: ${p.level}\nFocus: ${p.focus}\n`
+      ).join("\n");
+
+      const blob = new Blob([`Learning Quest Catalogue 2 — Shortlist\n\n${text}`],
+        { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "learning-quest-catalogue-2-shortlist.txt";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function readShortlist() {
+      try {
+        return JSON.parse(localStorage.getItem("learning_catalogue_2_shortlist") || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      })[char]);
+    }
+
+    searchInput.addEventListener("input", render);
+    phaseFilter.addEventListener("change", render);
+    subjectFilter.addEventListener("change", render);
+    document.getElementById("closeModal").addEventListener("click", closeModal);
+    document.getElementById("modalCloseBottom").addEventListener("click", closeModal);
+    document.getElementById("modalSave").addEventListener("click", () => {
+      if (selectedProgramme) toggleShortlist(selectedProgramme.no);
+    });
+    document.getElementById("exportSaved").addEventListener("click", exportShortlist);
+    modal.addEventListener("click", event => {
+      if (event.target === modal) closeModal();
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeModal();
+    });
+
+    render();
+  </script>
+  <script src="../../site-language.js"></script>
+</body>
+</html>

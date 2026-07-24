@@ -5,7 +5,7 @@ const id = window.PROGRAM_ID;
 const cfg = window.PROGRAMS[id];
 if(!cfg){document.body.innerHTML="<p style='padding:20px'>Program configuration not found.</p>";return;}
 document.documentElement.style.setProperty("--accent",cfg.accent);
-const key=`kpm_learning_${id}`;
+const key=`learning_quest_${id}`;
 const state=readJSON(key,{lessons:[],missions:{},quizScore:null,reflection:"",certificateName:""});
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
