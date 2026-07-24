@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="description" content="Sabah Navigator MVP — an installable community mapping prototype." />
+
+  <title>Sabah Navigator MVP</title>
+
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@^6.0.0/dist/maplibre-gl.css" />
+
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: rgba(15, 23, 42, 0.96);
+      --panel-soft: rgba(30, 41, 59, 0.94);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --line: rgba(148, 163, 184, 0.24);
+      --accent: #38bdf8;
+      --accent-dark: #0369a1;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --shadow: 0 18px 45px rgba(2, 6, 23, 0.28);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    button, input, select { font: inherit; }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease, background 0.15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+
+    .app {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      width: 100%;
+      height: 100%;
+    }
+
+    .sidebar {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      padding: 18px;
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 32%),
+        var(--panel);
+      border-right: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      overflow-y: auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, var(--accent), #2563eb);
+      box-shadow: 0 10px 24px rgba(56, 189, 248, 0.28);
+      font-size: 24px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 19px;
+      line-height: 1.1;
+    }
+
+    .brand p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .card {
+      padding: 14px;
+      margin-bottom: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel-soft);
+      backdrop-filter: blur(12px);
+    }
+
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 14px;
+    }
+
+    .search-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    input, select {
+      width: 100%;
+      min-width: 0;
+      padding: 11px 12px;
+      color: var(--text);
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.14);
+    }
+
+    .primary {
+      padding: 10px 13px;
+      color: white;
+      background: linear-gradient(135deg, var(--accent-dark), #2563eb);
+      border-radius: 12px;
+      font-weight: 700;
+    }
+
+    .secondary {
+      width: 100%;
+      padding: 11px 13px;
+      color: var(--text);
+      background: rgba(51, 65, 85, 0.9);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      font-weight: 650;
+    }
+
+    .danger {
+      color: #fecaca;
+      background: rgba(127, 29, 29, 0.45);
+    }
+
+    .hint {
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .status {
+      min-height: 18px;
+      margin-top: 8px;
+      color: #bae6fd;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .result-list, .saved-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .result-item, .saved-item {
+      width: 100%;
+      padding: 10px 11px;
+      text-align: left;
+      color: var(--text);
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    .result-item strong, .saved-item strong {
+      display: block;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-size: 12px;
+    }
+
+    .result-item span, .saved-item span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .route-grid {
+      display: grid;
+      gap: 8px;
+    }
+
+    .route-point {
+      padding: 10px;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    .route-point b {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .route-point span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      word-break: break-word;
+    }
+
+    .route-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 9px;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .metric {
+      padding: 10px;
+      text-align: center;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    .metric strong {
+      display: block;
+      color: #e0f2fe;
+      font-size: 16px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+
+    .map-wrap {
+      position: relative;
+      min-width: 0;
+    }
+
+    .floating-tip {
+      position: absolute;
+      z-index: 5;
+      top: 16px;
+      left: 16px;
+      max-width: min(380px, calc(100% - 32px));
+      padding: 10px 12px;
+      color: #0f172a;
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      font-size: 12px;
+      line-height: 1.4;
+      pointer-events: none;
+    }
+
+    .mobile-toggle {
+      display: none;
+      position: absolute;
+      z-index: 20;
+      right: 14px;
+      top: 14px;
+      padding: 11px 14px;
+      color: white;
+      background: var(--bg);
+      border-radius: 13px;
+      box-shadow: var(--shadow);
+    }
+
+    .popup-content {
+      min-width: 210px;
+      color: #0f172a;
+    }
+
+    .popup-content h3 {
+      margin: 0 0 5px;
+      font-size: 14px;
+    }
+
+    .popup-content p {
+      margin: 0 0 10px;
+      color: #475569;
+      font-size: 11px;
+    }
+
+    .popup-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .popup-actions button {
+      padding: 8px;
+      color: white;
+      background: #0369a1;
+      border-radius: 9px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .popup-actions button:last-child {
+      grid-column: 1 / -1;
+      background: #166534;
+    }
+
+    .maplibregl-popup-content { border-radius: 14px; }
+    .maplibregl-ctrl-group { border-radius: 12px; overflow: hidden; }
+
+    @media (max-width: 850px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: min(92vw, 360px);
+        transform: translateX(-105%);
+        transition: transform 0.22s ease;
+      }
+      .sidebar.open { transform: translateX(0); }
+      .mobile-toggle { display: block; }
+      .floating-tip { top: 72px; }
+    }
+    .mth-back{position:fixed;right:14px;top:12px;z-index:10000;padding:9px 13px;border:1px solid rgba(255,255,255,.22);border-radius:999px;color:#fff;background:rgba(15,23,42,.92);box-shadow:0 5px 18px rgba(0,0,0,.3);text-decoration:none;font-size:12px;font-weight:850}.mth-back:hover,.mth-back:focus-visible{background:#0369a1;outline:2px solid #7dd3fc;outline-offset:2px}@media(max-width:720px){.mth-back{right:8px;top:8px;padding:8px 10px}}
+  </style>
+</head>
+
+<body>
+  <a class="mth-back" href="../">← All Tools</a>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">🗺️</div>
+        <div>
+          <h1>Sabah Navigator</h1>
+          <p>Community mapping MVP · Version 1</p>
+        </div>
+      </div>
+
+      <section class="card">
+        <h2>Find a place</h2>
+        <form id="searchForm" class="search-row">
+          <input id="searchInput" type="search" placeholder="Example: Kundasang, Sabah" autocomplete="off" />
+          <button class="primary" type="submit">Search</button>
+        </form>
+        <div id="searchStatus" class="status"></div>
+        <div id="searchResults" class="result-list"></div>
+        <p class="hint">
+          Prototype search uses the public Nominatim endpoint only after a manual search.
+          No autocomplete is used. Replace it with your own or a commercial geocoder before production.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2>Your position</h2>
+        <button id="locateBtn" class="secondary" type="button">📍 Locate me</button>
+        <div id="locationStatus" class="status">GPS works best on HTTPS or localhost.</div>
+      </section>
+
+      <section class="card">
+        <h2>Route planner</h2>
+        <div class="route-grid">
+          <div class="route-point">
+            <b style="color:#16a34a">Start point</b>
+            <span id="startText">Not selected</span>
+          </div>
+          <div class="route-point">
+            <b style="color:#dc2626">Destination</b>
+            <span id="endText">Not selected</span>
+          </div>
+        </div>
+
+        <div class="route-actions">
+          <button id="routeBtn" class="primary" type="button">Build route</button>
+          <button id="clearRouteBtn" class="secondary danger" type="button">Clear</button>
+        </div>
+
+        <div id="routeStatus" class="status"></div>
+
+        <div class="metric-grid">
+          <div class="metric">
+            <strong id="distanceMetric">—</strong>
+            <span>Distance</span>
+          </div>
+          <div class="metric">
+            <strong id="durationMetric">—</strong>
+            <span>Estimated time</span>
+          </div>
+        </div>
+
+        <p class="hint">
+          Click any point on the map, then select Start or Destination. The public OSRM
+          demonstration router is suitable only for development testing.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2>Saved places</h2>
+        <div id="savedPlaces" class="saved-list"></div>
+        <button id="clearSavedBtn" class="secondary danger" type="button" style="margin-top:10px">
+          Delete saved places
+        </button>
+      </section>
+    </aside>
+
+    <main class="map-wrap">
+      <button class="mobile-toggle" id="mobileToggle" type="button">☰ Menu</button>
+      <div class="floating-tip">
+        Click the map to create a point. You can save it or use it as a route endpoint.
+      </div>
+      <div id="map" aria-label="Interactive map of Sabah"></div>
+    </main>
+  </div>
+
+  <script type="module">
+    import * as maplibregl from "https://unpkg.com/maplibre-gl@^6.0.0/dist/maplibre-gl.mjs";
+
+    // -------------------------------------------------------------------------
+    // Configuration
+    // -------------------------------------------------------------------------
+    const APP_NAME = "Sabah Navigator MVP";
+    const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
+    const OSRM_URL = "https://router.project-osrm.org/route/v1/driving";
+    const SABAH_CENTER = [116.6708, 5.9804]; // [longitude, latitude]
+
+    // Public services above are for low-volume prototyping only.
+    // For production, route requests through your own backend, add caching,
+    // and use your own/commercial geocoder and routing infrastructure.
+
+    const el = (id) => document.getElementById(id);
+    const searchForm = el("searchForm");
+    const searchInput = el("searchInput");
+    const searchStatus = el("searchStatus");
+    const searchResults = el("searchResults");
+    const locateBtn = el("locateBtn");
+    const locationStatus = el("locationStatus");
+    const startText = el("startText");
+    const endText = el("endText");
+    const routeBtn = el("routeBtn");
+    const clearRouteBtn = el("clearRouteBtn");
+    const routeStatus = el("routeStatus");
+    const distanceMetric = el("distanceMetric");
+    const durationMetric = el("durationMetric");
+    const savedPlacesEl = el("savedPlaces");
+    const clearSavedBtn = el("clearSavedBtn");
+    const sidebar = el("sidebar");
+    const mobileToggle = el("mobileToggle");
+
+    const state = {
+      selectedPoint: null,
+      selectedMarker: null,
+      currentLocationMarker: null,
+      searchMarkers: [],
+      savedMarkers: [],
+      start: null,
+      end: null,
+      routeCoordinates: [],
+      savedPlaces: readJson("sabahNavigatorSavedPlaces", []),
+      geocoderCache: readJson("sabahNavigatorGeocoderCache", {}),
+      lastSearchAt: 0
+    };
+
+    const map = new maplibregl.Map({
+      container: "map",
+      center: SABAH_CENTER,
+      zoom: 7.2,
+      minZoom: 2,
+      maxZoom: 19,
+      style: {
+        version: 8,
+        sources: {
+          osm: {
+            type: "raster",
+            tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+            tileSize: 256,
+            attribution: "© OpenStreetMap contributors"
+          }
+        },
+        layers: [
+          {
+            id: "osm-base",
+            type: "raster",
+            source: "osm"
+          }
+        ]
+      }
+    });
+
+    map.addControl(new maplibregl.NavigationControl(), "bottom-right");
+    map.addControl(new maplibregl.ScaleControl({ unit: "metric" }), "bottom-left");
+
+    map.on("load", () => {
+      map.addSource("route", {
+        type: "geojson",
+        data: emptyFeatureCollection()
+      });
+
+      map.addLayer({
+        id: "route-outline",
+        type: "line",
+        source: "route",
+        layout: {
+          "line-join": "round",
+          "line-cap": "round"
+        },
+        paint: {
+          "line-color": "#0f172a",
+          "line-width": 8,
+          "line-opacity": 0.45
+        }
+      });
+
+      map.addLayer({
+        id: "route-line",
+        type: "line",
+        source: "route",
+        layout: {
+          "line-join": "round",
+          "line-cap": "round"
+        },
+        paint: {
+          "line-color": "#38bdf8",
+          "line-width": 5
+        }
+      });
+
+      renderSavedPlaces();
+    });
+
+    map.on("click", (event) => {
+      const point = {
+        name: "Selected map point",
+        lng: Number(event.lngLat.lng.toFixed(6)),
+        lat: Number(event.lngLat.lat.toFixed(6))
+      };
+
+      showSelectedPoint(point);
+    });
+
+    searchForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      await searchPlace(searchInput.value.trim());
+    });
+
+    locateBtn.addEventListener("click", locateUser);
+    routeBtn.addEventListener("click", buildRoute);
+    clearRouteBtn.addEventListener("click", clearRoute);
+    clearSavedBtn.addEventListener("click", clearSavedPlaces);
+    mobileToggle.addEventListener("click", () => sidebar.classList.toggle("open"));
+
+    function showSelectedPoint(point) {
+      state.selectedPoint = point;
+
+      if (state.selectedMarker) state.selectedMarker.remove();
+
+      state.selectedMarker = new maplibregl.Marker({ color: "#f59e0b" })
+        .setLngLat([point.lng, point.lat])
+        .addTo(map);
+
+      const popupNode = document.createElement("div");
+      popupNode.className = "popup-content";
+      popupNode.innerHTML = `
+        <h3>${escapeHtml(point.name)}</h3>
+        <p>${point.lat.toFixed(6)}, ${point.lng.toFixed(6)}</p>
+        <div class="popup-actions">
+          <button type="button" data-action="start">Set Start</button>
+          <button type="button" data-action="end">Set Destination</button>
+          <button type="button" data-action="save">Save Place</button>
+        </div>
+      `;
+
+      popupNode.querySelector('[data-action="start"]').addEventListener("click", () => {
+        setRoutePoint("start", point);
+      });
+
+      popupNode.querySelector('[data-action="end"]').addEventListener("click", () => {
+        setRoutePoint("end", point);
+      });
+
+      popupNode.querySelector('[data-action="save"]').addEventListener("click", () => {
+        savePlace(point);
+      });
+
+      new maplibregl.Popup({ offset: 20, closeOnMove: false })
+        .setLngLat([point.lng, point.lat])
+        .setDOMContent(popupNode)
+        .addTo(map);
+    }
+
+    function setRoutePoint(type, point) {
+      state[type] = { ...point };
+      updateRouteLabels();
+      routeStatus.textContent =
+        state.start && state.end
+          ? "Both points selected. Press Build route."
+          : `${type === "start" ? "Start" : "Destination"} selected.`;
+    }
+
+    function updateRouteLabels() {
+      startText.textContent = state.start
+        ? `${state.start.name} · ${state.start.lat.toFixed(5)}, ${state.start.lng.toFixed(5)}`
+        : "Not selected";
+
+      endText.textContent = state.end
+        ? `${state.end.name} · ${state.end.lat.toFixed(5)}, ${state.end.lng.toFixed(5)}`
+        : "Not selected";
+    }
+
+    async function searchPlace(query) {
+      searchResults.innerHTML = "";
+
+      if (query.length < 3) {
+        searchStatus.textContent = "Enter at least three characters.";
+        return;
+      }
+
+      searchStatus.textContent = "Searching…";
+
+      const cacheKey = query.toLowerCase();
+      let results = state.geocoderCache[cacheKey];
+
+      if (!results) {
+        // Respect the public Nominatim maximum of one request per second.
+        const delay = Math.max(0, 1100 - (Date.now() - state.lastSearchAt));
+        if (delay) await sleep(delay);
+
+        const params = new URLSearchParams({
+          q: query,
+          format: "jsonv2",
+          limit: "5",
+          countrycodes: "my",
+          addressdetails: "1"
+        });
+
+        try {
+          state.lastSearchAt = Date.now();
+          const response = await fetch(`${NOMINATIM_URL}?${params.toString()}`, {
+            headers: {
+              "Accept": "application/json",
+              "Accept-Language": "en"
+            }
+          });
+
+          if (!response.ok) throw new Error(`Search failed (${response.status})`);
+          results = await response.json();
+
+          state.geocoderCache[cacheKey] = results;
+          localStorage.setItem(
+            "sabahNavigatorGeocoderCache",
+            JSON.stringify(state.geocoderCache)
+          );
+        } catch (error) {
+          console.error(error);
+          searchStatus.textContent =
+            "Search service unavailable. Try again after hosting the app on HTTPS.";
+          return;
+        }
+      }
+
+      if (!results.length) {
+        searchStatus.textContent = "No matching Malaysian location found.";
+        return;
+      }
+
+      searchStatus.textContent = `${results.length} result(s) found.`;
+      clearSearchMarkers();
+
+      results.forEach((result, index) => {
+        const point = {
+          name: result.display_name || `Search result ${index + 1}`,
+          lng: Number(result.lon),
+          lat: Number(result.lat)
+        };
+
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "result-item";
+        item.innerHTML = `
+          <strong>${escapeHtml(point.name)}</strong>
+          <span>${point.lat.toFixed(5)}, ${point.lng.toFixed(5)}</span>
+        `;
+
+        item.addEventListener("click", () => {
+          map.flyTo({ center: [point.lng, point.lat], zoom: 14 });
+          showSelectedPoint(point);
+          closeSidebarOnMobile();
+        });
+
+        searchResults.appendChild(item);
+
+        const marker = new maplibregl.Marker({ color: "#2563eb" })
+          .setLngLat([point.lng, point.lat])
+          .setPopup(
+            new maplibregl.Popup({ offset: 18 }).setText(point.name)
+          )
+          .addTo(map);
+
+        state.searchMarkers.push(marker);
+      });
+
+      if (results.length === 1) {
+        const result = results[0];
+        map.flyTo({ center: [Number(result.lon), Number(result.lat)], zoom: 14 });
+      }
+    }
+
+    function locateUser() {
+      if (!navigator.geolocation) {
+        locationStatus.textContent = "This browser does not support GPS.";
+        return;
+      }
+
+      locationStatus.textContent = "Requesting your location…";
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const point = {
+            name: "My current location",
+            lng: position.coords.longitude,
+            lat: position.coords.latitude
+          };
+
+          if (state.currentLocationMarker) state.currentLocationMarker.remove();
+
+          state.currentLocationMarker = new maplibregl.Marker({ color: "#22c55e" })
+            .setLngLat([point.lng, point.lat])
+            .setPopup(new maplibregl.Popup({ offset: 18 }).setText("My current location"))
+            .addTo(map);
+
+          map.flyTo({ center: [point.lng, point.lat], zoom: 15 });
+          locationStatus.textContent =
+            `Located with approximately ${Math.round(position.coords.accuracy)} m accuracy.`;
+
+          showSelectedPoint(point);
+          closeSidebarOnMobile();
+        },
+        (error) => {
+          console.error(error);
+          locationStatus.textContent =
+            "Location permission was denied or GPS is unavailable. Use HTTPS or localhost.";
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 12000,
+          maximumAge: 15000
+        }
+      );
+    }
+
+    async function buildRoute() {
+      if (!state.start || !state.end) {
+        routeStatus.textContent = "Select both Start and Destination first.";
+        return;
+      }
+
+      routeStatus.textContent = "Calculating driving route…";
+      routeBtn.disabled = true;
+      routeBtn.style.opacity = "0.65";
+
+      const coordinates =
+        `${state.start.lng},${state.start.lat};${state.end.lng},${state.end.lat}`;
+
+      const params = new URLSearchParams({
+        overview: "full",
+        geometries: "geojson",
+        steps: "true"
+      });
+
+      try {
+        const response = await fetch(`${OSRM_URL}/${coordinates}?${params.toString()}`);
+        if (!response.ok) throw new Error(`Routing failed (${response.status})`);
+
+        const data = await response.json();
+        if (data.code !== "Ok" || !data.routes?.length) {
+          throw new Error(data.message || "No route found");
+        }
+
+        const route = data.routes[0];
+        state.routeCoordinates = route.geometry.coordinates;
+
+        const source = map.getSource("route");
+        source.setData({
+          type: "FeatureCollection",
+          features: [
+            {
+              type: "Feature",
+              properties: {},
+              geometry: route.geometry
+            }
+          ]
+        });
+
+        distanceMetric.textContent = formatDistance(route.distance);
+        durationMetric.textContent = formatDuration(route.duration);
+        routeStatus.textContent = "Route created successfully.";
+
+        const bounds = new maplibregl.LngLatBounds();
+        route.geometry.coordinates.forEach((coord) => bounds.extend(coord));
+        map.fitBounds(bounds, { padding: 70, maxZoom: 15 });
+        closeSidebarOnMobile();
+      } catch (error) {
+        console.error(error);
+        routeStatus.textContent =
+          "Route service unavailable or no drivable route was found.";
+      } finally {
+        routeBtn.disabled = false;
+        routeBtn.style.opacity = "1";
+      }
+    }
+
+    function clearRoute() {
+      state.start = null;
+      state.end = null;
+      state.routeCoordinates = [];
+      updateRouteLabels();
+      distanceMetric.textContent = "—";
+      durationMetric.textContent = "—";
+      routeStatus.textContent = "Route cleared.";
+
+      const source = map.getSource("route");
+      if (source) source.setData(emptyFeatureCollection());
+    }
+
+    function savePlace(point) {
+      const defaultName = point.name === "Selected map point"
+        ? `Saved point ${state.savedPlaces.length + 1}`
+        : point.name;
+
+      const customName = window.prompt("Name this place:", defaultName);
+      if (!customName) return;
+
+      const saved = {
+        id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`,
+        name: customName.trim(),
+        lng: point.lng,
+        lat: point.lat,
+        createdAt: new Date().toISOString()
+      };
+
+      state.savedPlaces.unshift(saved);
+      persistSavedPlaces();
+      renderSavedPlaces();
+    }
+
+    function renderSavedPlaces() {
+      state.savedMarkers.forEach((marker) => marker.remove());
+      state.savedMarkers = [];
+      savedPlacesEl.innerHTML = "";
+
+      if (!state.savedPlaces.length) {
+        savedPlacesEl.innerHTML =
+          '<div class="hint">No saved places yet. Click the map and choose Save Place.</div>';
+        return;
+      }
+
+      state.savedPlaces.forEach((place) => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "saved-item";
+        item.innerHTML = `
+          <strong>${escapeHtml(place.name)}</strong>
+          <span>${place.lat.toFixed(5)}, ${place.lng.toFixed(5)}</span>
+        `;
+
+        item.addEventListener("click", () => {
+          map.flyTo({ center: [place.lng, place.lat], zoom: 15 });
+          showSelectedPoint(place);
+          closeSidebarOnMobile();
+        });
+
+        savedPlacesEl.appendChild(item);
+
+        const marker = new maplibregl.Marker({ color: "#8b5cf6" })
+          .setLngLat([place.lng, place.lat])
+          .setPopup(new maplibregl.Popup({ offset: 18 }).setText(place.name))
+          .addTo(map);
+
+        state.savedMarkers.push(marker);
+      });
+    }
+
+    function clearSavedPlaces() {
+      if (!state.savedPlaces.length) return;
+      const confirmed = window.confirm("Delete every saved place from this browser?");
+      if (!confirmed) return;
+
+      state.savedPlaces = [];
+      persistSavedPlaces();
+      renderSavedPlaces();
+    }
+
+    function persistSavedPlaces() {
+      localStorage.setItem(
+        "sabahNavigatorSavedPlaces",
+        JSON.stringify(state.savedPlaces)
+      );
+    }
+
+    function clearSearchMarkers() {
+      state.searchMarkers.forEach((marker) => marker.remove());
+      state.searchMarkers = [];
+    }
+
+    function formatDistance(metres) {
+      return metres >= 1000
+        ? `${(metres / 1000).toFixed(1)} km`
+        : `${Math.round(metres)} m`;
+    }
+
+    function formatDuration(seconds) {
+      const minutes = Math.round(seconds / 60);
+      if (minutes < 60) return `${minutes} min`;
+
+      const hours = Math.floor(minutes / 60);
+      const remaining = minutes % 60;
+      return remaining ? `${hours}h ${remaining}m` : `${hours}h`;
+    }
+
+    function readJson(key, fallback) {
+      try {
+        const value = localStorage.getItem(key);
+        return value ? JSON.parse(value) : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function emptyFeatureCollection() {
+      return { type: "FeatureCollection", features: [] };
+    }
+
+    function sleep(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function closeSidebarOnMobile() {
+      if (window.matchMedia("(max-width: 850px)").matches) {
+        sidebar.classList.remove("open");
+      }
+    }
+
+    // PWA service worker
+    if ("serviceWorker" in navigator && location.protocol !== "file:") {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./service-worker.js").catch((error) => {
+          console.warn("Service worker registration failed:", error);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
