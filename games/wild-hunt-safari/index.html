@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#1b321d">
+  <title>Wild Hunt Safari | MathToolsHub</title>
+  <meta name="description" content="Explore the savanna, photograph wildlife, and build fast combos in this family-friendly arcade safari game.">
+  <style>
+    :root{color-scheme:dark;--cream:#fff5d7;--green:#173c24;--lime:#b7e44b;--orange:#ff9f1c}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:#0e2014;color:#fff}
+    body{background:radial-gradient(circle at 50% -20%,#496c3d,#102617 60%,#08120b)}
+    button,a{font:inherit}.topbar{width:min(1060px,100%);margin:auto;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .back{color:#fff5d7;text-decoration:none;font-weight:850}.brand{color:var(--lime);font-weight:950;letter-spacing:.09em;text-transform:uppercase}
+    main{width:min(1060px,100%);margin:auto;padding:0 14px 24px}.intro{text-align:center;margin:0 0 12px}.intro h1{margin:0;font-size:clamp(1.8rem,6vw,3rem);line-height:1}.intro p{margin:8px 0;color:#dbe8cd}
+    .game{position:relative;overflow:hidden;border:2px solid #afc77d;border-radius:22px;background:#304f2f;box-shadow:0 20px 65px #0009}
+    canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;max-height:68vh;cursor:crosshair;touch-action:none}
+    .hud{position:absolute;z-index:2;inset:10px 10px auto;display:grid;grid-template-columns:repeat(4,1fr);gap:7px;pointer-events:none}
+    .stat{padding:7px 8px;border:1px solid #ffffff35;border-radius:11px;background:#132319d6;text-align:center;backdrop-filter:blur(5px)}.stat small{display:block;color:#cbd8b7;font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em}.stat strong{font-size:clamp(.88rem,3vw,1.22rem)}
+    .overlay{position:absolute;z-index:4;inset:0;display:grid;place-items:center;padding:18px;background:linear-gradient(#0b1b10b8,#07100ce8)}.overlay[hidden]{display:none}
+    .card{width:min(470px,100%);padding:clamp(18px,5vw,31px);border:1px solid #cfdfaa55;border-radius:22px;background:#14271eeF;text-align:center;box-shadow:0 20px 65px #0009}.card .icon{font-size:3rem}.card h2{margin:4px 0 8px;font-size:clamp(1.55rem,5vw,2.35rem)}.card p{margin:8px 0;color:#d6e1c7;line-height:1.5}
+    .rules{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:16px 0}.rule{padding:9px 5px;border-radius:11px;background:#ffffff0d;font-size:.75rem}.rule b{display:block;font-size:1.3rem}
+    .primary{width:100%;padding:13px 18px;border:0;border-radius:13px;color:#14220d;background:linear-gradient(100deg,var(--lime),#f4d35e);font-weight:950;cursor:pointer;box-shadow:0 9px 24px #b7e44b38}.primary:hover{filter:brightness(1.08)}
+    .toast{position:absolute;z-index:3;left:50%;top:23%;transform:translate(-50%,-50%);font-size:clamp(1.25rem,5vw,2.3rem);font-weight:1000;text-shadow:0 3px 10px #000;pointer-events:none;opacity:0}.toast.show{animation:pop .75s ease}@keyframes pop{0%{opacity:0;transform:translate(-50%,-20%) scale(.7)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}100%{opacity:0;transform:translate(-50%,-70%) scale(1)}}
+    .camera-bar{display:flex;justify-content:center;align-items:center;gap:12px;padding:10px;background:#101c14}.camera-button{min-width:190px;min-height:54px;border:1px solid #ffcf7a;border-radius:14px;color:#1f2410;background:linear-gradient(#ffd166,#f29e20);font-weight:1000;font-size:1.05rem;cursor:pointer}.camera-button:active{transform:translateY(2px)}
+    .tip{margin:11px 0 0;text-align:center;color:#c8d7bd;font-size:.88rem}
+    @media(max-width:560px){main{padding:0 0 18px}.game{border-left:0;border-right:0;border-radius:0}.topbar{padding:10px 12px}.brand{font-size:.72rem}.intro{padding:0 12px}.intro p{font-size:.85rem}.hud{inset:5px 5px auto;gap:4px}.stat{padding:4px 2px;border-radius:8px}.stat small{font-size:.49rem}.camera-button{width:calc(100% - 18px)}.card{padding:16px}.rules{margin:11px 0}}
+    @media(prefers-reduced-motion:reduce){.toast.show{animation:none;opacity:1}}
+  </style>
+</head>
+<body>
+  <header class="topbar"><a class="back" href="../">← All Games</a><span class="brand">Safari Arcade</span></header>
+  <main>
+    <div class="intro"><h1>Wild Hunt Safari</h1><p>Track wildlife. Frame the perfect photo. Protect the savanna.</p></div>
+    <section class="game" aria-label="Wild Hunt Safari arcade game">
+      <canvas id="safari" width="960" height="540" aria-label="Interactive safari landscape"></canvas>
+      <div class="hud" aria-live="polite">
+        <div class="stat"><small>Score</small><strong id="score">0</strong></div>
+        <div class="stat"><small>Time</small><strong id="time">60</strong></div>
+        <div class="stat"><small>Combo</small><strong id="combo">×1</strong></div>
+        <div class="stat"><small>Album</small><strong id="album">0 / 6</strong></div>
+      </div>
+      <div class="toast" id="toast"></div>
+      <div class="overlay" id="startScreen">
+        <div class="card">
+          <div class="icon">📸🦁</div>
+          <h2>Wildlife Photo Hunt</h2>
+          <p>Find moving animals and photograph them before they leave the scene. Rare wildlife earns more points.</p>
+          <div class="rules"><div class="rule"><b>🎯</b>Tap animals</div><div class="rule"><b>⚡</b>Build combos</div><div class="rule"><b>🌿</b>Skip ranger jeeps</div></div>
+          <button class="primary" id="startButton" type="button">Start Safari</button>
+        </div>
+      </div>
+      <div class="overlay" id="finishScreen" hidden>
+        <div class="card"><div class="icon">🏆</div><h2 id="finishTitle">Safari Complete!</h2><p id="finishText"></p><button class="primary" id="againButton" type="button">Play Again</button></div>
+      </div>
+    </section>
+    <div class="camera-bar"><button class="camera-button" id="cameraButton" type="button">📸 Take Photo</button></div>
+    <p class="tip">Move the pointer to aim · Tap an animal or press the camera button · Keyboard: arrows + Space</p>
+  </main>
+  <script>
+  (() => {
+    "use strict";
+    const canvas=document.querySelector("#safari"),ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height;
+    const ui={score:document.querySelector("#score"),time:document.querySelector("#time"),combo:document.querySelector("#combo"),album:document.querySelector("#album"),toast:document.querySelector("#toast"),start:document.querySelector("#startScreen"),finish:document.querySelector("#finishScreen"),finishTitle:document.querySelector("#finishTitle"),finishText:document.querySelector("#finishText")};
+    const species=[
+      {name:"Zebra",emoji:"🦓",points:100,size:70,speed:90},
+      {name:"Lion",emoji:"🦁",points:180,size:76,speed:72},
+      {name:"Elephant",emoji:"🐘",points:130,size:88,speed:58},
+      {name:"Giraffe",emoji:"🦒",points:150,size:82,speed:64},
+      {name:"Rhino",emoji:"🦏",points:200,size:82,speed:76},
+      {name:"Cheetah",emoji:"🐆",points:240,size:70,speed:145}
+    ];
+    let animals=[],running=false,last=0,remaining=60,score=0,combo=1,lastHit=0,spawnTimer=0,album=new Set(),aim={x:W/2,y:H/2},raf=0;
+    const ranger={emoji:"🚙",name:"Ranger jeep",points:0,size:80,speed:100};
+    function reset(){animals=[];remaining=60;score=0;combo=1;lastHit=0;spawnTimer=0;album=new Set();aim={x:W/2,y:H/2};updateHud();draw()}
+    function start(){reset();ui.start.hidden=true;ui.finish.hidden=true;running=true;last=performance.now();spawn(true);raf=requestAnimationFrame(loop)}
+    function spawn(first=false){
+      const isRanger=!first&&Math.random()<.15,item=isRanger?ranger:species[Math.floor(Math.random()*species.length)];
+      const left=Math.random()<.5,x=left?-90:W+90,y=H*(.48+Math.random()*.36),scale=.75+(y/H)*.45;
+      animals.push({item,x,y,scale,vx:(left?1:-1)*item.speed*(.85+Math.random()*.45),wave:Math.random()*6.28,shot:false});
+    }
+    function background(){
+      const sky=ctx.createLinearGradient(0,0,0,H*.65);sky.addColorStop(0,"#65b9db");sky.addColorStop(.65,"#ffc857");sky.addColorStop(1,"#e9832f");ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+      ctx.fillStyle="#f9d778";ctx.beginPath();ctx.arc(W*.78,H*.17,48,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle="#344f2c";ctx.beginPath();ctx.moveTo(0,H*.53);for(let x=0;x<=W;x+=80)ctx.lineTo(x,H*.49+Math.sin(x*.027)*22);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.fill();
+      ctx.fillStyle="#6d8533";ctx.fillRect(0,H*.59,W,H*.41);
+      for(let x=35;x<W;x+=145){const shift=(x*17)%70;ctx.fillStyle="#3e5727";ctx.fillRect(x,H*.42+shift*.15,9,105);ctx.beginPath();ctx.arc(x+4,H*.42+shift*.15,34,0,Math.PI*2);ctx.arc(x-22,H*.44+shift*.15,27,0,Math.PI*2);ctx.arc(x+28,H*.45+shift*.15,25,0,Math.PI*2);ctx.fill()}
+      ctx.fillStyle="#53642c";for(let x=0;x<W;x+=18){ctx.fillRect(x,H*.9-(x%5)*4,3,18)}
+    }
+    function drawAnimal(a){ctx.save();ctx.translate(a.x,a.y+Math.sin(a.wave)*4);if(a.vx<0)ctx.scale(-1,1);ctx.font=`${a.item.size*a.scale}px serif`;ctx.textAlign="center";ctx.textBaseline="bottom";ctx.shadowColor="#0008";ctx.shadowBlur=8;ctx.fillText(a.item.emoji,0,0);ctx.restore()}
+    function reticle(){ctx.save();ctx.strokeStyle="#fff";ctx.lineWidth=3;ctx.shadowColor="#000";ctx.shadowBlur=4;ctx.beginPath();ctx.arc(aim.x,aim.y,34,0,Math.PI*2);ctx.moveTo(aim.x-48,aim.y);ctx.lineTo(aim.x-18,aim.y);ctx.moveTo(aim.x+18,aim.y);ctx.lineTo(aim.x+48,aim.y);ctx.moveTo(aim.x,aim.y-48);ctx.lineTo(aim.x,aim.y-18);ctx.moveTo(aim.x,aim.y+18);ctx.lineTo(aim.x,aim.y+48);ctx.stroke();ctx.restore()}
+    function draw(){background();animals.sort((a,b)=>a.y-b.y).forEach(drawAnimal);reticle()}
+    function update(dt,now){
+      remaining-=dt;spawnTimer-=dt;
+      if(spawnTimer<=0){spawn();spawnTimer=.55+Math.random()*.85}
+      animals.forEach(a=>{a.x+=a.vx*dt;a.wave+=dt*3});
+      animals=animals.filter(a=>a.x>-150&&a.x<W+150&&!a.shot);
+      if(now-lastHit>1900)combo=1;
+      if(remaining<=0){remaining=0;finish()}updateHud()
+    }
+    function loop(now){if(!running)return;const dt=Math.min(.04,(now-last)/1000);last=now;update(dt,now);draw();raf=requestAnimationFrame(loop)}
+    function takePhoto(x=aim.x,y=aim.y){
+      if(!running)return;aim={x,y};
+      const hit=[...animals].reverse().find(a=>Math.hypot(a.x-x,(a.y-a.item.size*a.scale*.48)-y)<a.item.size*a.scale*.55);
+      if(!hit){combo=1;show("Missed! Keep tracking",false);return}
+      hit.shot=true;
+      if(hit.item===ranger){score=Math.max(0,score-150);combo=1;show("Ranger jeep — no photo! −150",false)}
+      else {const now=performance.now();combo=now-lastHit<1900?Math.min(5,combo+1):1;lastHit=now;const earned=hit.item.points*combo;score+=earned;album.add(hit.item.name);show(`${hit.item.emoji} ${hit.item.name} +${earned}`,true)}
+      updateHud();draw()
+    }
+    function show(text,good){ui.toast.textContent=text;ui.toast.style.color=good?"#efff91":"#ffd1d1";ui.toast.classList.remove("show");void ui.toast.offsetWidth;ui.toast.classList.add("show")}
+    function updateHud(){ui.score.textContent=score.toLocaleString();ui.time.textContent=Math.ceil(remaining);ui.combo.textContent=`×${combo}`;ui.album.textContent=`${album.size} / ${species.length}`}
+    function finish(){running=false;cancelAnimationFrame(raf);const complete=album.size===species.length;ui.finishTitle.textContent=complete?"Safari Album Complete!":"Safari Complete!";ui.finishText.textContent=`You scored ${score.toLocaleString()} points and photographed ${album.size} of ${species.length} species. ${complete?"Outstanding wildlife tracking!":"Play again to photograph every species."}`;ui.finish.hidden=false}
+    function pointer(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
+    canvas.addEventListener("pointermove",e=>{aim=pointer(e)});
+    canvas.addEventListener("pointerdown",e=>{e.preventDefault();const p=pointer(e);takePhoto(p.x,p.y)});
+    document.querySelector("#cameraButton").addEventListener("click",()=>takePhoto());
+    document.querySelector("#startButton").addEventListener("click",start);document.querySelector("#againButton").addEventListener("click",start);
+    addEventListener("keydown",e=>{const step=22;if(e.key==="ArrowLeft")aim.x-=step;if(e.key==="ArrowRight")aim.x+=step;if(e.key==="ArrowUp")aim.y-=step;if(e.key==="ArrowDown")aim.y+=step;aim.x=Math.max(0,Math.min(W,aim.x));aim.y=Math.max(0,Math.min(H,aim.y));if(e.key===" "){takePhoto();e.preventDefault()}});
+    addEventListener("blur",()=>{});document.addEventListener("visibilitychange",()=>{if(document.hidden&&running){last=performance.now()}});
+    reset();window.__safariGameReady=true;
+  })();
+  </script>
+</body>
+</html>
