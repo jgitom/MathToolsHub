@@ -51,9 +51,18 @@
       font: 700 14px/1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       cursor: pointer;
       user-select: none;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
     }
 
-    #mth-note-launcher:hover { transform: translateY(-1px); }
+    #mth-note-launcher:hover,
+    #mth-note-launcher:focus-visible {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 40px rgba(15,39,71,.36);
+      outline: 3px solid #bfdbfe;
+      outline-offset: 2px;
+    }
+
+    #mth-note-launcher.mth-note-above-assistant { bottom: 94px; }
 
     #mth-note-launcher .mth-note-dot {
       width: 9px;
@@ -269,6 +278,7 @@
 
     @media (max-width: 640px) {
       #mth-note-launcher { right: 14px; bottom: 14px; min-height: 44px; padding: 11px 14px; }
+      #mth-note-launcher.mth-note-above-assistant { bottom: 82px; }
       .mth-note-icon-btn { width: 44px; height: 44px; }
       .mth-note-tool-btn { min-height: 44px; }
       #mth-note-panel {
@@ -296,6 +306,7 @@
   launcher.setAttribute("aria-label", "Open writing pad");
   launcher.setAttribute("aria-controls", "mth-note-panel");
   launcher.setAttribute("aria-expanded", "false");
+  launcher.classList.toggle("mth-note-above-assistant", Boolean(document.querySelector(".ai-assistant")));
   launcher.innerHTML = '<span class="mth-note-dot"></span><span>Notes</span>';
 
   const panel = document.createElement("section");
