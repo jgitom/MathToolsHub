@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#050913">
+  <title>Formula Racing Champion 3D | MathToolsHub</title>
+  <meta name="description" content="Drive a Formula-style car around a full 3D circuit, race seven AI opponents, and master realistic arcade controls on desktop or mobile.">
+  <style>
+    :root{color-scheme:dark;--ink:#f8fafc;--muted:#aeb9d4;--panel:#081020df;--red:#ff3158;--cyan:#27e5ff;--gold:#ffd43b}
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:#030611;color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+    body{background:radial-gradient(circle at 50% -25%,#263b76,#080d1e 48%,#02040a);overflow-x:hidden}
+    button,a{font:inherit}
+    .topbar{width:min(1280px,100%);margin:auto;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .back{color:#dce7ff;text-decoration:none;font-weight:850}.back:hover{text-decoration:underline}
+    .brand{color:var(--cyan);font-size:.86rem;font-weight:950;letter-spacing:.1em;text-transform:uppercase}
+    main{width:min(1280px,100%);margin:auto;padding:0 14px 24px}
+    .title{text-align:center;margin:2px 0 11px}.title h1{margin:0;font-size:clamp(1.55rem,4.5vw,2.65rem);line-height:1}.title p{margin:7px 0;color:var(--muted)}
+    .game-shell{position:relative;overflow:hidden;border:1px solid #526184;border-radius:24px;background:#070b14;box-shadow:0 22px 80px #000b,0 0 45px #27e5ff18}
+    #stage{position:relative;width:100%;aspect-ratio:16/9;max-height:72vh;min-height:360px;background:linear-gradient(#76bdf2,#dff4ff)}
+    #stage canvas{display:block;width:100%!important;height:100%!important;touch-action:none}
+    .hud{position:absolute;inset:11px 11px auto;display:grid;grid-template-columns:repeat(5,1fr);gap:7px;z-index:2;pointer-events:none}
+    .stat{padding:7px 8px;border:1px solid #ffffff25;border-radius:10px;text-align:center;background:#050a17c9;box-shadow:0 5px 18px #0007;backdrop-filter:blur(6px)}
+    .stat small{display:block;color:#aebbd6;font-size:.57rem;font-weight:750;letter-spacing:.1em;text-transform:uppercase}.stat strong{font-size:clamp(.76rem,2.3vw,1.12rem)}
+    .gear strong{color:var(--gold)}
+    .countdown{position:absolute;inset:0;z-index:4;display:grid;place-items:center;color:#fff;font-size:clamp(5rem,18vw,12rem);font-weight:1000;text-shadow:0 0 35px var(--cyan),6px 8px 0 var(--red);pointer-events:none}.countdown:empty{display:none}
+    .message{position:absolute;left:50%;bottom:18px;z-index:3;translate:-50% 0;padding:8px 16px;border:1px solid #ffffff33;border-radius:999px;background:#050a17d9;font-size:.8rem;font-weight:850;opacity:0;transition:opacity .2s;pointer-events:none}.message.show{opacity:1}
+    .overlay{position:absolute;inset:0;z-index:5;display:grid;place-items:center;padding:18px;background:linear-gradient(#0409169c,#040916eb)}
+    .overlay[hidden]{display:none}.card{width:min(510px,100%);padding:clamp(18px,4vw,31px);border:1px solid #ffffff2c;border-radius:22px;background:#0c1428ed;text-align:center;box-shadow:0 18px 70px #000c}
+    .flag{font-size:2.45rem}.card h2{margin:5px 0;font-size:clamp(1.5rem,5vw,2.35rem)}.card p{margin:9px 0;color:#c4cee4;line-height:1.5}
+    .difficulty{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}
+    .difficulty button,.primary,.secondary{border:0;border-radius:12px;padding:11px 9px;font-weight:900;cursor:pointer}
+    .difficulty button{border:1px solid #ffffff1d;color:#fff;background:#202b46}.difficulty button.active{color:#031017;background:var(--cyan);box-shadow:0 0 20px #27e5ff66}
+    .primary{width:100%;color:#fff;background:linear-gradient(105deg,var(--red),#ff6b24);box-shadow:0 9px 27px #ff31584b;font-size:1.05rem}.primary:hover{filter:brightness(1.12)}
+    .secondary{margin-top:9px;color:#fff;background:#28334d}
+    .loading{margin-top:10px;color:#9fb1d0;font-size:.75rem}
+    .loading.error{color:#ff9aae}
+    .controls{display:grid;grid-template-columns:1fr 1fr 1.15fr 1.15fr;gap:9px;padding:10px;background:#070b15;user-select:none}
+    .control{min-height:62px;border:1px solid #ffffff26;border-radius:14px;color:#fff;background:linear-gradient(#26324d,#151c2d);font-size:1.18rem;font-weight:950;touch-action:none;cursor:pointer}
+    .control[data-key=up]{background:linear-gradient(#00b978,#08764f)}.control[data-key=down]{background:linear-gradient(#ef476f,#98243f)}
+    .control.pressed{translate:0 2px;filter:brightness(1.3)}
+    .tips{margin:11px 0 0;text-align:center;color:#9da9c5;font-size:.85rem}
+    @media(min-width:800px){.controls{width:570px;margin:auto;border-radius:0 0 18px 18px}}
+    @media(max-width:620px){
+      main{padding:0 0 16px}.topbar{padding:10px 11px}.brand{font-size:.68rem}.title{padding:0 10px}.title p{font-size:.78rem}
+      .game-shell{border-right:0;border-left:0;border-radius:0}#stage{min-height:390px;aspect-ratio:9/12;max-height:66vh}
+      .hud{inset:5px 5px auto;gap:3px}.stat{padding:4px 2px;border-radius:7px}.stat small{font-size:.43rem}.stat strong{font-size:.7rem}
+      .controls{gap:6px;padding:7px}.control{min-height:66px}.card{padding:17px}.difficulty{margin:12px 0}
+    }
+    @media(prefers-reduced-motion:reduce){.message{transition:none}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="back" href="../">← All Games</a>
+    <span class="brand">MathToolsHub Racing 3D</span>
+  </header>
+  <main>
+    <div class="title">
+      <h1>Formula Racing Champion 3D</h1>
+      <p>A complete 3D circuit, chase camera, responsive handling, and seven AI rivals.</p>
+    </div>
+    <section class="game-shell" aria-label="Formula Racing Champion 3D game">
+      <div id="stage">
+        <div class="hud" aria-live="polite">
+          <div class="stat"><small>Position</small><strong id="position">1 / 8</strong></div>
+          <div class="stat"><small>Lap</small><strong id="lap">1 / 3</strong></div>
+          <div class="stat"><small>Speed</small><strong id="speed">0 km/h</strong></div>
+          <div class="stat gear"><small>Gear</small><strong id="gear">N</strong></div>
+          <div class="stat"><small>Time</small><strong id="time">00:00.0</strong></div>
+        </div>
+        <div class="countdown" id="countdown"></div>
+        <div class="message" id="message"></div>
+        <div class="overlay" id="startScreen">
+          <div class="card">
+            <div class="flag">🏎️</div>
+            <h2>Enter the 3D Grand Prix</h2>
+            <p>Control a true 3D Formula car, find the racing line, and overtake seven computer drivers across three laps.</p>
+            <div class="difficulty" aria-label="Difficulty">
+              <button type="button" data-level="rookie">Rookie</button>
+              <button type="button" class="active" data-level="pro">Pro</button>
+              <button type="button" data-level="champion">Champion</button>
+            </div>
+            <button type="button" class="primary" id="startButton" disabled>Loading 3D Circuit…</button>
+            <div class="loading" id="loading">Preparing cars, track, lighting, and scenery.</div>
+          </div>
+        </div>
+        <div class="overlay" id="finishScreen" hidden>
+          <div class="card">
+            <div class="flag">🏆</div>
+            <h2 id="finishTitle">Race Complete!</h2>
+            <p id="finishText"></p>
+            <button type="button" class="primary" id="raceAgain">Race Again</button>
+            <a class="secondary" href="../formula-racing-champion/" style="display:block;text-decoration:none">Play lightweight 2D version</a>
+          </div>
+        </div>
+      </div>
+      <div class="controls" aria-label="Driving controls">
+        <button class="control" type="button" data-key="left" aria-label="Steer left">↶ LEFT</button>
+        <button class="control" type="button" data-key="right" aria-label="Steer right">RIGHT ↷</button>
+        <button class="control" type="button" data-key="down" aria-label="Brake">BRAKE</button>
+        <button class="control" type="button" data-key="up" aria-label="Accelerate">ACCELERATE</button>
+      </div>
+    </section>
+    <p class="tips">Keyboard: W/↑ accelerate · S/↓ brake · A/D or ←/→ steer · R resets the car</p>
+  </main>
+
+  <script type="module">
+    import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js";
+
+    const stage=document.querySelector("#stage");
+    const ui={
+      position:document.querySelector("#position"),lap:document.querySelector("#lap"),speed:document.querySelector("#speed"),
+      gear:document.querySelector("#gear"),time:document.querySelector("#time"),countdown:document.querySelector("#countdown"),
+      start:document.querySelector("#startScreen"),finish:document.querySelector("#finishScreen"),finishTitle:document.querySelector("#finishTitle"),
+      finishText:document.querySelector("#finishText"),startButton:document.querySelector("#startButton"),loading:document.querySelector("#loading"),
+      message:document.querySelector("#message")
+    };
+    const keys={left:false,right:false,up:false,down:false};
+    const LAPS=3, RX=64, RZ=38, ROAD_WIDTH=15, TRACK_LENGTH=326;
+    const levels={
+      rookie:{max:72,accel:24,brake:42,ai:.70},
+      pro:{max:84,accel:27,brake:45,ai:.82},
+      champion:{max:92,accel:29,brake:48,ai:.91}
+    };
+    let level="pro",running=false,last=0,elapsed=0,player,ais=[],messageTimer=0;
+
+    const scene=new THREE.Scene();
+    scene.background=new THREE.Color(0x7fc4f2);
+    scene.fog=new THREE.Fog(0x9bd1ef,70,220);
+    const camera=new THREE.PerspectiveCamera(58,16/9,.1,500);
+    const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:"high-performance"});
+    renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));
+    renderer.shadowMap.enabled=true;
+    renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+    renderer.outputColorSpace=THREE.SRGBColorSpace;
+    renderer.toneMapping=THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure=1.05;
+    stage.prepend(renderer.domElement);
+
+    scene.add(new THREE.HemisphereLight(0xd8efff,0x35542a,2.25));
+    const sun=new THREE.DirectionalLight(0xfff3d2,3.2);
+    sun.position.set(-45,75,-25);sun.castShadow=true;
+    sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-100;sun.shadow.camera.right=100;sun.shadow.camera.top=90;sun.shadow.camera.bottom=-90;
+    scene.add(sun);
+
+    const mats={
+      road:new THREE.MeshStandardMaterial({color:0x1c2028,roughness:.88,metalness:.05}),
+      grass:new THREE.MeshStandardMaterial({color:0x2f7135,roughness:1}),
+      white:new THREE.MeshStandardMaterial({color:0xf3f5f7,roughness:.72}),
+      red:new THREE.MeshStandardMaterial({color:0xe21d3f,roughness:.65}),
+      dark:new THREE.MeshStandardMaterial({color:0x090b0f,roughness:.56,metalness:.3}),
+      carbon:new THREE.MeshStandardMaterial({color:0x161a20,roughness:.42,metalness:.72})
+    };
+    const ground=new THREE.Mesh(new THREE.CircleGeometry(210,64),mats.grass);
+    ground.rotation.x=-Math.PI/2;ground.position.y=-.08;ground.receiveShadow=true;scene.add(ground);
+
+    function trackFrame(progress,lateral=0){
+      const a=progress*Math.PI*2,x=RX*Math.cos(a),z=RZ*Math.sin(a);
+      const tangent=new THREE.Vector3(-RX*Math.sin(a),0,RZ*Math.cos(a)).normalize();
+      const normal=new THREE.Vector3(tangent.z,0,-tangent.x);
+      return {position:new THREE.Vector3(x+normal.x*lateral,.02,z+normal.z*lateral),tangent,normal,yaw:Math.atan2(tangent.x,tangent.z)};
+    }
+    function stripGeometry(inner,outer,y=0){
+      const positions=[],uvs=[],indices=[],segments=240;
+      for(let i=0;i<=segments;i++){
+        const p=i/segments,a=p*Math.PI*2,c=Math.cos(a),s=Math.sin(a);
+        positions.push(c*(RX+inner),y,s*(RZ+inner),c*(RX+outer),y,s*(RZ+outer));
+        uvs.push(0,p*20,1,p*20);
+      }
+      for(let i=0;i<segments;i++){const n=i*2;indices.push(n,n+2,n+1,n+2,n+3,n+1)}
+      const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.Float32BufferAttribute(positions,3));g.setAttribute("uv",new THREE.Float32BufferAttribute(uvs,2));g.setIndex(indices);g.computeVertexNormals();return g;
+    }
+    const road=new THREE.Mesh(stripGeometry(-ROAD_WIDTH/2,ROAD_WIDTH/2,.01),mats.road);road.receiveShadow=true;scene.add(road);
+    const insideApron=new THREE.Mesh(stripGeometry(-ROAD_WIDTH/2-1.25,-ROAD_WIDTH/2,.025),mats.white);scene.add(insideApron);
+    const outsideApron=new THREE.Mesh(stripGeometry(ROAD_WIDTH/2,ROAD_WIDTH/2+1.25,.025),mats.red);scene.add(outsideApron);
+
+    const markerGeo=new THREE.BoxGeometry(.22,.025,2.2),markerMat=mats.white;
+    for(let i=0;i<80;i+=2){
+      const f=trackFrame(i/80,0),m=new THREE.Mesh(markerGeo,markerMat);
+      m.position.copy(f.position);m.position.y=.045;m.rotation.y=f.yaw;scene.add(m);
+    }
+    const curbGeo=new THREE.BoxGeometry(1.35,.18,2.15);
+    for(let i=0;i<96;i++){
+      [-1,1].forEach(side=>{
+        const f=trackFrame(i/96,side*(ROAD_WIDTH/2+.6)),c=new THREE.Mesh(curbGeo,i%2?mats.white:mats.red);
+        c.position.copy(f.position);c.position.y=.08;c.rotation.y=f.yaw;c.receiveShadow=true;scene.add(c);
+      });
+    }
+    const line=new THREE.Mesh(new THREE.BoxGeometry(ROAD_WIDTH,.035,.8),mats.white);
+    const startFrame=trackFrame(0,0);line.position.copy(startFrame.position);line.position.y=.06;line.rotation.y=startFrame.yaw;scene.add(line);
+
+    function makeTree(x,z,scale=1){
+      const g=new THREE.Group(),trunk=new THREE.Mesh(new THREE.CylinderGeometry(.28,.42,2.4,7),new THREE.MeshStandardMaterial({color:0x694529,roughness:1}));
+      trunk.position.y=1.2;g.add(trunk);
+      const crown=new THREE.Mesh(new THREE.IcosahedronGeometry(1.45,1),new THREE.MeshStandardMaterial({color:0x176b31,roughness:1}));
+      crown.position.y=3.05;crown.castShadow=true;g.add(crown);g.position.set(x,0,z);g.scale.setScalar(scale);scene.add(g);
+    }
+    for(let i=0;i<46;i++){
+      const a=i/46*Math.PI*2,r=i%2?88:108;
+      makeTree(Math.cos(a)*r,Math.sin(a)*r*.69,.75+(i%5)*.09);
+    }
+    function makeGrandstand(x,z,rotation){
+      const g=new THREE.Group();
+      for(let row=0;row<5;row++){
+        const step=new THREE.Mesh(new THREE.BoxGeometry(28,.65,2.4),new THREE.MeshStandardMaterial({color:row%2?0x243b65:0xd8e1ef,roughness:.8}));
+        step.position.set(0,.4+row*.75,-row*1.75);step.castShadow=true;step.receiveShadow=true;g.add(step);
+      }
+      g.position.set(x,0,z);g.rotation.y=rotation;scene.add(g);
+    }
+    makeGrandstand(0,-58,0);makeGrandstand(0,58,Math.PI);
+
+    function makeCar(colour){
+      const car=new THREE.Group();
+      const paint=new THREE.MeshStandardMaterial({color:colour,roughness:.25,metalness:.55});
+      const accent=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.25,metalness:.25});
+      const body=new THREE.Mesh(new THREE.BoxGeometry(1.55,.48,3.65),paint);body.position.y=.6;body.castShadow=true;car.add(body);
+      const nose=new THREE.Mesh(new THREE.BoxGeometry(.62,.32,2.35),paint);nose.position.set(0,.58,2.75);nose.castShadow=true;car.add(nose);
+      const cockpit=new THREE.Mesh(new THREE.SphereGeometry(.62,16,8,0,Math.PI*2,0,Math.PI/2),mats.dark);cockpit.scale.set(1,.7,1.35);cockpit.position.set(0,.82,-.15);car.add(cockpit);
+      const halo=new THREE.Mesh(new THREE.TorusGeometry(.48,.065,8,18,Math.PI),mats.carbon);halo.rotation.set(Math.PI/2,0,0);halo.position.set(0,1.02,.12);car.add(halo);
+      const frontWing=new THREE.Mesh(new THREE.BoxGeometry(3.5,.14,.58),mats.carbon);frontWing.position.set(0,.38,4);frontWing.castShadow=true;car.add(frontWing);
+      const rearWing=new THREE.Mesh(new THREE.BoxGeometry(3.25,.18,.58),mats.carbon);rearWing.position.set(0,1.18,-2.05);rearWing.castShadow=true;car.add(rearWing);
+      const rearPosts=new THREE.Mesh(new THREE.BoxGeometry(.18,.95,.35),mats.carbon);rearPosts.position.set(0,.76,-2.05);car.add(rearPosts);
+      const stripe=new THREE.Mesh(new THREE.BoxGeometry(.18,.025,3.1),accent);stripe.position.set(0,.855,1.05);car.add(stripe);
+      const wheelGeo=new THREE.CylinderGeometry(.62,.62,.42,18),wheelMat=new THREE.MeshStandardMaterial({color:0x08090b,roughness:.82});
+      [[-1.35,.58,2.65],[1.35,.58,2.65],[-1.42,.61,-1.45],[1.42,.61,-1.45]].forEach(([x,y,z])=>{
+        const wheel=new THREE.Mesh(wheelGeo,wheelMat);wheel.rotation.z=Math.PI/2;wheel.position.set(x,y,z);wheel.castShadow=true;car.add(wheel);
+      });
+      car.scale.setScalar(.72);scene.add(car);return car;
+    }
+    const playerCar=makeCar(0xf4254d);
+    const aiColours=[0x20dff3,0xffca28,0x8c5cff,0x13d879,0xff7b18,0xf044a7,0xe8edf5];
+    const aiCars=aiColours.map(makeCar);
+
+    function placeCar(car,progress,lateral,lean=0){
+      const f=trackFrame(progress,lateral);car.position.copy(f.position);car.position.y=.11;
+      car.rotation.set(0,f.yaw,lean);return f;
+    }
+    function resetRace(){
+      const cfg=levels[level];
+      player={progress:0,total:0,lateral:0,lateralVelocity:0,speed:0,max:cfg.max};
+      ais=aiCars.map((car,i)=>({
+        car,progress:.045+i*.018,total:.045+i*.018,lane:[-4,0,4][i%3]+(i%2?.5:-.5),
+        speed:cfg.max*(cfg.ai+(i%4)*.018),phase:i*1.37
+      }));
+      elapsed=0;messageTimer=0;placeCar(playerCar,0,0);
+      ais.forEach(ai=>placeCar(ai.car,ai.progress,ai.lane));updateHud();
+    }
+    function showMessage(text){
+      ui.message.textContent=text;ui.message.classList.add("show");messageTimer=1.1;
+    }
+    function update(dt){
+      const cfg=levels[level];
+      if(keys.up)player.speed+=cfg.accel*dt;else player.speed-=7.5*dt;
+      if(keys.down)player.speed-=cfg.brake*dt;
+      const speedRatio=Math.min(1,player.speed/player.max);
+      const steer=(keys.left?1:0)-(keys.right?1:0);
+      const steerPower=(7.5-4.5*speedRatio)*(.35+speedRatio);
+      player.lateralVelocity+=steer*steerPower*dt;
+      player.lateralVelocity*=Math.pow(.07,dt);
+      player.lateral+=player.lateralVelocity;
+      const offTrack=Math.max(0,Math.abs(player.lateral)-(ROAD_WIDTH/2-1.25));
+      if(offTrack>0){player.speed-=22*dt;player.lateralVelocity*=.86;if(messageTimer<=0)showMessage("GRASS — reduced grip")}
+      player.lateral=THREE.MathUtils.clamp(player.lateral,-ROAD_WIDTH/2-4,ROAD_WIDTH/2+4);
+      player.speed=THREE.MathUtils.clamp(player.speed,0,player.max);
+      const move=player.speed*dt/TRACK_LENGTH;player.progress=(player.progress+move)%1;player.total+=move;
+      const lean=-steer*speedRatio*.055;const frame=placeCar(playerCar,player.progress,player.lateral,lean);
+
+      ais.forEach((ai,i)=>{
+        const aiMove=ai.speed*dt/TRACK_LENGTH;ai.progress=(ai.progress+aiMove)%1;ai.total+=aiMove;
+        const lane=ai.lane+Math.sin(elapsed*.00065+ai.phase)*.45;placeCar(ai.car,ai.progress,lane);
+        let relative=((ai.progress-player.progress+.5)%1)-.5;
+        if(Math.abs(relative)<.008&&Math.abs(lane-player.lateral)<1.65){
+          player.speed*=.94;player.lateralVelocity+=(player.lateral<lane?-1:1)*.075;showMessage("CONTACT");
+        }
+      });
+      const behind=frame.tangent.clone().multiplyScalar(-10.5),side=frame.normal.clone().multiplyScalar(player.lateralVelocity*-.15);
+      const desired=frame.position.clone().add(behind).add(side).add(new THREE.Vector3(0,5.4,0));
+      camera.position.lerp(desired,1-Math.pow(.0001,dt));
+      const look=frame.position.clone().add(frame.tangent.clone().multiplyScalar(9)).add(new THREE.Vector3(0,1.1,0));
+      camera.lookAt(look);
+      elapsed+=dt*1000;if(messageTimer>0){messageTimer-=dt;if(messageTimer<=0)ui.message.classList.remove("show")}
+      if(player.total>=LAPS)finish();updateHud();
+    }
+    function position(){return 1+ais.filter(ai=>ai.total>player.total).length}
+    function formatTime(ms){const m=Math.floor(ms/60000),s=Math.floor(ms%60000/1000),t=Math.floor(ms%1000/100);return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}.${t}`}
+    function updateHud(){
+      if(!player)return;
+      ui.position.textContent=`${position()} / 8`;ui.lap.textContent=`${Math.min(LAPS,Math.floor(player.total)+1)} / ${LAPS}`;
+      const kmh=Math.round(player.speed*3.6);ui.speed.textContent=`${kmh} km/h`;
+      ui.gear.textContent=kmh<4?"N":String(Math.min(8,Math.max(1,Math.ceil(kmh/42))));ui.time.textContent=formatTime(elapsed);
+    }
+    function finish(){
+      running=false;const pos=position(),won=pos===1;
+      ui.finishTitle.textContent=won?"3D Formula Champion!":"Grand Prix Complete!";
+      ui.finishText.textContent=`You finished ${ordinal(pos)} of 8 in ${formatTime(elapsed)}. ${won?"A superb drive—the 3D trophy is yours!":"Try a smoother racing line and challenge the leaders again."}`;
+      ui.finish.hidden=false;
+    }
+    function ordinal(n){return n+(n===1?"st":n===2?"nd":n===3?"rd":"th")}
+    function startRace(){
+      resetRace();ui.start.hidden=true;ui.finish.hidden=true;let count=3;ui.countdown.textContent=count;
+      const timer=setInterval(()=>{count--;if(count>0)ui.countdown.textContent=count;else if(count===0)ui.countdown.textContent="GO!";else{clearInterval(timer);ui.countdown.textContent="";running=true;last=performance.now()}},700);
+    }
+    function resize(){
+      const rect=stage.getBoundingClientRect();renderer.setSize(rect.width,rect.height,false);camera.aspect=rect.width/rect.height;camera.updateProjectionMatrix();
+    }
+    function animate(now){
+      requestAnimationFrame(animate);
+      if(running){const dt=Math.min(.033,(now-last)/1000);last=now;update(dt)}
+      renderer.render(scene,camera);
+    }
+    function resetCar(){if(!player)return;player.lateral=0;player.lateralVelocity=0;player.speed*=.55;showMessage("CAR RESET")}
+
+    document.querySelectorAll("[data-level]").forEach(button=>button.addEventListener("click",()=>{
+      level=button.dataset.level;document.querySelectorAll("[data-level]").forEach(b=>b.classList.toggle("active",b===button));
+    }));
+    ui.startButton.addEventListener("click",startRace);document.querySelector("#raceAgain").addEventListener("click",startRace);
+    const keyMap={ArrowLeft:"left",a:"left",A:"left",ArrowRight:"right",d:"right",D:"right",ArrowUp:"up",w:"up",W:"up",ArrowDown:"down",s:"down",S:"down"};
+    addEventListener("keydown",event=>{if(keyMap[event.key]){keys[keyMap[event.key]]=true;event.preventDefault()}if(event.key==="r"||event.key==="R")resetCar()});
+    addEventListener("keyup",event=>{if(keyMap[event.key]){keys[keyMap[event.key]]=false;event.preventDefault()}});
+    document.querySelectorAll(".control").forEach(button=>{
+      const set=value=>{keys[button.dataset.key]=value;button.classList.toggle("pressed",value)};
+      button.addEventListener("pointerdown",event=>{event.preventDefault();button.setPointerCapture(event.pointerId);set(true)});
+      ["pointerup","pointercancel","lostpointercapture"].forEach(type=>button.addEventListener(type,()=>set(false)));
+    });
+    addEventListener("blur",()=>Object.keys(keys).forEach(key=>keys[key]=false));
+    document.addEventListener("visibilitychange",()=>{if(document.hidden)Object.keys(keys).forEach(key=>keys[key]=false)});
+    new ResizeObserver(resize).observe(stage);resize();resetRace();
+    const initial=trackFrame(0,0);camera.position.copy(initial.position).add(initial.tangent.clone().multiplyScalar(-11)).add(new THREE.Vector3(0,5.4,0));camera.lookAt(initial.position);
+    ui.startButton.disabled=false;ui.startButton.textContent="Start 3D Race";ui.loading.textContent="3D circuit ready · keyboard, touch, and responsive camera enabled";
+    window.__formula3DReady=true;requestAnimationFrame(animate);
+  </script>
+  <script>
+    setTimeout(()=>{
+      if(!window.__formula3DReady){
+        const loading=document.querySelector("#loading"),button=document.querySelector("#startButton");
+        loading.textContent="The 3D engine could not load. Check your internet connection and refresh.";
+        loading.classList.add("error");button.textContent="3D Engine Unavailable";
+      }
+    },12000);
+  </script>
+</body>
+</html>
