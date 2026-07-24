@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#083344">
+  <title>Sabah Navigator | MathToolsHub</title>
+  <meta name="description" content="Navigate a schematic map of Sabah while practising compass directions, distance, scale, travel time, route planning, and mathematical problem solving.">
+  <style>
+    :root{color-scheme:dark;--navy:#06283a;--ocean:#0e7490;--land:#d8e9bb;--forest:#3f7d44;--gold:#fbbf24;--coral:#fb7185;--ink:#f8fafc;--muted:#bed7df}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:#031822;color:var(--ink)}
+    body{background:radial-gradient(circle at 15% 0,#155e75 0,#062d40 36%,#03141d 100%);overflow-x:hidden}button,a{font:inherit}
+    .topbar{width:min(1180px,100%);margin:auto;padding:13px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .back{color:#e0f2fe;text-decoration:none;font-weight:850}.back:hover{text-decoration:underline}.brand{color:#67e8f9;font-size:.82rem;font-weight:950;letter-spacing:.11em;text-transform:uppercase}
+    main{width:min(1180px,100%);margin:auto;padding:0 14px 28px}.title{text-align:center;margin:2px 0 14px}.title h1{margin:0;font-size:clamp(1.8rem,5vw,3.2rem);line-height:1}.title p{margin:8px auto 0;max-width:720px;color:var(--muted)}
+    .shell{overflow:hidden;border:1px solid #67e8f966;border-radius:24px;background:#061d29;box-shadow:0 24px 80px #0009,0 0 50px #22d3ee18}
+    .hud{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#ffffff1c}.stat{padding:10px;text-align:center;background:#071c28}.stat small{display:block;color:#96bcca;font-size:.61rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.stat strong{font-size:clamp(.9rem,3vw,1.25rem)}
+    .game{position:relative;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(310px,.75fr);min-height:570px}
+    .map-panel{position:relative;min-height:520px;padding:14px;background:linear-gradient(145deg,#0e7490,#07526b)}
+    .map-frame{position:relative;height:100%;min-height:490px;overflow:hidden;border:1px solid #cffafe66;border-radius:19px;background:linear-gradient(#38bdf8,#0e7490);box-shadow:inset 0 0 50px #05334499}
+    .map-frame svg{display:block;width:100%;height:100%}.sea-label{fill:#d9f7ff;opacity:.72;font-size:17px;font-weight:800;letter-spacing:.16em}.region{fill:#d9e9bd;stroke:#f7fee7;stroke-width:3;filter:drop-shadow(0 8px 8px #042f3d99)}
+    .river{fill:none;stroke:#38bdf8;stroke-width:4;stroke-linecap:round;opacity:.72}.mountain{fill:#607744;stroke:#425833;stroke-width:1}
+    .road{fill:none;stroke:#f8fafc;stroke-width:2.2;stroke-dasharray:7 7;opacity:.6}.route{fill:none;stroke:#fbbf24;stroke-width:6;stroke-linecap:round;stroke-dasharray:10 8;filter:drop-shadow(0 0 5px #f59e0b)}
+    .city{cursor:pointer;outline:none}.city circle{fill:#fb7185;stroke:#fff;stroke-width:3;transition:.2s}.city text{fill:#082f49;font-size:13px;font-weight:950;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}.city:hover circle,.city:focus circle{r:10;fill:#fbbf24}.city.active circle{fill:#fbbf24;stroke:#7c2d12;stroke-width:4;filter:drop-shadow(0 0 7px #fff)}
+    .compass{position:absolute;right:24px;top:24px;width:78px;height:78px;display:grid;place-items:center;border:2px solid #fff9;border-radius:50%;color:#06283a;background:#fffc;font-size:.72rem;font-weight:950;box-shadow:0 6px 18px #003c}.compass::before{content:"▲";position:absolute;top:4px;color:#ef4444;font-size:1.6rem}.compass::after{content:"N";position:absolute;top:27px;font-size:1rem}
+    .panel{display:flex;flex-direction:column;padding:clamp(17px,3vw,28px);background:linear-gradient(160deg,#0b2230,#06151f)}
+    .mission-label{margin:0;color:#67e8f9;font-size:.72rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase}.panel h2{margin:7px 0 9px;font-size:clamp(1.35rem,3vw,2rem)}.question{min-height:84px;margin:0;color:#d8edf3;font-size:1.02rem;line-height:1.55}
+    .route-summary{display:flex;align-items:center;gap:9px;min-height:48px;margin:13px 0;padding:10px 12px;border:1px solid #ffffff1f;border-radius:12px;color:#dff8ff;background:#ffffff0a;font-size:.82rem;font-weight:750}
+    .answers{display:grid;gap:9px}.answer{width:100%;min-height:51px;padding:10px 13px;border:1px solid #ffffff25;border-radius:12px;color:#f8fafc;background:#153648;text-align:left;font-weight:800;cursor:pointer}.answer:hover,.answer:focus-visible{border-color:#67e8f9;background:#19506a;outline:none}.answer.correct{border-color:#4ade80;background:#166534}.answer.wrong{border-color:#fb7185;background:#881337}
+    .feedback{min-height:48px;margin:13px 0 0;padding:10px 12px;border-radius:11px;color:#bed7df;background:#ffffff0a;font-size:.85rem;line-height:1.45}.feedback.good{color:#dcfce7;background:#14532d}.feedback.bad{color:#ffe4e6;background:#7f1d1d}
+    .next{margin-top:auto;padding:13px;border:0;border-radius:12px;color:#06202d;background:linear-gradient(100deg,#fbbf24,#fb923c);font-weight:950;cursor:pointer}.next[hidden]{display:none}
+    .overlay{position:absolute;inset:0;z-index:4;display:grid;place-items:center;padding:18px;background:linear-gradient(#05202dc9,#03141df5)}.overlay[hidden]{display:none}
+    .card{width:min(540px,100%);padding:clamp(20px,4vw,34px);border:1px solid #67e8f966;border-radius:22px;background:#082332f2;text-align:center;box-shadow:0 18px 65px #000a}.hero{font-size:3.2rem}.card h2{margin:5px 0;font-size:clamp(1.6rem,5vw,2.5rem)}.card p{color:#c5dde5;line-height:1.55}
+    .levels{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:17px 0}.level{padding:11px 7px;border:1px solid #ffffff24;border-radius:12px;color:#fff;background:#153648;font-weight:900;cursor:pointer}.level small{display:block;margin-top:4px;color:#a9c8d3;font-size:.66rem;font-weight:650}.level.selected{color:#05202c;background:#67e8f9}.level.selected small{color:#164e63}
+    .primary{width:100%;padding:13px;border:0;border-radius:12px;color:#05202d;background:linear-gradient(100deg,#fbbf24,#fb923c);font-weight:950;cursor:pointer}.secondary{display:block;margin-top:9px;padding:11px;border:1px solid #ffffff2c;border-radius:12px;color:#fff;background:#173849;text-decoration:none;font-weight:850}
+    .note{margin:11px 0 0;color:#91b8c5;font-size:.75rem;text-align:center}
+    @media(max-width:820px){.game{grid-template-columns:1fr}.map-panel{min-height:390px;padding:8px}.map-frame{min-height:370px}.panel{min-height:480px}.compass{right:15px;top:15px}.city text{font-size:12px}}
+    @media(max-width:520px){main{padding:0 0 18px}.topbar{padding:10px 11px}.brand{font-size:.66rem}.title{padding:0 11px}.title p{font-size:.8rem}.shell{border-right:0;border-left:0;border-radius:0}.hud{gap:0}.stat{padding:7px 2px}.stat small{font-size:.46rem}.stat strong{font-size:.78rem}.map-panel{min-height:330px}.map-frame{min-height:315px}.panel{min-height:460px;padding:17px}.levels{grid-template-columns:1fr}.level small{display:inline;margin-left:5px}.city text{font-size:11px}.compass{width:58px;height:58px}.compass::before{font-size:1.2rem}.compass::after{top:21px}}
+  </style>
+</head>
+<body>
+  <header class="topbar"><a class="back" href="../">← All Games</a><span class="brand">MathToolsHub · Sabah Explorer</span></header>
+  <main>
+    <div class="title"><h1>🧭 Sabah Navigator</h1><p>Explore Sabah while mastering direction, distance, scale, speed, time, and route-planning mathematics.</p></div>
+    <section class="shell" aria-label="Sabah Navigator game">
+      <div class="hud">
+        <div class="stat"><small>Mission</small><strong id="round">1 / 10</strong></div>
+        <div class="stat"><small>Score</small><strong id="score">0</strong></div>
+        <div class="stat"><small>Streak</small><strong id="streak">0 🔥</strong></div>
+        <div class="stat"><small>Lives</small><strong id="lives">❤️❤️❤️</strong></div>
+      </div>
+      <div class="game">
+        <div class="map-panel">
+          <div class="map-frame">
+            <svg id="map" viewBox="0 0 760 500" role="img" aria-label="Schematic learning map of Sabah with major towns">
+              <text class="sea-label" x="50" y="85">SOUTH CHINA SEA</text><text class="sea-label" x="536" y="446">CELEBES SEA</text>
+              <path class="region" d="M165 95 C214 58 271 54 323 82 C355 96 380 92 421 67 C464 41 524 53 556 91 C582 121 579 155 605 176 C632 198 682 201 698 236 C714 271 677 297 642 312 C608 327 609 351 581 380 C552 411 504 435 463 422 C424 410 400 369 358 366 C318 363 294 401 250 393 C212 386 204 350 173 332 C140 313 98 311 80 278 C63 246 87 220 109 199 C132 177 124 128 165 95 Z"/>
+              <path class="river" d="M426 104 C407 160 462 190 423 236 C393 269 410 319 376 356"/><path class="river" d="M536 154 C510 202 540 246 507 292 C487 319 499 359 475 402"/>
+              <path class="mountain" d="M266 198 l22-48 23 48z"/><path class="mountain" d="M300 205 l18-38 19 38z"/>
+              <path class="road" d="M154 245 L202 139 L292 207 L475 178 L505 269 L559 343 L623 380 M154 245 L238 310 L623 380 M475 178 L442 275 L505 269"/>
+              <g id="routeLayer"></g>
+              <g class="city" data-city="Kota Kinabalu" tabindex="0"><circle cx="154" cy="245" r="8"/><text x="98" y="268">Kota Kinabalu</text></g>
+              <g class="city" data-city="Kudat" tabindex="0"><circle cx="202" cy="139" r="8"/><text x="177" y="124">Kudat</text></g>
+              <g class="city" data-city="Ranau" tabindex="0"><circle cx="292" cy="207" r="8"/><text x="304" y="199">Ranau</text></g>
+              <g class="city" data-city="Keningau" tabindex="0"><circle cx="238" cy="310" r="8"/><text x="168" y="334">Keningau</text></g>
+              <g class="city" data-city="Sandakan" tabindex="0"><circle cx="475" cy="178" r="8"/><text x="489" y="169">Sandakan</text></g>
+              <g class="city" data-city="Kinabatangan" tabindex="0"><circle cx="442" cy="275" r="8"/><text x="365" y="300">Kinabatangan</text></g>
+              <g class="city" data-city="Lahad Datu" tabindex="0"><circle cx="505" cy="269" r="8"/><text x="519" y="260">Lahad Datu</text></g>
+              <g class="city" data-city="Semporna" tabindex="0"><circle cx="559" cy="343" r="8"/><text x="572" y="338">Semporna</text></g>
+              <g class="city" data-city="Tawau" tabindex="0"><circle cx="623" cy="380" r="8"/><text x="635" y="403">Tawau</text></g>
+              <text x="273" y="220" fill="#fff" font-size="12" font-weight="900">⛰ Kinabalu</text>
+            </svg>
+            <div class="compass" aria-label="North compass"></div>
+          </div>
+        </div>
+        <aside class="panel">
+          <p class="mission-label" id="missionLabel">Mission briefing</p>
+          <h2 id="missionTitle">Ready to explore?</h2>
+          <p class="question" id="question">Choose a navigator level to begin your Sabah journey.</p>
+          <div class="route-summary" id="routeSummary">🗺️ Routes and distances are simulated for mathematics practice.</div>
+          <div class="answers" id="answers"></div>
+          <div class="feedback" id="feedback">Use the map, compass, and route information to solve each mission.</div>
+          <button class="next" id="next" type="button" hidden>Next Mission →</button>
+        </aside>
+        <div class="overlay" id="startScreen">
+          <div class="card">
+            <div class="hero">🗺️ 🧭 🏔️</div><h2>Choose Your Expedition</h2>
+            <p>Complete ten navigation missions across a schematic map of Sabah.</p>
+            <div class="levels">
+              <button class="level selected" data-level="explorer">Map Explorer<small>Direction &amp; location</small></button>
+              <button class="level" data-level="navigator">Route Navigator<small>Distance, speed &amp; time</small></button>
+              <button class="level" data-level="master">Sabah Master<small>Multi-step planning</small></button>
+            </div>
+            <button class="primary" id="start" type="button">Start Navigation</button>
+            <p class="note">Educational schematic map · not intended for real-world navigation</p>
+          </div>
+        </div>
+        <div class="overlay" id="finishScreen" hidden>
+          <div class="card">
+            <div class="hero">🏆 🌄 ⭐</div><h2 id="finishTitle">Expedition Complete!</h2><p id="finishText"></p>
+            <button class="primary" id="again" type="button">Navigate Again</button><a class="secondary" href="../">Return to All Games</a>
+          </div>
+        </div>
+      </div>
+    </section>
+    <p class="note">Learning alignment: compass direction, coordinates, scale, distance, speed, time, operations, ratio, and financial mathematics.</p>
+  </main>
+  <script>
+  (() => {
+    "use strict";
+    const $=id=>document.getElementById(id),ui={round:$("round"),score:$("score"),streak:$("streak"),lives:$("lives"),label:$("missionLabel"),title:$("missionTitle"),question:$("question"),summary:$("routeSummary"),answers:$("answers"),feedback:$("feedback"),next:$("next"),startScreen:$("startScreen"),finishScreen:$("finishScreen"),finishTitle:$("finishTitle"),finishText:$("finishText"),route:$("routeLayer")};
+    const cities={
+      "Kota Kinabalu":{x:154,y:245},"Kudat":{x:202,y:139},"Ranau":{x:292,y:207},"Keningau":{x:238,y:310},
+      "Sandakan":{x:475,y:178},"Kinabatangan":{x:442,y:275},"Lahad Datu":{x:505,y:269},"Semporna":{x:559,y:343},"Tawau":{x:623,y:380}
+    };
+    const routes=[
+      ["Kota Kinabalu","Ranau",105],["Kota Kinabalu","Keningau",110],["Kota Kinabalu","Kudat",190],["Ranau","Sandakan",220],
+      ["Sandakan","Kinabatangan",110],["Kinabatangan","Lahad Datu",135],["Sandakan","Lahad Datu",145],["Lahad Datu","Semporna",150],
+      ["Semporna","Tawau",110],["Lahad Datu","Tawau",150],["Keningau","Tawau",300]
+    ];
+    let level="explorer",round=0,score=0,streak=0,lives=3,current=null,locked=false;
+    const pick=array=>array[Math.floor(Math.random()*array.length)],shuffle=array=>[...array].sort(()=>Math.random()-.5);
+    function direction(a,b){
+      const dx=cities[b].x-cities[a].x,dy=cities[b].y-cities[a].y;
+      const horizontal=Math.abs(dx)>35?(dx>0?"east":"west"):"",vertical=Math.abs(dy)>35?(dy>0?"south":"north"):"";
+      return vertical&&horizontal?vertical+"-"+horizontal:vertical||horizontal;
+    }
+    function choices(answer,pool){
+      const values=shuffle([...new Set([answer,...pool.filter(v=>v!==answer)])]).slice(0,4);
+      if(!values.includes(answer))values[0]=answer;return shuffle(values);
+    }
+    function buildMission(){
+      const route=pick(routes),[from,to,distance]=route;
+      if(level==="explorer"){
+        if(round%2===0){
+          const answer=direction(from,to);return {title:"Compass Course",question:`Travel from ${from} to ${to}. Which general compass direction should you follow?`,answer,options:choices(answer,["north","north-east","east","south-east","south","south-west","west","north-west"]),from,to,summary:`📍 ${from} → ${to} · Use the north compass and map positions.`,tip:`${to} is generally ${answer} of ${from}.`};
+        }
+        const answer=to;return {title:"Find the Destination",question:`Your route begins in ${from} and covers the highlighted ${distance} km learning route. Which destination does it reach?`,answer,options:choices(answer,Object.keys(cities)),from,to,summary:`🚐 Starting point: ${from} · Learning distance: ${distance} km`,tip:`The highlighted route ends at ${to}.`};
+      }
+      if(level==="navigator"){
+        if(round%2===0){
+          const speed=pick([50,55,60,75]),answer=Number((distance/speed).toFixed(1)),unit=" hours",answerText=answer+unit;
+          return {title:"Estimate Travel Time",question:`A learning route from ${from} to ${to} is ${distance} km. At an average speed of ${speed} km/h, approximately how long will it take?`,answer:answerText,options:choices(answerText,[answer+.5,Math.max(.5,answer-.5),answer+1].map(v=>Number(v.toFixed(1))+unit)),from,to,summary:`⏱️ Distance ${distance} km · Average speed ${speed} km/h`,tip:`Time = distance ÷ speed = ${distance} ÷ ${speed} ≈ ${answer} hours.`};
+        }
+        const scale=10,mapCm=distance/scale,answer=mapCm+" cm";
+        return {title:"Map Scale",question:`On a learning map, 1 cm represents ${scale} km. How long should the ${from}–${to} route appear if its distance is ${distance} km?`,answer,options:choices(answer,[mapCm/2,mapCm+5,mapCm*2].map(v=>v+" cm")),from,to,summary:`📏 Scale 1 cm : ${scale} km · Route ${distance} km`,tip:`Map length = ${distance} ÷ ${scale} = ${mapCm} cm.`};
+      }
+      if(round%3===0){
+        const second=routes.find(r=>r[0]===to)||routes.find(r=>r[1]===to),next=second?(second[0]===to?second[1]:second[0]):from,total=distance+(second?second[2]:distance),answer=total+" km";
+        return {title:"Multi-stop Expedition",question:`Travel from ${from} to ${to}, then continue to ${next}. What is the total learning-route distance?`,answer,options:choices(answer,[total-25,total+35,total+distance].map(v=>v+" km")),from,to,extra:next,summary:`🗺️ ${from} → ${to} → ${next}`,tip:`Add both stages: ${distance} + ${second?second[2]:distance} = ${total} km.`};
+      }
+      if(round%3===1){
+        const use=8,litres=Number((distance/use).toFixed(1)),answer=litres+" L";
+        return {title:"Fuel Planning",question:`A vehicle travels ${use} km per litre. About how much fuel is required for the ${distance} km route from ${from} to ${to}?`,answer,options:choices(answer,[litres+5,Math.max(1,litres-5),litres*2].map(v=>Number(v.toFixed(1))+" L")),from,to,summary:`⛽ Efficiency ${use} km/L · Distance ${distance} km`,tip:`Fuel = ${distance} ÷ ${use} ≈ ${litres} litres.`};
+      }
+      const fare=.45,total=Math.round(distance*fare),answer="RM"+total;
+      return {title:"Expedition Budget",question:`Transport costs RM${fare.toFixed(2)} per kilometre. Estimate the cost of the ${distance} km ${from}–${to} route.`,answer,options:choices(answer,[total-15,total+20,total+45].map(v=>"RM"+v)),from,to,summary:`💰 Rate RM${fare.toFixed(2)}/km · Distance ${distance} km`,tip:`Cost = ${distance} × RM${fare.toFixed(2)} ≈ RM${total}.`};
+    }
+    function drawRoute(mission){
+      ui.route.innerHTML="";document.querySelectorAll(".city").forEach(city=>city.classList.toggle("active",[mission.from,mission.to,mission.extra].includes(city.dataset.city)));
+      const points=[mission.from,mission.to,mission.extra].filter(Boolean);
+      for(let i=0;i<points.length-1;i++){const a=cities[points[i]],b=cities[points[i+1]],line=document.createElementNS("http://www.w3.org/2000/svg","line");line.setAttribute("x1",a.x);line.setAttribute("y1",a.y);line.setAttribute("x2",b.x);line.setAttribute("y2",b.y);line.setAttribute("class","route");ui.route.appendChild(line)}
+    }
+    function renderMission(){
+      locked=false;current=buildMission();ui.round.textContent=`${round+1} / 10`;ui.label.textContent=`${level==="explorer"?"Map Explorer":level==="navigator"?"Route Navigator":"Sabah Master"} · Mission ${round+1}`;ui.title.textContent=current.title;ui.question.textContent=current.question;ui.summary.textContent=current.summary;ui.feedback.className="feedback";ui.feedback.textContent="Study the highlighted route and choose the best answer.";ui.next.hidden=true;ui.answers.innerHTML="";
+      current.options.forEach(option=>{const button=document.createElement("button");button.type="button";button.className="answer";button.textContent=option;button.addEventListener("click",()=>answer(option,button));ui.answers.appendChild(button)});drawRoute(current);
+    }
+    function answer(value,button){
+      if(locked)return;locked=true;const correct=String(value)===String(current.answer);document.querySelectorAll(".answer").forEach(item=>{item.disabled=true;if(item.textContent===String(current.answer))item.classList.add("correct")});
+      if(correct){streak++;score+=100+Math.min(100,(streak-1)*20);ui.feedback.className="feedback good";ui.feedback.textContent=`Correct! ${current.tip}`}
+      else{streak=0;lives--;button.classList.add("wrong");ui.feedback.className="feedback bad";ui.feedback.textContent=`Not quite. ${current.tip}`}
+      ui.score.textContent=score;ui.streak.textContent=`${streak} 🔥`;ui.lives.textContent="❤️".repeat(Math.max(0,lives))+"🖤".repeat(3-Math.max(0,lives));ui.next.hidden=false;ui.next.textContent=lives<=0||round===9?"View Expedition Result →":"Next Mission →";
+    }
+    function next(){if(lives<=0||round===9){finish();return}round++;renderMission()}
+    function finish(){
+      const completed=round+1,rank=score>=1100?"Master Sabah Navigator":score>=700?"Skilled Route Navigator":"Sabah Map Explorer";
+      ui.finishTitle.textContent=lives>0?"Sabah Expedition Complete!":"Expedition Paused";
+      ui.finishText.textContent=`You completed ${completed} mission${completed===1?"":"s"}, scored ${score} points, and earned the rank “${rank}”.`;
+      ui.finishScreen.hidden=false;
+    }
+    function start(){round=0;score=0;streak=0;lives=3;ui.score.textContent=0;ui.streak.textContent="0 🔥";ui.lives.textContent="❤️❤️❤️";ui.startScreen.hidden=true;ui.finishScreen.hidden=true;renderMission()}
+    document.querySelectorAll(".level").forEach(button=>button.addEventListener("click",()=>{level=button.dataset.level;document.querySelectorAll(".level").forEach(item=>item.classList.toggle("selected",item===button))}));
+    $("start").addEventListener("click",start);$("again").addEventListener("click",start);ui.next.addEventListener("click",next);
+    document.querySelectorAll(".city").forEach(city=>{city.addEventListener("click",()=>{if(!locked)ui.feedback.textContent=`📍 ${city.dataset.city} selected. Compare its position with the highlighted route.`});city.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();city.click()}})});
+    window.__sabahNavigatorReady=true;
+  })();
+  </script>
+</body>
+</html>
