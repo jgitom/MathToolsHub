@@ -618,13 +618,13 @@
         const subscriptionLaunched = new Date() >= subscriptionLaunch || paymentPreview;
         const subscriptionPhase = subscriptionLaunched ? "paid" : "free";
         const subscriptionDismissalKey = `mathToolsHubSubscriptionBanner2026-${subscriptionPhase}`;
-        if (subscriptionLaunched && paymentConfig.checkoutUrl) {
+        if (subscriptionLaunched && Array.isArray(paymentConfig.plans) && paymentConfig.plans.length) {
             const testMode = paymentConfig.mode !== "live";
             subscriptionBannerText.dataset.i18n = testMode ? "subscriptionTest" : "subscriptionLive";
             subscriptionBannerAction.dataset.i18n = testMode ? "subscriptionTestAction" : "subscriptionPay";
-            subscriptionBannerAction.href = paymentConfig.checkoutUrl;
-            subscriptionBannerAction.target = "_blank";
-            subscriptionBannerAction.rel = "noopener noreferrer";
+            subscriptionBannerAction.href = "account.html";
+            subscriptionBannerAction.removeAttribute("target");
+            subscriptionBannerAction.removeAttribute("rel");
         }
         if (paymentPreview || localStorage.getItem(subscriptionDismissalKey) !== "dismissed") subscriptionBanner.hidden = false;
         subscriptionBannerClose.addEventListener("click", () => {
