@@ -300,6 +300,8 @@
     }
 
     .squad-actions{display:flex;align-items:end;justify-content:flex-end;gap:8px;flex-wrap:wrap}.squad-actions label{min-width:145px}.number-input{width:58px;padding:7px 6px;border:1px solid var(--line);border-radius:9px;color:var(--text);background:#092016;text-align:center;font-weight:900}.number-input:disabled{color:#9bb7a7;background:#07170f;opacity:.72}.shirt-number{display:inline-grid;place-items:center;min-width:30px;height:30px;padding:0 6px;border:2px solid #70efab;border-radius:9px;color:#fff;background:#0a2b1b;font-weight:950}.player-dot .formation-number{display:block;color:#f7c948;font-size:13px;line-height:1.1}.live-player{display:grid;place-items:center;color:#fff;font-size:8px;font-weight:950}.live-player.keeper{color:#422006}
+    .halftime-panel{margin-top:14px;padding:16px;border:1px solid rgba(247,201,72,.45);border-radius:14px;background:linear-gradient(135deg,rgba(247,201,72,.12),rgba(62,209,125,.08))}.halftime-panel h3{margin:0 0 5px;color:var(--gold)}.halftime-panel p{margin:0 0 12px}.halftime-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.substitution-row{display:grid;grid-template-columns:1fr 1fr auto;gap:9px;align-items:end;margin-top:12px}.halftime-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px}.halftime-footer strong{color:var(--gold)}
+
     .form-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -474,6 +476,7 @@
       .topbar { grid-template-columns: 1fr 1fr 1fr; }
       .club-title { grid-column: 1 / -1; }
       .form-grid { grid-template-columns: 1fr; }
+      .halftime-actions,.substitution-row{grid-template-columns:1fr}.halftime-footer{align-items:stretch;flex-direction:column}
     }
 
     @media (max-width: 620px) {
@@ -742,7 +745,24 @@
       <div class="match-stat-row"><span id="homeCorners">0</span><b>Corners</b><span id="awayCorners">0</span></div>
       <div class="match-stat-row"><span id="homeFouls">0</span><b>Fouls</b><span id="awayFouls">0</span></div>
     </div>
-    <div class="bar"><span id="matchProgressBar" style="width:0%"></span></div>
+    <div class="halftime-panel hidden" id="halftimePanel">
+      <h3>Half-Time Team Talk</h3>
+      <p>Change your tactics or make up to five substitutions before the second half.</p>
+      <div class="halftime-actions">
+        <label>Formation<select id="halftimeFormation"><option>4-3-3</option><option>4-4-2</option><option>4-2-3-1</option><option>3-5-2</option></select></label>
+        <label>Mentality<select id="halftimeMentality"><option>Balanced</option><option>Attacking</option><option>Defensive</option><option>Counter Attack</option></select></label>
+        <label>Pressing<select id="halftimePressing"><option>Standard</option><option>High Press</option><option>Low Block</option></select></label>
+      </div>
+      <div class="substitution-row">
+        <label>Player off<select id="halftimePlayerOff"></select></label>
+        <label>Player on<select id="halftimePlayerOn"></select></label>
+        <button class="secondary" id="makeSubstitutionBtn" type="button">Make Substitution</button>
+      </div>
+      <div class="halftime-footer">
+        <strong id="substitutionCount">Substitutions: 0 / 5</strong>
+        <button class="primary" id="startSecondHalfBtn" type="button">Start Second Half</button>
+      </div>
+    </div>    <div class="bar"><span id="matchProgressBar" style="width:0%"></span></div>
     <div id="matchEvents" class="event-log" style="margin-top:14px"></div>
     <button class="secondary" id="skipMatchBtn" type="button" style="margin-top:12px;width:100%">Skip to Full Time</button>
   </div>
@@ -1202,16 +1222,18 @@
     els.matchMinute.textContent = "0'";
     els.skipMatchBtn.textContent = "Skip to Full Time";
 
-    let minute = 0, hg = 0, ag = 0, done = false;
+    let minute = 0, hg = 0, ag = 0, done = false, paused = false, substitutions = 0;
     const ourHome = fixture.home === CLUB;
-    const ourStrength = squadAverage() + tacticBonus();
+    let ourStrength = squadAverage() + tacticBonus();
     const oppStrength = 67 + Math.floor(Math.random()*10) + Math.min(state.week/3,4);
+    const playedIds = new Set(state.players.filter(player=>player.starter).map(player=>player.id));
+    const substitutedOut = new Set();
     const matchStats={slices:0,homePossessionUnits:0,homeShots:0,awayShots:0,homeOnTarget:0,awayOnTarget:0,homeCorners:0,awayCorners:0,homeFouls:0,awayFouls:0};
     let pitchMoment = "play", pitchHomeAttacks = true;
     const pitchPlayers={home:[],away:[]};
     const homeShape=[[5,50],[20,17],[20,39],[20,61],[20,83],[42,24],[42,50],[42,76],[63,22],[66,50],[63,78]];
     const awayShape=homeShape.map(([x,y])=>[100-x,y]);
-    const ourNumbers=state.players.filter(player=>player.starter).sort((a,b)=>positionOrder(a.pos)-positionOrder(b.pos)).slice(0,11).map(player=>player.number);
+    let ourNumbers=state.players.filter(player=>player.starter).sort((a,b)=>positionOrder(a.pos)-positionOrder(b.pos)).slice(0,11).map(player=>player.number);
 
     function setupLivePitch(){
       els.livePitch.querySelectorAll(".live-player,.live-ball").forEach(node=>node.remove());
@@ -1240,15 +1262,69 @@
     function THREEClamp(value,min,max){return Math.max(min,Math.min(max,value))}
     setupLivePitch();
     renderMatchStats();
+    els.halftimePanel.classList.add("hidden");
 
     const interval = setInterval(()=>{
-      if (done) return;
+      if (done || paused) return;
       minute += 5;
       simulateSlice();
       updateLive();
-      if (minute>=90) finish();
+      if (minute===45) pauseForHalftime();
+      else if (minute>=90) finish();
     }, 250);
 
+    function refreshHalftimePlayers(){
+      const starters=state.players.filter(player=>player.starter);
+      const bench=state.players.filter(player=>!player.starter && !substitutedOut.has(player.id));
+      els.halftimePlayerOff.innerHTML=starters.map(player=>`<option value="${player.id}">#${player.number} ${player.name} (${player.pos})</option>`).join("");
+      els.halftimePlayerOn.innerHTML=bench.map(player=>`<option value="${player.id}">#${player.number} ${player.name} (${player.pos})</option>`).join("");
+      els.substitutionCount.textContent=`Substitutions: ${substitutions} / 5`;
+      els.makeSubstitutionBtn.disabled=substitutions>=5 || !bench.length;
+    }
+
+    function refreshOurLiveNumbers(){
+      ourNumbers=state.players.filter(player=>player.starter).sort((a,b)=>positionOrder(a.pos)-positionOrder(b.pos)).slice(0,11).map(player=>player.number);
+      pitchPlayers[ourHome?"home":"away"].forEach((dot,index)=>dot.textContent=ourNumbers[index]||index+1);
+    }
+
+    function pauseForHalftime(){
+      paused=true;
+      els.matchMinute.textContent="HT";
+      addEvent(`45' Half-time. The manager can now make changes.`);
+      els.halftimeFormation.value=state.formation;
+      els.halftimeMentality.value=state.mentality;
+      els.halftimePressing.value=state.pressing;
+      refreshHalftimePlayers();
+      els.halftimePanel.classList.remove("hidden");
+      els.halftimePanel.scrollIntoView({behavior:"smooth",block:"nearest"});
+    }
+
+    function makeHalftimeSubstitution(){
+      if(!paused || substitutions>=5)return;
+      const playerOff=state.players.find(player=>player.id===Number(els.halftimePlayerOff.value));
+      const playerOn=state.players.find(player=>player.id===Number(els.halftimePlayerOn.value));
+      if(!playerOff || !playerOn || !playerOff.starter || playerOn.starter)return;
+      playerOff.starter=false;playerOn.starter=true;
+      substitutedOut.add(playerOff.id);playedIds.add(playerOn.id);substitutions++;
+      addEvent(`HT Substitution: #${playerOn.number} ${playerOn.name} replaces #${playerOff.number} ${playerOff.name}.`);
+      refreshHalftimePlayers();refreshOurLiveNumbers();
+    }
+
+    function startSecondHalf(){
+      if(!paused)return;
+      state.formation=els.halftimeFormation.value;
+      state.mentality=els.halftimeMentality.value;
+      state.pressing=els.halftimePressing.value;
+      ourStrength=squadAverage()+tacticBonus();
+      addEvent(`46' Second half: ${state.mentality} ${state.formation}, ${state.pressing}.`);
+      els.halftimePanel.classList.add("hidden");
+      paused=false;
+      els.matchMinute.textContent="46'";
+      saveGame();
+    }
+
+    els.makeSubstitutionBtn.onclick=makeHalftimeSubstitution;
+    els.startSecondHalfBtn.onclick=startSecondHalf;
     function simulateSlice() {
       pitchMoment = "play";
       const homeStrength = ourHome ? ourStrength : oppStrength;
@@ -1303,6 +1379,8 @@
     function finish() {
       done=true;
       clearInterval(interval);
+      paused=false;
+      els.halftimePanel.classList.add("hidden");
       els.matchMinute.textContent="FT";
       fixture.played=true;
       fixture.homeGoals=hg;
@@ -1316,7 +1394,7 @@
       state.news.unshift(`${fixture.home} ${hg}-${ag} ${fixture.away}.`);
 
       state.players.forEach(p=>{
-        p.fitness=Math.max(55,p.fitness-(p.starter?7:2)+Math.random()*2);
+        p.fitness=Math.max(55,p.fitness-(playedIds.has(p.id)?7:2)+Math.random()*2);
         p.morale=Math.max(45,Math.min(100,p.morale + (resultForClub(fixture)==="W"?4:resultForClub(fixture)==="D"?1:-3)));
       });
       state.morale=Math.round(state.players.reduce((s,p)=>s+p.morale,0)/state.players.length);
