@@ -1,4 +1,4 @@
-# 24 KPM-Aligned Interactive Learning Programmes
+# 24 Curriculum-Aligned Interactive Learning Programmes
 
 This package contains 24 browser-based learning programme prototypes from Preschool to Form 5.
 
@@ -34,6 +34,6 @@ Upload the complete folder while preserving the `assets` and `programs` director
 
 ## Curriculum note
 
-These are thematic KPM-aligned development prototypes. Before formal deployment,
+These are thematic curriculum-aligned development prototypes. Before formal deployment,
 map and verify each programme against the latest official DSKP, including the
 relevant Content Standards, Learning Standards and Performance Standards.
