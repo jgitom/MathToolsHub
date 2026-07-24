@@ -488,7 +488,7 @@ Menyelesaikan masalah pecahan</textarea>
 
           <div class="field full">
             <label for="curriculumSource">Sumber DSKP</label>
-            <input id="curriculumSource" value="DSKP KSSR Matematik Tahun 4, BPK KPM" placeholder="Nama dokumen rujukan rasmi" />
+            <input id="curriculumSource" value="DSKP KSSR Matematik Tahun 4, BPK" placeholder="Nama dokumen rujukan rasmi" />
           </div>
 
           <div class="field full">
@@ -716,7 +716,7 @@ Menyelesaikan masalah pecahan</textarea>
 
       const profile = `DSKP ${curriculum} ${currentSubject} ${currentLevel} (${stream})`;
       document.getElementById("curriculum").value = curriculum;
-      document.getElementById("curriculumSource").value = `${profile}, BPK KPM`;
+      document.getElementById("curriculumSource").value = `${profile}, BPK`;
     }
 
     function applyDskpProfile(){
@@ -730,7 +730,7 @@ Menyelesaikan masalah pecahan</textarea>
       const curriculum = schoolType === "primary" ? "KSSR Semakan 2017" : "KSSM";
       const stream = valueOf("schoolStream") || (schoolType === "primary" ? "SK" : "SMK");
       document.getElementById("curriculum").value = curriculum;
-      document.getElementById("curriculumSource").value = `DSKP ${curriculum} ${subject} ${level} (${stream}), BPK KPM`;
+      document.getElementById("curriculumSource").value = `DSKP ${curriculum} ${subject} ${level} (${stream}), BPK`;
     }
 
     function toggleTeacherField(){
@@ -747,7 +747,7 @@ Menyelesaikan masalah pecahan</textarea>
       const topic = valueOf("topic") || "topik yang dipilih";
       const contentStandard = valueOf("contentStandard");
       const learningStandard = valueOf("learningStandard");
-      const curriculum = valueOf("curriculum") || "Kurikulum KPM yang berkenaan";
+      const curriculum = valueOf("curriculum") || "Kurikulum yang berkenaan";
       const schoolStream = valueOf("schoolStream") || "Aliran sekolah yang berkenaan";
       const curriculumField = valueOf("curriculumField");
       const curriculumSource = valueOf("curriculumSource");
@@ -797,16 +797,16 @@ RUJUKAN KURIKULUM:
 - Kurikulum: ${curriculum}
 - Jenis/aliran sekolah: ${schoolStream}
 - Bidang: ${curriculumField || "Tidak diberikan"}
-- Sumber: ${curriculumSource || `DSKP bagi ${subject}, ${level}, terbitan BPK KPM`}
+- Sumber: ${curriculumSource || `DSKP bagi ${subject}, ${level}, terbitan BPK`}
 
-Gunakan Dokumen Standard Kurikulum dan Pentaksiran (DSKP) bagi ${subject}, ${level}, terbitan Bahagian Pembangunan Kurikulum, Kementerian Pendidikan Malaysia.
+Gunakan Dokumen Standard Kurikulum dan Pentaksiran (DSKP) yang berkaitan bagi ${subject}, ${level}.
 
 Selaraskan setiap soalan dengan:
 1. Standard Kandungan yang dipilih: ${contentStandard || "Tidak diberikan — jangan mereka-reka nombor atau pernyataan Standard Kandungan"};
 2. Standard Pembelajaran yang dipilih: ${learningStandard ? `\n${learningStandard.split("\n").filter(Boolean).map((standard,index) => `   ${index + 1}. ${standard.trim()}`).join("\n")}` : "Tidak diberikan — jangan mereka-reka nombor atau pernyataan Standard Pembelajaran"};
 3. tahap perkembangan murid;
 4. aras kognitif yang ditetapkan;
-5. istilah yang digunakan dalam buku teks KPM.
+5. istilah yang digunakan dalam buku teks yang berkaitan.
 
 Jangan mereka-reka nombor Standard Kandungan atau Standard Pembelajaran yang tidak diberikan. Jika standard tidak diberikan, nyatakan bahawa penjajaran khusus tidak dapat dibuat dan teruskan berdasarkan topik sahaja.
 
@@ -1090,7 +1090,7 @@ Sebelum memberikan jawapan akhir, semak semula semua soalan, pilihan jawapan, pe
       document.getElementById("curriculumField").value = "Nombor dan Operasi";
       document.getElementById("contentStandard").value = "2.1 Pecahan";
       document.getElementById("learningStandard").value = "Mengenal pasti pecahan wajar\nMembandingkan nilai pecahan\nMenyelesaikan masalah pecahan";
-      document.getElementById("curriculumSource").value = "DSKP KSSR Matematik Tahun 4, BPK KPM";
+      document.getElementById("curriculumSource").value = "DSKP KSSR Matematik Tahun 4, BPK";
       document.getElementById("count").value = 10;
       document.getElementById("difficulty").value = "Sederhana";
       document.getElementById("questionType").value = "Aneka pilihan";
@@ -1153,7 +1153,7 @@ Sebelum memberikan jawapan akhir, semak semula semua soalan, pilihan jawapan, pe
         document.getElementById("curriculumField").value = "Nombor dan Operasi";
         document.getElementById("contentStandard").value = "2.1 Pecahan";
         document.getElementById("learningStandard").value = "Mengenal pasti pecahan wajar\nMembandingkan nilai pecahan\nMenyelesaikan masalah pecahan";
-        document.getElementById("curriculumSource").value = "DSKP KSSR Matematik Tahun 4, BPK KPM";
+        document.getElementById("curriculumSource").value = "DSKP KSSR Matematik Tahun 4, BPK";
       }
       generatePrompt();
     }
