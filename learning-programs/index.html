@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#07111f"><meta name="description" content="Explore 24 interactive KPM-aligned learning adventures from Preschool to Form 5."><meta name="author" content="Juil Gitom"><title>Learning Quest Universe | MathToolsHub</title>
+<style>
+*{box-sizing:border-box}body{margin:0;color:#f8fafc;background:#07111f;font-family:Inter,system-ui,sans-serif}
+main{width:min(1180px,calc(100% - 24px));margin:auto;padding:28px 0 50px}
+.hero{padding:28px;border:1px solid rgba(255,255,255,.1);border-radius:24px;background:radial-gradient(circle at top right,rgba(37,99,235,.28),transparent 38%),#0f172a}
+h1{font-size:clamp(32px,6vw,60px);margin:0 0 10px}.site-back{position:fixed;right:16px;top:14px;z-index:20;padding:10px 14px;border:1px solid rgba(255,255,255,.18);border-radius:999px;color:#fff;background:rgba(15,23,42,.92);text-decoration:none;font-size:13px;font-weight:850;box-shadow:0 10px 28px #0006}.site-back:hover,.site-back:focus-visible{background:#2563eb;outline:3px solid #93c5fd;outline-offset:2px}.hero p{max-width:780px;color:#a9b7ca;line-height:1.7}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.stat{padding:10px 13px;border-radius:12px;background:rgba(255,255,255,.06)}.stat b{display:block;font-size:20px;color:#93c5fd}.stat span{font-size:11px;color:#a9b7ca}
+.filter{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.filter button{padding:9px 12px;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#cbd5e1;background:#0f172a;cursor:pointer}.filter button.active{background:#2563eb;color:white}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.program-card{display:grid;grid-template-columns:auto 1fr;gap:13px;padding:17px;text-decoration:none;color:white;border:1px solid rgba(255,255,255,.1);border-radius:17px;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 16%,#162033),#0f172a);transition:.16s}
+.program-card:hover{transform:translateY(-2px);border-color:var(--c)}.card-icon{font-size:36px}.program-card span{font-size:11px;color:#a9b7ca}.program-card h3{margin:4px 0 7px}.program-card p{margin:0;color:#a9b7ca;font-size:13px;line-height:1.5}
+.notice{margin-top:20px;padding:12px 14px;border:1px solid rgba(245,158,11,.35);border-radius:12px;background:rgba(245,158,11,.08);color:#fde68a}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:620px){.grid{grid-template-columns:1fr}.site-back{position:static;display:inline-flex;margin:12px 0 0 12px}}
+</style>
+</head>
+<body><a class="site-back" href="../index.html">← MathToolsHub</a><main>
+<section class="hero"><h1>Learning Quest Universe</h1><p>Choose from 24 interactive adventures spanning Preschool to Form 5. Learn through stories, complete real-world missions, master each challenge, reflect on your progress, and unlock a printable achievement certificate.</p>
+<div class="stats"><div class="stat"><b>24</b><span>Programmes</span></div><div class="stat"><b>12</b><span>Education levels</span></div><div class="stat"><b>120</b><span>Assessment questions</span></div></div></section>
+<div class="filter" id="filters"><button class="active" data-level="All">All</button><button data-level="Preschool">Preschool</button><button data-level="Primary">Primary</button><button data-level="Secondary">Secondary</button></div>
+<section class="grid" id="programGrid"><a class="program-card" href="programs/little-explorers-village.html" style="--c:#7c3aed">
+<div class="card-icon">🏘️</div>
+<div><span>Preschool · Programme 25</span><h3>Little Explorers Adventure Village</h3><p>Early communication, numeracy, personal competence and community awareness</p></div>
+</a>
+<a class="program-card" href="programs/five-senses-lab.html" style="--c:#db2777">
+<div class="card-icon">👃</div>
+<div><span>Preschool · Programme 26</span><h3>Super Senses Discovery Lab</h3><p>Early science, language, health and sensory observation</p></div>
+</a>
+<a class="program-card" href="programs/number-town-post-office.html" style="--c:#2563eb">
+<div class="card-icon">📮</div>
+<div><span>Year 1 · Programme 27</span><h3>Number Town Delivery Heroes</h3><p>Whole numbers, addition, subtraction, sequencing and reading instructions</p></div>
+</a>
+<a class="program-card" href="programs/living-things-care-centre.html" style="--c:#16a34a">
+<div class="card-icon">🌱</div>
+<div><span>Year 1 · Programme 28</span><h3>Living World Rescue Centre</h3><p>Basic science, needs of living things and simple communication</p></div>
+</a>
+<a class="program-card" href="programs/clock-calendar-adventure.html" style="--c:#0891b2">
+<div class="card-icon">🕒</div>
+<div><span>Year 2 · Programme 29</span><h3>Time Travellers: Clock & Calendar Quest</h3><p>Time, days, months, schedules and duration</p></div>
+</a>
+<a class="program-card" href="programs/healthy-food-cafe.html" style="--c:#ea580c">
+<div class="card-icon">🥗</div>
+<div><span>Year 2 · Programme 30</span><h3>Healthy Heroes Food Café</h3><p>Health, nutrition, money and basic measurement</p></div>
+</a>
+<a class="program-card" href="programs/fraction-food-truck.html" style="--c:#dc2626">
+<div class="card-icon">🍕</div>
+<div><span>Year 3 · Programme 31</span><h3>Fraction Food Truck Frenzy</h3><p>Fractions, money, mass, volume and communication</p></div>
+</a>
+<a class="program-card" href="programs/weather-watch-junior.html" style="--c:#0284c7">
+<div class="card-icon">🌦️</div>
+<div><span>Year 3 · Programme 32</span><h3>Junior Weather Detective HQ</h3><p>Weather observation, data recording, graphs and report writing</p></div>
+</a>
+<a class="program-card" href="programs/energy-smart-home.html" style="--c:#ca8a04">
+<div class="card-icon">💡</div>
+<div><span>Year 4 · Programme 33</span><h3>Energy-Smart Dream Home Challenge</h3><p>Energy, electricity, measurement, budgeting and environmental awareness</p></div>
+</a>
+<a class="program-card" href="programs/malaysia-heritage-quest.html" style="--c:#9333ea">
+<div class="card-icon">🏛️</div>
+<div><span>Year 4 · Programme 34</span><h3>Malaysia Heritage Time-Travel Quest</h3><p>Malaysian history, timelines, maps, reading and cultural appreciation</p></div>
+</a>
+<a class="program-card" href="programs/water-cycle-rescue.html" style="--c:#0ea5e9">
+<div class="card-icon">💧</div>
+<div><span>Year 5 · Programme 35</span><h3>Water Cycle Rescue Squad</h3><p>Water cycle, conservation, scientific processes and data</p></div>
+</a>
+<a class="program-card" href="programs/young-data-journalist.html" style="--c:#475569">
+<div class="card-icon">📰</div>
+<div><span>Year 5 · Programme 36</span><h3>Data Newsroom: Junior Journalist Mission</h3><p>Data collection, tables, graphs, language and digital literacy</p></div>
+</a>
+<a class="program-card" href="programs/sustainable-school-engineer.html" style="--c:#059669">
+<div class="card-icon">🏫</div>
+<div><span>Year 6 · Programme 37</span><h3>Eco-School Engineering Challenge</h3><p>Area, perimeter, volume, science, design and sustainability</p></div>
+</a>
+<a class="program-card" href="programs/personal-finance-challenge.html" style="--c:#65a30d">
+<div class="card-icon">💰</div>
+<div><span>Year 6 · Programme 38</span><h3>Money Master: Personal Finance Quest</h3><p>Money, percentage, discounts, savings and financial decision-making</p></div>
+</a>
+<a class="program-card" href="programs/ecosystem-ranger.html" style="--c:#15803d">
+<div class="card-icon">🦋</div>
+<div><span>Form 1 · Programme 39</span><h3>Ecosystem Ranger Adventure Academy</h3><p>Biodiversity, ecosystems, classification and environmental responsibility</p></div>
+</a>
+<a class="program-card" href="programs/integer-expedition.html" style="--c:#4f46e5">
+<div class="card-icon">🏔️</div>
+<div><span>Form 1 · Programme 40</span><h3>Integer Mountain Expedition</h3><p>Positive and negative integers, coordinates and problem-solving</p></div>
+</a>
+<a class="program-card" href="programs/smart-transport-planner.html" style="--c:#0369a1">
+<div class="card-icon">🚌</div>
+<div><span>Form 2 · Programme 41</span><h3>Smart Transport City Planner</h3><p>Speed, distance, time, scale, geography and design</p></div>
+</a>
+<a class="program-card" href="programs/human-body-diagnostic.html" style="--c:#be123c">
+<div class="card-icon">🫀</div>
+<div><span>Form 2 · Programme 42</span><h3>Human Body Medical Detective Lab</h3><p>Human body systems, health, scientific investigation and data interpretation</p></div>
+</a>
+<a class="program-card" href="programs/disaster-risk-command.html" style="--c:#b45309">
+<div class="card-icon">🌋</div>
+<div><span>Form 3 · Programme 43</span><h3>Disaster Response Command Centre</h3><p>Natural hazards, geography, science, statistics and decision-making</p></div>
+</a>
+<a class="program-card" href="programs/consumer-finance-studio.html" style="--c:#7e22ce">
+<div class="card-icon">💳</div>
+<div><span>Form 3 · Programme 44</span><h3>MoneyWise Consumer Finance Studio</h3><p>Savings, investments, credit, debt, interest and financial literacy</p></div>
+</a>
+<a class="program-card" href="programs/green-technology-startup.html" style="--c:#0f766e">
+<div class="card-icon">🔋</div>
+<div><span>Form 4 · Programme 45</span><h3>GreenTech Startup Challenge</h3><p>Science, technology, entrepreneurship, budgeting and sustainable design</p></div>
+</a>
+<a class="program-card" href="programs/statistical-investigation.html" style="--c:#1d4ed8">
+<div class="card-icon">📊</div>
+<div><span>Form 4 · Programme 46</span><h3>Statistical Detective Investigation Unit</h3><p>Data collection, central tendency, dispersion and evidence-based conclusions</p></div>
+</a>
+<a class="program-card" href="programs/career-salary-planner.html" style="--c:#334155">
+<div class="card-icon">🧑‍💼</div>
+<div><span>Form 5 · Programme 47</span><h3>Future Career & Salary Planner</h3><p>Income, taxation, insurance, budgeting and career awareness</p></div>
+</a>
+<a class="program-card" href="programs/smart-city-network.html" style="--c:#6d28d9">
+<div class="card-icon">🌐</div>
+<div><span>Form 5 · Programme 48</span><h3>Smart City Network Command Centre</h3><p>Graph theory, matrices, optimisation, transport and urban planning</p></div>
+</a></section>
+<div class="notice">Curriculum alignment is thematic and intended as a development prototype. Conduct a final mapping to the current official KPM DSKP standards before formal school deployment.</div>
+</main>
+<script>
+const cards=[...document.querySelectorAll(".program-card")];
+document.querySelectorAll("#filters button").forEach(b=>b.addEventListener("click",()=>{
+document.querySelectorAll("#filters button").forEach(x=>x.classList.remove("active"));b.classList.add("active");
+const f=b.dataset.level;cards.forEach(c=>{const t=c.querySelector("span").textContent;c.style.display=f==="All"||t.includes(f)||(f==="Primary"&&/Year/.test(t))||(f==="Secondary"&&/Form/.test(t))?"grid":"none"})
+}));
+</script><script src="../site-language.js"></script></body></html>
