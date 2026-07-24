@@ -10,7 +10,7 @@ main{width:min(1180px,calc(100% - 24px));margin:auto;padding:28px 0 50px}
 h1{font-size:clamp(32px,6vw,60px);margin:0 0 10px}.page-actions{position:fixed;right:16px;top:14px;z-index:1001;display:flex;align-items:center;gap:9px}.site-language-slot{display:flex;align-items:center}.site-back{display:inline-flex;align-items:center;min-height:38px;padding:9px 13px;border:1px solid rgba(255,255,255,.18);border-radius:8px;color:#fff;background:rgba(15,23,42,.94);text-decoration:none;font-size:13px;font-weight:850;box-shadow:0 8px 22px #0005}.site-back:hover,.site-back:focus-visible{background:#2563eb;outline:3px solid #93c5fd;outline-offset:2px}.hero p{max-width:780px;color:#a9b7ca;line-height:1.7}
 .stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.stat{padding:10px 13px;border-radius:12px;background:rgba(255,255,255,.06)}.stat b{display:block;font-size:20px;color:#93c5fd}.stat span{font-size:11px;color:#a9b7ca}
 .filter{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.filter button{padding:9px 12px;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#cbd5e1;background:#0f172a;cursor:pointer}.filter button.active{background:#2563eb;color:white}
-.collection-heading{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:24px 0 12px}.collection-heading h2{margin:0;font-size:clamp(22px,4vw,32px)}.collection-heading p{margin:0;color:#a9b7ca;font-size:13px}.blueprint-card{border-style:dashed}.blueprint-card h3::after{content:"Blueprint";display:inline-block;margin-left:7px;padding:3px 6px;border-radius:999px;background:#064e3b;color:#a7f3d0;font-size:9px;vertical-align:middle}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.collection-heading{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:24px 0 12px}.collection-heading h2{margin:0;font-size:clamp(22px,4vw,32px)}.collection-heading p{margin:0;color:#a9b7ca;font-size:13px}.developed-card{border-color:rgba(52,211,153,.38)}.developed-card h3::after{content:"Interactive";display:inline-block;margin-left:7px;padding:3px 6px;border-radius:999px;background:#064e3b;color:#a7f3d0;font-size:9px;vertical-align:middle}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 .program-card{display:grid;grid-template-columns:auto 1fr;gap:13px;padding:17px;text-decoration:none;color:white;border:1px solid rgba(255,255,255,.1);border-radius:17px;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 16%,#162033),#0f172a);transition:.16s}
 .program-card:hover{transform:translateY(-2px);border-color:var(--c)}.card-icon{font-size:36px}.program-card span{font-size:11px;color:#a9b7ca}.program-card h3{margin:4px 0 7px}.program-card p{margin:0;color:#a9b7ca;font-size:13px;line-height:1.5}
 .catalogue-next{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;margin:18px 0;padding:17px;border:1px solid rgba(52,211,153,.4);border-radius:17px;color:#fff;background:linear-gradient(135deg,rgba(16,185,129,.18),rgba(37,99,235,.18));text-decoration:none;box-shadow:0 12px 30px #0003}.catalogue-next:hover,.catalogue-next:focus-visible{border-color:#6ee7b7;transform:translateY(-2px);outline:3px solid #60a5fa;outline-offset:2px}.catalogue-next .next-icon{font-size:38px}.catalogue-next strong{display:block;font-size:20px}.catalogue-next span{color:#b9d6d1;font-size:13px;line-height:1.5}.catalogue-next b{color:#6ee7b7;font-size:14px}.notice{margin-top:20px;padding:12px 14px;border:1px solid rgba(245,158,11,.35);border-radius:12px;background:rgba(245,158,11,.08);color:#fde68a}
@@ -18,8 +18,8 @@ h1{font-size:clamp(32px,6vw,60px);margin:0 0 10px}.page-actions{position:fixed;r
 </style>
 </head>
 <body><div class="page-actions"><a class="site-back" href="../quizzes.html">← Back to Quizzes</a><div class="site-language-slot" id="siteLanguageSlot"></div></div><main>
-<section class="hero"><h1>Learning Quest Universe</h1><p>Explore 48 choices spanning Preschool to Form 5: 24 fully interactive adventures and 24 creative programme blueprints. Filter by learning phase, choose a quest, and open its activities or detailed plan.</p>
-<div class="stats"><div class="stat"><b>48</b><span>Learning choices</span></div><div class="stat"><b>24</b><span>Interactive adventures</span></div><div class="stat"><b>24</b><span>Creative blueprints</span></div><div class="stat"><b>12</b><span>Education levels</span></div></div></section>
+<section class="hero"><h1>Learning Quest Universe</h1><p>Explore 48 choices spanning Preschool to Form 5: 48 fully interactive learning adventures. Filter by learning phase, choose a quest, and open its activities or detailed plan.</p>
+<div class="stats"><div class="stat"><b>48</b><span>Learning choices</span></div><div class="stat"><b>48</b><span>Interactive programmes</span></div><div class="stat"><b>24</b><span>Newly developed quests</span></div><div class="stat"><b>12</b><span>Education levels</span></div></div></section>
 <div class="filter" id="filters"><button class="active" data-level="All">All</button><button data-level="Preschool">Preschool</button><button data-level="Primary">Primary</button><button data-level="Secondary">Secondary</button></div>
 <div class="collection-heading"><div><h2>Interactive Learning Adventures</h2><p>Open complete lessons, missions, assessments, progress tracking and certificates.</p></div><p>Programmes 25–48</p></div>
 <section class="grid" id="programGrid"><a class="program-card" href="programs/little-explorers-village.html" style="--c:#7c3aed">
@@ -118,101 +118,101 @@ h1{font-size:clamp(32px,6vw,60px);margin:0 0 10px}.page-actions{position:fixed;r
 <div class="card-icon">🌐</div>
 <div><span>Form 5 · Programme 48</span><h3>Smart City Network Command Centre</h3><p>Graph theory, matrices, optimisation, transport and urban planning</p></div>
 </a></section>
-<div class="collection-heading"><div><h2>Creative Programme Blueprints</h2><p>Open detailed outcomes, activity ideas, assessments and proposed student products.</p></div><p>Programmes 49–72</p></div>
+<div class="collection-heading"><div><h2>New Interactive Learning Adventures</h2><p>Open complete guided learning, activities, project work, assessment, saved progress and certificates.</p></div><p>Programmes 49–72</p></div>
 <section class="grid" id="blueprintGrid">
-<a class="program-card blueprint-card" href="catalogue-2/?programme=49" style="--c:#7c3aed">
+<a class="program-card developed-card" href="catalogue-2/programs/story-garden-adventure.html" style="--c:#7c3aed">
 <div class="card-icon">ðŸŒ¼</div>
 <div><span>Preschool · Programme 49</span><h3>Story Garden Adventure</h3><p>Listening, speaking, story sequence, emotions and creative expression</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=50" style="--c:#db2777">
+<a class="program-card developed-card" href="catalogue-2/programs/shape-and-motion-playground.html" style="--c:#db2777">
 <div class="card-icon">ðŸ›</div>
 <div><span>Preschool · Programme 50</span><h3>Shape and Motion Playground</h3><p>Shapes, positions, movement, balance and spatial vocabulary</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=51" style="--c:#2563eb">
+<a class="program-card developed-card" href="catalogue-2/programs/phonics-rescue-station.html" style="--c:#2563eb">
 <div class="card-icon">ðŸ”¤</div>
 <div><span>Year 1 · Programme 51</span><h3>Phonics Rescue Station</h3><p>Letter-sound relationships, blending, vocabulary and simple sentence reading</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=52" style="--c:#0891b2">
+<a class="program-card developed-card" href="catalogue-2/programs/mini-makers-workshop.html" style="--c:#0891b2">
 <div class="card-icon">ðŸ§°</div>
 <div><span>Year 1 · Programme 52</span><h3>Mini Makers Workshop</h3><p>Materials, simple construction, measurement and safe tool habits</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=53" style="--c:#16a34a">
+<a class="program-card developed-card" href="catalogue-2/programs/community-helpers-mission.html" style="--c:#16a34a">
 <div class="card-icon">ðŸš’</div>
 <div><span>Year 2 · Programme 53</span><h3>Community Helpers Mission</h3><p>Community roles, communication, responsibility and emergency awareness</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=54" style="--c:#ea580c">
+<a class="program-card developed-card" href="catalogue-2/programs/pattern-and-coding-trail.html" style="--c:#ea580c">
 <div class="card-icon">ðŸ¤–</div>
 <div><span>Year 2 · Programme 54</span><h3>Pattern and Coding Trail</h3><p>Patterns, sequences, direction, algorithms and debugging</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=55" style="--c:#9333ea">
+<a class="program-card developed-card" href="catalogue-2/programs/sabah-river-explorer.html" style="--c:#9333ea">
 <div class="card-icon">ðŸžï¸</div>
 <div><span>Year 3 · Programme 55</span><h3>Sabah River Explorer</h3><p>Freshwater habitats, observation, conservation and descriptive reporting</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=56" style="--c:#0f766e">
+<a class="program-card developed-card" href="catalogue-2/programs/storybook-creator-studio.html" style="--c:#0f766e">
 <div class="card-icon">ðŸ“–</div>
 <div><span>Year 3 · Programme 56</span><h3>Storybook Creator Studio</h3><p>Narrative structure, vocabulary, dialogue, illustration and editing</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=57" style="--c:#7c3aed">
+<a class="program-card developed-card" href="catalogue-2/programs/safe-internet-junior.html" style="--c:#7c3aed">
 <div class="card-icon">ðŸ›¡ï¸</div>
 <div><span>Year 4 · Programme 57</span><h3>Safe Internet Junior</h3><p>Passwords, privacy, online communication, scams and responsible behaviour</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=58" style="--c:#db2777">
+<a class="program-card developed-card" href="catalogue-2/programs/plant-growth-research-station.html" style="--c:#db2777">
 <div class="card-icon">ðŸª´</div>
 <div><span>Year 4 · Programme 58</span><h3>Plant Growth Research Station</h3><p>Plant needs, variables, measurement, data tables and scientific reporting</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=59" style="--c:#2563eb">
+<a class="program-card developed-card" href="catalogue-2/programs/young-inventor-design-lab.html" style="--c:#2563eb">
 <div class="card-icon">âš™ï¸</div>
 <div><span>Year 5 · Programme 59</span><h3>Young Inventor Design Lab</h3><p>Problem identification, sketches, mechanisms, testing and improvement</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=60" style="--c:#0891b2">
+<a class="program-card developed-card" href="catalogue-2/programs/local-economy-market-challenge.html" style="--c:#0891b2">
 <div class="card-icon">ðŸ§º</div>
 <div><span>Year 5 · Programme 60</span><h3>Local Economy Market Challenge</h3><p>Local products, supply and demand, pricing, profit and responsible consumption</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=61" style="--c:#16a34a">
+<a class="program-card developed-card" href="catalogue-2/programs/civic-decision-lab.html" style="--c:#16a34a">
 <div class="card-icon">ðŸ—³ï¸</div>
 <div><span>Year 6 · Programme 61</span><h3>Civic Decision Lab</h3><p>Representation, respectful discussion, voting, data and community decisions</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=62" style="--c:#ea580c">
+<a class="program-card developed-card" href="catalogue-2/programs/earth-and-space-observatory.html" style="--c:#ea580c">
 <div class="card-icon">ðŸ”­</div>
 <div><span>Year 6 · Programme 62</span><h3>Earth and Space Observatory</h3><p>Solar system, rotation, revolution, scale and scientific models</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=63" style="--c:#9333ea">
+<a class="program-card developed-card" href="catalogue-2/programs/digital-storytelling-studio.html" style="--c:#9333ea">
 <div class="card-icon">ðŸŽ¬</div>
 <div><span>Form 1 · Programme 63</span><h3>Digital Storytelling Studio</h3><p>Script writing, media language, storyboarding, copyright and presentation</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=64" style="--c:#0f766e">
+<a class="program-card developed-card" href="catalogue-2/programs/food-science-investigation.html" style="--c:#0f766e">
 <div class="card-icon">ðŸ§ª</div>
 <div><span>Form 1 · Programme 64</span><h3>Food Science Investigation</h3><p>Nutrients, food tests, experimental variables, data and balanced nutrition</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=65" style="--c:#7c3aed">
+<a class="program-card developed-card" href="catalogue-2/programs/renewable-island-operations.html" style="--c:#7c3aed">
 <div class="card-icon">ðŸï¸</div>
 <div><span>Form 2 · Programme 65</span><h3>Renewable Island Operations</h3><p>Renewable resources, energy demand, storage, weather and system reliability</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=66" style="--c:#db2777">
+<a class="program-card developed-card" href="catalogue-2/programs/language-debate-arena.html" style="--c:#db2777">
 <div class="card-icon">ðŸŽ™ï¸</div>
 <div><span>Form 2 · Programme 66</span><h3>Language Debate Arena</h3><p>Claims, evidence, rebuttal, persuasive language and respectful communication</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=67" style="--c:#2563eb">
+<a class="program-card developed-card" href="catalogue-2/programs/cyber-safety-operations-centre.html" style="--c:#2563eb">
 <div class="card-icon">ðŸ’»</div>
 <div><span>Form 3 · Programme 67</span><h3>Cyber Safety Operations Centre</h3><p>Phishing, malware, authentication, backups, incident response and digital ethics</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=68" style="--c:#0891b2">
+<a class="program-card developed-card" href="catalogue-2/programs/sustainable-agriculture-simulator.html" style="--c:#0891b2">
 <div class="card-icon">ðŸšœ</div>
 <div><span>Form 3 · Programme 68</span><h3>Sustainable Agriculture Simulator</h3><p>Soil, water, crop planning, productivity, biodiversity and sustainable farming</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=69" style="--c:#16a34a">
+<a class="program-card developed-card" href="catalogue-2/programs/entrepreneurship-and-e-commerce-lab.html" style="--c:#16a34a">
 <div class="card-icon">ðŸ›’</div>
 <div><span>Form 4 · Programme 69</span><h3>Entrepreneurship and E-Commerce Lab</h3><p>Customer needs, digital storefronts, pricing, marketing metrics and consumer protection</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=70" style="--c:#ea580c">
+<a class="program-card developed-card" href="catalogue-2/programs/chemistry-in-everyday-life-lab.html" style="--c:#ea580c">
 <div class="card-icon">âš—ï¸</div>
 <div><span>Form 4 · Programme 70</span><h3>Chemistry in Everyday Life Lab</h3><p>Acids and alkalis, reaction evidence, household chemicals, concentration and safety</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=71" style="--c:#9333ea">
+<a class="program-card developed-card" href="catalogue-2/programs/ai-ethics-and-society-forum.html" style="--c:#9333ea">
 <div class="card-icon">ðŸ§ </div>
 <div><span>Form 5 · Programme 71</span><h3>AI Ethics and Society Forum</h3><p>AI systems, bias, privacy, transparency, accountability and evidence-based discussion</p></div>
 </a>
-<a class="program-card blueprint-card" href="catalogue-2/?programme=72" style="--c:#0f766e">
+<a class="program-card developed-card" href="catalogue-2/programs/climate-adaptation-city-planner.html" style="--c:#0f766e">
 <div class="card-icon">ðŸŒ§ï¸</div>
 <div><span>Form 5 · Programme 72</span><h3>Climate Adaptation City Planner</h3><p>Climate risk, flooding, heat, infrastructure, data and adaptation planning</p></div>
 </a>
