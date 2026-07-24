@@ -353,6 +353,7 @@
         : [...shortlist, no];
       localStorage.setItem("learning_catalogue_2_shortlist", JSON.stringify(shortlist));
       render();
+
       updateModalSave();
     }
 
@@ -417,6 +418,10 @@
     });
 
     render();
+    const requestedProgramme = Number(new URLSearchParams(window.location.search).get("programme"));
+    if (requestedProgramme && programmes.some(programme => programme.no === requestedProgramme)) {
+      openModal(requestedProgramme);
+    }
   </script>
   <script src="../../site-language.js"></script>
 </body>
