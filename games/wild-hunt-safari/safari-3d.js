@@ -45,33 +45,62 @@ for(let i=0;i<34;i++){const rock=new THREE.Mesh(new THREE.DodecahedronGeometry(.
 for(let i=0;i<8;i++){const grass=new THREE.Mesh(new THREE.ConeGeometry(.18,.9,5),new THREE.MeshStandardMaterial({color:0x405a25}));grass.position.set((Math.random()-.5)*25,.45,-5-Math.random()*25);scene.add(grass)}
 
 const matCache=new Map();
-function material(colour){if(!matCache.has(colour))matCache.set(colour,new THREE.MeshStandardMaterial({color:colour,roughness:.78}));return matCache.get(colour)}
+function material(colour,roughness=.88){const key=`${colour}-${roughness}`;if(!matCache.has(key))matCache.set(key,new THREE.MeshStandardMaterial({color:colour,roughness,metalness:0}));return matCache.get(key)}
 function mesh(geometry,colour,parent,x,y,z,sx=1,sy=1,sz=1){
   const m=new THREE.Mesh(geometry,material(colour));m.position.set(x,y,z);m.scale.set(sx,sy,sz);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m
 }
-const sphere=new THREE.SphereGeometry(1,12,9),box=new THREE.BoxGeometry(1,1,1),cylinder=new THREE.CylinderGeometry(.17,.2,1.5,7),cone=new THREE.ConeGeometry(.18,.7,8);
-function animalModel(def){
-  const root=new THREE.Group(),body=new THREE.Group();root.add(body);root.userData={def,legs:[],phase:Math.random()*6.28};
-  const longNeck=def.name==="Giraffe",large=def.name==="Elephant"||def.name==="Rhino";
-  mesh(sphere,def.colour,body,0,1.65,0,large?1.75:1.45,large?1.05:.88,large?.82:.68);
-  const neckHeight=longNeck?3.3:def.name==="Elephant"?.75:1.05;
-  mesh(cylinder,def.colour,body,.93,2.05+neckHeight*.38,0,longNeck?1.5:1,neckHeight,longNeck?1.5:1).rotation.z=longNeck?-.05:-.45;
-  const head=mesh(sphere,def.colour,body,longNeck?1.05:1.25,longNeck?4.65:2.45,0,longNeck?.62:.72,longNeck?.68:.62,longNeck?.62:.68);
-  if(def.name==="Lion")mesh(sphere,def.accent,body,1.18,2.48,0,.91,.86,.38);
-  if(def.name==="Elephant"){
-    const trunk=mesh(cylinder,def.colour,body,1.78,1.64,0,.72,1.35,.72);trunk.rotation.z=-.13;
-    mesh(sphere,def.accent,body,1.05,2.55,.64,.55,.78,.16);mesh(sphere,def.accent,body,1.05,2.55,-.64,.55,.78,.16)
-  }
-  if(def.name==="Rhino"){const horn=mesh(cone,def.accent,body,1.9,2.55,0,1.2,1.3,1.2);horn.rotation.z=-Math.PI/2}
-  if(def.name==="Giraffe"){mesh(cone,def.accent,body,.92,5.32,.25,.55,.65,.55);mesh(cone,def.accent,body,.92,5.32,-.25,.55,.65,.55)}
-  [-.88,.82].forEach(x=>[-.42,.42].forEach(z=>{const leg=mesh(cylinder,def.colour,body,x,large?.65:.68,z,large?1.18:.82,large?1.28:1,large?1.18:.82);root.userData.legs.push(leg)}));
-  const tail=mesh(cylinder,def.accent,body,-1.35,1.65,0,.38,.7,.38);tail.rotation.z=-1.05;
-  if(def.name==="Zebra")for(let i=-2;i<=2;i++)mesh(box,def.accent,body,i*.38,1.7,0,.09,.86,.72);
-  if(def.name==="Cheetah")for(let i=0;i<8;i++){const spot=mesh(sphere,def.accent,body,-.9+(i%4)*.55,1.55+Math.floor(i/4)*.45,.61,.11,.11,.05);spot.castShadow=false}
-  mesh(sphere,0x111111,head,.55,.18,.48,.08,.08,.08);mesh(sphere,0x111111,head,.55,.18,-.48,.08,.08,.08);
-  root.scale.setScalar(def.scale);root.traverse(o=>{if(o.isMesh)o.userData.animalRoot=root});return root
+const sphere=new THREE.SphereGeometry(1,18,13),box=new THREE.BoxGeometry(1,1,1),cone=new THREE.ConeGeometry(1,1,12),hoofGeometry=new THREE.SphereGeometry(1,12,8);
+function addEar(parent,x,y,z,colour,size=.28){const ear=mesh(cone,colour,parent,x,y,z,size,size*1.8,size*.48);ear.rotation.z=-.18;return ear}
+function addEye(parent,x,y,z){mesh(sphere,0xf7dfb0,parent,x,y,z,.105,.105,.065);mesh(sphere,0x100d09,parent,x+.055,y,z,.055,.065,.04)}
+function addLeg(parent,x,z,colour,hoofColour,long=false,heavy=false){
+  const leg=new THREE.Group();leg.position.set(x,long?1.15:heavy?.82:.78,z);parent.add(leg);
+  const upper=mesh(new THREE.CylinderGeometry(heavy?.19:.13,heavy?.16:.11,long?1.45:1.02,9),colour,leg,0,long?-.64:-.43,0);
+  const lower=mesh(new THREE.CylinderGeometry(heavy?.14:.095,heavy?.12:.08,long?1.35:.82,9),colour,leg,0,long?-1.72:-1.25,0);
+  mesh(hoofGeometry,hoofColour,leg,.08,long?-2.38:-1.68,0,heavy?.27:.2,.13,heavy?.26:.2);
+  leg.userData={upper,lower};return leg
 }
-function rangerModel(){
+function addSpots(parent,colour,bodyLength=2.5,count=16){for(let i=0;i<count;i++){const angle=(i%4)*Math.PI/2,x=-bodyLength*.42+(i%5)*(bodyLength*.2),y=1.58+Math.floor(i/5)*.32,z=Math.sin(angle)*.68;const spot=mesh(sphere,colour,parent,x,y,z,.09,.09,.045);spot.castShadow=false}}
+function animalModel(def){
+  const root=new THREE.Group(),body=new THREE.Group();root.add(body);
+  root.userData={def,legs:[],phase:Math.random()*6.28,head:null,tail:null};
+  const name=def.name,elephant=name==="Elephant",rhino=name==="Rhino",giraffe=name==="Giraffe",lion=name==="Lion",zebra=name==="Zebra",cheetah=name==="Cheetah";
+  const heavy=elephant||rhino,longLeg=giraffe;
+  const bodyLength=elephant?3.25:rhino?3.05:giraffe?2.6:lion?2.5:cheetah?2.65:2.55;
+  const bodyHeight=elephant?1.3:rhino?1.18:giraffe?.95:lion?.9:cheetah?.72:.82;
+  const torso=mesh(new THREE.CapsuleGeometry(bodyHeight*.72,bodyLength*.62,7,14),def.colour,body,0,1.65,0,1,1,1);torso.rotation.z=Math.PI/2;
+  mesh(sphere,def.colour,body,-bodyLength*.38,1.72,0,.72,bodyHeight*.92,.7);
+  mesh(sphere,def.colour,body,bodyLength*.38,1.73,0,.75,bodyHeight*.95,.72);
+  const headGroup=new THREE.Group();body.add(headGroup);root.userData.head=headGroup;
+  const neckX=bodyLength*.46;
+  if(giraffe){
+    const neck=mesh(new THREE.CylinderGeometry(.24,.4,3.35,12),def.colour,body,neckX,3.15,0);neck.rotation.z=-.08;
+    headGroup.position.set(neckX+.16,4.9,0);mesh(sphere,def.colour,headGroup,.22,0,0,.7,.58,.48);mesh(sphere,def.colour,headGroup,.82,-.08,0,.58,.34,.4);
+    addEar(headGroup,.12,.58,.42,def.colour,.25);addEar(headGroup,.12,.58,-.42,def.colour,.25);
+    [-.24,.24].forEach(z=>{const horn=mesh(new THREE.CylinderGeometry(.055,.075,.38,8),def.accent,headGroup,.08,.73,z);mesh(sphere,def.accent,headGroup,.08,.95,z,.1,.1,.1)});
+    addEye(headGroup,.58,.18,.42);addEye(headGroup,.58,.18,-.42);addSpots(body,def.accent,bodyLength,20);addSpots(headGroup,def.accent,1.3,5)
+  }else if(elephant){
+    const neck=mesh(sphere,def.colour,body,neckX,2.05,0,.72,.9,.78);headGroup.position.set(neckX+.7,2.35,0);
+    mesh(sphere,def.colour,headGroup,0,0,0,.88,.82,.82);mesh(sphere,def.accent,headGroup,-.05,.05,.75,.62,.82,.12);mesh(sphere,def.accent,headGroup,-.05,.05,-.75,.62,.82,.12);
+    const trunkTop=mesh(new THREE.CylinderGeometry(.2,.3,1.25,12),def.colour,headGroup,.68,-.55,0);trunkTop.rotation.z=-.12;const trunkTip=mesh(new THREE.CylinderGeometry(.13,.19,.72,12),def.colour,headGroup,.6,-1.45,0);trunkTip.rotation.z=.3;
+    [1,-1].forEach(side=>{const tusk=mesh(cone,0xf2e3bd,headGroup,.72,-.35,side*.34,.09,.8,.09);tusk.rotation.z=-2.02});addEye(headGroup,.65,.2,.61);addEye(headGroup,.65,.2,-.61)
+  }else if(rhino){
+    const neck=mesh(sphere,def.colour,body,neckX+.1,2.0,0,.85,.86,.82);headGroup.position.set(neckX+.75,2.12,0);
+    mesh(sphere,def.colour,headGroup,.18,0,0,.9,.62,.66);mesh(sphere,def.colour,headGroup,.85,-.13,0,.72,.4,.53);
+    const horn=mesh(cone,def.accent,headGroup,.95,.38,0,.17,1.1,.17);horn.rotation.z=-1.2;const horn2=mesh(cone,def.accent,headGroup,.45,.52,0,.11,.6,.11);horn2.rotation.z=-1.05;
+    addEar(headGroup,-.12,.65,.43,def.colour,.22);addEar(headGroup,-.12,.65,-.43,def.colour,.22);addEye(headGroup,.55,.22,.56);addEye(headGroup,.55,.22,-.56)
+  }else{
+    const neck=mesh(new THREE.CylinderGeometry(.3,.48,1.15,12),def.colour,body,neckX+.05,2.08,0);neck.rotation.z=-.7;
+    headGroup.position.set(neckX+.72,2.52,0);mesh(sphere,def.colour,headGroup,0,0,0,.72,.66,.58);mesh(sphere,def.colour,headGroup,.62,-.12,0,.58,.34,.42);
+    if(lion){mesh(new THREE.TorusGeometry(.72,.22,8,20),def.accent,headGroup,-.05,.02,0,1,1,.8).rotation.y=Math.PI/2;mesh(sphere,0xe7c184,headGroup,.76,-.14,0,.34,.22,.34)}
+    addEar(headGroup,-.18,.55,.38,def.accent,.24);addEar(headGroup,-.18,.55,-.38,def.accent,.24);addEye(headGroup,.48,.13,.47);addEye(headGroup,.48,.13,-.47);mesh(sphere,0x211914,headGroup,1.05,-.1,0,.13,.12,.14);
+    if(zebra){for(let i=-4;i<=4;i++){const stripe=mesh(new THREE.TorusGeometry(.65,.055,6,18),def.accent,body,i*.26,1.68,0,1,bodyHeight,1);stripe.rotation.y=Math.PI/2}for(let i=0;i<4;i++)mesh(box,def.accent,headGroup,-.25+i*.28,.05,0,.07,.62,.59)}
+    if(cheetah)addSpots(body,def.accent,bodyLength,22)
+  }
+  const legX=[-bodyLength*.34,bodyLength*.34];legX.forEach(x=>[-.48,.48].forEach(z=>root.userData.legs.push(addLeg(body,x,z,def.colour,heavy?0x44443f:0x34291f,longLeg,heavy))));
+  const tailPivot=new THREE.Group();tailPivot.position.set(-bodyLength*.58,1.75,0);body.add(tailPivot);root.userData.tail=tailPivot;
+  const tailLength=elephant?1.25:rhino?.72:giraffe?1.65:2.0;const tail=mesh(new THREE.CylinderGeometry(.055,.09,tailLength,9),def.colour,tailPivot,-tailLength*.45,-.25,0);tail.rotation.z=-1.15;mesh(sphere,def.accent,tailPivot,-tailLength*.88,-.64,0,.16,.24,.16);
+  root.scale.setScalar(def.scale);root.traverse(o=>{if(o.isMesh)o.userData.animalRoot=root});return root
+}function rangerModel(){
   const g=new THREE.Group();mesh(box,0x285c32,g,0,.72,0,2.1,.75,1);mesh(box,0xc7d0c4,g,.2,1.35,0,.9,.65,.9);
   [-.82,.82].forEach(x=>[-.58,.58].forEach(z=>{const w=mesh(new THREE.CylinderGeometry(.34,.34,.25,12),0x171717,g,x,.38,z);w.rotation.x=Math.PI/2}));
   g.userData={ranger:true,phase:Math.random()*6.28};g.traverse(o=>{if(o.isMesh)o.userData.animalRoot=g});return g
@@ -107,8 +136,10 @@ function animate(now){
     remaining-=dt;spawnTimer-=dt;if(spawnTimer<=0){spawn();spawnTimer=.7+Math.random()*.8}
     targets.slice().forEach(root=>{
       root.position.x+=root.userData.speed*dt;root.userData.phase+=dt*Math.abs(root.userData.speed)*1.7;
-      root.position.y=Math.abs(Math.sin(root.userData.phase))*0.08;
-      if(root.userData.legs)root.userData.legs.forEach((leg,i)=>leg.rotation.z=Math.sin(root.userData.phase+i*Math.PI)*.35);
+      root.position.y=Math.abs(Math.sin(root.userData.phase))*0.055;
+      if(root.userData.legs)root.userData.legs.forEach((leg,i)=>{const stride=Math.sin(root.userData.phase+(i%2?Math.PI:0))*.34;leg.rotation.z=stride;if(leg.userData.lower)leg.userData.lower.rotation.z=-stride*.42});
+      if(root.userData.head){root.userData.head.rotation.z=Math.sin(root.userData.phase*.5)*.035;root.userData.head.rotation.y=Math.sin(root.userData.phase*.23)*.08}
+      if(root.userData.tail)root.userData.tail.rotation.y=Math.sin(root.userData.phase*.8)*.48;
       if(Math.abs(root.position.x)>27)removeTarget(root)
     });
     if(now-lastHit>1900)combo=1;if(remaining<=0){remaining=0;finish()}updateHud()
