@@ -380,6 +380,14 @@
       border-left: 3px solid var(--accent);
     }
 
+    .live-pitch{position:relative;width:100%;aspect-ratio:1.72;max-height:290px;overflow:hidden;margin:12px 0;border:3px solid rgba(255,255,255,.72);border-radius:15px;background:repeating-linear-gradient(90deg,#168149 0 11%,#117541 11% 22%);box-shadow:inset 0 0 28px rgba(0,0,0,.25)}
+    .live-pitch::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;background:#ffffff9c}.live-pitch::after{content:"";position:absolute;left:50%;top:50%;width:21%;aspect-ratio:1;translate:-50% -50%;border:2px solid #ffffff9c;border-radius:50%}
+    .pitch-box{position:absolute;top:24%;bottom:24%;width:13%;border:2px solid #ffffff9c}.pitch-box.left{left:-2px;border-left:0}.pitch-box.right{right:-2px;border-right:0}
+    .pitch-goal{position:absolute;top:39%;bottom:39%;width:2.2%;border:2px solid #fff}.pitch-goal.left{left:0;border-left:0}.pitch-goal.right{right:0;border-right:0}
+    .live-player,.live-ball{position:absolute;left:50%;top:50%;translate:-50% -50%;border-radius:50%;transition:left .23s ease,top .23s ease,transform .18s ease,box-shadow .18s ease;z-index:3}
+    .live-player{width:17px;height:17px;border:2px solid #fff;box-shadow:0 2px 5px #0008}.live-player.home{background:#ef4444}.live-player.away{background:#2563eb}.live-player.keeper{background:#facc15;border-color:#422006}
+    .live-ball{width:9px;height:9px;background:#fff;border:1px solid #111;box-shadow:0 1px 4px #000;z-index:4}.live-pitch.goal-flash{box-shadow:inset 0 0 45px #facc15,0 0 18px #facc15}.pitch-legend{display:flex;justify-content:center;gap:16px;margin:-5px 0 10px;color:var(--muted);font-size:11px;font-weight:800}.pitch-legend i{display:inline-block;width:10px;height:10px;margin-right:4px;border:1px solid #fff;border-radius:50%;vertical-align:-1px}
+    @media(max-width:620px){.live-player{width:13px;height:13px}.live-ball{width:7px;height:7px}.live-pitch{border-width:2px}.modal-card{padding:13px}}
     .match-score {
       text-align: center;
       padding: 16px;
@@ -716,6 +724,10 @@
       <div class="score" id="liveScore">0 - 0</div>
       <div><strong id="matchAway">Kinabalu United</strong></div>
     </div>
+    <div class="live-pitch" id="livePitch" aria-label="Animated live match pitch">
+      <div class="pitch-box left"></div><div class="pitch-box right"></div><div class="pitch-goal left"></div><div class="pitch-goal right"></div>
+    </div>
+    <div class="pitch-legend"><span><i style="background:#ef4444"></i>Home</span><span><i style="background:#2563eb"></i>Away</span><span>⚪ Ball</span></div>
     <div class="bar"><span id="matchProgressBar" style="width:0%"></span></div>
     <div id="matchEvents" class="event-log" style="margin-top:14px"></div>
     <button class="secondary" id="skipMatchBtn" type="button" style="margin-top:12px;width:100%">Skip to Full Time</button>
@@ -1133,11 +1145,43 @@
     els.matchEvents.innerHTML = '<div class="event">Kick-off!</div>';
     els.matchProgressBar.style.width = "0%";
     els.matchMinute.textContent = "0'";
+    els.skipMatchBtn.textContent = "Skip to Full Time";
 
     let minute = 0, hg = 0, ag = 0, done = false;
     const ourHome = fixture.home === CLUB;
     const ourStrength = squadAverage() + tacticBonus();
     const oppStrength = 67 + Math.floor(Math.random()*10) + Math.min(state.week/3,4);
+    let pitchMoment = "play";
+    const pitchPlayers={home:[],away:[]};
+    const homeShape=[[5,50],[20,17],[20,39],[20,61],[20,83],[42,24],[42,50],[42,76],[63,22],[66,50],[63,78]];
+    const awayShape=homeShape.map(([x,y])=>[100-x,y]);
+
+    function setupLivePitch(){
+      els.livePitch.querySelectorAll(".live-player,.live-ball").forEach(node=>node.remove());
+      [["home",homeShape],["away",awayShape]].forEach(([team,shape])=>shape.forEach(([x,y],index)=>{
+        const dot=document.createElement("span");dot.className=`live-player ${team}${index===0?" keeper":""}`;dot.dataset.x=x;dot.dataset.y=y;dot.setAttribute("aria-hidden","true");dot.style.left=x+"%";dot.style.top=y+"%";els.livePitch.appendChild(dot);pitchPlayers[team].push(dot);
+      }));
+      const ball=document.createElement("span");ball.className="live-ball";ball.id="liveBall";ball.setAttribute("aria-hidden","true");els.livePitch.appendChild(ball);
+      updateLivePitch("kickoff");
+    }
+
+    function updateLivePitch(moment="play"){
+      const homeAttacks=moment==="homeGoal"||moment!=="awayGoal"&&Math.random()<(ourHome?ourStrength:oppStrength)/(ourStrength+oppStrength);
+      [["home",homeAttacks?8:-3],["away",homeAttacks?3:-8]].forEach(([team,shift])=>pitchPlayers[team].forEach((dot,index)=>{
+        const baseX=Number(dot.dataset.x),baseY=Number(dot.dataset.y),direction=team==="home"?1:-1;
+        const movement=index===0?shift*.18:shift*(.55+index/22),jitter=index===0?1.2:3.2;
+        dot.style.left=THREEClamp(baseX+direction*movement+(Math.random()-.5)*jitter,2.5,97.5)+"%";
+        dot.style.top=THREEClamp(baseY+(Math.random()-.5)*(index===0?4:11),6,94)+"%";
+      }));
+      const ball=els.livePitch.querySelector(".live-ball");
+      let ballX=homeAttacks?58+Math.random()*25:42-Math.random()*25,ballY=18+Math.random()*64;
+      if(moment==="homeGoal"){ballX=98;ballY=50}else if(moment==="awayGoal"){ballX=2;ballY=50}else if(moment==="kickoff"){ballX=50;ballY=50}
+      ball.style.left=ballX+"%";ball.style.top=ballY+"%";
+      els.livePitch.setAttribute("aria-label",`${minute}' live pitch: ${fixture.home} ${hg}, ${fixture.away} ${ag}`);
+      if(moment.endsWith("Goal")){els.livePitch.classList.add("goal-flash");setTimeout(()=>els.livePitch.classList.remove("goal-flash"),220)}
+    }
+    function THREEClamp(value,min,max){return Math.max(min,Math.min(max,value))}
+    setupLivePitch();
 
     const interval = setInterval(()=>{
       if (done) return;
@@ -1148,6 +1192,7 @@
     }, 250);
 
     function simulateSlice() {
+      pitchMoment = "play";
       const homeStrength = ourHome ? ourStrength : oppStrength;
       const awayStrength = ourHome ? oppStrength : ourStrength;
       const homeChance = 0.055 + (homeStrength-awayStrength)/900;
@@ -1155,10 +1200,12 @@
 
       if (Math.random()<homeChance) {
         hg++;
+        pitchMoment = "homeGoal";
         addEvent(`${minute}' GOAL — ${fixture.home}!`);
         if (ourHome) addPlayerGoal();
       } else if (Math.random()<awayChance) {
         ag++;
+        pitchMoment = "awayGoal";
         addEvent(`${minute}' GOAL — ${fixture.away}!`);
         if (!ourHome) addPlayerGoal();
       } else if (Math.random()<0.23) {
@@ -1178,6 +1225,7 @@
       els.liveScore.textContent=`${hg} - ${ag}`;
       els.matchMinute.textContent=`${Math.min(90,minute)}'`;
       els.matchProgressBar.style.width=`${Math.min(100,minute/90*100)}%`;
+      updateLivePitch(pitchMoment);
     }
 
     function finish() {
