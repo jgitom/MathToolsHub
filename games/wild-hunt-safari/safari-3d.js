@@ -32,6 +32,9 @@ const hillMat=new THREE.MeshStandardMaterial({color:0x40552e,roughness:1});
 for(let i=0;i<9;i++){const hill=new THREE.Mesh(new THREE.ConeGeometry(7+Math.random()*7,7+Math.random()*5,7),hillMat);hill.position.set(-45+i*12,-1,-50-Math.random()*13);hill.scale.z=1.8;scene.add(hill)}
 const sunDisk=new THREE.Mesh(new THREE.SphereGeometry(3,24,16),new THREE.MeshBasicMaterial({color:0xffd36c}));
 sunDisk.position.set(22,17,-48);scene.add(sunDisk);
+const backdropTexture=new THREE.TextureLoader().load("./assets/realistic-savanna.webp",texture=>{texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy())});
+const backdropMaterial=new THREE.MeshBasicMaterial({map:backdropTexture,fog:false,depthWrite:false});
+const savannaBackdrop=new THREE.Mesh(new THREE.PlaneGeometry(46,30.6),backdropMaterial);savannaBackdrop.position.set(0,10,-62);savannaBackdrop.renderOrder=-2;scene.add(savannaBackdrop);
 
 const trunkMat=new THREE.MeshStandardMaterial({color:0x684526,roughness:1}),leafMat=new THREE.MeshStandardMaterial({color:0x315925,roughness:1});
 function tree(x,z,s=1){
