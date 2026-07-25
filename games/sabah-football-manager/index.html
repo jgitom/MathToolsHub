@@ -408,6 +408,10 @@
       font-weight:800;
     }
     .match-rating strong{color:var(--gold)}
+    .player-ratings{margin-top:10px;padding:10px 11px;border:1px solid var(--line);border-radius:12px;background:rgba(0,0,0,.14)}
+    .player-ratings h3{margin:0 0 7px;font-size:13px;color:#d9fbe7;text-align:center}
+    .player-ratings table{min-width:0}
+    .player-ratings th,.player-ratings td{padding:6px 7px;font-size:11px}
     .match-score .score {
       font-size: 42px;
       font-weight: 950;
@@ -611,7 +615,7 @@
         <div class="table-wrap">
           <table>
             <thead>
-              <tr><th>No.</th><th>Player</th><th>Pos</th><th>Age</th><th>Rating</th><th>Fitness</th><th>Morale</th><th>Goals</th><th>Status</th></tr>
+              <tr><th>No.</th><th>Player</th><th>Pos</th><th>Age</th><th>Rating</th><th>Last</th><th>Fitness</th><th>Morale</th><th>Goals</th><th>Status</th></tr>
             </thead>
             <tbody id="squadBody"></tbody>
           </table>
@@ -759,6 +763,15 @@
         <strong id="fullTimeRating">FT rating: --</strong>
       </div>
     </div>
+    <div class="player-ratings">
+      <h3>Individual Player Ratings</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>No.</th><th>Player</th><th>Pos</th><th>HT</th><th>FT</th></tr></thead>
+          <tbody id="matchRatingsBody"></tbody>
+        </table>
+      </div>
+    </div>
     <div class="live-pitch" id="livePitch" aria-label="Animated live match pitch">
       <div class="pitch-box left"></div><div class="pitch-box right"></div><div class="pitch-goal left"></div><div class="pitch-goal right"></div>
     </div>
@@ -903,6 +916,8 @@
     player.suspensionWeeks=Math.max(0,Number(player.suspensionWeeks)||0);
     player.injuryWeeks=Math.max(0,Number(player.injuryWeeks)||0);
     player.injury=player.injuryWeeks ? (player.injury||"Match injury") : "";
+    player.lastMatchRating=Number.isFinite(Number(player.lastMatchRating))?Number(player.lastMatchRating):null;
+    player.lastHalfRating=Number.isFinite(Number(player.lastHalfRating))?Number(player.lastHalfRating):null;
   });
   ensurePlayerNumbers();
   if (!state.fixtures.length || !state.table.length) initialiseSeason();
@@ -1097,6 +1112,7 @@
       <tr>
         <td><input class="number-input" type="number" min="1" max="99" inputmode="numeric" aria-label="Player number for ${p.name}" data-id="${p.id}" value="${p.number}" ${state.numberMode==="auto"?"disabled":""}></td>
         <td>${p.name}</td><td>${p.pos}</td><td>${p.age}</td><td>${ratingBadge(p.rating)}</td>
+        <td>${p.lastMatchRating!=null?`<span class="rating ${p.lastMatchRating>=7.2?"":p.lastMatchRating>=6.5?"mid":"low"}">${p.lastMatchRating.toFixed(1)}</span>`:'<span class="status">--</span>'}</td>
         <td>${Math.round(p.fitness)}%</td><td>${Math.round(p.morale)}%</td><td>${p.goals}</td>
         <td>${availabilityHtml(p)}<button class="secondary toggle-starter" data-id="${p.id}" type="button" ${isAvailable(p)?"":"disabled"}>${p.starter ? "Starting XI" : "Bench"}</button></td>
       </tr>
@@ -1326,6 +1342,8 @@
     let pauseMode = "";
     let matchRating = 6.8;
     let halfTimeRatingSnapshot = null;
+    const matchPlayerRatings = new Map();
+    const halfRatings = new Map();
     const ourHome = fixture.home === CLUB;
     let ourStrength = squadAverage() + tacticBonus();
     let oppStrength = 67 + Math.floor(Math.random()*10) + Math.min(state.week/3,4);
@@ -1339,6 +1357,7 @@
     const homeShape=[[5,50],[20,17],[20,39],[20,61],[20,83],[42,24],[42,50],[42,76],[63,22],[66,50],[63,78]];
     const awayShape=homeShape.map(([x,y])=>[100-x,y]);
     let ourNumbers=state.players.filter(player=>player.starter).sort((a,b)=>positionOrder(a.pos)-positionOrder(b.pos)).slice(0,11).map(player=>player.number);
+    state.players.forEach(player=>{if(player.starter)matchPlayerRatings.set(player.id,6.8)});
 
     function setupLivePitch(){
       els.livePitch.querySelectorAll(".live-player,.live-ball").forEach(node=>node.remove());
@@ -1373,9 +1392,23 @@
     els.halfTimeRating.textContent = "HT rating: --";
     els.fullTimeRating.textContent = `FT rating: ${matchRating.toFixed(1)}`;
     refreshLivePlayers();
+    renderMatchRatings();
 
     function clampRating(value){return Math.max(1,Math.min(10,value))}
     function adjustMatchRating(delta){matchRating=clampRating(matchRating+delta);els.fullTimeRating.textContent=`FT rating: ${matchRating.toFixed(1)}`}
+    function playerRating(id){return matchPlayerRatings.has(id)?matchPlayerRatings.get(id):6.8}
+    function adjustPlayerMatchRating(id,delta){matchPlayerRatings.set(id,clampRating(playerRating(id)+delta));}
+    function renderMatchRatings(){
+      const rows=state.players
+        .filter(player=>playedIds.has(player.id) || matchPlayerRatings.has(player.id))
+        .sort((a,b)=>Number(b.starter)-Number(a.starter)||positionOrder(a.pos)-positionOrder(b.pos))
+        .map(player=>{
+          const ht=halfRatings.has(player.id)?halfRatings.get(player.id).toFixed(1):"--";
+          const ft=matchPlayerRatings.has(player.id)?matchPlayerRatings.get(player.id).toFixed(1):"--";
+          return `<tr><td>#${player.number}</td><td>${player.name}</td><td>${player.pos}</td><td>${ht}</td><td>${ft}</td></tr>`;
+        }).join("");
+      els.matchRatingsBody.innerHTML=rows || '<tr><td colspan="5" style="text-align:center;color:var(--muted)">No ratings yet</td></tr>';
+    }
 
     const interval = setInterval(()=>{
       if (done || paused) return;
@@ -1405,9 +1438,13 @@
       const playerOn=state.players.find(player=>player.id===Number(els.livePlayerOn.value));
       if(!playerOff || !playerOn || !playerOff.starter || playerOn.starter || substitutedOut.has(playerOff.id) || sentOffIds.has(playerOff.id) || !isAvailable(playerOn))return;
       playerOff.starter=false;playerOn.starter=true;substitutedOut.add(playerOff.id);playedIds.add(playerOn.id);substitutions++;
+      if(!matchPlayerRatings.has(playerOn.id))matchPlayerRatings.set(playerOn.id,6.6);
+      adjustPlayerMatchRating(playerOn.id,0.12);
+      adjustPlayerMatchRating(playerOff.id,-0.04);
       addEvent(`${minute}' Substitution: #${playerOn.number} ${playerOn.name} replaces #${playerOff.number} ${playerOff.name}.`);
       refreshLivePlayers();refreshHalftimePlayers();refreshOurLiveNumbers();refreshOurStrength();saveGame();
       adjustMatchRating(0.08);
+      renderMatchRatings();
     }
 
     function makeIncidentSubstitution(){
@@ -1416,9 +1453,13 @@
       const playerOn=state.players.find(player=>player.id===Number(els.incidentPlayerOn.value));
       if(!playerOff || !playerOn || !playerOff.starter || playerOn.starter || sentOffIds.has(playerOff.id) || !isAvailable(playerOn))return;
       playerOff.starter=false;playerOn.starter=true;substitutedOut.add(playerOff.id);playedIds.add(playerOn.id);substitutions++;
+      if(!matchPlayerRatings.has(playerOn.id))matchPlayerRatings.set(playerOn.id,6.6);
+      adjustPlayerMatchRating(playerOn.id,0.15);
+      adjustPlayerMatchRating(playerOff.id,-0.05);
       addEvent(`${minute}' Incident change: #${playerOn.number} ${playerOn.name} replaces #${playerOff.number} ${playerOff.name}.`);
       refreshLivePlayers();refreshHalftimePlayers();refreshOurLiveNumbers();refreshOurStrength();
       adjustMatchRating(0.12);
+      renderMatchRatings();
     }
 
     function refreshHalftimePlayers(){
@@ -1441,6 +1482,7 @@
       els.matchMinute.textContent="HT";
       halfTimeRatingSnapshot = matchRating;
       els.halfTimeRating.textContent = `HT rating: ${halfTimeRatingSnapshot.toFixed(1)}`;
+      matchPlayerRatings.forEach((value,id)=>halfRatings.set(id,value));
       addEvent(`45' Half-time. The manager can now make changes.`);
       els.halftimeFormation.value=state.formation;
       els.halftimeMentality.value=state.mentality;
@@ -1462,8 +1504,11 @@
       if(!playerOff || !playerOn || !playerOff.starter || playerOn.starter || sentOffIds.has(playerOff.id) || !isAvailable(playerOn))return;
       playerOff.starter=false;playerOn.starter=true;
       substitutedOut.add(playerOff.id);playedIds.add(playerOn.id);substitutions++;
+      if(!matchPlayerRatings.has(playerOn.id))matchPlayerRatings.set(playerOn.id,6.6);
+      adjustPlayerMatchRating(playerOn.id,0.12);
       addEvent(`HT Substitution: #${playerOn.number} ${playerOn.name} replaces #${playerOff.number} ${playerOff.name}.`);
       refreshHalftimePlayers();refreshLivePlayers();refreshOurLiveNumbers();refreshOurStrength();
+      renderMatchRatings();
     }
 
     function startSecondHalf(){
@@ -1480,6 +1525,7 @@
       refreshLivePlayers();
       els.matchMinute.textContent="46'";
       saveGame();
+      renderMatchRatings();
     }
 
     function pauseForIncident(message, isOurIncident){
@@ -1550,6 +1596,7 @@
         addEvent(`${minute}' 🟥 RED CARD - #${player.number} ${player.name}. Two-match suspension.`);
         pauseForIncident(`#${player.number} ${player.name} is sent off.`,true);
         adjustMatchRating(-0.38);
+        adjustPlayerMatchRating(player.id,-1.1);
       }else{
         const matchCount=(matchYellows.get(player.id)||0)+1;matchYellows.set(player.id,matchCount);player.yellowCards++;matchStats[team+"YellowCards"]++;
         if(matchCount>=2){
@@ -1557,14 +1604,17 @@
           addEvent(`${minute}' 🟨🟥 Second yellow - #${player.number} ${player.name} is sent off.`);
           pauseForIncident(`#${player.number} ${player.name} is sent off.`,true);
           adjustMatchRating(-0.32);
+          adjustPlayerMatchRating(player.id,-0.95);
         }else{
           addEvent(`${minute}' 🟨 Yellow card - #${player.number} ${player.name}.`);
           adjustMatchRating(-0.08);
+          adjustPlayerMatchRating(player.id,-0.35);
           if(player.yellowCards>=5){player.yellowCards=0;player.suspensionWeeks=Math.max(player.suspensionWeeks,1);newUnavailableIds.add(player.id);addEvent(`${minute}' #${player.number} ${player.name} will miss the next match after five yellow cards.`)}
         }
       }
       refreshOurStrength();
       refreshLivePlayers();refreshOurLiveNumbers();
+      renderMatchRatings();
     }
 
     function registerInjury(){
@@ -1579,8 +1629,10 @@
       addEvent(`${minute}' 🩹 INJURY - #${player.number} ${player.name}: ${injury.name} (${injury.weeks} match${injury.weeks===1?"":"es"}).`);
       pauseForIncident(`#${player.number} ${player.name} is injured (${injury.name}).`,true);
       adjustMatchRating(-0.22);
+      adjustPlayerMatchRating(player.id,-0.7);
       refreshOurStrength();
       refreshLivePlayers();refreshOurLiveNumbers();
+      renderMatchRatings();
     }
 
     function simulateSlice() {
@@ -1596,14 +1648,16 @@
         hg++;matchStats.homeShots++;matchStats.homeOnTarget++;
         pitchMoment = "homeGoal";
         addEvent(`${minute}' GOAL - ${fixture.home}!`);
-        if (ourHome) addPlayerGoal();
+        const scorer = ourHome ? addPlayerGoal() : null;
         if (ourHome) adjustMatchRating(0.4); else adjustMatchRating(-0.35);
+        if (scorer) adjustPlayerMatchRating(scorer.id,0.95);
       } else if (Math.random()<awayChance) {
         ag++;matchStats.awayShots++;matchStats.awayOnTarget++;
         pitchMoment = "awayGoal";
         addEvent(`${minute}' GOAL - ${fixture.away}!`);
-        if (!ourHome) addPlayerGoal();
+        const scorer = !ourHome ? addPlayerGoal() : null;
         if (!ourHome) adjustMatchRating(0.4); else adjustMatchRating(-0.35);
+        if (scorer) adjustPlayerMatchRating(scorer.id,0.95);
       } else if (Math.random()<0.32) {
         const team=pitchHomeAttacks?"home":"away",name=pitchHomeAttacks?fixture.home:fixture.away,eventRoll=Math.random();
         if(eventRoll<.36){matchStats[team+"Shots"]++;matchStats[team+"OnTarget"]++;addEvent(`${minute}' ${name} force a strong save.`)}
@@ -1615,6 +1669,7 @@
       if(Math.random()<.055)matchStats[(pitchHomeAttacks?"away":"home")+"Fouls"]++;
       issueCard();
       registerInjury();
+      renderMatchRatings();
     }
 
     function renderMatchStats(){
@@ -1660,6 +1715,8 @@
       state.news.unshift(`${fixture.home} ${hg}-${ag} ${fixture.away}.`);
 
       state.players.forEach(p=>{
+        p.lastHalfRating=halfRatings.has(p.id)?Number(halfRatings.get(p.id).toFixed(1)):null;
+        p.lastMatchRating=matchPlayerRatings.has(p.id)?Number(matchPlayerRatings.get(p.id).toFixed(1)):null;
         if(!newUnavailableIds.has(p.id)){
           p.suspensionWeeks=Math.max(0,(p.suspensionWeeks||0)-1);
           p.injuryWeeks=Math.max(0,(p.injuryWeeks||0)-1);
@@ -1684,11 +1741,15 @@
       setTimeout(()=>{
         els.matchEvents.prepend(Object.assign(document.createElement("div"),{className:"event",textContent:"Full time. Close this window to continue."}));
       },100);
+      renderMatchRatings();
     }
 
     function addPlayerGoal() {
       const candidates=state.players.filter(p=>p.starter && !sentOffIds.has(p.id) && !matchInjuredIds.has(p.id) && ["ST","LW","RW","AM","CM"].includes(p.pos));
-      if (candidates.length) candidates[Math.floor(Math.random()*candidates.length)].goals++;
+      if (!candidates.length) return null;
+      const scorer = candidates[Math.floor(Math.random()*candidates.length)];
+      scorer.goals++;
+      return scorer;
     }
 
     els.skipMatchBtn.onclick=()=>{
