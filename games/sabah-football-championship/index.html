@@ -569,6 +569,15 @@
       };
 
       let audioCtx = null;
+      const stadiumAudio = {
+        masterGain: null,
+        crowdSource: null,
+        crowdFilter: null,
+        crowdGain: null,
+        rumbleOsc: null,
+        chantTimer: null,
+        active: false
+      };
 
       function loadProgress() {
         try {
@@ -609,7 +618,7 @@
       function playTone(freq, duration = 0.1, type = "sine", volume = 0.05) {
         if (!state.sound) return;
         try {
-          audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+          audioCtx = ensureAudioContext();
           const osc = audioCtx.createOscillator();
           const gain = audioCtx.createGain();
           osc.type = type;
@@ -621,6 +630,131 @@
           gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
           osc.stop(audioCtx.currentTime + duration);
         } catch {}
+      }
+
+      function ensureAudioContext() {
+        audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume().catch(() => {});
+        return audioCtx;
+      }
+
+      function createNoiseBuffer(ctx, seconds = 2.4) {
+        const length = Math.floor(ctx.sampleRate * seconds);
+        const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < length; i++) data[i] = (Math.random() * 2 - 1) * 0.65;
+        return buffer;
+      }
+
+      function setStadiumIntensity(level, ramp = 0.35) {
+        if (!stadiumAudio.masterGain || !audioCtx) return;
+        const t = audioCtx.currentTime;
+        stadiumAudio.masterGain.gain.cancelScheduledValues(t);
+        stadiumAudio.masterGain.gain.setTargetAtTime(level, t, Math.max(0.08, ramp));
+      }
+
+      function queueCrowdChant() {
+        clearTimeout(stadiumAudio.chantTimer);
+        if (!stadiumAudio.active || !state.sound || !audioCtx) return;
+
+        const delay = 4200 + Math.random() * 4200;
+        stadiumAudio.chantTimer = setTimeout(() => {
+          if (!stadiumAudio.active || !state.sound || !audioCtx) return;
+
+          const t = audioCtx.currentTime;
+          const chantGain = audioCtx.createGain();
+          chantGain.gain.value = 0.0001;
+          chantGain.connect(stadiumAudio.masterGain);
+
+          const o1 = audioCtx.createOscillator();
+          const o2 = audioCtx.createOscillator();
+          o1.type = "sawtooth";
+          o2.type = "triangle";
+          o1.frequency.value = 170 + Math.random() * 30;
+          o2.frequency.value = o1.frequency.value * 1.5;
+          o1.connect(chantGain);
+          o2.connect(chantGain);
+
+          chantGain.gain.setValueAtTime(0.0001, t);
+          chantGain.gain.linearRampToValueAtTime(0.04, t + 0.12);
+          chantGain.gain.linearRampToValueAtTime(0.055, t + 0.35);
+          chantGain.gain.exponentialRampToValueAtTime(0.00015, t + 1.2);
+
+          o1.start(t);
+          o2.start(t);
+          o1.stop(t + 1.25);
+          o2.stop(t + 1.25);
+          o1.onended = () => chantGain.disconnect();
+
+          queueCrowdChant();
+        }, delay);
+      }
+
+      function startStadiumAmbience() {
+        if (!state.sound || stadiumAudio.active) return;
+        try {
+          const ctx = ensureAudioContext();
+          stadiumAudio.masterGain = ctx.createGain();
+          stadiumAudio.masterGain.gain.value = 0.0001;
+          stadiumAudio.masterGain.connect(ctx.destination);
+
+          const source = ctx.createBufferSource();
+          source.buffer = createNoiseBuffer(ctx);
+          source.loop = true;
+
+          const filter = ctx.createBiquadFilter();
+          filter.type = "bandpass";
+          filter.frequency.value = 640;
+          filter.Q.value = 0.55;
+
+          const crowdGain = ctx.createGain();
+          crowdGain.gain.value = 0.09;
+
+          const rumble = ctx.createOscillator();
+          rumble.type = "sine";
+          rumble.frequency.value = 54;
+          const rumbleGain = ctx.createGain();
+          rumbleGain.gain.value = 0.007;
+
+          source.connect(filter);
+          filter.connect(crowdGain);
+          crowdGain.connect(stadiumAudio.masterGain);
+          rumble.connect(rumbleGain);
+          rumbleGain.connect(stadiumAudio.masterGain);
+
+          source.start();
+          rumble.start();
+
+          stadiumAudio.crowdSource = source;
+          stadiumAudio.crowdFilter = filter;
+          stadiumAudio.crowdGain = crowdGain;
+          stadiumAudio.rumbleOsc = rumble;
+          stadiumAudio.active = true;
+
+          setStadiumIntensity(0.085, 0.5);
+          queueCrowdChant();
+        } catch {}
+      }
+
+      function stopStadiumAmbience() {
+        clearTimeout(stadiumAudio.chantTimer);
+        stadiumAudio.chantTimer = null;
+        if (!stadiumAudio.active) return;
+
+        try { if (stadiumAudio.crowdSource) stadiumAudio.crowdSource.stop(); } catch {}
+        try { if (stadiumAudio.rumbleOsc) stadiumAudio.rumbleOsc.stop(); } catch {}
+        try { if (stadiumAudio.crowdSource) stadiumAudio.crowdSource.disconnect(); } catch {}
+        try { if (stadiumAudio.crowdFilter) stadiumAudio.crowdFilter.disconnect(); } catch {}
+        try { if (stadiumAudio.crowdGain) stadiumAudio.crowdGain.disconnect(); } catch {}
+        try { if (stadiumAudio.rumbleOsc) stadiumAudio.rumbleOsc.disconnect(); } catch {}
+        try { if (stadiumAudio.masterGain) stadiumAudio.masterGain.disconnect(); } catch {}
+
+        stadiumAudio.masterGain = null;
+        stadiumAudio.crowdSource = null;
+        stadiumAudio.crowdFilter = null;
+        stadiumAudio.crowdGain = null;
+        stadiumAudio.rumbleOsc = null;
+        stadiumAudio.active = false;
       }
 
       function resetPositions(kickoff = "home") {
@@ -670,6 +804,8 @@
         resetPositions("home");
         saveProgress();
         updateStats();
+        startStadiumAmbience();
+        setStadiumIntensity(0.085, 0.45);
         showMessage("Kick off!");
         playTone(520, 0.12);
 
@@ -683,6 +819,7 @@
         state.paused = false;
         cancelAnimationFrame(state.animationId);
         ui.incidentOverlay.classList.add("hidden");
+        stopStadiumAmbience();
 
         let reward = 10;
         let title = "Match Draw";
@@ -950,6 +1087,7 @@
       function pauseForIncident(title, text) {
         state.paused = true;
         keys.up = keys.down = keys.left = keys.right = false;
+        setStadiumIntensity(0.038, 0.25);
         ui.incidentTitle.textContent = title;
         ui.incidentText.textContent = text;
         ui.incidentOverlay.classList.remove("hidden");
@@ -960,6 +1098,7 @@
       function resumeAfterIncident() {
         if (!state.running) return;
         state.paused = false;
+        setStadiumIntensity(0.085, 0.35);
         ui.incidentOverlay.classList.add("hidden");
         showMessage("Play resumed", 800);
         playTone(540, 0.08, "triangle", 0.05);
@@ -1344,12 +1483,22 @@
       ui.menuBtn.addEventListener("click", () => {
         ui.resultOverlay.classList.add("hidden");
         ui.menuOverlay.classList.remove("hidden");
+        stopStadiumAmbience();
       });
 
       ui.soundBtn.addEventListener("click", () => {
         state.sound = !state.sound;
         ui.soundBtn.textContent = `Sound: ${state.sound ? "On" : "Off"}`;
-        if (state.sound) playTone(520, 0.08);
+        if (state.sound) {
+          playTone(520, 0.08);
+          if (state.running) {
+            startStadiumAmbience();
+            if (state.paused) setStadiumIntensity(0.038, 0.2);
+            else setStadiumIntensity(0.085, 0.35);
+          }
+        } else {
+          stopStadiumAmbience();
+        }
       });
 
       ui.resetProgressBtn.addEventListener("click", () => {
