@@ -223,6 +223,6 @@ h1{font-size:clamp(32px,6vw,60px);margin:0 0 10px}.page-actions{position:fixed;r
 const cards=[...document.querySelectorAll(".program-card")];
 document.querySelectorAll("#filters button").forEach(b=>b.addEventListener("click",()=>{
 document.querySelectorAll("#filters button").forEach(x=>x.classList.remove("active"));b.classList.add("active");
-const f=b.dataset.level;cards.forEach(c=>{const t=c.querySelector("span").textContent;c.style.display=f==="All"||t.includes(f)||(f==="Primary"&&/Year/.test(t))||(f==="Secondary"&&/Form/.test(t))?"grid":"none"})
+const f=b.dataset.level;cards.forEach(c=>{c.style.display=f==="All"||c.dataset.learningLevel===f?"grid":"none"})
 }));
-</script><script src="../site-language.js"></script></body></html>
+</script><script src="../site-language.js"></script><script src="catalogue-i18n.js"></script></body></html>
