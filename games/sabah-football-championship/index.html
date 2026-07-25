@@ -299,7 +299,7 @@
       transform: scale(0.96);
     }
 
-    .action-buttons{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}.pass-btn{width:86px;height:86px;border-radius:999px;color:#082f49;background:#7dd3fc;border:6px solid rgba(255,255,255,.14);font-weight:950;font-size:15px;touch-action:none}
+    .action-buttons{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}.pass-btn,.next-btn{width:82px;height:82px;border-radius:999px;color:#082f49;border:6px solid rgba(255,255,255,.14);font-weight:950;font-size:14px;touch-action:none}.pass-btn{background:#7dd3fc}.next-btn{background:#bef264}
 
     .shoot-btn {
       width: 110px;
@@ -358,7 +358,7 @@
         grid-template-columns: repeat(3, 44px);
         grid-template-rows: repeat(3, 44px);
       }
-      .shoot-btn { width: 84px; height: 84px; font-size: 14px; }.pass-btn{width:72px;height:72px;font-size:13px}.action-buttons{gap:4px}
+      .shoot-btn { width: 78px; height: 78px; font-size: 13px; }.pass-btn,.next-btn{width:64px;height:64px;font-size:11px}.action-buttons{gap:3px}
     }
     .mth-back{position:fixed;left:12px;top:10px;z-index:10000;padding:9px 13px;border:1px solid rgba(255,255,255,.18);border-radius:999px;color:#fff;background:rgba(3,16,10,.9);box-shadow:0 5px 18px rgba(0,0,0,.35);text-decoration:none;font-size:12px;font-weight:850}.mth-back:hover,.mth-back:focus-visible{background:#166534;outline:2px solid #66f0a8;outline-offset:2px}@media(max-width:620px){.mth-back{left:7px;top:6px;padding:7px 9px}}
   </style>
@@ -462,13 +462,13 @@
         <span></span>
       </div>
       <div></div>
-      <div class="action-buttons"><button id="passBtn" class="pass-btn" type="button">PASS</button><button id="shootBtn" class="shoot-btn" type="button">SHOOT</button></div>
+      <div class="action-buttons"><button id="nextBtn" class="next-btn" type="button">NEXT</button><button id="passBtn" class="pass-btn" type="button">PASS</button><button id="shootBtn" class="shoot-btn" type="button">SHOOT</button></div>
     </section>
 
     <label class="speed-setting">Peak ball speed <select id="ballSpeed" aria-label="Football peak ball speed"><option value=".7">Controlled · 60 km/h</option><option value="1" selected>Match · 85 km/h</option><option value="1.3">Power shot · 110 km/h</option></select></label>
     <div class="desktop-help">
       Move with <strong>WASD</strong> or <strong>arrow keys</strong>. Hold the ball close,
-      aim with movement direction, press <strong>E</strong> to pass and <strong>Space</strong> to shoot. All 22 players are active on the field.
+      aim with movement direction, press <strong>Q</strong> to select the next teammate, <strong>E</strong> to pass and <strong>Space</strong> to shoot.
     </div>
 
     <div class="footer-note">
@@ -509,7 +509,8 @@
         replayBtn: document.getElementById("replayBtn"),
         menuBtn: document.getElementById("menuBtn"),
         shootBtn: document.getElementById("shootBtn"),
-        passBtn: document.getElementById("passBtn")
+        passBtn: document.getElementById("passBtn"),
+        nextBtn: document.getElementById("nextBtn")
       };
 
       const FIELD = { left: 45, right: 915, top: 50, bottom: 550 };
@@ -544,6 +545,7 @@
         goalFreeze: 0,
         animationId: null,
         passTarget: null,
+        passSelection: null,
         player: { x: 240, y: 300, r: 18, speed: 255, vx: 0, vy: 0, dirX: 1, dirY: 0 },
         opponent: { x: 690, y: 300, r: 18, speed: 190, vx: 0, vy: 0, dirX: -1, dirY: 0 },
         homePlayers: makeOutfield(homeShape,"home"),
@@ -616,7 +618,7 @@
         Object.assign(state.keeperHome, { x: 78, y: 300 });
         Object.assign(state.keeperAway, { x: 882, y: 300 });
         Object.assign(state.ball, { x: 480, y: 300, vx: 0, vy: 0, owner: kickoff === "home" ? "player" : "opponent" });
-        state.passTarget=null;
+        state.passTarget=null;state.passSelection=null;
         state.playerHasBall = kickoff === "home";
         state.aiHasBall = kickoff === "away";
       }
@@ -766,7 +768,7 @@
           state.ball.owner = "player";
           state.playerHasBall = true;
           state.ball.vx = state.ball.vy = 0;
-          state.passTarget=null;
+          state.passTarget=null;state.passSelection=null;
         }
 
         if (distance(state.player, state.opponent) < 33 && state.ball.owner === "opponent" && state.tackleCooldown <= 0) {
@@ -854,7 +856,7 @@
         state.awayPlayers.forEach(player=>{
           const chase=player===awayChaser && (state.ball.owner===null||state.ball.owner==="player");
           moveSupportPlayer(player,chase?state.ball.x:player.anchorX+ballShift,chase?state.ball.y:player.anchorY,dt);
-          if(state.ball.owner===null&&distance(player,state.ball)<player.r+state.ball.r+3&&Math.hypot(state.ball.vx,state.ball.vy)<330){switchOpponent(player);state.ball.owner="opponent";state.passTarget=null;}
+          if(state.ball.owner===null&&distance(player,state.ball)<player.r+state.ball.r+3&&Math.hypot(state.ball.vx,state.ball.vy)<330){switchOpponent(player);state.ball.owner="opponent";state.passTarget=null;state.passSelection=null;}
           if(state.ball.owner==="player"&&distance(player,state.player)<player.r+state.player.r+3&&Math.random()<.02+state.selectedDifficulty*.006){switchOpponent(player);state.ball.owner="opponent";state.playerHasBall=false;showMessage("Tackled!",500)}
         });
       }
@@ -952,19 +954,29 @@
 
       function passBall(){
         if(!state.running||state.goalFreeze>0||state.shotCooldown>0||state.ball.owner!=="player")return;
+        const selected=state.homePlayers.includes(state.passSelection)?state.passSelection:null;
         const facing=state.homePlayers.filter(player=>(player.x-state.player.x)*state.player.dirX+(player.y-state.player.y)*state.player.dirY>20);
         const pool=facing.length?facing:state.homePlayers;
-        const target=pool.reduce((best,player)=>{
+        const target=selected||pool.reduce((best,player)=>{
           const playerScore=distance(state.player,player)-((player.x-state.player.x)*state.player.dirX+(player.y-state.player.y)*state.player.dirY)*.35;
           const bestScore=distance(state.player,best)-((best.x-state.player.x)*state.player.dirX+(best.y-state.player.y)*state.player.dirY)*.35;
           return playerScore<bestScore?player:best;
         },pool[0]);
         if(!target)return;
         const startX=state.ball.x,startY=state.ball.y,oldControlled=state.player,index=state.homePlayers.indexOf(target);
-        oldControlled.speed=178;state.homePlayers[index]=oldControlled;state.player=target;state.player.speed=255;
+        oldControlled.speed=178;state.homePlayers[index]=oldControlled;state.player=target;state.player.speed=255;state.passSelection=null;
         const dx=state.player.x-startX,dy=state.player.y-startY,len=Math.hypot(dx,dy)||1;
         state.ball.owner=null;state.playerHasBall=false;state.passTarget=state.player;state.ball.x=startX;state.ball.y=startY;state.ball.vx=dx/len*440*ballSpeedMultiplier();state.ball.vy=dy/len*440*ballSpeedMultiplier();state.shotCooldown=.22;
         showMessage(`Pass to #${state.player.number}`,500);playTone(380,.05,"square",.035);
+      }
+
+      function selectNextTeammate(){
+        if(!state.running)return;
+        const ordered=[...state.homePlayers].sort((a,b)=>a.number-b.number);
+        const current=ordered.indexOf(state.passSelection);
+        state.passSelection=ordered[(current+1)%ordered.length];
+        showMessage(`Target #${state.passSelection.number} selected`,650);
+        playTone(520,.04,"square",.025);
       }
 
       function aiShoot() {
@@ -1069,7 +1081,7 @@
         drawGoal(FIELD.right, true);
         drawPlayer(state.keeperHome, "#ffd166", "GK");
         drawPlayer(state.keeperAway, "#ffd166", "GK");
-        state.homePlayers.forEach(player=>drawPlayer(player,"#2384e8",String(player.number)));
+        if(state.passSelection&&state.homePlayers.includes(state.passSelection)){ctx.strokeStyle="#d9ff57";ctx.lineWidth=5;ctx.beginPath();ctx.arc(state.passSelection.x,state.passSelection.y,state.passSelection.r+10,0,Math.PI*2);ctx.stroke()}
         state.awayPlayers.forEach(player=>drawPlayer(player,"#dc3f4f",String(player.number)));
         drawPlayer(state.player, "#4aa8ff", "YOU");
         drawPlayer(state.opponent, "#ff5c5c", "AI");
@@ -1183,6 +1195,7 @@
         }
         setKey(event.code, true);
         if (event.code === "Space") shoot();
+        if (event.code === "KeyQ") selectNextTeammate();
         if (event.code === "KeyE" || event.code === "ShiftLeft" || event.code === "ShiftRight") passBall();
       });
 
@@ -1208,6 +1221,8 @@
 
       ui.passBtn.addEventListener("pointerdown",(event)=>{event.preventDefault();ui.passBtn.style.transform="scale(.95)";passBall()});
       ui.passBtn.addEventListener("pointerup",()=>{ui.passBtn.style.transform=""});
+      ui.nextBtn.addEventListener("pointerdown",(event)=>{event.preventDefault();ui.nextBtn.style.transform="scale(.95)";selectNextTeammate()});
+      ui.nextBtn.addEventListener("pointerup",()=>{ui.nextBtn.style.transform=""});
 
       ui.shootBtn.addEventListener("pointerdown", (event) => {
         event.preventDefault();
