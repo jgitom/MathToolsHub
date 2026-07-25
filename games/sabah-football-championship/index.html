@@ -314,7 +314,7 @@
       touch-action: none;
     }
 
-    .desktop-help {
+    .speed-setting{display:flex;align-items:center;justify-content:center;gap:9px;margin:12px 0 0;color:var(--muted);font-size:13px;font-weight:800}.speed-setting select{min-height:38px;padding:7px 32px 7px 11px;border:1px solid var(--line);border-radius:10px;color:#fff;background:#13243a;font:800 13px inherit}
       padding: 12px 14px;
       border: 1px solid var(--line);
       border-radius: 16px;
@@ -342,7 +342,7 @@
       .stat { min-width: 0; padding: 7px; }
       .stage { min-height: 360px; aspect-ratio: 10 / 13; }
       .controls { display: grid; }
-      .desktop-help { display: none; }
+      .speed-setting{display:flex;align-items:center;justify-content:center;gap:9px;margin:12px 0 0;color:var(--muted);font-size:13px;font-weight:800}.speed-setting select{min-height:38px;padding:7px 32px 7px 11px;border:1px solid var(--line);border-radius:10px;color:#fff;background:#13243a;font:800 13px inherit} display: none; }
       .menu-grid, .rules { grid-template-columns: 1fr; }
       .hud { top: 8px; left: 8px; right: 8px; }
       .team-box, .timer-box { padding: 7px 9px; font-size: 12px; }
@@ -465,6 +465,7 @@
       <div class="action-buttons"><button id="passBtn" class="pass-btn" type="button">PASS</button><button id="shootBtn" class="shoot-btn" type="button">SHOOT</button></div>
     </section>
 
+    <label class="speed-setting">Peak ball speed <select id="ballSpeed" aria-label="Football peak ball speed"><option value=".7">Controlled · 60 km/h</option><option value="1" selected>Match · 85 km/h</option><option value="1.3">Power shot · 110 km/h</option></select></label>
     <div class="desktop-help">
       Move with <strong>WASD</strong> or <strong>arrow keys</strong>. Hold the ball close,
       aim with movement direction, press <strong>E</strong> to pass and <strong>Space</strong> to shoot. All 22 players are active on the field.
@@ -515,6 +516,7 @@
       const GOAL = { top: 225, bottom: 375, depth: 28 };
       const keys = { up: false, down: false, left: false, right: false };
       const opponents = ["City Tigers", "Borneo Eagles", "Coastal Warriors", "Mountain Lions", "Sabah Legends"];
+      const ballSpeedMultiplier=()=>Number(document.getElementById("ballSpeed").value)||1;
 
       const homeShape=[[225,120],[225,210],[225,390],[225,480],[405,145],[405,300],[405,455],[590,190],[590,410]];
       const awayShape=homeShape.map(([x,y])=>[960-x,y]);
@@ -930,7 +932,7 @@
         if (state.ball.owner === "player") {
           state.ball.owner = null;
           state.playerHasBall = false;
-          const power = 510;
+          const power = 510*ballSpeedMultiplier();
           state.ball.vx = state.player.dirX * power;
           state.ball.vy = state.player.dirY * power;
           state.ball.x += state.player.dirX * 8;
@@ -939,7 +941,7 @@
           state.shotCooldown = 0.35;
           playTone(310, 0.06, "square", 0.05);
         } else if (distance(state.player, state.ball) < 34 && state.ball.owner === null) {
-          const power = 470;
+          const power = 470*ballSpeedMultiplier();
           state.ball.vx = state.player.dirX * power;
           state.ball.vy = state.player.dirY * power;
           state.shots += 1;
@@ -961,7 +963,7 @@
         const startX=state.ball.x,startY=state.ball.y,oldControlled=state.player,index=state.homePlayers.indexOf(target);
         oldControlled.speed=178;state.homePlayers[index]=oldControlled;state.player=target;state.player.speed=255;
         const dx=state.player.x-startX,dy=state.player.y-startY,len=Math.hypot(dx,dy)||1;
-        state.ball.owner=null;state.playerHasBall=false;state.passTarget=state.player;state.ball.x=startX;state.ball.y=startY;state.ball.vx=dx/len*440;state.ball.vy=dy/len*440;state.shotCooldown=.22;
+        state.ball.owner=null;state.playerHasBall=false;state.passTarget=state.player;state.ball.x=startX;state.ball.y=startY;state.ball.vx=dx/len*440*ballSpeedMultiplier();state.ball.vy=dy/len*440*ballSpeedMultiplier();state.shotCooldown=.22;
         showMessage(`Pass to #${state.player.number}`,500);playTone(380,.05,"square",.035);
       }
 
@@ -973,7 +975,7 @@
         const dx = 25 - state.ball.x;
         const dy = targetY - state.ball.y;
         const len = Math.hypot(dx, dy) || 1;
-        const power = 430 + state.selectedDifficulty * 35;
+        const power = (430 + state.selectedDifficulty * 35)*ballSpeedMultiplier();
         state.ball.vx = dx / len * power;
         state.ball.vy = dy / len * power;
         playTone(220, 0.06, "square", 0.04);
