@@ -388,6 +388,14 @@
 
       <div id="message" class="message">Kick off!</div>
 
+      <div id="incidentOverlay" class="overlay hidden" aria-live="polite">
+        <div class="menu-card">
+          <h2 id="incidentTitle">Match Stopped</h2>
+          <p id="incidentText">An incident happened. Make your changes, then resume.</p>
+          <button id="incidentResumeBtn" class="primary" type="button">Resume Match</button>
+        </div>
+      </div>
+
       <div id="menuOverlay" class="overlay">
         <div class="menu-card">
           <h1>Sabah Football Championship</h1>
@@ -495,6 +503,10 @@
         message: document.getElementById("message"),
         menuOverlay: document.getElementById("menuOverlay"),
         resultOverlay: document.getElementById("resultOverlay"),
+        incidentOverlay: document.getElementById("incidentOverlay"),
+        incidentTitle: document.getElementById("incidentTitle"),
+        incidentText: document.getElementById("incidentText"),
+        incidentResumeBtn: document.getElementById("incidentResumeBtn"),
         resultTitle: document.getElementById("resultTitle"),
         resultText: document.getElementById("resultText"),
         rewardText: document.getElementById("rewardText"),
@@ -543,6 +555,7 @@
         shotCooldown: 0,
         tackleCooldown: 0,
         goalFreeze: 0,
+        incidentCooldown: 0,
         animationId: null,
         passTarget: null,
         passSelection: null,
@@ -642,6 +655,7 @@
         state.shotCooldown = 0;
         state.tackleCooldown = 0;
         state.goalFreeze = 0;
+        state.incidentCooldown = 0;
         state.running = true;
         state.paused = false;
 
@@ -651,6 +665,7 @@
         ui.awayScore.textContent = "0";
         ui.menuOverlay.classList.add("hidden");
         ui.resultOverlay.classList.add("hidden");
+        ui.incidentOverlay.classList.add("hidden");
 
         resetPositions("home");
         saveProgress();
@@ -665,7 +680,9 @@
 
       function finishMatch() {
         state.running = false;
+        state.paused = false;
         cancelAnimationFrame(state.animationId);
+        ui.incidentOverlay.classList.add("hidden");
 
         let reward = 10;
         let title = "Match Draw";
@@ -708,6 +725,11 @@
       }
 
       function update(dt) {
+        if (state.paused) {
+          updateHud();
+          return;
+        }
+
         if (state.goalFreeze > 0) {
           state.goalFreeze -= dt;
           if (state.goalFreeze <= 0) resetPositions(Math.random() > 0.5 ? "home" : "away");
@@ -723,6 +745,7 @@
 
         state.shotCooldown = Math.max(0, state.shotCooldown - dt);
         state.tackleCooldown = Math.max(0, state.tackleCooldown - dt);
+        state.incidentCooldown = Math.max(0, state.incidentCooldown - dt);
 
         updatePlayer(dt);
         updateAI(dt);
@@ -778,6 +801,7 @@
             state.aiHasBall = false;
             state.tackleCooldown = 0.7;
             playTone(260, 0.06, "square", 0.035);
+            maybeTriggerIncident("home", "away", 0.035);
           }
         }
       }
@@ -827,6 +851,7 @@
             state.aiHasBall = true;
             state.tackleCooldown = 0.75;
             showMessage("Tackled!", 650);
+            maybeTriggerIncident("away", "home", 0.04);
           }
         }
       }
@@ -868,8 +893,76 @@
           const chase=player===awayChaser && (state.ball.owner===null||state.ball.owner==="player");
           moveSupportPlayer(player,chase?state.ball.x:player.anchorX+ballShift,chase?state.ball.y:player.anchorY,dt);
           if(state.ball.owner===null&&distance(player,state.ball)<player.r+state.ball.r+3&&Math.hypot(state.ball.vx,state.ball.vy)<330){switchOpponent(player);state.ball.owner="opponent";state.passTarget=null;state.passSelection=null;}
-          if(state.ball.owner==="player"&&distance(player,state.player)<player.r+state.player.r+3&&Math.random()<.02+state.selectedDifficulty*.006){switchOpponent(player);state.ball.owner="opponent";state.playerHasBall=false;showMessage("Tackled!",500)}
+          if(state.ball.owner==="player"&&distance(player,state.player)<player.r+state.player.r+3&&Math.random()<.02+state.selectedDifficulty*.006){switchOpponent(player);state.ball.owner="opponent";state.playerHasBall=false;showMessage("Tackled!",500);maybeTriggerIncident("away","home",0.03)}
         });
+      }
+
+      function maybeTriggerIncident(attackerTeam, defenderTeam, chance = 0.03) {
+        if (!state.running || state.paused || state.goalFreeze > 0 || state.incidentCooldown > 0) return;
+        if (Math.random() > chance) return;
+
+        const incidentRoll = Math.random();
+        if (incidentRoll < 0.64) {
+          applyInjury(defenderTeam);
+        } else {
+          applyRedCard(attackerTeam);
+        }
+
+        state.incidentCooldown = 14;
+      }
+
+      function applyInjury(team) {
+        const isHome = team === "home";
+        const squad = isHome ? state.homePlayers : state.awayPlayers;
+        const teamName = isHome ? ui.homeName.textContent : ui.awayName.textContent;
+
+        if (squad.length > 0) {
+          const subIn = squad[Math.floor(Math.random() * squad.length)];
+          if (isHome) takeControl(subIn);
+          else switchOpponent(subIn);
+        }
+
+        pauseForIncident(
+          `${teamName} injury`,
+          `${teamName} has an injured player. Match paused for substitution or tactic adjustment.`
+        );
+      }
+
+      function applyRedCard(team) {
+        const isHome = team === "home";
+        const squad = isHome ? state.homePlayers : state.awayPlayers;
+        const teamName = isHome ? ui.homeName.textContent : ui.awayName.textContent;
+
+        if (squad.length > 0) {
+          const sentOff = squad.splice(Math.floor(Math.random() * squad.length), 1)[0];
+          if (isHome && state.passSelection === sentOff) state.passSelection = null;
+        } else {
+          if (isHome) state.player.speed = Math.max(220, state.player.speed - 20);
+          else state.opponent.speed = Math.max(160, state.opponent.speed - 15);
+        }
+
+        pauseForIncident(
+          `Red card for ${teamName}`,
+          `${teamName} is down to 10 players. Match paused for tactic change before restart.`
+        );
+      }
+
+      function pauseForIncident(title, text) {
+        state.paused = true;
+        keys.up = keys.down = keys.left = keys.right = false;
+        ui.incidentTitle.textContent = title;
+        ui.incidentText.textContent = text;
+        ui.incidentOverlay.classList.remove("hidden");
+        showMessage("Play stopped", 900);
+        playTone(210, 0.14, "square", 0.05);
+      }
+
+      function resumeAfterIncident() {
+        if (!state.running) return;
+        state.paused = false;
+        ui.incidentOverlay.classList.add("hidden");
+        showMessage("Play resumed", 800);
+        playTone(540, 0.08, "triangle", 0.05);
       }
 
       function updateKeepers(dt) {
@@ -940,7 +1033,7 @@
       }
 
       function shoot() {
-        if (!state.running || state.goalFreeze > 0 || state.shotCooldown > 0) return;
+        if (!state.running || state.paused || state.goalFreeze > 0 || state.shotCooldown > 0) return;
 
         if (state.ball.owner === "player") {
           state.ball.owner = null;
@@ -964,7 +1057,7 @@
       }
 
       function passBall(){
-        if(!state.running||state.goalFreeze>0||state.shotCooldown>0||state.ball.owner!=="player")return;
+        if(!state.running||state.paused||state.goalFreeze>0||state.shotCooldown>0||state.ball.owner!=="player")return;
         const selected=state.homePlayers.includes(state.passSelection)?state.passSelection:null;
         const facing=state.homePlayers.filter(player=>(player.x-state.player.x)*state.player.dirX+(player.y-state.player.y)*state.player.dirY>20);
         const pool=facing.length?facing:state.homePlayers;
@@ -982,7 +1075,7 @@
       }
 
       function selectNextTeammate(){
-        if(!state.running)return;
+        if(!state.running||state.paused)return;
         const ordered=[...state.homePlayers].sort((a,b)=>a.number-b.number);
         const current=ordered.indexOf(state.passSelection);
         state.passSelection=ordered[(current+1)%ordered.length];
@@ -1269,6 +1362,8 @@
         updateStats();
         showMessage("Progress reset");
       });
+
+      ui.incidentResumeBtn.addEventListener("click", resumeAfterIncident);
 
       window.addEventListener("blur", () => {
         keys.up = keys.down = keys.left = keys.right = false;
