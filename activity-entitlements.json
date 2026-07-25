@@ -348,6 +348,13 @@
                            "path":  "/games/ratio-racer/"
                        },
                        {
+                           "activity_id":  "game/tennis-championship",
+                           "access_tier":  "premium",
+                           "category":  "game",
+                           "title":  "Tennis Championship",
+                           "path":  "/games/tennis-championship/"
+                       },
+                       {
                            "activity_id":  "game/badminton-championship",
                            "access_tier":  "premium",
                            "category":  "game",
