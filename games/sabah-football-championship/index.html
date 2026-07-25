@@ -299,6 +299,8 @@
       transform: scale(0.96);
     }
 
+    .action-buttons{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}.pass-btn{width:86px;height:86px;border-radius:999px;color:#082f49;background:#7dd3fc;border:6px solid rgba(255,255,255,.14);font-weight:950;font-size:15px;touch-action:none}
+
     .shoot-btn {
       width: 110px;
       height: 110px;
@@ -356,7 +358,7 @@
         grid-template-columns: repeat(3, 44px);
         grid-template-rows: repeat(3, 44px);
       }
-      .shoot-btn { width: 94px; height: 94px; font-size: 15px; }
+      .shoot-btn { width: 84px; height: 84px; font-size: 14px; }.pass-btn{width:72px;height:72px;font-size:13px}.action-buttons{gap:4px}
     }
     .mth-back{position:fixed;left:12px;top:10px;z-index:10000;padding:9px 13px;border:1px solid rgba(255,255,255,.18);border-radius:999px;color:#fff;background:rgba(3,16,10,.9);box-shadow:0 5px 18px rgba(0,0,0,.35);text-decoration:none;font-size:12px;font-weight:850}.mth-back:hover,.mth-back:focus-visible{background:#166534;outline:2px solid #66f0a8;outline-offset:2px}@media(max-width:620px){.mth-back{left:7px;top:6px;padding:7px 9px}}
   </style>
@@ -460,12 +462,12 @@
         <span></span>
       </div>
       <div></div>
-      <button id="shootBtn" class="shoot-btn" type="button">SHOOT</button>
+      <div class="action-buttons"><button id="passBtn" class="pass-btn" type="button">PASS</button><button id="shootBtn" class="shoot-btn" type="button">SHOOT</button></div>
     </section>
 
     <div class="desktop-help">
       Move with <strong>WASD</strong> or <strong>arrow keys</strong>. Hold the ball close,
-      aim with movement direction and press <strong>Space</strong> to shoot.
+      aim with movement direction, press <strong>E</strong> to pass and <strong>Space</strong> to shoot. All 22 players are active on the field.
     </div>
 
     <div class="footer-note">
@@ -505,13 +507,18 @@
         nextMatchBtn: document.getElementById("nextMatchBtn"),
         replayBtn: document.getElementById("replayBtn"),
         menuBtn: document.getElementById("menuBtn"),
-        shootBtn: document.getElementById("shootBtn")
+        shootBtn: document.getElementById("shootBtn"),
+        passBtn: document.getElementById("passBtn")
       };
 
       const FIELD = { left: 45, right: 915, top: 50, bottom: 550 };
       const GOAL = { top: 225, bottom: 375, depth: 28 };
       const keys = { up: false, down: false, left: false, right: false };
       const opponents = ["City Tigers", "Borneo Eagles", "Coastal Warriors", "Mountain Lions", "Sabah Legends"];
+
+      const homeShape=[[225,120],[225,210],[225,390],[225,480],[405,145],[405,300],[405,455],[590,190],[590,410]];
+      const awayShape=homeShape.map(([x,y])=>[960-x,y]);
+      function makeOutfield(shape,team){return shape.map(([x,y],index)=>({x,y,anchorX:x,anchorY:y,r:14,speed:team==="home"?178:172,vx:0,vy:0,dirX:team==="home"?1:-1,dirY:0,number:index+2,team}))}
 
       const saved = loadProgress();
       const state = {
@@ -534,8 +541,11 @@
         tackleCooldown: 0,
         goalFreeze: 0,
         animationId: null,
+        passTarget: null,
         player: { x: 240, y: 300, r: 18, speed: 255, vx: 0, vy: 0, dirX: 1, dirY: 0 },
         opponent: { x: 690, y: 300, r: 18, speed: 190, vx: 0, vy: 0, dirX: -1, dirY: 0 },
+        homePlayers: makeOutfield(homeShape,"home"),
+        awayPlayers: makeOutfield(awayShape,"away"),
         keeperHome: { x: 78, y: 300, r: 19, speed: 175 },
         keeperAway: { x: 882, y: 300, r: 19, speed: 175 },
         ball: { x: 480, y: 300, r: 10, vx: 0, vy: 0, owner: null }
@@ -597,11 +607,14 @@
       }
 
       function resetPositions(kickoff = "home") {
-        Object.assign(state.player, { x: 245, y: 300, vx: 0, vy: 0, dirX: 1, dirY: 0 });
-        Object.assign(state.opponent, { x: 715, y: 300, vx: 0, vy: 0, dirX: -1, dirY: 0 });
+        state.player={x:245,y:300,r:18,speed:255,vx:0,vy:0,dirX:1,dirY:0,number:10,team:"home"};
+        state.opponent={x:715,y:300,r:18,speed:190,vx:0,vy:0,dirX:-1,dirY:0,number:10,team:"away"};
+        state.homePlayers=makeOutfield(homeShape,"home");
+        state.awayPlayers=makeOutfield(awayShape,"away");
         Object.assign(state.keeperHome, { x: 78, y: 300 });
         Object.assign(state.keeperAway, { x: 882, y: 300 });
         Object.assign(state.ball, { x: 480, y: 300, vx: 0, vy: 0, owner: kickoff === "home" ? "player" : "opponent" });
+        state.passTarget=null;
         state.playerHasBall = kickoff === "home";
         state.aiHasBall = kickoff === "away";
       }
@@ -709,6 +722,7 @@
 
         updatePlayer(dt);
         updateAI(dt);
+        updateSupportPlayers(dt);
         updateKeepers(dt);
         updateBall(dt);
         resolvePlayerCollisions();
@@ -746,10 +760,11 @@
           state.playerHasBall = false;
         }
 
-        if (distance(state.player, state.ball) < 28 && state.ball.owner === null && Math.hypot(state.ball.vx, state.ball.vy) < 350) {
+        if (distance(state.player, state.ball) < 30 && state.ball.owner === null && (state.passTarget===state.player || Math.hypot(state.ball.vx, state.ball.vy) < 350)) {
           state.ball.owner = "player";
           state.playerHasBall = true;
           state.ball.vx = state.ball.vy = 0;
+          state.passTarget=null;
         }
 
         if (distance(state.player, state.opponent) < 33 && state.ball.owner === "opponent" && state.tackleCooldown <= 0) {
@@ -810,6 +825,36 @@
             showMessage("Tackled!", 650);
           }
         }
+      }
+
+      function moveSupportPlayer(player,targetX,targetY,dt){
+        const dx=targetX-player.x,dy=targetY-player.y,len=Math.hypot(dx,dy)||1;
+        player.dirX=dx/len;player.dirY=dy/len;
+        const step=Math.min(len,player.speed*dt);player.x+=player.dirX*step;player.y+=player.dirY*step;clampPlayer(player);
+      }
+
+      function switchOpponent(target){
+        const index=state.awayPlayers.indexOf(target);if(index<0)return;
+        const previous=state.opponent;previous.speed=172;state.awayPlayers[index]=previous;state.opponent=target;state.opponent.speed=190+state.selectedDifficulty*8;
+      }
+
+      function updateSupportPlayers(dt){
+        const ballShift=(state.ball.x-480)*.12;
+        const homeChaser=state.homePlayers.reduce((best,player)=>distance(player,state.ball)<distance(best,state.ball)?player:best,state.homePlayers[0]);
+        const awayChaser=state.awayPlayers.reduce((best,player)=>distance(player,state.ball)<distance(best,state.ball)?player:best,state.awayPlayers[0]);
+        state.homePlayers.forEach(player=>{
+          const chase=player===homeChaser && (state.ball.owner===null||state.ball.owner==="opponent");
+          moveSupportPlayer(player,chase?state.ball.x:player.anchorX+ballShift,chase?state.ball.y:player.anchorY,dt);
+          if(state.ball.owner===null&&state.passTarget!==player&&distance(player,state.ball)<player.r+state.ball.r+3&&Math.hypot(state.ball.vx,state.ball.vy)<250){
+            const dx=state.player.x-player.x,dy=state.player.y-player.y,len=Math.hypot(dx,dy)||1;state.ball.vx=dx/len*330;state.ball.vy=dy/len*330;
+          }
+        });
+        state.awayPlayers.forEach(player=>{
+          const chase=player===awayChaser && (state.ball.owner===null||state.ball.owner==="player");
+          moveSupportPlayer(player,chase?state.ball.x:player.anchorX+ballShift,chase?state.ball.y:player.anchorY,dt);
+          if(state.ball.owner===null&&distance(player,state.ball)<player.r+state.ball.r+3&&Math.hypot(state.ball.vx,state.ball.vy)<330){switchOpponent(player);state.ball.owner="opponent";state.passTarget=null;}
+          if(state.ball.owner==="player"&&distance(player,state.player)<player.r+state.player.r+3&&Math.random()<.02+state.selectedDifficulty*.006){switchOpponent(player);state.ball.owner="opponent";state.playerHasBall=false;showMessage("Tackled!",500)}
+        });
       }
 
       function updateKeepers(dt) {
@@ -903,6 +948,23 @@
         }
       }
 
+      function passBall(){
+        if(!state.running||state.goalFreeze>0||state.shotCooldown>0||state.ball.owner!=="player")return;
+        const facing=state.homePlayers.filter(player=>(player.x-state.player.x)*state.player.dirX+(player.y-state.player.y)*state.player.dirY>20);
+        const pool=facing.length?facing:state.homePlayers;
+        const target=pool.reduce((best,player)=>{
+          const playerScore=distance(state.player,player)-((player.x-state.player.x)*state.player.dirX+(player.y-state.player.y)*state.player.dirY)*.35;
+          const bestScore=distance(state.player,best)-((best.x-state.player.x)*state.player.dirX+(best.y-state.player.y)*state.player.dirY)*.35;
+          return playerScore<bestScore?player:best;
+        },pool[0]);
+        if(!target)return;
+        const startX=state.ball.x,startY=state.ball.y,oldControlled=state.player,index=state.homePlayers.indexOf(target);
+        oldControlled.speed=178;state.homePlayers[index]=oldControlled;state.player=target;state.player.speed=255;
+        const dx=state.player.x-startX,dy=state.player.y-startY,len=Math.hypot(dx,dy)||1;
+        state.ball.owner=null;state.playerHasBall=false;state.passTarget=state.player;state.ball.x=startX;state.ball.y=startY;state.ball.vx=dx/len*440;state.ball.vy=dy/len*440;state.shotCooldown=.22;
+        showMessage(`Pass to #${state.player.number}`,500);playTone(380,.05,"square",.035);
+      }
+
       function aiShoot() {
         if (state.ball.owner !== "opponent") return;
         state.ball.owner = null;
@@ -918,11 +980,9 @@
       }
 
       function resolvePlayerCollisions() {
-        separate(state.player, state.opponent, 38);
-
-        // Keep outfield players mostly outside the goal net.
-        state.player.x = Math.max(FIELD.left + state.player.r, Math.min(FIELD.right - state.player.r, state.player.x));
-        state.opponent.x = Math.max(FIELD.left + state.opponent.r, Math.min(FIELD.right - state.opponent.r, state.opponent.x));
+        const home=[state.player,...state.homePlayers],away=[state.opponent,...state.awayPlayers];
+        home.forEach(homePlayer=>away.forEach(awayPlayer=>{if(distance(homePlayer,awayPlayer)<homePlayer.r+awayPlayer.r)separate(homePlayer,awayPlayer,homePlayer.r+awayPlayer.r)}));
+        [...home,...away].forEach(player=>{player.x=Math.max(FIELD.left+player.r,Math.min(FIELD.right-player.r,player.x));player.y=Math.max(FIELD.top+player.r,Math.min(FIELD.bottom-player.r,player.y))});
       }
 
       function detectGoals() {
@@ -1007,6 +1067,8 @@
         drawGoal(FIELD.right, true);
         drawPlayer(state.keeperHome, "#ffd166", "GK");
         drawPlayer(state.keeperAway, "#ffd166", "GK");
+        state.homePlayers.forEach(player=>drawPlayer(player,"#2384e8",String(player.number)));
+        state.awayPlayers.forEach(player=>drawPlayer(player,"#dc3f4f",String(player.number)));
         drawPlayer(state.player, "#4aa8ff", "YOU");
         drawPlayer(state.opponent, "#ff5c5c", "AI");
         drawBall();
@@ -1119,6 +1181,7 @@
         }
         setKey(event.code, true);
         if (event.code === "Space") shoot();
+        if (event.code === "KeyE" || event.code === "ShiftLeft" || event.code === "ShiftRight") passBall();
       });
 
       window.addEventListener("keyup", (event) => setKey(event.code, false));
@@ -1140,6 +1203,9 @@
         button.addEventListener("pointercancel", up);
         button.addEventListener("pointerleave", up);
       });
+
+      ui.passBtn.addEventListener("pointerdown",(event)=>{event.preventDefault();ui.passBtn.style.transform="scale(.95)";passBall()});
+      ui.passBtn.addEventListener("pointerup",()=>{ui.passBtn.style.transform=""});
 
       ui.shootBtn.addEventListener("pointerdown", (event) => {
         event.preventDefault();
