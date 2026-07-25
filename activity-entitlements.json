@@ -348,6 +348,13 @@
                            "path":  "/games/ratio-racer/"
                        },
                        {
+                           "activity_id":  "game/badminton-championship",
+                           "access_tier":  "premium",
+                           "category":  "game",
+                           "title":  "Badminton Championship",
+                           "path":  "/games/badminton-championship/"
+                       },
+                       {
                            "activity_id":  "game/sabah-football-championship",
                            "access_tier":  "premium",
                            "category":  "game",
