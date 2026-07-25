@@ -48,7 +48,7 @@
 
     .topbar {
       display: grid;
-      grid-template-columns: 1fr auto auto auto;
+      grid-template-columns: 1fr auto auto auto auto;
       gap: 10px;
       align-items: center;
       padding: 12px 14px;
@@ -375,6 +375,7 @@
       <div class="stat"><b id="levelStat">1</b><small>Level</small></div>
       <div class="stat"><b id="coinStat">100</b><small>Coins</small></div>
       <div class="stat"><b id="freeStat">3</b><small>Free Matches</small></div>
+      <div class="stat"><b id="ratingStat">6.5</b><small>Rating</small></div>
     </header>
 
     <section class="stage">
@@ -451,6 +452,7 @@
             <div class="rule"><strong id="rewardText">+0</strong>Coins earned</div>
             <div class="rule"><strong id="shotsText">0</strong>Your shots</div>
             <div class="rule"><strong id="savesText">0</strong>Goalkeeper saves</div>
+            <div class="rule"><strong id="ratingText">6.5</strong>Player rating</div>
           </div>
           <button id="nextMatchBtn" class="primary" type="button">Play Next Match</button>
           <div class="button-row">
@@ -499,6 +501,7 @@
         levelStat: document.getElementById("levelStat"),
         coinStat: document.getElementById("coinStat"),
         freeStat: document.getElementById("freeStat"),
+        ratingStat: document.getElementById("ratingStat"),
         homeName: document.getElementById("homeName"),
         awayName: document.getElementById("awayName"),
         homeScore: document.getElementById("homeScore"),
@@ -518,6 +521,7 @@
         rewardText: document.getElementById("rewardText"),
         shotsText: document.getElementById("shotsText"),
         savesText: document.getElementById("savesText"),
+        ratingText: document.getElementById("ratingText"),
         teamSelect: document.getElementById("teamSelect"),
         difficultySelect: document.getElementById("difficultySelect"),
         startBtn: document.getElementById("startBtn"),
@@ -550,6 +554,7 @@
         coins: saved.coins,
         freeMatches: saved.freeMatches,
         selectedDifficulty: 1,
+        playerRating: 6.5,
         matchTime: 90,
         scoreHome: 0,
         scoreAway: 0,
@@ -616,6 +621,12 @@
         ui.levelStat.textContent = state.level;
         ui.coinStat.textContent = state.coins;
         ui.freeStat.textContent = state.freeMatches;
+        ui.ratingStat.textContent = state.playerRating.toFixed(1);
+      }
+
+      function adjustPlayerRating(delta) {
+        state.playerRating = Math.max(1, Math.min(10, state.playerRating + delta));
+        ui.ratingStat.textContent = state.playerRating.toFixed(1);
       }
 
       function showMessage(text, duration = 1100) {
@@ -791,6 +802,7 @@
         else state.coins -= cost;
 
         state.selectedDifficulty = Number(ui.difficultySelect.value);
+        state.playerRating = 6.5;
         state.matchTime = 90;
         state.scoreHome = 0;
         state.scoreAway = 0;
@@ -840,12 +852,14 @@
         if (state.scoreHome > state.scoreAway) {
           reward = 50 + state.level * 10 + state.selectedDifficulty * 10;
           title = "Victory!";
+          adjustPlayerRating(0.6);
           state.level += 1;
           playTone(740, 0.18, "triangle", 0.08);
           setTimeout(() => playTone(980, 0.2, "triangle", 0.07), 160);
         } else if (state.scoreHome < state.scoreAway) {
           reward = 10;
           title = "Defeat";
+          adjustPlayerRating(-0.35);
           playTone(180, 0.3, "sawtooth", 0.04);
         } else {
           reward = 25;
@@ -862,6 +876,7 @@
         ui.rewardText.textContent = `+${reward}`;
         ui.shotsText.textContent = state.shots;
         ui.savesText.textContent = state.keeperSaves;
+        ui.ratingText.textContent = state.playerRating.toFixed(1);
         ui.resultOverlay.classList.remove("hidden");
       }
 
@@ -951,6 +966,7 @@
             state.playerHasBall = true;
             state.aiHasBall = false;
             state.tackleCooldown = 0.7;
+            adjustPlayerRating(0.1);
             playTone(260, 0.06, "square", 0.035);
             maybeTriggerIncident("home", "away", 0.035);
           }
@@ -1002,6 +1018,7 @@
             state.playerHasBall = false;
             state.aiHasBall = true;
             state.tackleCooldown = 0.75;
+            adjustPlayerRating(-0.12);
             showMessage("Tackled!", 650);
             maybeTriggerIncident("away", "home", 0.04);
           }
@@ -1045,7 +1062,7 @@
           const chase=player===awayChaser && (state.ball.owner===null||state.ball.owner==="player");
           moveSupportPlayer(player,chase?state.ball.x:player.anchorX+ballShift,chase?state.ball.y:player.anchorY,dt);
           if(state.ball.owner===null&&distance(player,state.ball)<player.r+state.ball.r+3&&Math.hypot(state.ball.vx,state.ball.vy)<330){switchOpponent(player);state.ball.owner="opponent";state.passTarget=null;state.passSelection=null;}
-          if(state.ball.owner==="player"&&distance(player,state.player)<player.r+state.player.r+3&&Math.random()<.02+state.selectedDifficulty*.006){switchOpponent(player);state.ball.owner="opponent";state.playerHasBall=false;showMessage("Tackled!",500);maybeTriggerIncident("away","home",0.03)}
+          if(state.ball.owner==="player"&&distance(player,state.player)<player.r+state.player.r+3&&Math.random()<.02+state.selectedDifficulty*.006){switchOpponent(player);state.ball.owner="opponent";state.playerHasBall=false;adjustPlayerRating(-0.1);showMessage("Tackled!",500);maybeTriggerIncident("away","home",0.03)}
         });
       }
 
@@ -1066,6 +1083,7 @@
       function applyInjury(team) {
         const isHome = team === "home";
         const teamName = isHome ? ui.homeName.textContent : ui.awayName.textContent;
+        if (isHome) adjustPlayerRating(-0.2);
 
         pauseForIncident(
           `${teamName} injury`,
@@ -1079,6 +1097,7 @@
         const isHome = team === "home";
         const squad = isHome ? state.homePlayers : state.awayPlayers;
         const teamName = isHome ? ui.homeName.textContent : ui.awayName.textContent;
+        if (isHome) adjustPlayerRating(-0.45);
 
         if (squad.length > 0) {
           const sentOff = squad.splice(Math.floor(Math.random() * squad.length), 1)[0];
@@ -1319,11 +1338,13 @@
 
         if (team === "home") {
           state.scoreHome += 1;
+          adjustPlayerRating(1.0);
           showMessage("GOAL! ⚽", 1300);
           playTone(660, 0.1, "triangle", 0.08);
           setTimeout(() => playTone(880, 0.14, "triangle", 0.07), 100);
         } else {
           state.scoreAway += 1;
+          adjustPlayerRating(-0.6);
           showMessage("Opponent scores", 1200);
           playTone(160, 0.2, "sawtooth", 0.04);
         }
