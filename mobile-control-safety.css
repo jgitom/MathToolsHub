@@ -1,0 +1,124 @@
+/* Shared phone layout for navigation controls on activities and catalogues. */
+@media (max-width: 600px) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  body > :is(.mth-back-link, .mth-back, .site-back, a.back, a.back-link) {
+    position: static !important;
+    inset: auto !important;
+    display: inline-flex !important;
+    align-items: center;
+    width: auto !important;
+    max-width: calc(100% - 24px);
+    min-height: 42px;
+    margin: 10px 12px 2px !important;
+    white-space: normal;
+  }
+
+  .topbar > :is(a.back, a.back-link, .site-back) {
+    position: static !important;
+    inset: auto !important;
+    min-width: 0;
+    min-height: 42px;
+    white-space: normal;
+  }
+
+  .topbar:has(#backBtn) {
+    position: relative !important;
+    inset: auto !important;
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .topbar:has(#backBtn) > :is(.actions, .top-actions) {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    gap: 8px;
+  }
+
+  .topbar:has(#backBtn) > :is(.actions, .top-actions) > * {
+    width: 100%;
+    min-width: 0;
+    min-height: 42px;
+    white-space: normal;
+  }
+  .topbar:has(> .site-language-slot) {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(112px, 132px);
+    align-items: center;
+    gap: 8px 10px;
+  }
+
+  .topbar:has(> .site-language-slot) > .site-language-slot {
+    grid-column: 2;
+    min-width: 0;
+    margin-left: 0 !important;
+  }
+
+  .topbar:has(> .site-language-slot) > .status-pill {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .site-language-slot {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .site-language-slot .site-language-picker,
+  .site-language-slot select {
+    position: static !important;
+    inset: auto !important;
+    width: 100%;
+    max-width: 132px !important;
+    min-height: 42px;
+    margin: 0 !important;
+  }
+
+  .page-actions {
+    position: static !important;
+    inset: auto !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(112px, 132px);
+    align-items: center;
+    width: min(100% - 24px, 1180px) !important;
+    margin: 10px auto 2px !important;
+    gap: 8px 10px;
+  }
+
+  .page-actions .site-back {
+    min-width: 0;
+    min-height: 42px;
+    white-space: normal;
+  }
+
+  .header-inner {
+    gap: 8px 12px;
+  }
+
+  .header-actions {
+    min-width: 0;
+    gap: 8px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .topbar:has(> .site-language-slot),
+  .page-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar:has(> .site-language-slot) > .site-language-slot,
+  .topbar:has(> .site-language-slot) > .status-pill {
+    grid-column: 1;
+  }
+
+  .site-language-slot .site-language-picker,
+  .site-language-slot select {
+    max-width: 100% !important;
+  }
+}
