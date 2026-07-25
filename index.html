@@ -414,6 +414,7 @@
             .ai-copy small { display: none; }
         }
     </style>
+    <link rel="stylesheet" href="site-search.css">
     <script src="daily-background.js"></script>
 </head>
 <body>
@@ -428,6 +429,7 @@
                 <a href="games/" data-i18n="navGames">Games</a>
                 <a href="tools/" data-i18n="navTools">Tools</a>
                 <a href="account.html" data-i18n="navAccount" data-user-account>Account</a>
+                <button class="site-search-open" id="siteSearchOpen" type="button" aria-haspopup="dialog" aria-controls="siteSearchDialog"><span aria-hidden="true">⌕</span><span class="site-search-label">Search</span></button>
                 <button class="calendar-toggle menu-voice-toggle" id="menuVoiceToggle" type="button" aria-pressed="false">🔇 Menu voice</button>
                 <select class="language-select" id="languageSelect" aria-label="Select language">
                     <option value="en">English</option>
@@ -849,5 +851,6 @@
     <script src="supabase-config.js"></script>
     <script type="module" src="supabase-user.js"></script>
     <script type="module" src="dashboard.js"></script>
+    <script src="site-search.js"></script>
 </body>
 </html>
