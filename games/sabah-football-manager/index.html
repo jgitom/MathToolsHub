@@ -392,6 +392,7 @@
     .live-ball{width:9px;height:9px;background:#fff;border:1px solid #111;box-shadow:0 1px 4px #000;z-index:4}.live-pitch.goal-flash{box-shadow:inset 0 0 45px #facc15,0 0 18px #facc15}.pitch-legend{display:flex;justify-content:center;gap:16px;margin:-5px 0 10px;color:var(--muted);font-size:11px;font-weight:800}.pitch-legend i{display:inline-block;width:10px;height:10px;margin-right:4px;border:1px solid #fff;border-radius:50%;vertical-align:-1px}
     @media(max-width:620px){.live-player{width:13px;height:13px}.live-ball{width:7px;height:7px}.live-pitch{border-width:2px}.modal-card{padding:13px}}
     .match-statistics{margin:11px 0 13px;padding:10px 13px;border:1px solid var(--line);border-radius:13px;background:rgba(0,0,0,.16)}.match-statistics h3{margin:0 0 8px;text-align:center;font-size:13px;color:#d9fbe7}.match-stat-row{display:grid;grid-template-columns:54px 1fr 54px;align-items:center;gap:8px;padding:4px 0;text-align:center;font-size:12px}.match-stat-row span:first-child{color:#ff9b9b;font-weight:900}.match-stat-row span:last-child{color:#91bdff;font-weight:900}.match-stat-row b{color:var(--muted);font-size:10px;letter-spacing:.05em;text-transform:uppercase}.match-stat-teams{display:grid;grid-template-columns:1fr 1fr;margin-bottom:3px;color:var(--muted);font-size:10px;font-weight:850;text-align:center}.match-stat-teams span:first-child{color:#ff9b9b}.match-stat-teams span:last-child{color:#91bdff}
+    .availability{display:inline-flex;align-items:center;gap:5px;margin:2px 4px 2px 0;padding:4px 7px;border-radius:999px;font-size:10px;font-weight:900;white-space:nowrap}.availability.available{color:#86efac;background:rgba(34,197,94,.13)}.availability.caution{color:#fde68a;background:rgba(245,158,11,.15)}.availability.suspended{color:#fecaca;background:rgba(239,68,68,.16)}.availability.injured{color:#bfdbfe;background:rgba(37,99,235,.18)}.toggle-starter:disabled{opacity:.45;cursor:not-allowed}
     .match-score {
       text-align: center;
       padding: 16px;
@@ -745,6 +746,9 @@
       <div class="match-stat-row"><span id="homeOnTarget">0</span><b>On target</b><span id="awayOnTarget">0</span></div>
       <div class="match-stat-row"><span id="homeCorners">0</span><b>Corners</b><span id="awayCorners">0</span></div>
       <div class="match-stat-row"><span id="homeFouls">0</span><b>Fouls</b><span id="awayFouls">0</span></div>
+      <div class="match-stat-row"><span id="homeYellowCards">0</span><b>Yellow cards</b><span id="awayYellowCards">0</span></div>
+      <div class="match-stat-row"><span id="homeRedCards">0</span><b>Red cards</b><span id="awayRedCards">0</span></div>
+      <div class="match-stat-row"><span id="homeInjuries">0</span><b>Injuries</b><span id="awayInjuries">0</span></div>
     </div>
     <div class="halftime-panel hidden" id="halftimePanel">
       <h3>Half-Time Team Talk</h3>
@@ -841,6 +845,13 @@
   };
 
   state.numberMode = state.numberMode === "manual" ? "manual" : "auto";
+  state.players.forEach(player=>{
+    player.yellowCards=Number(player.yellowCards)||0;
+    player.redCards=Number(player.redCards)||0;
+    player.suspensionWeeks=Math.max(0,Number(player.suspensionWeeks)||0);
+    player.injuryWeeks=Math.max(0,Number(player.injuryWeeks)||0);
+    player.injury=player.injuryWeeks ? (player.injury||"Match injury") : "";
+  });
   ensurePlayerNumbers();
   if (!state.fixtures.length || !state.table.length) initialiseSeason();
 
@@ -938,8 +949,23 @@
     return n + ({1:"st",2:"nd",3:"rd"}[n%10] || "th");
   }
 
+  function isAvailable(player) { return !player.injuryWeeks && !player.suspensionWeeks; }
+
+  function availabilityHtml(player) {
+    if (player.injuryWeeks) return `<span class="availability injured">🩹 ${player.injury || "Injured"} · ${player.injuryWeeks} match${player.injuryWeeks===1?"":"es"}</span>`;
+    if (player.suspensionWeeks) return `<span class="availability suspended">🟥 Suspended · ${player.suspensionWeeks} match${player.suspensionWeeks===1?"":"es"}</span>`;
+    if (player.yellowCards) return `<span class="availability caution">🟨 ${player.yellowCards} yellow card${player.yellowCards===1?"":"s"}</span>`;
+    return '<span class="availability available">✓ Available</span>';
+  }
+
+  function ensureAvailableXI() {
+    state.players.forEach(player=>{ if(player.starter && !isAvailable(player)) player.starter=false; });
+    if (state.players.filter(player=>player.starter && isAvailable(player)).length<11) autoSelectXI(false);
+    return state.players.filter(player=>player.starter && isAvailable(player)).length===11;
+  }
+
   function squadAverage() {
-    const starters = state.players.filter(p => p.starter).slice(0,11);
+    const starters = state.players.filter(p => p.starter && isAvailable(p)).slice(0,11);
     return Math.round(starters.reduce((s,p)=>s+p.rating*(p.fitness/100)*(0.8+p.morale/500),0) / Math.max(starters.length,1));
   }
 
@@ -1020,7 +1046,7 @@
         <td><input class="number-input" type="number" min="1" max="99" inputmode="numeric" aria-label="Player number for ${p.name}" data-id="${p.id}" value="${p.number}" ${state.numberMode==="auto"?"disabled":""}></td>
         <td>${p.name}</td><td>${p.pos}</td><td>${p.age}</td><td>${ratingBadge(p.rating)}</td>
         <td>${Math.round(p.fitness)}%</td><td>${Math.round(p.morale)}%</td><td>${p.goals}</td>
-        <td><button class="secondary toggle-starter" data-id="${p.id}" type="button">${p.starter ? "Starting XI" : "Bench"}</button></td>
+        <td>${availabilityHtml(p)}<button class="secondary toggle-starter" data-id="${p.id}" type="button" ${isAvailable(p)?"":"disabled"}>${p.starter ? "Starting XI" : "Bench"}</button></td>
       </tr>
     `).join("");
 
@@ -1033,6 +1059,7 @@
   function toggleStarter(id) {
     const p = state.players.find(x=>x.id===id);
     if (!p) return;
+    if (!isAvailable(p)) { toast(`${p.name} is unavailable for selection.`); return; }
     const starters = state.players.filter(x=>x.starter).length;
     if (!p.starter && starters >= 11) {
       toast("Starting XI already has 11 players.");
@@ -1046,20 +1073,20 @@
     renderAll();
   }
 
-  function autoSelectXI() {
+  function autoSelectXI(showMessage=true) {
     state.players.forEach(p=>p.starter=false);
     const roles = [
       ["GK",1],["RB",1],["LB",1],["CB",2],["CM",2],["AM",1],["RW",1],["LW",1],["ST",1]
     ];
     const chosen = [];
     roles.forEach(([pos,count])=>{
-      const available = state.players.filter(p=>p.pos===pos && !chosen.includes(p)).sort((a,b)=>effective(b)-effective(a));
+      const available = state.players.filter(p=>p.pos===pos && !chosen.includes(p) && isAvailable(p)).sort((a,b)=>effective(b)-effective(a));
       chosen.push(...available.slice(0,count));
     });
-    const remaining = state.players.filter(p=>!chosen.includes(p)).sort((a,b)=>effective(b)-effective(a));
+    const remaining = state.players.filter(p=>!chosen.includes(p) && isAvailable(p)).sort((a,b)=>effective(b)-effective(a));
     chosen.push(...remaining.slice(0,11-chosen.length));
     chosen.slice(0,11).forEach(p=>p.starter=true);
-    toast("Best available Starting XI selected.");
+    if(showMessage) toast(chosen.length>=11?"Best available Starting XI selected.":"Fewer than 11 players are available.");
     renderAll();
   }
 
@@ -1209,6 +1236,7 @@
   function playNextMatch() {
     const fixture = getNextFixture();
     if (!fixture) { toast("No remaining fixture."); return; }
+    if (!ensureAvailableXI()) { toast("You need 11 available players before starting the match."); return; }
 
     const wage = weeklyWage();
     state.balance -= wage;
@@ -1226,10 +1254,12 @@
     let minute = 0, hg = 0, ag = 0, done = false, paused = false, substitutions = 0;
     const ourHome = fixture.home === CLUB;
     let ourStrength = squadAverage() + tacticBonus();
-    const oppStrength = 67 + Math.floor(Math.random()*10) + Math.min(state.week/3,4);
+    let oppStrength = 67 + Math.floor(Math.random()*10) + Math.min(state.week/3,4);
     const playedIds = new Set(state.players.filter(player=>player.starter).map(player=>player.id));
     const substitutedOut = new Set();
-    const matchStats={slices:0,homePossessionUnits:0,homeShots:0,awayShots:0,homeOnTarget:0,awayOnTarget:0,homeCorners:0,awayCorners:0,homeFouls:0,awayFouls:0};
+    const sentOffIds = new Set(), matchInjuredIds = new Set(), newUnavailableIds = new Set();
+    const matchYellows = new Map();
+    const matchStats={slices:0,homePossessionUnits:0,homeShots:0,awayShots:0,homeOnTarget:0,awayOnTarget:0,homeCorners:0,awayCorners:0,homeFouls:0,awayFouls:0,homeYellowCards:0,awayYellowCards:0,homeRedCards:0,awayRedCards:0,homeInjuries:0,awayInjuries:0};
     let pitchMoment = "play", pitchHomeAttacks = true;
     const pitchPlayers={home:[],away:[]};
     const homeShape=[[5,50],[20,17],[20,39],[20,61],[20,83],[42,24],[42,50],[42,76],[63,22],[66,50],[63,78]];
@@ -1275,9 +1305,9 @@
     }, 250);
 
     function refreshHalftimePlayers(){
-      const starters=state.players.filter(player=>player.starter);
-      const bench=state.players.filter(player=>!player.starter && !substitutedOut.has(player.id));
-      els.halftimePlayerOff.innerHTML=starters.map(player=>`<option value="${player.id}">#${player.number} ${player.name} (${player.pos})</option>`).join("");
+      const starters=state.players.filter(player=>player.starter && !sentOffIds.has(player.id));
+      const bench=state.players.filter(player=>!player.starter && !substitutedOut.has(player.id) && isAvailable(player));
+      els.halftimePlayerOff.innerHTML=starters.map(player=>`<option value="${player.id}">#${player.number} ${player.name} (${player.pos})${matchInjuredIds.has(player.id)?" · INJURED":""}</option>`).join("");
       els.halftimePlayerOn.innerHTML=bench.map(player=>`<option value="${player.id}">#${player.number} ${player.name} (${player.pos})</option>`).join("");
       els.substitutionCount.textContent=`Substitutions: ${substitutions} / 5`;
       els.makeSubstitutionBtn.disabled=substitutions>=5 || !bench.length;
@@ -1307,11 +1337,11 @@
       if(!paused || substitutions>=5)return;
       const playerOff=state.players.find(player=>player.id===Number(els.halftimePlayerOff.value));
       const playerOn=state.players.find(player=>player.id===Number(els.halftimePlayerOn.value));
-      if(!playerOff || !playerOn || !playerOff.starter || playerOn.starter)return;
+      if(!playerOff || !playerOn || !playerOff.starter || playerOn.starter || sentOffIds.has(playerOff.id) || !isAvailable(playerOn))return;
       playerOff.starter=false;playerOn.starter=true;
       substitutedOut.add(playerOff.id);playedIds.add(playerOn.id);substitutions++;
       addEvent(`HT Substitution: #${playerOn.number} ${playerOn.name} replaces #${playerOff.number} ${playerOff.name}.`);
-      refreshHalftimePlayers();refreshOurLiveNumbers();
+      refreshHalftimePlayers();refreshOurLiveNumbers();refreshOurStrength();
     }
 
     function startSecondHalf(){
@@ -1319,7 +1349,7 @@
       state.formation=els.halftimeFormation.value;
       state.mentality=els.halftimeMentality.value;
       state.pressing=els.halftimePressing.value;
-      ourStrength=squadAverage()+tacticBonus();
+      refreshOurStrength();
       addEvent(`46' Second half: ${state.mentality} ${state.formation}, ${state.pressing}.`);
       els.halftimePanel.classList.add("hidden");
       paused=false;
@@ -1329,6 +1359,61 @@
 
     els.makeSubstitutionBtn.onclick=makeHalftimeSubstitution;
     els.startSecondHalfBtn.onclick=startSecondHalf;
+    function activeOurPlayers(){
+      return state.players.filter(player=>player.starter && playedIds.has(player.id) && !substitutedOut.has(player.id) && !sentOffIds.has(player.id) && !matchInjuredIds.has(player.id));
+    }
+
+    function refreshOurStrength(){
+      const active=activeOurPlayers();
+      const activeAverage=active.reduce((sum,player)=>sum+effective(player),0)/Math.max(active.length,1);
+      ourStrength=(activeAverage+tacticBonus())*Math.max(.55,active.length/11);
+    }
+
+    function randomActivePlayer(){
+      const candidates=activeOurPlayers();
+      return candidates[Math.floor(Math.random()*candidates.length)];
+    }
+
+    function issueCard(){
+      if(Math.random()>=.09)return;
+      const team=Math.random()<.5?"home":"away", club=team==="home"?fixture.home:fixture.away;
+      matchStats[team+"Fouls"]++;
+      const ours=team===(ourHome?"home":"away");
+      if(!ours){
+        if(Math.random()<.14){matchStats[team+"RedCards"]++;oppStrength*=.9;addEvent(`${minute}' 🟥 RED CARD - ${club} are down to ten players.`)}
+        else{matchStats[team+"YellowCards"]++;addEvent(`${minute}' 🟨 Yellow card for ${club}.`)}
+        return;
+      }
+      const player=randomActivePlayer(); if(!player)return;
+      if(Math.random()<.14){
+        player.redCards++;player.suspensionWeeks=Math.max(player.suspensionWeeks,2);sentOffIds.add(player.id);newUnavailableIds.add(player.id);matchStats[team+"RedCards"]++;
+        addEvent(`${minute}' 🟥 RED CARD - #${player.number} ${player.name}. Two-match suspension.`);
+      }else{
+        const matchCount=(matchYellows.get(player.id)||0)+1;matchYellows.set(player.id,matchCount);player.yellowCards++;matchStats[team+"YellowCards"]++;
+        if(matchCount>=2){
+          player.redCards++;player.suspensionWeeks=Math.max(player.suspensionWeeks,1);sentOffIds.add(player.id);newUnavailableIds.add(player.id);matchStats[team+"RedCards"]++;
+          addEvent(`${minute}' 🟨🟥 Second yellow - #${player.number} ${player.name} is sent off.`);
+        }else{
+          addEvent(`${minute}' 🟨 Yellow card - #${player.number} ${player.name}.`);
+          if(player.yellowCards>=5){player.yellowCards=0;player.suspensionWeeks=Math.max(player.suspensionWeeks,1);newUnavailableIds.add(player.id);addEvent(`${minute}' #${player.number} ${player.name} will miss the next match after five yellow cards.`)}
+        }
+      }
+      refreshOurStrength();
+    }
+
+    function registerInjury(){
+      if(Math.random()>=.035)return;
+      const team=Math.random()<.5?"home":"away", club=team==="home"?fixture.home:fixture.away;
+      matchStats[team+"Injuries"]++;
+      const ours=team===(ourHome?"home":"away");
+      if(!ours){oppStrength*=.96;addEvent(`${minute}' 🩹 ${club} have an injured player.`);return}
+      const player=randomActivePlayer(); if(!player)return;
+      const injuries=[{name:"Knock",weeks:1},{name:"Ankle sprain",weeks:2},{name:"Hamstring strain",weeks:3},{name:"Knee injury",weeks:4}],injury=injuries[Math.floor(Math.random()*injuries.length)];
+      player.injury=injury.name;player.injuryWeeks=injury.weeks;player.fitness=Math.max(45,player.fitness-10);matchInjuredIds.add(player.id);newUnavailableIds.add(player.id);
+      addEvent(`${minute}' 🩹 INJURY - #${player.number} ${player.name}: ${injury.name} (${injury.weeks} match${injury.weeks===1?"":"es"}).`);
+      refreshOurStrength();
+    }
+
     function simulateSlice() {
       pitchMoment = "play";
       const homeStrength = ourHome ? ourStrength : oppStrength;
@@ -1357,12 +1442,14 @@
       }
       if(Math.random()<.07)matchStats[(pitchHomeAttacks?"home":"away")+"Corners"]++;
       if(Math.random()<.055)matchStats[(pitchHomeAttacks?"away":"home")+"Fouls"]++;
+      issueCard();
+      registerInjury();
     }
 
     function renderMatchStats(){
       const homePossession=matchStats.slices?Math.round(matchStats.homePossessionUnits/matchStats.slices*100):50;
       els.homePossession.textContent=homePossession+"%";els.awayPossession.textContent=(100-homePossession)+"%";
-      ["Shots","OnTarget","Corners","Fouls"].forEach(stat=>{els["home"+stat].textContent=matchStats["home"+stat];els["away"+stat].textContent=matchStats["away"+stat]});
+      ["Shots","OnTarget","Corners","Fouls","YellowCards","RedCards","Injuries"].forEach(stat=>{els["home"+stat].textContent=matchStats["home"+stat];els["away"+stat].textContent=matchStats["away"+stat]});
     }
 
     function addEvent(text) {
@@ -1398,6 +1485,12 @@
       state.news.unshift(`${fixture.home} ${hg}-${ag} ${fixture.away}.`);
 
       state.players.forEach(p=>{
+        if(!newUnavailableIds.has(p.id)){
+          p.suspensionWeeks=Math.max(0,(p.suspensionWeeks||0)-1);
+          p.injuryWeeks=Math.max(0,(p.injuryWeeks||0)-1);
+          if(!p.injuryWeeks)p.injury="";
+        }
+        if(!isAvailable(p))p.starter=false;
         p.fitness=Math.max(55,p.fitness-(playedIds.has(p.id)?7:2)+Math.random()*2);
         p.morale=Math.max(45,Math.min(100,p.morale + (resultForClub(fixture)==="W"?4:resultForClub(fixture)==="D"?1:-3)));
       });
@@ -1419,7 +1512,7 @@
     }
 
     function addPlayerGoal() {
-      const candidates=state.players.filter(p=>p.starter && ["ST","LW","RW","AM","CM"].includes(p.pos));
+      const candidates=state.players.filter(p=>p.starter && !sentOffIds.has(p.id) && !matchInjuredIds.has(p.id) && ["ST","LW","RW","AM","CM"].includes(p.pos));
       if (candidates.length) candidates[Math.floor(Math.random()*candidates.length)].goals++;
     }
 
@@ -1498,6 +1591,7 @@
       p.age+=1;
       p.fitness=94;
       p.morale=Math.max(65,p.morale);
+      p.yellowCards=0;p.suspensionWeeks=0;p.injuryWeeks=0;p.injury="";
       if(p.age<=23 && Math.random()<.45 && p.rating<84) p.rating++;
       if(p.age>=31 && Math.random()<.35 && p.rating>60) p.rating--;
     });
