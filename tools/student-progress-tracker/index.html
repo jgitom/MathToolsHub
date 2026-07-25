@@ -48,4 +48,4 @@ function csv(value){return'"'+String(value).replace(/"/g,'""')+'"'}
 function exportCsv(){var lines=[["Student","Activity","Category","Date","Score","Maximum","Percentage","Notes"].map(csv).join(",")];records.forEach(function(item){lines.push([item.student,item.activity,item.category,item.date,item.score,item.maximum,percentage(item)+"%",item.notes].map(csv).join(","))});var newline=String.fromCharCode(13)+String.fromCharCode(10),blob=new Blob([lines.join(newline)],{type:"text/csv"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="student-progress.csv";a.click();URL.revokeObjectURL(a.href)}
 g("add").onclick=add;g("clear").onclick=clearAll;g("export").onclick=exportCsv;g("print").onclick=function(){window.print()};g("studentFilter").onchange=render;g("categoryFilter").onchange=render;g("goal").onchange=function(){localStorage.setItem(goalKey,String(Math.max(1,Number(g("goal").value)||5)));render()};g("date").value=new Date().toISOString().slice(0,10);load();
 </script>
-</body></html>
+<script src="../../supabase-config.js"></script><script type="module" src="../../subscription-access.js"></script></body></html>
