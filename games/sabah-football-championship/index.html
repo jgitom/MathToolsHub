@@ -392,6 +392,10 @@
         <div class="menu-card">
           <h2 id="incidentTitle">Match Stopped</h2>
           <p id="incidentText">An incident happened. Make your changes, then resume.</p>
+          <div class="button-row">
+            <button id="incidentSubBtn" class="secondary" type="button">Make Substitution</button>
+            <button id="incidentTacticBtn" class="secondary" type="button">Change Tactic</button>
+          </div>
           <button id="incidentResumeBtn" class="primary" type="button">Resume Match</button>
         </div>
       </div>
@@ -506,6 +510,8 @@
         incidentOverlay: document.getElementById("incidentOverlay"),
         incidentTitle: document.getElementById("incidentTitle"),
         incidentText: document.getElementById("incidentText"),
+        incidentSubBtn: document.getElementById("incidentSubBtn"),
+        incidentTacticBtn: document.getElementById("incidentTacticBtn"),
         incidentResumeBtn: document.getElementById("incidentResumeBtn"),
         resultTitle: document.getElementById("resultTitle"),
         resultText: document.getElementById("resultText"),
@@ -556,6 +562,10 @@
         tackleCooldown: 0,
         goalFreeze: 0,
         incidentCooldown: 0,
+        pendingIncidentType: null,
+        pendingIncidentTeam: null,
+        incidentActionDone: true,
+        tacticMode: "balanced",
         animationId: null,
         passTarget: null,
         passSelection: null,
@@ -790,6 +800,10 @@
         state.tackleCooldown = 0;
         state.goalFreeze = 0;
         state.incidentCooldown = 0;
+        state.pendingIncidentType = null;
+        state.pendingIncidentTeam = null;
+        state.incidentActionDone = true;
+        state.tacticMode = "balanced";
         state.running = true;
         state.paused = false;
 
@@ -944,7 +958,8 @@
       }
 
       function updateAI(dt) {
-        const aiSpeed = state.opponent.speed + state.selectedDifficulty * 18 + Math.min(state.level * 4, 35);
+        const tacticAdjust = state.tacticMode === "defensive" ? -14 : state.tacticMode === "attacking" ? 10 : 0;
+        const aiSpeed = state.opponent.speed + state.selectedDifficulty * 18 + Math.min(state.level * 4, 35) + tacticAdjust;
         let tx, ty;
 
         if (state.ball.owner === "opponent") {
@@ -1050,18 +1065,13 @@
 
       function applyInjury(team) {
         const isHome = team === "home";
-        const squad = isHome ? state.homePlayers : state.awayPlayers;
         const teamName = isHome ? ui.homeName.textContent : ui.awayName.textContent;
-
-        if (squad.length > 0) {
-          const subIn = squad[Math.floor(Math.random() * squad.length)];
-          if (isHome) takeControl(subIn);
-          else switchOpponent(subIn);
-        }
 
         pauseForIncident(
           `${teamName} injury`,
-          `${teamName} has an injured player. Match paused for substitution or tactic adjustment.`
+          `${teamName} has an injured player. Match paused. Make a substitution or change tactic, then resume.`,
+          "injury",
+          team
         );
       }
 
@@ -1080,24 +1090,72 @@
 
         pauseForIncident(
           `Red card for ${teamName}`,
-          `${teamName} is down to 10 players. Match paused for tactic change before restart.`
+          `${teamName} is down to 10 players. Match paused. Adjust substitution or tactic before restart.`,
+          "red",
+          team
         );
       }
 
-      function pauseForIncident(title, text) {
+      function pauseForIncident(title, text, incidentType, team) {
         state.paused = true;
+        state.pendingIncidentType = incidentType;
+        state.pendingIncidentTeam = team;
+        state.incidentActionDone = false;
         keys.up = keys.down = keys.left = keys.right = false;
         setStadiumIntensity(0.038, 0.25);
         ui.incidentTitle.textContent = title;
         ui.incidentText.textContent = text;
+        ui.incidentResumeBtn.disabled = true;
+        ui.incidentResumeBtn.textContent = "Make a change first";
         ui.incidentOverlay.classList.remove("hidden");
         showMessage("Play stopped", 900);
         playTone(210, 0.14, "square", 0.05);
       }
 
+      function markIncidentActionDone(note) {
+        state.incidentActionDone = true;
+        ui.incidentResumeBtn.disabled = false;
+        ui.incidentResumeBtn.textContent = "Resume Match";
+        if (note) showMessage(note, 850);
+      }
+
+      function applySubstitution() {
+        if (!state.running || !state.paused) return;
+        const isHome = state.pendingIncidentTeam === "home";
+        const squad = isHome ? state.homePlayers : state.awayPlayers;
+
+        if (squad.length > 0) {
+          const subIn = squad[Math.floor(Math.random() * squad.length)];
+          if (isHome) {
+            takeControl(subIn);
+            markIncidentActionDone(`Substitution made: #${state.player.number}`);
+          } else {
+            switchOpponent(subIn);
+            markIncidentActionDone("Opponent made a substitution");
+          }
+        } else {
+          if (isHome) state.player.speed = Math.max(225, state.player.speed - 10);
+          else state.opponent.speed = Math.max(165, state.opponent.speed - 8);
+          markIncidentActionDone("No bench left. Tactical reshuffle applied");
+        }
+      }
+
+      function cycleTactic() {
+        if (!state.running || !state.paused) return;
+        state.tacticMode = state.tacticMode === "balanced" ? "defensive" : state.tacticMode === "defensive" ? "attacking" : "balanced";
+        const label = state.tacticMode.charAt(0).toUpperCase() + state.tacticMode.slice(1);
+        markIncidentActionDone(`Tactic changed: ${label}`);
+      }
+
       function resumeAfterIncident() {
         if (!state.running) return;
+        if (!state.incidentActionDone) {
+          showMessage("Make substitution or tactic change first", 900);
+          return;
+        }
         state.paused = false;
+        state.pendingIncidentType = null;
+        state.pendingIncidentTeam = null;
         setStadiumIntensity(0.085, 0.35);
         ui.incidentOverlay.classList.add("hidden");
         showMessage("Play resumed", 800);
@@ -1513,6 +1571,8 @@
       });
 
       ui.incidentResumeBtn.addEventListener("click", resumeAfterIncident);
+      ui.incidentSubBtn.addEventListener("click", applySubstitution);
+      ui.incidentTacticBtn.addEventListener("click", cycleTactic);
 
       window.addEventListener("blur", () => {
         keys.up = keys.down = keys.left = keys.right = false;
