@@ -837,6 +837,17 @@
         const step=Math.min(len,player.speed*dt);player.x+=player.dirX*step;player.y+=player.dirY*step;clampPlayer(player);
       }
 
+      function takeControl(target){
+        const index=state.homePlayers.indexOf(target);
+        if(index<0||target===state.player)return;
+        const previous=state.player;
+        previous.speed=178;
+        state.homePlayers[index]=previous;
+        state.player=target;
+        state.player.speed=255;
+        state.passSelection=null;
+      }
+
       function switchOpponent(target){
         const index=state.awayPlayers.indexOf(target);if(index<0)return;
         const previous=state.opponent;previous.speed=172;state.awayPlayers[index]=previous;state.opponent=target;state.opponent.speed=190+state.selectedDifficulty*8;
@@ -850,7 +861,7 @@
           const chase=player===homeChaser && (state.ball.owner===null||state.ball.owner==="opponent");
           moveSupportPlayer(player,chase?state.ball.x:player.anchorX+ballShift,chase?state.ball.y:player.anchorY,dt);
           if(state.ball.owner===null&&state.passTarget!==player&&distance(player,state.ball)<player.r+state.ball.r+3&&Math.hypot(state.ball.vx,state.ball.vy)<250){
-            const dx=state.player.x-player.x,dy=state.player.y-player.y,len=Math.hypot(dx,dy)||1;state.ball.vx=dx/len*330;state.ball.vy=dy/len*330;
+            takeControl(player);state.ball.owner="player";state.playerHasBall=true;state.aiHasBall=false;state.passTarget=null;state.passSelection=null;state.ball.vx=0;state.ball.vy=0;showMessage(`You control #${state.player.number}`,500);
           }
         });
         state.awayPlayers.forEach(player=>{
@@ -963,8 +974,8 @@
           return playerScore<bestScore?player:best;
         },pool[0]);
         if(!target)return;
-        const startX=state.ball.x,startY=state.ball.y,oldControlled=state.player,index=state.homePlayers.indexOf(target);
-        oldControlled.speed=178;state.homePlayers[index]=oldControlled;state.player=target;state.player.speed=255;state.passSelection=null;
+        const startX=state.ball.x,startY=state.ball.y;
+        takeControl(target);
         const dx=state.player.x-startX,dy=state.player.y-startY,len=Math.hypot(dx,dy)||1;
         state.ball.owner=null;state.playerHasBall=false;state.passTarget=state.player;state.ball.x=startX;state.ball.y=startY;state.ball.vx=dx/len*440*ballSpeedMultiplier();state.ball.vy=dy/len*440*ballSpeedMultiplier();state.shotCooldown=.22;
         showMessage(`Pass to #${state.player.number}`,500);playTone(380,.05,"square",.035);
