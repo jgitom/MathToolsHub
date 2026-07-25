@@ -546,12 +546,12 @@
         animationId: null,
         passTarget: null,
         passSelection: null,
-        player: { x: 240, y: 300, r: 18, speed: 255, vx: 0, vy: 0, dirX: 1, dirY: 0 },
-        opponent: { x: 690, y: 300, r: 18, speed: 190, vx: 0, vy: 0, dirX: -1, dirY: 0 },
+        player: { x: 240, y: 300, r: 18, speed: 255, vx: 0, vy: 0, dirX: 1, dirY: 0, number: 11, team: "home" },
+        opponent: { x: 690, y: 300, r: 18, speed: 190, vx: 0, vy: 0, dirX: -1, dirY: 0, number: 11, team: "away" },
         homePlayers: makeOutfield(homeShape,"home"),
         awayPlayers: makeOutfield(awayShape,"away"),
-        keeperHome: { x: 78, y: 300, r: 19, speed: 175 },
-        keeperAway: { x: 882, y: 300, r: 19, speed: 175 },
+        keeperHome: { x: 78, y: 300, r: 19, speed: 175, number: 1 },
+        keeperAway: { x: 882, y: 300, r: 19, speed: 175, number: 1 },
         ball: { x: 480, y: 300, r: 10, vx: 0, vy: 0, owner: null }
       };
 
@@ -611,12 +611,12 @@
       }
 
       function resetPositions(kickoff = "home") {
-        state.player={x:245,y:300,r:18,speed:255,vx:0,vy:0,dirX:1,dirY:0,number:10,team:"home"};
-        state.opponent={x:715,y:300,r:18,speed:190,vx:0,vy:0,dirX:-1,dirY:0,number:10,team:"away"};
+        state.player={x:245,y:300,r:18,speed:255,vx:0,vy:0,dirX:1,dirY:0,number:11,team:"home"};
+        state.opponent={x:715,y:300,r:18,speed:190,vx:0,vy:0,dirX:-1,dirY:0,number:11,team:"away"};
         state.homePlayers=makeOutfield(homeShape,"home");
         state.awayPlayers=makeOutfield(awayShape,"away");
-        Object.assign(state.keeperHome, { x: 78, y: 300 });
-        Object.assign(state.keeperAway, { x: 882, y: 300 });
+        Object.assign(state.keeperHome, { x: 78, y: 300, number: 1 });
+        Object.assign(state.keeperAway, { x: 882, y: 300, number: 1 });
         Object.assign(state.ball, { x: 480, y: 300, vx: 0, vy: 0, owner: kickoff === "home" ? "player" : "opponent" });
         state.passTarget=null;state.passSelection=null;
         state.playerHasBall = kickoff === "home";
@@ -1093,6 +1093,7 @@
         drawPlayer(state.keeperHome, "#ffd166", "GK");
         drawPlayer(state.keeperAway, "#ffd166", "GK");
         if(state.passSelection&&state.homePlayers.includes(state.passSelection)){ctx.strokeStyle="#d9ff57";ctx.lineWidth=5;ctx.beginPath();ctx.arc(state.passSelection.x,state.passSelection.y,state.passSelection.r+10,0,Math.PI*2);ctx.stroke()}
+        state.homePlayers.forEach(player=>drawPlayer(player,"#4aa8ff",String(player.number)));
         state.awayPlayers.forEach(player=>drawPlayer(player,"#dc3f4f",String(player.number)));
         drawPlayer(state.player, "#4aa8ff", "YOU");
         drawPlayer(state.opponent, "#ff5c5c", "AI");
