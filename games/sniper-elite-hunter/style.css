@@ -398,7 +398,9 @@ kbd {
   text-transform: uppercase;
   transform: rotate(-2deg);
 }
-#hiddenMessage strong{color:#d4ff44;font-size:.78em;letter-spacing:.24em}#hiddenMessage code{color:inherit;font:700 1em/1.2 "Courier New",monospace;white-space:nowrap}
+#hiddenMessage::after{content:"";position:absolute;left:8px;right:8px;bottom:4px;height:2px;background:#d4ff44;box-shadow:0 0 5px #d4ff44,0 0 14px #72ff9f;transform-origin:left;animation:laserSweep 2.8s ease-in-out infinite}#hiddenMessage code{color:#edffb0;font:800 1em/1.2 "Courier New",monospace;white-space:nowrap;text-shadow:0 0 5px #d4ff44,0 0 13px #72ff9f;animation:laserBlink 2.8s steps(1,end) infinite}
+@keyframes laserBlink{0%,8%,16%,25%,40%,54%,68%,82%,100%{opacity:1}4%,12%,21%,32%,47%,61%,75%,90%{opacity:.12}}@keyframes laserSweep{0%,100%{transform:scaleX(.08);opacity:.25}45%{transform:scaleX(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){#hiddenMessage::after,#hiddenMessage code{animation:none}}
 #missionText {
   left: 50%;
   top: 3%;
