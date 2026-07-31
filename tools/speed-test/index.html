@@ -30,6 +30,7 @@
     .reading { position:relative; z-index:2; text-align:center; transform:rotate(135deg); }
     .reading strong { display:block; color:var(--navy); font-size:clamp(2.5rem,12vw,4.6rem); line-height:1; font-variant-numeric:tabular-nums; }
     .reading span { display:block; margin-top:8px; color:var(--muted); font-weight:850; }
+    .reading small { display:block; margin-top:5px; color:#94a3b8; font-size:.7rem; font-weight:750; }
     .phase { min-height:25px; margin:0 0 22px; text-align:center; color:var(--muted); font-weight:750; }
     .progress { height:9px; margin-bottom:16px; border-radius:99px; background:#e7edf5; overflow:hidden; }
     .bar { width:0; height:100%; border-radius:inherit; background:linear-gradient(90deg,var(--blue),var(--cyan)); transition:width .2s; }
@@ -42,7 +43,7 @@
     .button:disabled { opacity:.55; cursor:not-allowed; }
     .cancel { display:none; min-width:110px; background:#e8eef7; color:var(--ink); box-shadow:none; }
     .secondary { min-width:110px; display:none; color:var(--ink); background:#e8eef7; box-shadow:none; }
-    .results { display:none; grid-template-columns:repeat(5,1fr); gap:14px; margin-top:28px; }
+    .results { display:none; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:28px; }
     .result { padding:20px 14px; border:1px solid var(--line); border-radius:15px; text-align:center; background:#f8fafc; }
     .result span { display:block; color:var(--muted); font-size:.78rem; font-weight:800; }
     .result strong { display:block; margin:8px 0 4px; color:var(--navy); font-size:1.65rem; }
@@ -51,6 +52,12 @@
     .quality.good { display:block; color:#047857; background:#ecfdf5; }
     .quality.fair { display:block; color:#a16207; background:#fffbeb; }
     .quality.slow { display:block; color:#b91c1c; background:#fef2f2; }
+    .insights { display:none; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:14px; }
+    .insights.show { display:grid; }
+    .insight { padding:15px; border:1px solid var(--line); border-radius:13px; background:#f8fafc; }
+    .insight span { display:block; color:var(--muted); font-size:.76rem; font-weight:800; }
+    .insight strong { display:block; margin-top:7px; color:var(--navy); font-size:.94rem; }
+    .insight.good strong { color:#047857; }.insight.fair strong { color:#a16207; }.insight.slow strong { color:#b91c1c; }
     .history { margin-top:18px; padding:16px; border:1px solid var(--line); border-radius:14px; background:#f8fafc; }
     .history h3 { margin:0 0 10px; color:var(--ink); font-size:.98rem; }
     .history ul { margin:0; padding:0; list-style:none; display:grid; gap:8px; }
@@ -63,7 +70,7 @@
     .creator strong { color:var(--navy); }
     @media (max-width:740px) {
       .results { grid-template-columns:1fr 1fr; }
-      .result:last-child { grid-column:1 / -1; }
+      .insights { grid-template-columns:1fr; }
     }
     @media (max-width:620px) {
       .wrap { margin-top:28px; }
@@ -101,10 +108,10 @@
   <section class="intro">
     <p class="eyebrow" data-i18n="eyebrow">Connection check</p>
     <h1 id="pageTitle" data-i18n="title">MathToolsHub Speed Test</h1>
-    <p class="lead" data-i18n="lead">Check how quickly your device connects to MathToolsHub. The test measures latency, jitter, and download speed.</p>
+    <p class="lead" data-i18n="lead">Check your latency, jitter, packet loss, parallel-stream download speed, upload speed, and connection suitability.</p>
   </section>
   <section class="panel" aria-labelledby="pageTitle">
-    <div class="meter" id="meter" aria-hidden="true"><div class="reading"><strong id="speed">0.0</strong><span id="unit">Mbps</span></div></div>
+    <div class="meter" id="meter" aria-hidden="true"><div class="reading"><strong id="speed">0.0</strong><span id="unit">Mbps</span><small id="meterScale">Scale 100 Mbps</small></div></div>
     <p class="phase" id="phase" role="status" aria-live="polite">Ready to test your connection.</p>
     <div class="progress"><div class="bar" id="bar"></div></div>
     <div class="mode-row">
@@ -121,8 +128,14 @@
       <div class="result"><span data-i18n="latency">Latency</span><strong id="latency">—</strong><small>ms</small></div>
       <div class="result"><span data-i18n="jitter">Jitter</span><strong id="jitter">—</strong><small>ms</small></div>
       <div class="result"><span data-i18n="packetLoss">Packet loss</span><strong id="packetLoss">—</strong><small>%</small></div>
+      <div class="result"><span data-i18n="dataUsed">Test data</span><strong id="dataUsed">—</strong><small>MB</small></div>
     </div>
     <div class="quality" id="quality"></div>
+    <div class="insights" id="insights">
+      <div class="insight" id="videoInsight"><span data-i18n="video">HD / 4K video</span><strong>—</strong></div>
+      <div class="insight" id="callsInsight"><span data-i18n="calls">Video calls</span><strong>—</strong></div>
+      <div class="insight" id="gamingInsight"><span data-i18n="gaming">Online gaming</span><strong>—</strong></div>
+    </div>
     <section class="history" aria-live="polite">
       <h3 data-i18n="historyTitle">Recent tests</h3>
       <ul id="historyList"><li data-i18n="noHistory">No previous tests yet.</li></ul>
@@ -137,34 +150,34 @@
 <script>
 const COPY = {
   en: {
-    back:"← Tools", eyebrow:"Connection check", title:"MathToolsHub Speed Test", lead:"Check how quickly your device connects to MathToolsHub. The test measures latency, jitter, and download speed.",
+    back:"← Tools", eyebrow:"Connection check", title:"MathToolsHub Speed Test", lead:"Check your latency, jitter, packet loss, parallel-stream download speed, upload speed, and connection suitability.",
     start:"Start Speed Test", cancel:"Cancel", copy:"Copy result", copied:"Copied", modeLabel:"Test mode", quick:"Quick", accurate:"Accurate",
-    download:"Download", upload:"Upload", latency:"Latency", jitter:"Jitter", packetLoss:"Packet loss", historyTitle:"Recent tests", noHistory:"No previous tests yet.",
+    download:"Download", upload:"Upload", latency:"Latency", jitter:"Jitter", packetLoss:"Packet loss", dataUsed:"Test data", video:"HD / 4K video", calls:"Video calls", gaming:"Online gaming", historyTitle:"Recent tests", noHistory:"No previous tests yet.",
     privacyTitle:"Private browser test", privacy:"No personal information is collected. Download test data comes from MathToolsHub. Upload testing sends only temporary random bytes to Cloudflare, never your files.",
     estimateTitle:"Results are estimates", estimate:"Wi-Fi strength, other downloads, browser limits, and distance from the server can affect results. Upload results use the Cloudflare edge network and may differ from your speed to other services.",
     created:"Created by", ready:"Ready to test your connection.", ping:"Measuring latency…", down:"Measuring download speed…", up:"Measuring upload speed…",
     done:"Test complete.", cancelled:"Test cancelled.", failed:"Speed test failed. Please check your connection and try again.",
-    good:"Excellent connection - suitable for video lessons and downloads.", fair:"Good connection - suitable for most learning activities.", slow:"Slow connection - move closer to Wi-Fi or close other downloads."
+    good:"Excellent connection - suitable for video lessons and downloads.", fair:"Good connection - suitable for most learning activities.", slow:"Slow connection - move closer to Wi-Fi or close other downloads.", ideal:"Excellent", supported:"Suitable", limited:"Limited", uploadUnavailable:"Upload unavailable"
   },
   ms: {
-    back:"← Alatan", eyebrow:"Semakan sambungan", title:"Ujian Kelajuan MathToolsHub", lead:"Semak kepantasan peranti anda bersambung ke MathToolsHub. Ujian ini mengukur kependaman, getaran dan kelajuan muat turun.",
+    back:"← Alatan", eyebrow:"Semakan sambungan", title:"Ujian Kelajuan MathToolsHub", lead:"Semak kependaman, getaran, kehilangan paket, kelajuan muat turun berbilang aliran, kelajuan muat naik dan kesesuaian sambungan anda.",
     start:"Mulakan Ujian Kelajuan", cancel:"Batal", copy:"Salin keputusan", copied:"Disalin", modeLabel:"Mod ujian", quick:"Pantas", accurate:"Tepat",
-    download:"Muat turun", upload:"Muat naik", latency:"Kependaman", jitter:"Getaran", packetLoss:"Kehilangan paket", historyTitle:"Ujian terkini", noHistory:"Belum ada ujian sebelum ini.",
+    download:"Muat turun", upload:"Muat naik", latency:"Kependaman", jitter:"Getaran", packetLoss:"Kehilangan paket", dataUsed:"Data ujian", video:"Video HD / 4K", calls:"Panggilan video", gaming:"Permainan dalam talian", historyTitle:"Ujian terkini", noHistory:"Belum ada ujian sebelum ini.",
     privacyTitle:"Ujian pelayar peribadi", privacy:"Tiada maklumat peribadi dikumpulkan. Data muat turun datang daripada MathToolsHub. Ujian muat naik hanya menghantar bait rawak sementara kepada Cloudflare, bukan fail anda.",
     estimateTitle:"Keputusan ialah anggaran", estimate:"Kekuatan Wi-Fi, muat turun lain, had pelayar dan jarak dari pelayan boleh mempengaruhi keputusan. Keputusan muat naik menggunakan rangkaian Cloudflare dan mungkin berbeza untuk perkhidmatan lain.",
     created:"Dicipta oleh", ready:"Bersedia untuk menguji sambungan anda.", ping:"Mengukur kependaman…", down:"Mengukur kelajuan muat turun…", up:"Mengukur kelajuan muat naik…",
     done:"Ujian selesai.", cancelled:"Ujian dibatalkan.", failed:"Ujian gagal. Sila semak sambungan anda dan cuba semula.",
-    good:"Sambungan sangat baik - sesuai untuk video pembelajaran dan muat turun.", fair:"Sambungan baik - sesuai untuk kebanyakan aktiviti pembelajaran.", slow:"Sambungan perlahan - dekati Wi-Fi atau tutup muat turun lain."
+    good:"Sambungan sangat baik - sesuai untuk video pembelajaran dan muat turun.", fair:"Sambungan baik - sesuai untuk kebanyakan aktiviti pembelajaran.", slow:"Sambungan perlahan - dekati Wi-Fi atau tutup muat turun lain.", ideal:"Cemerlang", supported:"Sesuai", limited:"Terhad", uploadUnavailable:"Muat naik tidak tersedia"
   },
   zh: {
-    back:"← 工具", eyebrow:"连接检查", title:"MathToolsHub 网速测试", lead:"检查您的设备连接 MathToolsHub 的速度。测试将测量延迟、抖动和下载速度。",
+    back:"← 工具", eyebrow:"连接检查", title:"MathToolsHub 网速测试", lead:"检测延迟、抖动、丢包率、多线程下载速度、上传速度以及连接适用性。",
     start:"开始网速测试", cancel:"取消", copy:"复制结果", copied:"已复制", modeLabel:"测试模式", quick:"快速", accurate:"精准",
-    download:"下载速度", upload:"上传速度", latency:"延迟", jitter:"抖动", packetLoss:"丢包率", historyTitle:"最近测试", noHistory:"暂无历史测试。",
+    download:"下载速度", upload:"上传速度", latency:"延迟", jitter:"抖动", packetLoss:"丢包率", dataUsed:"测试数据", video:"高清视频 / 4K", calls:"视频通话", gaming:"在线游戏", historyTitle:"最近测试", noHistory:"暂无历史测试。",
     privacyTitle:"私人浏览器测试", privacy:"不收集个人信息。下载测试数据来自 MathToolsHub。上传测试只向 Cloudflare 发送临时随机字节，绝不会发送您的文件。",
     estimateTitle:"结果仅供参考", estimate:"Wi-Fi 信号、其他下载、浏览器限制和服务器距离都会影响结果。上传结果使用 Cloudflare 边缘网络，连接其他服务时可能有所不同。",
     created:"创建者", ready:"可以开始测试连接。", ping:"正在测量延迟…", down:"正在测量下载速度…", up:"正在测量上传速度…",
     done:"测试完成。", cancelled:"测试已取消。", failed:"测试失败。请检查网络后重试。",
-    good:"连接极佳 - 适合视频课程和下载。", fair:"连接良好 - 适合大多数学习活动。", slow:"连接较慢 - 请靠近 Wi-Fi 或关闭其他下载。"
+    good:"连接极佳 - 适合视频课程和下载。", fair:"连接良好 - 适合大多数学习活动。", slow:"连接较慢 - 请靠近 Wi-Fi 或关闭其他下载。", ideal:"极佳", supported:"适用", limited:"受限", uploadUnavailable:"无法测试上传"
   }
 };
 
@@ -182,11 +195,15 @@ const quality = $("quality");
 const language = $("language");
 const testMode = $("testMode");
 const historyList = $("historyList");
+const meterScale = $("meterScale");
+const insights = $("insights");
 
 let controller = null;
 let running = false;
 let currentLanguage = "en";
 let lastResultSummary = "";
+let totalTransferred = 0;
+let meterMaximum = 100;
 
 function t(key) { return COPY[currentLanguage][key] || COPY.en[key] || key; }
 
@@ -196,9 +213,12 @@ function setProgress(value) {
 }
 
 function setMeter(value) {
-  const bounded = Math.max(0, Math.min(100, value));
-  speed.textContent = Number.isFinite(value) ? value.toFixed(1) : "0.0";
-  meter.style.setProperty("--value", (bounded / 100 * 270) + "deg");
+  const safeValue = Number.isFinite(value) ? Math.max(0, value) : 0;
+  const scales = [10, 25, 50, 100, 250, 500, 1000, 2500];
+  meterMaximum = scales.find(limit => safeValue <= limit * .92) || 2500;
+  speed.textContent = safeValue.toFixed(1);
+  meterScale.textContent = "Scale " + meterMaximum + " Mbps";
+  meter.style.setProperty("--value", (Math.min(safeValue / meterMaximum, 1) * 270) + "deg");
 }
 
 function loadHistory() {
@@ -220,7 +240,8 @@ function renderHistory() {
   }
   historyList.innerHTML = history.map(item => {
     const when = new Date(item.timestamp).toLocaleString();
-    return "<li><span>" + when + "</span><strong>D " + item.download.toFixed(1) + " / U " + item.upload.toFixed(1) + " Mbps | " + item.latency.toFixed(0) + " ms</strong></li>";
+    const uploadText = Number.isFinite(item.upload) ? item.upload.toFixed(1) : "N/A";
+    return "<li><span>" + when + "</span><strong>D " + item.download.toFixed(1) + " / U " + uploadText + " Mbps | " + item.latency.toFixed(0) + " ms</strong></li>";
   }).join("");
 }
 
@@ -277,44 +298,41 @@ async function ping(samplesCount) {
   return { average, jitter, packetLoss };
 }
 
-async function fetchWithLiveThroughput(url, progressStart, progressSpan) {
+async function downloadBatch(streamCount, progressStart, progressSpan) {
   const started = performance.now();
-  const response = await fetch(url, { cache:"no-store", signal:controller.signal });
-  if (!response.ok) throw new Error("Download failed");
-  if (!response.body || !response.body.getReader) {
-    const data = await response.arrayBuffer();
-    const seconds = (performance.now() - started) / 1000;
-    return (data.byteLength * 8 / seconds) / 1000000;
-  }
-  const reader = response.body.getReader();
   let received = 0;
-  const total = Number(response.headers.get("content-length")) || 0;
-  while (true) {
-    if (controller.signal.aborted) throw new DOMException("Aborted", "AbortError");
-    const { value, done } = await reader.read();
-    if (done) break;
-    received += value.byteLength;
-    const elapsed = Math.max((performance.now() - started) / 1000, 0.1);
-    const liveMbps = (received * 8 / elapsed) / 1000000;
-    setMeter(liveMbps);
-    if (total > 0) setProgress(progressStart + Math.min(received / total, 1) * progressSpan);
-  }
-  const seconds = (performance.now() - started) / 1000;
+  const responses = await Promise.all(Array.from({ length:streamCount }, (_, index) =>
+    fetch("../../games/math-kingdom-defender/Math%20Kingdom%20March-2.mp3?speed=" + Date.now() + "-" + index, { cache:"no-store", signal:controller.signal })
+  ));
+  responses.forEach(response => { if (!response.ok) throw new Error("Download failed"); });
+  const expected = responses.reduce((sum, response) => sum + (Number(response.headers.get("content-length")) || 0), 0);
+  await Promise.all(responses.map(async response => {
+    if (!response.body || !response.body.getReader) {
+      const data = await response.arrayBuffer();
+      received += data.byteLength;
+      totalTransferred += data.byteLength;
+      return;
+    }
+    const reader = response.body.getReader();
+    while (true) {
+      if (controller.signal.aborted) throw new DOMException("Aborted", "AbortError");
+      const { value, done } = await reader.read();
+      if (done) break;
+      received += value.byteLength;
+      totalTransferred += value.byteLength;
+      const elapsed = Math.max((performance.now() - started) / 1000, .1);
+      setMeter((received * 8 / elapsed) / 1000000);
+      if (expected) setProgress(progressStart + Math.min(received / expected, 1) * progressSpan);
+    }
+  }));
+  const seconds = Math.max((performance.now() - started) / 1000, .001);
   return (received * 8 / seconds) / 1000000;
 }
 
 async function downloadTest(mode) {
-  const runCount = mode === "accurate" ? 3 : 2;
-  const runs = [];
-  for (let i = 0; i < runCount; i++) {
-    if (controller.signal.aborted) throw new DOMException("Aborted", "AbortError");
-    const mbps = await fetchWithLiveThroughput("../../games/math-kingdom-defender/Math%20Kingdom%20March-2.mp3?speed=" + Date.now() + i, 25 + (i / runCount) * 35, 35 / runCount);
-    runs.push(mbps);
-    setProgress(25 + (i + 1) / runCount * 35);
-  }
-  return mode === "accurate" ? median(runs) : runs.reduce((a, b) => a + b, 0) / runs.length;
+  const streams = mode === "accurate" ? 3 : 2;
+  return downloadBatch(streams, 25, 35);
 }
-
 async function uploadTest(mode) {
   const sizes = mode === "accurate" ? [1000000, 4000000, 8000000] : [1000000, 4000000];
   const runs = [];
@@ -327,6 +345,7 @@ async function uploadTest(mode) {
     const started = performance.now();
     const response = await fetch("https://speed.cloudflare.com/__up", { method:"POST", body:payload, cache:"no-store", signal:controller.signal });
     if (!response.ok) throw new Error("Upload failed");
+    totalTransferred += payload.byteLength;
     const seconds = (performance.now() - started) / 1000;
     const mbps = (payload.byteLength * 8 / seconds) / 1000000;
     runs.push(mbps);
@@ -336,30 +355,45 @@ async function uploadTest(mode) {
   return mode === "accurate" ? median(runs) : runs.reduce((a, b) => a + b, 0) / runs.length;
 }
 
+function setInsight(id, grade) {
+  const card = $(id);
+  card.className = "insight " + grade;
+  card.querySelector("strong").textContent = t(grade === "good" ? "ideal" : grade === "fair" ? "supported" : "limited");
+}
+
 function finish(download, upload, pingResult) {
+  const hasUpload = Number.isFinite(upload);
   $("download").textContent = download.toFixed(1);
-  $("upload").textContent = upload.toFixed(1);
+  $("upload").textContent = hasUpload ? upload.toFixed(1) : "N/A";
   $("latency").textContent = pingResult.average.toFixed(0);
   $("jitter").textContent = pingResult.jitter.toFixed(1);
   $("packetLoss").textContent = pingResult.packetLoss.toFixed(1);
+  $("dataUsed").textContent = (totalTransferred / 1000000).toFixed(1);
 
   results.style.display = "grid";
+  insights.classList.add("show");
   copyResult.style.display = "inline-block";
 
-  const type = download >= 25 && upload >= 8 && pingResult.average < 80 && pingResult.packetLoss < 1
+  const uploadGood = !hasUpload || upload >= 8;
+  const uploadFair = !hasUpload || upload >= 3;
+  const type = download >= 25 && uploadGood && pingResult.average < 80 && pingResult.packetLoss < 1
     ? "good"
-    : download >= 8 && upload >= 3 && pingResult.average < 160 && pingResult.packetLoss < 3
+    : download >= 8 && uploadFair && pingResult.average < 160 && pingResult.packetLoss < 3
       ? "fair"
       : "slow";
   quality.className = "quality " + type;
-  quality.textContent = t(type);
+  quality.textContent = t(type) + (hasUpload ? "" : " · " + t("uploadUnavailable"));
+  setInsight("videoInsight", download >= 25 ? "good" : download >= 8 ? "fair" : "slow");
+  setInsight("callsInsight", download >= 8 && (!hasUpload || upload >= 3) && pingResult.average < 120 ? "good" : download >= 3 && pingResult.average < 200 ? "fair" : "slow");
+  setInsight("gamingInsight", pingResult.average < 60 && pingResult.jitter < 20 && pingResult.packetLoss < 1 ? "good" : pingResult.average < 120 && pingResult.jitter < 40 && pingResult.packetLoss < 3 ? "fair" : "slow");
   phase.textContent = t("done");
   setProgress(100);
 
-  const result = { timestamp: Date.now(), download, upload, latency: pingResult.average, jitter: pingResult.jitter, packetLoss: pingResult.packetLoss };
+  const result = { timestamp:Date.now(), download, upload:hasUpload ? upload : null, latency:pingResult.average, jitter:pingResult.jitter, packetLoss:pingResult.packetLoss };
   saveHistory(result);
   renderHistory();
-  lastResultSummary = "Download " + download.toFixed(1) + " Mbps, Upload " + upload.toFixed(1) + " Mbps, Latency " + pingResult.average.toFixed(0) + " ms, Jitter " + pingResult.jitter.toFixed(1) + " ms, Packet loss " + pingResult.packetLoss.toFixed(1) + "%";
+  const uploadSummary = hasUpload ? upload.toFixed(1) + " Mbps" : "unavailable";
+  lastResultSummary = "Download " + download.toFixed(1) + " Mbps, Upload " + uploadSummary + ", Latency " + pingResult.average.toFixed(0) + " ms, Jitter " + pingResult.jitter.toFixed(1) + " ms, Packet loss " + pingResult.packetLoss.toFixed(1) + "%, Test data " + (totalTransferred / 1000000).toFixed(1) + " MB";
 }
 
 start.addEventListener("click", async () => {
@@ -372,6 +406,8 @@ start.addEventListener("click", async () => {
   copyResult.style.display = "none";
   results.style.display = "none";
   quality.className = "quality";
+  insights.classList.remove("show");
+  totalTransferred = 0;
   setMeter(0);
   setProgress(2);
   try {
@@ -381,7 +417,13 @@ start.addEventListener("click", async () => {
     phase.textContent = t("down");
     const download = await downloadTest(mode);
     phase.textContent = t("up");
-    const upload = await uploadTest(mode);
+    let upload = null;
+    try {
+      upload = await uploadTest(mode);
+    } catch (uploadError) {
+      if (uploadError.name === "AbortError") throw uploadError;
+      setProgress(95);
+    }
     finish(download, upload, pingResult);
   } catch (error) {
     phase.textContent = error.name === "AbortError" ? t("cancelled") : t("failed");

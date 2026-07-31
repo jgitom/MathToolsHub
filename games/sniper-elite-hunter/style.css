@@ -383,14 +383,22 @@ kbd {
   bottom: 5%;
   z-index: 4;
   pointer-events: none;
-  color: rgba(170, 255, 200, 0.16);
+  display: grid;
+  gap: 3px;
+  min-width: 150px;
+  padding: 9px 12px;
+  border: 2px solid rgba(170, 255, 200, 0.38);
+  border-radius: 3px;
+  color: rgba(216, 255, 226, 0.8);
+  background: linear-gradient(145deg, rgba(17, 43, 36, 0.88), rgba(5, 18, 17, 0.94));
+  box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.55), 0 5px 15px rgba(0, 0, 0, 0.35);
   font-family: "Courier New", monospace;
   font-size: clamp(0.7rem, 1.2vw, 0.95rem);
-  letter-spacing: 0.28em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   transform: rotate(-2deg);
 }
-
+#hiddenMessage strong{color:#d4ff44;font-size:.78em;letter-spacing:.24em}#hiddenMessage code{color:inherit;font:700 1em/1.2 "Courier New",monospace;white-space:nowrap}
 #missionText {
   left: 50%;
   top: 3%;
