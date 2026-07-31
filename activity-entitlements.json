@@ -453,6 +453,20 @@
                            "path":  "/games/trigonometry-tower/"
                        },
                        {
+                           "activity_id":  "game/sniper-elite-hunter",
+                           "access_tier":  "premium",
+                           "category":  "game",
+                           "title":  "Sniper Elite Hunter",
+                           "path":  "/games/sniper-elite-hunter/"
+                       },
+                       {
+                           "activity_id":  "game/sniper-shadow-ops",
+                           "access_tier":  "premium",
+                           "category":  "game",
+                           "title":  "Sniper: Shadow Ops",
+                           "path":  "/games/sniper-shadow-ops/"
+                       },
+                       {
                            "activity_id":  "game/wild-hunt-safari",
                            "access_tier":  "free",
                            "category":  "game",

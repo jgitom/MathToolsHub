@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Sniper: Shadow Ops | MathToolsHub</title>
+  <link rel="stylesheet" href="style.css" />
+<style>.mth-back{position:fixed;left:max(9px,env(safe-area-inset-left));top:max(8px,env(safe-area-inset-top));z-index:10000;padding:9px 13px;border:1px solid rgba(255,255,255,.25);border-radius:999px;color:#fff;background:rgba(3,8,18,.92);box-shadow:0 6px 18px rgba(0,0,0,.4);text-decoration:none;font:800 12px/1.2 Arial,sans-serif}.mth-back:focus-visible{outline:3px solid #66f0ff;outline-offset:2px}@media(max-width:760px){.topbar{padding-top:42px}.mth-back{padding:8px 10px}}</style>
+</head>
+<body>
+  <a class="mth-back" href="../" aria-label="Back to all games">← All Games</a>
+  <div id="app">
+    <header class="topbar">
+      <div>
+        <h1>SNIPER ELITE: SHADOW OPS</h1>
+        <p class="subtitle">Tactical Precision Simulator</p>
+      </div>
+      <button id="soundBtn" class="secondary-btn">Sound: ON</button>
+    </header>
+
+    <main>
+      <section id="startScreen" class="panel start-screen">
+        <div class="mission-card">
+          <span class="badge">MISSION 01</span>
+          <h2>Neon Hive Siege</h2>
+          <p>
+            Scan the tower block and neutralize alien infiltrators hiding in window bays.
+            Avoid disguised civilians and decoys.
+          </p>
+
+          <div class="mission-grid">
+            <div><span>Difficulty</span><strong id="difficultyValue">Normal</strong></div>
+            <div><span>Range</span><strong>220–640 m</strong></div>
+            <div><span>Ammo</span><strong id="ammoValue">8 rounds</strong></div>
+            <div><span>Time</span><strong id="timeValue">60 seconds</strong></div>
+          </div>
+
+          <div class="difficulty-picker" role="group" aria-label="Select difficulty">
+            <button class="difficulty-btn" data-difficulty="easy" type="button">Easy</button>
+            <button class="difficulty-btn active" data-difficulty="normal" type="button">Normal</button>
+            <button class="difficulty-btn" data-difficulty="hard" type="button">Hard</button>
+            <button class="difficulty-btn" data-difficulty="nightmare" type="button">Nightmare</button>
+          </div>
+
+          <button id="startBtn" class="primary-btn">Start Mission</button>
+        </div>
+
+        <aside class="intel-card">
+          <h3>Mission Intel</h3>
+          <ul>
+            <li>Green eyes indicate alien hostiles.</li>
+            <li>Blue silhouettes are civilian decoys.</li>
+            <li>Headshots earn bonus points.</li>
+            <li>Missed shots reduce accuracy.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section id="gameScreen" class="game-screen hidden">
+        <div class="hud">
+          <div><span>Score</span><strong id="score">0</strong></div>
+          <div><span>Ammo</span><strong id="ammo">8</strong></div>
+          <div><span>Time</span><strong id="timer">60</strong></div>
+          <div><span>Accuracy</span><strong id="accuracy">100%</strong></div>
+          <div><span>Threat</span><strong id="threatStatus">Low</strong></div>
+          <div>
+            <span>Health</span>
+            <strong id="health">100</strong>
+            <div class="health-bar" aria-hidden="true">
+              <div id="healthFill" class="health-fill"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="gameArea" class="game-area">
+          <div class="environment-layer stars"></div>
+          <div class="environment-layer skyline"></div>
+          <div class="environment-layer buildings"></div>
+          <div class="environment-layer fog"></div>
+
+          <div id="targetLayer"></div>
+
+          <div id="scope" class="scope">
+            <div class="scope-ring"></div>
+            <div class="scope-line horizontal"></div>
+            <div class="scope-line vertical"></div>
+            <div class="scope-dot"></div>
+          </div>
+
+          <div id="shotFlash" class="shot-flash"></div>
+          <div id="enemyHitFlash" class="enemy-hit-flash"></div>
+
+          <div class="range-display">
+            RANGE: <span id="rangeValue">450</span> M
+          </div>
+
+          <div class="wind-display">
+            WIND: <span id="windValue">2.4</span> M/S →
+          </div>
+        </div>
+
+        <div class="controls">
+          <button id="reloadBtn" class="secondary-btn">Reload</button>
+          <button id="backBtn" class="secondary-btn">Back Menu</button>
+          <button id="abortBtn" class="danger-btn">Abort Mission</button>
+        </div>
+      </section>
+
+      <section id="resultScreen" class="panel result-screen hidden">
+        <span id="resultBadge" class="badge">MISSION COMPLETE</span>
+        <h2 id="resultTitle">Excellent work.</h2>
+
+        <div class="result-grid">
+          <div><span>Final Score</span><strong id="finalScore">0</strong></div>
+          <div><span>Accuracy</span><strong id="finalAccuracy">0%</strong></div>
+          <div><span>Aliens Hit</span><strong id="finalHits">0</strong></div>
+          <div><span>Decoys Hit</span><strong id="civilianHits">0</strong></div>
+        </div>
+
+        <button id="retryBtn" class="primary-btn">Retry Mission</button>
+      </section>
+    </main>
+
+    <footer>
+      Prototype build • Desktop recommended • Click to fire
+    </footer>
+  </div>
+
+  <script src="game.js"></script>
+  <script src="../../supabase-config.js"></script><script type="module" src="../../subscription-access.js"></script>
+</body>
+</html>
