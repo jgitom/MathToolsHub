@@ -137,5 +137,9 @@ insert into public.activity_entitlements (activity_id, access_tier, title, path,
 ('tool/step-by-step-math-solver','premium','Step-by-Step Math Solver','/tools/step-by-step-math-solver/','tool'),
 ('tool/student-notepad','free','Student Notepad','/tools/student-notepad/','tool'),
 ('tool/student-progress-tracker','premium','Student Progress Tracker','/tools/student-progress-tracker/','tool'),
+('game/badminton-championship','premium','Badminton Championship','/games/badminton-championship/','game'),
+('game/tennis-championship','premium','Tennis Championship','/games/tennis-championship/','game'),
+('game/sniper-elite-hunter','premium','Sniper Elite Hunter','/games/sniper-elite-hunter/','game'),
+('game/sniper-shadow-ops','premium','Sniper: Shadow Ops','/games/sniper-shadow-ops/','game'),
 ('tool/worksheet-generator','premium','Worksheet Generator','/tools/worksheet-generator/','tool')
 on conflict (activity_id) do update set access_tier=excluded.access_tier,title=excluded.title,path=excluded.path,category=excluded.category,active=true,updated_at=now();
