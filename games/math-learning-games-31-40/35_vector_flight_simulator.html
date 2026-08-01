@@ -14,4 +14,6 @@ const GAME={levels:{easy:{label:"Easy",rounds:10},medium:{label:"Medium",rounds:
 buildRound(level){let answer,question,choices;if(level==="easy"){let x=randomInt(-5,5),y=randomInt(-5,5);answer=`(${x}, ${y})`;question=`Move ${Math.abs(x)} ${x>=0?"east":"west"} and ${Math.abs(y)} ${y>=0?"north":"south"}. Give the vector.`;$("display").textContent="?";vdraw(x,y);choices=[answer,`(${y}, ${x})`,`(${-x}, ${y})`,`(${x}, ${-y})`]}
 else if(level==="medium"){let a=[randomInt(-4,4),randomInt(-4,4)],b=[randomInt(-4,4),randomInt(-4,4)],r=[a[0]+b[0],a[1]+b[1]];answer=`(${r[0]}, ${r[1]})`;question=`Find (${a[0]},${a[1]}) + (${b[0]},${b[1]}).`;$("display").textContent="Resultant";vdraw(r[0],r[1]);choices=[answer,`(${a[0]-b[0]}, ${a[1]-b[1]})`,`(${r[1]}, ${r[0]})`,`(${a[0]+b[1]}, ${a[1]+b[0]})`]}
 else{let t=randomChoice([[3,4,5],[5,12,13],[6,8,10],[8,15,17]]),x=t[0]*(Math.random()<.5?-1:1),y=t[1]*(Math.random()<.5?-1:1);answer=t[2];question=`Find the magnitude of vector (${x},${y}).`;$("display").textContent=`|(${x},${y})|`;vdraw(x,y);choices=[t[2],t[2]+1,t[2]-1,Math.abs(x)+Math.abs(y)]}return{answer,question,choices}},onCorrect(){$("plane").classList.add("fly");setTimeout(()=>$("plane").classList.remove("fly"),700)}};
-</script><script src="game_engine.js"></script></body></html>
+</script><script src="game_engine.js"></script>
+<script src="../../universal-language.js"></script>
+</body></html>

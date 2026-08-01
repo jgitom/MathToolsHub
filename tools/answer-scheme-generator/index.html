@@ -35,4 +35,6 @@ function download(){if(!current.length)return;var lines=[g("school").value,g("ti
 function clearAll(){g("items").innerHTML="";current=[];g("preview").innerHTML='<div class="empty"><div><strong>Your answer scheme will appear here.</strong><br>Add question details and select Generate scheme.</div></div>';g("print").disabled=g("download").disabled=true;addItem()}
 g("add").onclick=function(){addItem()};g("generate").onclick=generate;g("print").onclick=function(){window.print()};g("download").onclick=download;g("clear").onclick=clearAll;addItem({qno:"1",marks:1});addItem({qno:"2",marks:2});addItem({qno:"3",marks:4});
 </script>
-<script src="../../supabase-config.js"></script><script type="module" src="../../subscription-access.js"></script></body></html>
+<script src="../../supabase-config.js"></script><script type="module" src="../../subscription-access.js"></script>
+<script src="../../universal-language.js"></script>
+</body></html>
