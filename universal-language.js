@@ -9,17 +9,8 @@
   const languages = {
     en: { label: "English", locale: "en-GB", dir: "ltr" },
     ms: { label: "Bahasa Malaysia", locale: "ms-MY", dir: "ltr" },
-    zh: { label: "中文（普通话）", locale: "zh-CN", dir: "ltr" },
-    id: { label: "Bahasa Indonesia", locale: "id-ID", dir: "ltr" },
-    ar: { label: "العربية", locale: "ar", dir: "rtl" },
-    fr: { label: "Français", locale: "fr-FR", dir: "ltr" },
-    es: { label: "Español", locale: "es-ES", dir: "ltr" },
-    ko: { label: "한국어", locale: "ko-KR", dir: "ltr" },
-    ja: { label: "日本語", locale: "ja-JP", dir: "ltr" },
-    it: { label: "Italiano", locale: "it-IT", dir: "ltr" },
-    pt: { label: "Português", locale: "pt-PT", dir: "ltr" }
+    zh: { label: "中文（普通话）", locale: "zh-CN", dir: "ltr" }
   };
-
   const keys = [
     "Select language", "Home", "Back", "Return to home", "All Games", "All programmes",
     "Learning catalogue", "Mathematics Games", "MathToolsHub Tools", "Quizzes", "Games", "Tools",
@@ -80,6 +71,9 @@
       (document.getElementById("siteLanguageSlot") || document.body).appendChild(selector);
     }
     selector.setAttribute("aria-label", "Select language");
+    selector.querySelectorAll("option").forEach(option => {
+      if (!languages[option.value]) option.remove();
+    });
     Object.entries(languages).forEach(([code, metadata]) => {
       let option = selector.querySelector(`option[value="${code}"]`);
       if (!option) {
