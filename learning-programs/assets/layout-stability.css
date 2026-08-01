@@ -1,0 +1,11 @@
+/* Reserve dynamic programme regions before JavaScript fills them. */
+#programTitle { min-height: 1.25em; }
+#programIntro { min-height: 3.3em; }
+#programFocus { min-height: 4.8em; }
+#objectives { min-height: 180px; }
+#programIcon { min-width: 72px; min-height: 86px; }
+
+@media (max-width: 600px) {
+  #programIntro { min-height: 4.9em; }
+  #programFocus { min-height: 6.4em; }
+}
