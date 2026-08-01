@@ -3,6 +3,7 @@
 
   if (window.__MTH_UNIVERSAL_LANGUAGE__) return;
   window.__MTH_UNIVERSAL_LANGUAGE__ = true;
+  if (location.pathname.includes("/learning-programs/")) document.documentElement.classList.add("mth-learning-page");
 
   const STORAGE_KEY = "mathToolsHubLanguage";
   const languages = {
@@ -183,6 +184,7 @@
     .site-language-slot .mth-universal-language-picker,.site-language-slot #languageSelect{position:static;box-shadow:none}
     .mth-universal-language-picker:focus{outline:3px solid #93c5fd;outline-offset:2px}
     html.mth-rtl body{text-align:start}html.mth-rtl canvas,html.mth-rtl svg,html.mth-rtl .game-board,html.mth-rtl [data-direction="ltr"]{direction:ltr}
+    html.mth-learning-page{scroll-behavior:auto!important;overflow-y:auto!important}html.mth-learning-page body{overflow-y:auto!important;touch-action:pan-y}
     @media(max-width:560px){.mth-universal-language-picker,body>.site-language-picker{top:auto;right:auto;left:12px;bottom:12px;max-width:155px}.site-language-slot .mth-universal-language-picker,.site-language-slot #languageSelect{max-width:145px}}
   `;
   document.head.appendChild(style);
@@ -204,13 +206,13 @@
     apply(selected);
   }, true);
 
-  const observer = new MutationObserver(mutations => {
+  let translationTimer = 0;
+  const observer = new MutationObserver(() => {
     if (applying) return;
     const selected = localStorage.getItem(STORAGE_KEY) || "en";
     if (selected === "en") return;
-    mutations.forEach(mutation => mutation.addedNodes.forEach(node => {
-      translateSubtree(node, selected);
-    }));
+    clearTimeout(translationTimer);
+    translationTimer = setTimeout(() => apply(selected, false), 80);
   });
   observer.observe(document.body, { childList: true, subtree: true });
 
