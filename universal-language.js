@@ -185,7 +185,7 @@
   ensureSelector();
 
   document.addEventListener("change", event => {
-    if (event.target !== selector) return;
+    if (event.target !== selector || !event.isTrusted) return;
     const selected = selector.value;
     if (selectorWasPresent) {
       event.stopImmediatePropagation();
