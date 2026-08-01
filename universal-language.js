@@ -201,12 +201,26 @@
   }, true);
 
   let translationTimer = 0;
-  const observer = new MutationObserver(() => {
+  const pendingTranslationRoots = new Set();
+  const observer = new MutationObserver(mutations => {
     if (applying) return;
     const selected = localStorage.getItem(STORAGE_KEY) || "en";
     if (selected === "en") return;
+    mutations.forEach(mutation => mutation.addedNodes.forEach(node => pendingTranslationRoots.add(node)));
     clearTimeout(translationTimer);
-    translationTimer = setTimeout(() => apply(selected, false), 80);
+    translationTimer = setTimeout(() => {
+      const current = localStorage.getItem(STORAGE_KEY) || "en";
+      if (!languages[current] || current === "en") {
+        pendingTranslationRoots.clear();
+        return;
+      }
+      applying = true;
+      [...pendingTranslationRoots].forEach(root => {
+        if (root.isConnected || root.nodeType === Node.TEXT_NODE && root.parentNode?.isConnected) translateSubtree(root, current);
+      });
+      pendingTranslationRoots.clear();
+      applying = false;
+    }, 80);
   });
   observer.observe(document.body, { childList: true, subtree: true });
 
