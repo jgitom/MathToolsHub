@@ -9,4 +9,6 @@ const GAME={levels:{easy:{label:"Easy",rounds:10},medium:{label:"Medium",rounds:
 build(l){let a,q,c;if(l==="easy"){let roof=ri(20,60),panel=random([2,3,4]);a=Math.floor(roof/panel);q=`Usable roof area is ${roof} m². Each panel needs ${panel} m². Maximum panels?`;c=[a,a+1,Math.max(0,a-1),Math.ceil(roof/panel)];$("display").textContent=`Roof ${roof} m² • Panel ${panel} m²`; $("meter").style.width=`${Math.min(100,a*5)}%`}
 else if(l==="medium"){let panels=ri(4,20),power=random([300,350,400]),sun=random([4,5,6]),energy=panels*power*sun/1000;a=energy.toFixed(1);q=`${panels} panels at ${power} W receive ${sun} peak-sun hours. Daily energy?`;c=[`${a} kWh`,`${(energy+2).toFixed(1)} kWh`,`${(energy-1).toFixed(1)} kWh`,`${panels*power} kWh`];a=`${a} kWh`;$("display").textContent=`${panels} × ${power} W × ${sun} h`; $("meter").style.width=`${Math.min(100,energy*3)}%`}
 else{let cost=ri(12,30)*1000,saving=ri(2,6)*1000,pay=cost/saving;a=pay.toFixed(1);q=`System cost RM${cost}; annual saving RM${saving}. Estimated payback period?`;c=[`${a} years`,`${(pay+1).toFixed(1)} years`,`${Math.max(.5,pay-1).toFixed(1)} years`,`${cost-saving} years`];a=`${a} years`;$("display").textContent=`RM${cost} ÷ RM${saving}/year`; $("meter").style.width=`${Math.min(100,saving/cost*500)}%`}return{answer:a,question:q,choices:c}}};
-</script><script src="program_engine.js"></script></body></html>
+</script><script src="program_engine.js"></script>
+<script src="../../universal-language.js"></script>
+</body></html>

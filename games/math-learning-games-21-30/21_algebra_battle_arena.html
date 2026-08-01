@@ -246,5 +246,6 @@ function onGameStart(){enemyHealth.style.width="100%"}
 function onCorrect(){heroFighter.classList.add("attack");enemyFighter.classList.add("hit");enemyHealth.style.width=`${Math.max(0,100-correctCount*8)}%`;setTimeout(()=>{heroFighter.classList.remove("attack");enemyFighter.classList.remove("hit")},600)}
 
 </script>
+<script src="../../universal-language.js"></script>
 </body>
 </html>

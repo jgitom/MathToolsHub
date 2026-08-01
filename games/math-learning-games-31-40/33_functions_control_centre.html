@@ -14,4 +14,6 @@ buildRound(level){let answer,question,choices;if(level==="easy"){let a=randomInt
 else if(level==="medium"){let xs=[1,2,3,4],a=randomInt(2,5),ys=xs.map(x=>a*x),mode=randomChoice(["range","domain"]);answer=mode==="range"?`{${ys.join(", ")}}`:`{${xs.join(", ")}}`;question=`For f(x)=${a}x, identify the ${mode}.`;$("input").textContent="x";$("rule").textContent=`f(x)=${a}x`;$("output").textContent="f(x)";$("mapping").textContent=xs.map((x,i)=>`${x}→${ys[i]}`).join("   ");choices=[answer,mode==="range"?`{${xs.join(", ")}}`:`{${ys.join(", ")}}`,`{${xs.concat(ys).join(", ")}}`,"{}"]}
 else if(Math.random()<.5){let a=randomInt(2,5),b=randomInt(1,6),c=randomInt(2,5),d=randomInt(0,5),x=randomInt(1,8),ans=a*(c*x+d)+b;answer=ans;question=`f(x)=${a}x+${b}, g(x)=${c}x+${d}. Find f(g(${x})).`;$("input").textContent=x;$("rule").textContent="g → f";$("output").textContent="?";$("mapping").textContent=`${x} → g(x) → f(g(x))`;choices=[ans,ans+a,ans-c,a*c*x+b+d]}
 else{let a=randomInt(2,5),b=randomInt(1,6),x=randomInt(1,8),y=a*x+b;answer=x;question=`f(x)=${a}x+${b}. Find f⁻¹(${y}).`;$("input").textContent=y;$("rule").textContent="f⁻¹";$("output").textContent="?";$("mapping").textContent=`${y} → x`;choices=[x,x+1,x-1,Math.round(y/a)]}return{answer,question,choices}},onCorrect(){$("output").textContent=correctAnswer}};
-</script><script src="game_engine.js"></script></body></html>
+</script><script src="game_engine.js"></script>
+<script src="../../universal-language.js"></script>
+</body></html>

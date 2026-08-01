@@ -9,4 +9,6 @@ const GAME={levels:{easy:{label:"Easy",rounds:10},medium:{label:"Medium",rounds:
 build(l){let a,q,c;if(l==="easy"){let total=ri(40,100),green=ri(10,total-10);a=Math.round(green/total*100);q=`A city has ${green} ha green space out of ${total} ha. What percentage is green?`;c=[`${a}%`,`${a+10}%`,`${Math.max(0,a-10)}%`,`${green}%`];a=`${a}%`;$("display").textContent=`Green space ${green}/${total} ha`;$("meter").style.width=a}
 else if(l==="medium"){let homes=ri(50,200),saving=ri(2,6);a=homes*saving;q=`${homes} homes save ${saving} kWh each day. Total daily saving?`;c=[`${a} kWh`,`${a+saving} kWh`,`${homes+saving} kWh`,`${a*7} kWh`];a=`${a} kWh`;$("display").textContent=`${homes} homes • ${saving} kWh`;$("meter").style.width=`${Math.min(100,homes/2)}%`}
 else{let current=ri(500,1500),target=ri(10,30),reduction=current*target/100;a=current-reduction;q=`Current emissions are ${current} tonnes. Reduce by ${target}%. New emissions?`;c=[`${a} tonnes`,`${reduction} tonnes`,`${current+reduction} tonnes`,`${current-target} tonnes`];a=`${a} tonnes`;$("display").textContent=`Reduce ${target}%`;$("meter").style.width=`${100-target}%`}return{answer:a,question:q,choices:c}}};
-</script><script src="program_engine.js"></script></body></html>
+</script><script src="program_engine.js"></script>
+<script src="../../universal-language.js"></script>
+</body></html>

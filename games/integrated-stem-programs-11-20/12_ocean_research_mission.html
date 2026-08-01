@@ -9,4 +9,6 @@ const GAME={levels:{easy:{label:"Easy",rounds:10},medium:{label:"Medium",rounds:
 build(l){let a,q,c;if(l==="easy"){let d1=ri(10,80),d2=ri(10,80);a=d1>d2?"Site A":"Site B";if(d1===d2)a="Equal depth";q=`Site A depth ${d1} m; Site B depth ${d2} m. Which is deeper?`;c=["Site A","Site B","Equal depth","Cannot tell"];$("display").textContent=`A ${d1} m • B ${d2} m`; $("meter").style.width=`${Math.max(d1,d2)}%`}
 else if(l==="medium"){let temps=Array.from({length:5},()=>ri(18,31)),mean=temps.reduce((s,x)=>s+x,0)/5;a=mean.toFixed(1);q=`Water temperatures: ${temps.join(", ")}°C. Mean temperature?`;c=[`${a}°C`,`${(mean+1).toFixed(1)}°C`,`${(mean-1).toFixed(1)}°C`,`${Math.max(...temps)}°C`];a=`${a}°C`;$("display").textContent=temps.join(" • "); $("meter").style.width=`${mean/35*100}%`}
 else{let old=ri(40,100),now=ri(40,100),change=now-old;a=change>0?"Population increased":change<0?"Population decreased":"No change";q=`Marine sightings changed from ${old} to ${now}. What trend is shown?`;c=["Population increased","Population decreased","No change","Insufficient oxygen"];$("display").textContent=`${old} → ${now}`; $("meter").style.width=`${now}%`}return{answer:a,question:q,choices:c}}};
-</script><script src="program_engine.js"></script></body></html>
+</script><script src="program_engine.js"></script>
+<script src="../../universal-language.js"></script>
+</body></html>

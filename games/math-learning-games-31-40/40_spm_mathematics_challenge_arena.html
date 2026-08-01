@@ -19,4 +19,6 @@ if(t==="finance"){answer="RM1102.50";question="Find the compound amount of RM100
 if(t==="vectors"){let x=randomInt(-5,5),y=randomInt(-5,5);answer=`(${-x}, ${-y})`;question=`Find the vector opposite to (${x},${y}).`;choices=[answer,`(${x}, ${-y})`,`(${-x}, ${y})`,`(${y}, ${x})`]}
 if(t==="matrix"){let a=randomInt(-5,9),b=randomInt(-5,9),c=randomInt(-5,9),d=randomInt(-5,9),det=a*d-b*c;answer=det;question=`Find det [[${a},${b}],[${c},${d}]].`;choices=[det,det+1,det-1,a*d+b*c]}
 $("spmMeter").style.width=`${Math.min(100,correctCount/GAME.levels[selectedLevel].rounds*100)}%`;return{answer,question,choices}}};
-</script><script src="game_engine.js"></script></body></html>
+</script><script src="game_engine.js"></script>
+<script src="../../universal-language.js"></script>
+</body></html>

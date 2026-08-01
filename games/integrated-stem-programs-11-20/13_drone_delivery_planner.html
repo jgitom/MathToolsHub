@@ -9,4 +9,6 @@ const GAME={levels:{easy:{label:"Easy",rounds:10},medium:{label:"Medium",rounds:
 build(l){let a,q,c;if(l==="easy"){let x1=ri(0,5),y1=ri(0,5),x2=ri(6,10),y2=ri(6,10),d=Math.abs(x2-x1)+Math.abs(y2-y1);a=d;q=`Using grid distance, from (${x1},${y1}) to (${x2},${y2}), total horizontal + vertical distance?`;c=[`${d} units`,`${d+1} units`,`${d-1} units`,`${Math.abs(x2-x1)} units`];a=`${d} units`;$("display").textContent=`(${x1},${y1}) → (${x2},${y2})`; $("meter").style.width=`${Math.min(100,d*7)}%`}
 else if(l==="medium"){let dist=ri(4,20),speed=random([2,4,5,10]),time=dist/speed;a=time.toFixed(1);q=`Drone flies ${dist} km at ${speed} km/h. Travel time?`;c=[`${a} hours`,`${(time+1).toFixed(1)} hours`,`${(time-.5).toFixed(1)} hours`,`${dist*speed} hours`];a=`${a} hours`;$("display").textContent=`${dist} km ÷ ${speed} km/h`; $("meter").style.width=`${Math.min(100,dist*5)}%`}
 else{let start=random(["North","East","South","West"]),turn=random([90,180,270]),dirs=["North","East","South","West"],idx=dirs.indexOf(start),end=dirs[(idx+turn/90)%4];a=end;q=`Drone faces ${start} and turns ${turn}° clockwise. New direction?`;c=["North","East","South","West"];$("display").textContent=`${start} ↻ ${turn}°`; $("meter").style.width=`${turn/360*100}%`}return{answer:a,question:q,choices:c}}};
-</script><script src="program_engine.js"></script></body></html>
+</script><script src="program_engine.js"></script>
+<script src="../../universal-language.js"></script>
+</body></html>
