@@ -12,7 +12,7 @@
     html,body{margin:0;min-height:100%;background:#030611;color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
     body{background:radial-gradient(circle at 50% -25%,#263b76,#080d1e 48%,#02040a);overflow-x:hidden}
     button,a{font:inherit}
-    .topbar{width:min(1280px,100%);margin:auto;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .topbar{width:min(1280px,100%);margin:auto;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.topbar-actions{display:flex;align-items:center;justify-content:flex-end;gap:9px}.site-language-slot{display:flex;align-items:center}.menu-button{min-height:38px;padding:8px 13px;border:1px solid #ffffff2c;border-radius:999px;color:#fff;background:#202b46;font-weight:900;cursor:pointer}.menu-button:hover,.menu-button:focus-visible{border-color:var(--cyan);outline:none;box-shadow:0 0 0 3px #27e5ff25}
     .back{color:#dce7ff;text-decoration:none;font-weight:850}.back:hover{text-decoration:underline}
     .brand{color:var(--cyan);font-size:.86rem;font-weight:950;letter-spacing:.1em;text-transform:uppercase}
     main{width:min(1280px,100%);margin:auto;padding:0 14px 24px}
@@ -33,7 +33,7 @@
     .difficulty button,.primary,.secondary{border:0;border-radius:12px;padding:11px 9px;font-weight:900;cursor:pointer}
     .difficulty button{border:1px solid #ffffff1d;color:#fff;background:#202b46}.difficulty button.active{color:#031017;background:var(--cyan);box-shadow:0 0 20px #27e5ff66}
     .primary{width:100%;color:#fff;background:linear-gradient(105deg,var(--red),#ff6b24);box-shadow:0 9px 27px #ff31584b;font-size:1.05rem}.primary:hover{filter:brightness(1.12)}
-    .secondary{margin-top:9px;color:#fff;background:#28334d}
+    .secondary{margin-top:9px;color:#fff;background:#28334d}.menu-link{display:block;width:100%;text-decoration:none}.button-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:9px}.button-row .secondary{margin-top:0}
     .loading{margin-top:10px;color:#9fb1d0;font-size:.75rem}
     .loading.error{color:#ff9aae}
     .controls{display:grid;grid-template-columns:1fr 1fr 1.15fr 1.15fr;gap:9px;padding:10px;background:#070b15;user-select:none}
@@ -43,10 +43,10 @@
     .tips{margin:11px 0 0;text-align:center;color:#9da9c5;font-size:.85rem}
     @media(min-width:800px){.controls{width:570px;margin:auto;border-radius:0 0 18px 18px}}
     @media(max-width:620px){
-      main{padding:0 0 16px}.topbar{padding:10px 11px}.brand{font-size:.68rem}.title{padding:0 10px}.title p{font-size:.78rem}
+      main{padding:0 0 16px}.topbar{padding:10px 11px}.brand{font-size:.68rem}.topbar-actions{flex:1;justify-content:flex-end}.site-language-slot .mth-universal-language-picker{max-width:145px}.title{padding:0 10px}.title p{font-size:.78rem}
       .game-shell{border-right:0;border-left:0;border-radius:0}#stage{min-height:390px;aspect-ratio:9/12;max-height:66vh}
       .hud{inset:5px 5px auto;gap:3px}.stat{padding:4px 2px;border-radius:7px}.stat small{font-size:.43rem}.stat strong{font-size:.7rem}
-      .controls{gap:6px;padding:7px}.control{min-height:66px}.card{padding:17px}.difficulty{margin:12px 0}
+      .controls{gap:6px;padding:7px}.control{min-height:66px}.card{padding:17px}.difficulty{margin:12px 0}.button-row{grid-template-columns:1fr}
     }
     @media(prefers-reduced-motion:reduce){.message{transition:none}}
   </style>
@@ -56,6 +56,7 @@
   <header class="topbar">
     <a class="back" href="../">← All Games</a>
     <span class="brand">MathToolsHub Racing 3D</span>
+    <div class="topbar-actions"><div id="siteLanguageSlot" class="site-language-slot"></div><button class="menu-button" id="mainMenuButton" type="button">Main Menu</button></div>
   </header>
   <main>
     <div class="title">
@@ -93,7 +94,7 @@
             <h2 id="finishTitle">Race Complete!</h2>
             <p id="finishText"></p>
             <button type="button" class="primary" id="raceAgain">Race Again</button>
-            <a class="secondary" href="../formula-racing-champion/" style="display:block;text-decoration:none">Play lightweight 2D version</a>
+            <div class="button-row"><button type="button" class="secondary" id="finishMainMenu">← Main Menu</button><a class="secondary menu-link" href="../formula-racing-champion/">Play lightweight 2D version</a></div>
           </div>
         </div>
       </div>
@@ -104,7 +105,7 @@
         <button class="control" type="button" data-key="up" aria-label="Accelerate">ACCELERATE</button>
       </div>
     </section>
-    <p class="tips">Keyboard: W/↑ accelerate · S/↓ brake · A/D or ←/→ steer · R resets the car</p>
+    <p class="tips">Keyboard: W/↑ accelerate · S/↓ brake · A/D or ←/→ steer · R resets the car · Esc opens the main menu</p>
   </main>
 
   <script type="module">
@@ -134,7 +135,7 @@
       pro:{max:84,accel:27,brake:45,ai:.82},
       champion:{max:92,accel:29,brake:48,ai:.91}
     };
-    let level="pro",running=false,last=0,elapsed=0,player,ais=[],messageTimer=0;
+    let level="pro",running=false,last=0,elapsed=0,player,ais=[],messageTimer=0,countdownTimer=null;
 
     const scene=new THREE.Scene();
     scene.background=new THREE.Color(0x7fc4f2);
@@ -318,9 +319,13 @@
       ui.finish.hidden=false;
     }
     function ordinal(n){return n+(n===1?"st":n===2?"nd":n===3?"rd":"th")}
+    function showMainMenu(){
+      running=false;if(countdownTimer){clearInterval(countdownTimer);countdownTimer=null}Object.keys(keys).forEach(key=>keys[key]=false);
+      document.querySelectorAll(".control.pressed").forEach(button=>button.classList.remove("pressed"));ui.countdown.textContent="";ui.finish.hidden=true;ui.start.hidden=false;
+    }
     function startRace(){
-      resetRace();ui.start.hidden=true;ui.finish.hidden=true;let count=3;ui.countdown.textContent=count;
-      const timer=setInterval(()=>{count--;if(count>0)ui.countdown.textContent=count;else if(count===0)ui.countdown.textContent="GO!";else{clearInterval(timer);ui.countdown.textContent="";running=true;last=performance.now()}},700);
+      if(countdownTimer)clearInterval(countdownTimer);resetRace();ui.start.hidden=true;ui.finish.hidden=true;let count=3;ui.countdown.textContent=count;
+      countdownTimer=setInterval(()=>{count--;if(count>0)ui.countdown.textContent=count;else if(count===0)ui.countdown.textContent="GO!";else{clearInterval(countdownTimer);countdownTimer=null;ui.countdown.textContent="";running=true;last=performance.now()}},700);
     }
     function resize(){
       const rect=stage.getBoundingClientRect();renderer.setSize(rect.width,rect.height,false);camera.aspect=rect.width/rect.height;camera.updateProjectionMatrix();
@@ -335,9 +340,9 @@
     document.querySelectorAll("[data-level]").forEach(button=>button.addEventListener("click",()=>{
       level=button.dataset.level;document.querySelectorAll("[data-level]").forEach(b=>b.classList.toggle("active",b===button));
     }));
-    ui.startButton.addEventListener("click",startRace);document.querySelector("#raceAgain").addEventListener("click",startRace);
+    ui.startButton.addEventListener("click",startRace);document.querySelector("#raceAgain").addEventListener("click",startRace);document.querySelector("#mainMenuButton").addEventListener("click",showMainMenu);document.querySelector("#finishMainMenu").addEventListener("click",showMainMenu);
     const keyMap={ArrowLeft:"left",a:"left",A:"left",ArrowRight:"right",d:"right",D:"right",ArrowUp:"up",w:"up",W:"up",ArrowDown:"down",s:"down",S:"down"};
-    addEventListener("keydown",event=>{if(keyMap[event.key]){keys[keyMap[event.key]]=true;event.preventDefault()}if(event.key==="r"||event.key==="R")resetCar()});
+    addEventListener("keydown",event=>{if(event.key==="Escape"){showMainMenu();return}if(keyMap[event.key]){keys[keyMap[event.key]]=true;event.preventDefault()}if(event.key==="r"||event.key==="R")resetCar()});
     addEventListener("keyup",event=>{if(keyMap[event.key]){keys[keyMap[event.key]]=false;event.preventDefault()}});
     document.querySelectorAll(".control").forEach(button=>{
       const set=value=>{keys[button.dataset.key]=value;button.classList.toggle("pressed",value)};
