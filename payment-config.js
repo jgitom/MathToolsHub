@@ -1,5 +1,5 @@
 window.MATHTOOLSHUB_PAYMENT = Object.freeze({
-  launchAt: "2026-08-15T00:00:00+08:00",
+  launchAt: "2026-08-21T00:00:00+08:00",
   mode: "live",
   plans: Object.freeze([
     Object.freeze({
