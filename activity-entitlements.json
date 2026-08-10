@@ -1,8 +1,8 @@
 {
     "version":  1,
-    "launch_at":  "2026-08-15T00:00:00+08:00",
+    "launch_at":  "2026-08-21T00:00:00+08:00",
     "free_count":  25,
-    "premium_count":  117,
+    "premium_count":  119,
     "activities":  [
                        {
                            "activity_id":  "game/ai-robot-mission",
@@ -274,7 +274,7 @@
                            "activity_id":  "game/math-learning-games-31-40",
                            "access_tier":  "premium",
                            "category":  "game",
-                           "title":  "SPM Mathematics \u0026 Additional Mathematics Games 31–40",
+                           "title":  "SPM Mathematics \u0026 Additional Mathematics Games 31â€“40",
                            "path":  "/games/math-learning-games-31-40/"
                        },
                        {
@@ -997,6 +997,20 @@
                            "category":  "tool",
                            "title":  "Worksheet Generator",
                            "path":  "/tools/worksheet-generator/"
+                       },
+                       {
+                           "activity_id":  "game/jutawan-pintar",
+                           "access_tier":  "premium",
+                           "category":  "game",
+                           "title":  "Jutawan Pintar",
+                           "path":  "/games/jutawan-pintar/"
+                       },
+                       {
+                           "activity_id":  "game/sahibah",
+                           "access_tier":  "premium",
+                           "category":  "game",
+                           "title":  "Sahibah",
+                           "path":  "/games/sahibah/"
                        }
                    ]
 }

@@ -43,7 +43,7 @@ Run `supabase/catalogue.sql` once in the SQL Editor. Afterwards, manage catalogu
 
 Authenticated visitors receive signed links that expire after 120 seconds. Do not put a `service_role` key in browser code.
 
-Authenticated accounts receive access through 31 July 2026 via `profiles.content_access_until`. After the promotion, extend this timestamp for paid subscribers; administrators retain access.
+Authenticated accounts receive access through 20 August 2026 via `profiles.content_access_until`. After the promotion, extend this timestamp for paid subscribers; administrators retain access.
 
 
 ## Paid subscriptions

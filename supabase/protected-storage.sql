@@ -2,10 +2,10 @@
 -- Run in Supabase Dashboard > SQL Editor before changing public asset links.
 
 alter table public.profiles
-add column if not exists content_access_until timestamptz not null default '2026-08-01T00:00:00+08:00';
+add column if not exists content_access_until timestamptz not null default '2026-08-21T00:00:00+08:00';
 
 update public.profiles
-set content_access_until = greatest(content_access_until, '2026-08-01T00:00:00+08:00'::timestamptz);
+set content_access_until = greatest(content_access_until, '2026-08-21T00:00:00+08:00'::timestamptz);
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('protected-content', 'protected-content', false, 26214400, array['application/pdf'])
 on conflict (id) do update set public=false,file_size_limit=excluded.file_size_limit,allowed_mime_types=excluded.allowed_mime_types;

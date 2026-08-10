@@ -2,7 +2,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 const manifestUrl = new URL("activity-entitlements.json", import.meta.url);
 const accountUrl = new URL("account.html", import.meta.url);
-const launchAt = new Date("2026-08-15T00:00:00+08:00");
+const launchAt = new Date("2026-08-21T00:00:00+08:00");
 const config = window.MATHTOOLSHUB_SUPABASE;
 const launched = new Date() >= launchAt || new URLSearchParams(location.search).get("subscription_preview") === "1";
 

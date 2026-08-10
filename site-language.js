@@ -174,6 +174,10 @@
     selector.value=language;
     localStorage.setItem(STORAGE_KEY,language);
   }
+  Object.assign(translations.ms, {"Jutawan Pintar":"Jutawan Pintar","Manage capital, evaluate business opportunities, and master profit, discount, interest, and growth.":"Urus modal, nilai peluang perniagaan dan kuasai untung, diskaun, faedah serta pertumbuhan.","Financial strategy":"Strategi kewangan","Money maths":"Matematik wang","Business":"Perniagaan","Bina Kekayaan":"Bina Kekayaan"});
+  Object.assign(translations.zh, {"Jutawan Pintar":"智慧富翁","Manage capital, evaluate business opportunities, and master profit, discount, interest, and growth.":"管理资本、评估商业机会，并掌握利润、折扣、利息和增长计算。","Financial strategy":"金融策略","Money maths":"金钱数学","Business":"商业","Bina Kekayaan":"积累财富"});
+  Object.assign(translations.ms, {"Sahibah":"Sahibah","Build connected Malay words on a 15 × 15 board, use letter and word bonuses, and compete for the highest score.":"Bina perkataan Melayu yang bersambung pada papan 15 × 15, gunakan bonus huruf dan perkataan serta bersaing untuk markah tertinggi.","Word game":"Permainan kata","Main Sahibah":"Main Sahibah"});
+  Object.assign(translations.zh, {"Sahibah":"Sahibah 文字游戏","Build connected Malay words on a 15 × 15 board, use letter and word bonuses, and compete for the highest score.":"在 15 × 15 棋盘上连接马来语单词，使用字母与单词奖励并争取最高分。","Word game":"文字游戏","Bahasa Melayu":"马来语","Main Sahibah":"开始 Sahibah"});
   selector.addEventListener("change",event=>apply(event.target.value));
   apply(localStorage.getItem(STORAGE_KEY) || "en");
 })();
