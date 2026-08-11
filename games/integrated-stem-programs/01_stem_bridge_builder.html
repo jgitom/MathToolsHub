@@ -10,5 +10,5 @@ build(l){let a,q,c;if(l==="easy"){let span=ri(10,40),section=ri(2,8);a=Math.ceil
 else if(l==="medium"){let load=ri(8,30),beam=ri(3,8);a=Math.ceil(load/beam);q=`Each beam supports ${beam} tonnes. How many beams support ${load} tonnes?`;c=[a,a+1,Math.max(1,a-1),load*beam];$("display").textContent=`Load ${load} t • Beam ${beam} t`;$("meter").style.width=`${Math.min(100,load/30*100)}%`}
 else{let budget=ri(30,70)*1000,cost=ri(4,10)*1000,a=Math.floor(budget/cost);q=`Budget RM${budget}. Each reinforced segment costs RM${cost}. Maximum segments?`;c=[a,a+1,Math.max(0,a-1),Math.ceil(budget/cost)];$("display").textContent=`Budget RM${budget}`;$("meter").style.width=`${a*cost/budget*100}%`}return{answer:a,question:q,choices:c}}};
 </script><script src="program_engine.js"></script>
-<script src="../../universal-language.js?v=20260811-2"></script>
+<script src="../../universal-language.js"></script>
 </body></html>
