@@ -20,5 +20,5 @@ if(t==="vectors"){let x=randomInt(-5,5),y=randomInt(-5,5);answer=`(${-x}, ${-y})
 if(t==="matrix"){let a=randomInt(-5,9),b=randomInt(-5,9),c=randomInt(-5,9),d=randomInt(-5,9),det=a*d-b*c;answer=det;question=`Find det [[${a},${b}],[${c},${d}]].`;choices=[det,det+1,det-1,a*d+b*c]}
 $("spmMeter").style.width=`${Math.min(100,correctCount/GAME.levels[selectedLevel].rounds*100)}%`;return{answer,question,choices}}};
 </script><script src="game_engine.js"></script>
-<script src="../../universal-language.js?v=20260811-2"></script>
+<script src="../../universal-language.js"></script>
 </body></html>

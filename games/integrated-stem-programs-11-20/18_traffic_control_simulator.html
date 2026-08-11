@@ -10,5 +10,5 @@ build(l){let a,q,c;if(l==="easy"){let vehicles=ri(30,150),minutes=random([5,10,1
 else if(l==="medium"){let queue=ri(20,100),clear=random([5,10,20]),time=queue/clear;a=time.toFixed(1);q=`Queue ${queue} vehicles; junction clears ${clear} vehicles/min. Time to clear?`;c=[`${a} min`,`${(time+1).toFixed(1)} min`,`${queue*clear} min`,`${clear} min`];a=`${a} min`;$("display").textContent=`${queue} ÷ ${clear}`; $("meter").style.width=`${Math.min(100,queue)}%`}
 else{let A=ri(40,120),B=ri(40,120),C=ri(40,120),max=Math.max(A,B,C);a=max===A?"Road A":max===B?"Road B":"Road C";q=`Peak counts: Road A ${A}, Road B ${B}, Road C ${C}. Which road should receive the longest green signal?`;c=["Road A","Road B","Road C","All equal"];$("display").textContent=`A ${A} • B ${B} • C ${C}`; $("meter").style.width=`${Math.min(100,max)}%`}return{answer:a,question:q,choices:c}}};
 </script><script src="program_engine.js"></script>
-<script src="../../universal-language.js?v=20260811-2"></script>
+<script src="../../universal-language.js"></script>
 </body></html>

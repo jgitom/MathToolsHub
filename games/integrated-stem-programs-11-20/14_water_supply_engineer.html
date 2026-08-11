@@ -10,5 +10,5 @@ build(l){let a,q,c;if(l==="easy"){let m3=ri(1,10);a=m3*1000;q=`Convert ${m3} m³
 else if(l==="medium"){let rate=random([10,20,25,50]),time=ri(5,20),vol=rate*time;a=vol;q=`A pipe flows at ${rate} L/min for ${time} minutes. Volume delivered?`;c=[`${vol} L`,`${vol+rate} L`,`${rate+time} L`,`${vol-time} L`];a=`${vol} L`;$("display").textContent=`${rate} L/min × ${time} min`; $("meter").style.width=`${Math.min(100,vol/10)}%`}
 else{let homes=ri(50,200),use=ri(100,250),saving=ri(10,30),newUse=homes*use*(1-saving/100);a=Math.round(newUse);q=`${homes} homes use ${use} L/day each. Conservation saves ${saving}%. New total daily use?`;c=[`${a} L`,`${homes*use} L`,`${Math.round(homes*use*saving/100)} L`,`${a+1000} L`];a=`${a} L`;$("display").textContent=`Save ${saving}%`; $("meter").style.width=`${100-saving}%`}return{answer:a,question:q,choices:c}}};
 </script><script src="program_engine.js"></script>
-<script src="../../universal-language.js?v=20260811-2"></script>
+<script src="../../universal-language.js"></script>
 </body></html>
