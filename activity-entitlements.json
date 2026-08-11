@@ -2,7 +2,7 @@
     "version":  1,
     "launch_at":  "2026-08-21T00:00:00+08:00",
     "free_count":  25,
-    "premium_count":  119,
+    "premium_count":  120,
     "activities":  [
                        {
                            "activity_id":  "game/ai-robot-mission",
@@ -1011,6 +1011,13 @@
                            "category":  "game",
                            "title":  "Sahibah",
                            "path":  "/games/sahibah/"
+                       },
+                       {
+                           "activity_id":  "game/empire-kota",
+                           "access_tier":  "premium",
+                           "category":  "game",
+                           "title":  "Empire Kota",
+                           "path":  "/games/empire-kota/"
                        }
                    ]
 }
