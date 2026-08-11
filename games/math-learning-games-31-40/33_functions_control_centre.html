@@ -15,5 +15,5 @@ else if(level==="medium"){let xs=[1,2,3,4],a=randomInt(2,5),ys=xs.map(x=>a*x),mo
 else if(Math.random()<.5){let a=randomInt(2,5),b=randomInt(1,6),c=randomInt(2,5),d=randomInt(0,5),x=randomInt(1,8),ans=a*(c*x+d)+b;answer=ans;question=`f(x)=${a}x+${b}, g(x)=${c}x+${d}. Find f(g(${x})).`;$("input").textContent=x;$("rule").textContent="g → f";$("output").textContent="?";$("mapping").textContent=`${x} → g(x) → f(g(x))`;choices=[ans,ans+a,ans-c,a*c*x+b+d]}
 else{let a=randomInt(2,5),b=randomInt(1,6),x=randomInt(1,8),y=a*x+b;answer=x;question=`f(x)=${a}x+${b}. Find f⁻¹(${y}).`;$("input").textContent=y;$("rule").textContent="f⁻¹";$("output").textContent="?";$("mapping").textContent=`${y} → x`;choices=[x,x+1,x-1,Math.round(y/a)]}return{answer,question,choices}},onCorrect(){$("output").textContent=correctAnswer}};
 </script><script src="game_engine.js"></script>
-<script src="../../universal-language.js"></script>
+<script src="../../universal-language.js?v=20260811-2"></script>
 </body></html>

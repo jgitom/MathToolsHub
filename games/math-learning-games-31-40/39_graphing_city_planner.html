@@ -12,5 +12,5 @@ buildRound(level){let answer,question,choices;if(level==="easy"){let m=randomInt
 else if(level==="medium"){let m=randomInt(-3,4),c=randomInt(-5,5),x=randomInt(-4,5),y=m*x+c;answer=y;question=`For y=${m}x ${c>=0?"+":"−"} ${Math.abs(c)}, find y when x=${x}.`;$("equation").textContent=`x=${x}`;line(m,c);choices=[y,y+m,y-m,c]}
 else{let h=randomInt(-3,3),k=randomInt(-4,4);answer=`(${h}, ${k})`;question=`Find the turning point of y=(x ${h>=0?"−":"+"} ${Math.abs(h)})² ${k>=0?"+":"−"} ${Math.abs(k)}.`;$("equation").textContent="Quadratic graph";curve(h,k);choices=[answer,`(${-h}, ${k})`,`(${h}, ${-k})`,`(${-h}, ${-k})`]}return{answer,question,choices}}};
 </script><script src="game_engine.js"></script>
-<script src="../../universal-language.js"></script>
+<script src="../../universal-language.js?v=20260811-2"></script>
 </body></html>

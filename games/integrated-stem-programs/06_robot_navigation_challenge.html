@@ -10,5 +10,5 @@ build(l){let a,q,c;if(l==="easy"){let x=ri(-4,4),y=ri(-4,4),dx=ri(-3,3),dy=ri(-3
 else if(l==="medium"){let turn=random([90,180,270]),dir=random(["North","East","South","West"]),dirs=["North","East","South","West"],idx=dirs.indexOf(dir),steps=turn/90;a=dirs[(idx+steps)%4];q=`Robot faces ${dir} and turns ${turn}° clockwise. New direction?`;c=[a,dirs[(idx-steps+8)%4],dir,dirs[(idx+2)%4]];$("display").textContent=`${dir} ↻ ${turn}°`}
 else{let x=ri(-3,3),y=ri(-3,3),commands=[[2,0],[0,3],[-1,0],[0,-2]],nx=x,ny=y;commands.forEach(v=>{nx+=v[0];ny+=v[1]});a=`(${nx}, ${ny})`;q=`Start at (${x},${y}). Move right 2, up 3, left 1, down 2. Final coordinate?`;c=[a,`(${nx+1}, ${ny})`,`(${nx}, ${ny+1})`,`(${x}, ${y})`];$("display").textContent="→2 ↑3 ←1 ↓2"}$("meter").style.width=`${Math.min(100,round/GAME.levels[level].rounds*100)}%`;return{answer:a,question:q,choices:c}}};
 </script><script src="program_engine.js"></script>
-<script src="../../universal-language.js"></script>
+<script src="../../universal-language.js?v=20260811-2"></script>
 </body></html>

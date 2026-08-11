@@ -16,5 +16,5 @@ else if(level==="medium"){let p=randomInt(1,6),q=randomInt(1,6);answer=`x = ${p}
 else if(Math.random()<.5){let b=randomInt(-8,8),c=randomInt(-5,10),d=b*b-4*c;answer=d>0?"Two real roots":d===0?"One repeated real root":"No real roots";question=`Classify the roots of x² ${b>=0?"+":"−"} ${Math.abs(b)}x ${c>=0?"+":"−"} ${Math.abs(c)} = 0.`;$("display").textContent=`Discriminant = ${d}`;qdraw(1,-b/2,c-b*b/4);choices=["Two real roots","One repeated real root","No real roots","Infinitely many roots"]}
 else{let h=randomInt(-4,4),k=randomInt(-5,5);answer=`(${h}, ${k})`;question=`Find the vertex of y=(x ${h>=0?"−":"+"} ${Math.abs(h)})² ${k>=0?"+":"−"} ${Math.abs(k)}.`;$("display").textContent="Vertex form";qdraw(1,h,k);choices=[answer,`(${-h}, ${k})`,`(${h}, ${-k})`,`(${-h}, ${-k})`]}return{answer,question,choices}}};
 </script><script src="game_engine.js"></script>
-<script src="../../universal-language.js"></script>
+<script src="../../universal-language.js?v=20260811-2"></script>
 </body></html>

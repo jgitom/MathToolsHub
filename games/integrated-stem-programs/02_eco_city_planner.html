@@ -10,5 +10,5 @@ build(l){let a,q,c;if(l==="easy"){let total=ri(40,100),green=ri(10,total-10);a=M
 else if(l==="medium"){let homes=ri(50,200),saving=ri(2,6);a=homes*saving;q=`${homes} homes save ${saving} kWh each day. Total daily saving?`;c=[`${a} kWh`,`${a+saving} kWh`,`${homes+saving} kWh`,`${a*7} kWh`];a=`${a} kWh`;$("display").textContent=`${homes} homes • ${saving} kWh`;$("meter").style.width=`${Math.min(100,homes/2)}%`}
 else{let current=ri(500,1500),target=ri(10,30),reduction=current*target/100;a=current-reduction;q=`Current emissions are ${current} tonnes. Reduce by ${target}%. New emissions?`;c=[`${a} tonnes`,`${reduction} tonnes`,`${current+reduction} tonnes`,`${current-target} tonnes`];a=`${a} tonnes`;$("display").textContent=`Reduce ${target}%`;$("meter").style.width=`${100-target}%`}return{answer:a,question:q,choices:c}}};
 </script><script src="program_engine.js"></script>
-<script src="../../universal-language.js"></script>
+<script src="../../universal-language.js?v=20260811-2"></script>
 </body></html>

@@ -10,5 +10,5 @@ buildRound(level){let answer,question,choices;if(level==="easy"){let p=randomCho
 else if(level==="medium"){let p=randomChoice([500,1000,1500,2000]),r=randomChoice([.02,.03,.04,.05]),n=randomChoice([2,3,4]),A=p*Math.pow(1+r,n);answer=rm(A);question=`Find the compound amount for ${rm(p)} at ${r*100}% for ${n} years.`;$("screen").textContent="A=P(1+r)^n";choices=[answer,rm(p*(1+r*n)),rm(A+50),rm(Math.max(0,A-50))];$("wealth").style.width=`${Math.min(100,(A/p-1)*400)}%`}
 else{let loan=randomChoice([5000,8000,10000]),rate=randomChoice([.03,.04,.05]),years=randomChoice([2,3,4]),total=loan*Math.pow(1+rate,years),monthly=total/(years*12);answer=rm(monthly);question=`A ${rm(loan)} loan grows at ${rate*100}% annually for ${years} years. Estimate equal monthly repayment.`;$("screen").textContent=`Total ÷ ${years*12}`;choices=[answer,rm(loan/(years*12)),rm(monthly+20),rm(Math.max(0,monthly-20))];$("wealth").style.width=`${Math.min(100,monthly/200)}%`}return{answer,question,choices}}};
 </script><script src="game_engine.js"></script>
-<script src="../../universal-language.js"></script>
+<script src="../../universal-language.js?v=20260811-2"></script>
 </body></html>

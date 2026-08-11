@@ -11,5 +11,5 @@ build(l){let a,q,c,code;if(l==="easy"){let start=ri(1,8),step=ri(2,6),times=ri(2
 else if(l==="medium"){let x=ri(2,10),m=ri(2,6),b=ri(0,9);a=m*x+b;code=`x = ${x}\ny = ${m} * x + ${b}`;q="What is y?";c=[a,a+m,a-b,m+b]}
 else{let x=ri(1,10);a=x%2===0?"EVEN":"ODD";code=`x = ${x}\nif x % 2 == 0:\n  print("EVEN")\nelse:\n  print("ODD")`;q="What will the program print?";c=["EVEN","ODD","0","ERROR"]}$("display").textContent=code;return{answer:a,question:q,choices:c}}};
 </script><script src="program_engine.js"></script>
-<script src="../../universal-language.js"></script>
+<script src="../../universal-language.js?v=20260811-2"></script>
 </body></html>

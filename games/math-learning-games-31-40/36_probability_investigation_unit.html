@@ -11,5 +11,5 @@ else if(level==="medium"&&Math.random()<.5){answer="1/4";question="Two fair coin
 else if(level==="medium"){answer="1/12";question="Roll a fair die and toss a fair coin. Find P(6 and H).";$("tree").textContent="P(6)=1/6\nP(H)=1/2\nMultiply";$("case").textContent="Die + coin";choices=["1/12","1/6","1/3","1/8"]}
 else{let r=randomInt(3,7),b=randomInt(2,6),t=r+b;answer=fr(r-1,t-1);question=`A bag has ${r} red and ${b} blue balls. One red is removed. Find P(next is red).`;$("tree").textContent=`Original: ${r}R, ${b}B\nAfter removal: ${r-1}R, ${b}B\nTotal: ${t-1}`;$("case").textContent="Conditional probability";choices=[answer,fr(r,t),fr(r-1,t),fr(b,t-1)]}return{answer,question,choices}}};
 </script><script src="game_engine.js"></script>
-<script src="../../universal-language.js"></script>
+<script src="../../universal-language.js?v=20260811-2"></script>
 </body></html>

@@ -10,5 +10,5 @@ build(l){let a,q,c;if(l==="easy"){let length=ri(4,15),width=ri(3,10);a=length*wi
 else if(l==="medium"){let area=ri(10,50),yieldPer=ri(2,8),total=area*yieldPer;a=total;q=`Farm area ${area} m² produces ${yieldPer} kg/m². Total yield?`;c=[`${a} kg`,`${a+yieldPer} kg`,`${area+yieldPer} kg`,`${a-area} kg`];a=`${a} kg`;$("display").textContent=`${yieldPer} kg/m²`}
 else{let yieldKg=ri(50,180),price=ri(3,8),cost=ri(100,500),profit=yieldKg*price-cost;a=`RM${profit}`;q=`Harvest ${yieldKg} kg sold at RM${price}/kg; cost RM${cost}. Profit?`;c=[a,`RM${yieldKg*price}`,`RM${cost}`,`RM${profit+cost}`];$("display").textContent=`Revenue RM${yieldKg*price}`}$("meter").style.width=`${Math.min(100,round/GAME.levels[level].rounds*100)}%`;return{answer:a,question:q,choices:c}}};
 </script><script src="program_engine.js"></script>
-<script src="../../universal-language.js"></script>
+<script src="../../universal-language.js?v=20260811-2"></script>
 </body></html>

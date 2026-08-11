@@ -10,5 +10,5 @@ build(l){let a,q,c;if(l==="easy"){let d=ri(4,12),speed=random([2,3,4]);a=(d/spee
 else if(l==="medium"){let map=ri(3,10),scale=random([500,1000,2000]),real=map*scale/100000;a=real.toFixed(2);q=`Map distance ${map} cm; scale 1:${scale}. Real distance in km?`;c=[`${a} km`,`${(real*10).toFixed(2)} km`,`${map*scale} km`,`${(real/10).toFixed(2)} km`];a=`${a} km`;$("display").textContent=`${map} cm at 1:${scale}`}
 else{let people=ri(3,8),food=ri(25,45),transport=ri(80,160),budget=ri(300,900),total=people*food+transport;a=total<=budget?"Within budget":"Over budget";q=`${people} hikers: food RM${food} each, transport RM${transport}, budget RM${budget}. Status?`;c=["Within budget","Over budget","Exactly zero","Cannot tell"];$("display").textContent=`Total RM${total} • Budget RM${budget}`}$("meter").style.width=`${Math.min(100,round/GAME.levels[level].rounds*100)}%`;return{answer:a,question:q,choices:c}}};
 </script><script src="program_engine.js"></script>
-<script src="../../universal-language.js"></script>
+<script src="../../universal-language.js?v=20260811-2"></script>
 </body></html>
