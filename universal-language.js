@@ -236,6 +236,85 @@
     @media(max-width:560px){.mth-universal-language-picker,body>.site-language-picker{top:auto;right:auto;left:12px;bottom:12px;max-width:155px}.site-language-slot .mth-universal-language-picker,.site-language-slot #languageSelect{max-width:145px}}
   `;
   document.head.appendChild(style);
+  function setupSmartphoneGameView() {
+    if (!location.pathname.includes("/games/")) return;
+
+    document.documentElement.classList.add("mth-game-page");
+    const phoneStyle = document.createElement("style");
+    phoneStyle.textContent = `
+      .mth-landscape-prompt{position:fixed;inset:0;z-index:2147483646;display:grid;place-items:center;padding:24px;background:#0f172af2;color:#fff;text-align:center;font-family:"Segoe UI",Arial,sans-serif}
+      .mth-landscape-prompt[hidden]{display:none!important}.mth-landscape-card{width:min(92vw,420px);padding:24px;border:1px solid #ffffff30;border-radius:20px;background:#172033;box-shadow:0 24px 70px #0008}
+      .mth-landscape-icon{display:block;font-size:3rem;line-height:1;transform:rotate(90deg);margin-bottom:12px}.mth-landscape-card h2{margin:0 0 8px;font-size:1.35rem}.mth-landscape-card p{margin:0 0 18px;line-height:1.45}
+      .mth-landscape-card button{min-width:180px;min-height:48px;border:0;border-radius:12px;background:#facc15;color:#172033;font:800 1rem "Segoe UI",Arial,sans-serif;cursor:pointer}
+      @media (orientation:landscape) and (max-height:600px) and (pointer:coarse){html.mth-game-page{font-size:12px!important}html.mth-game-page body{font-size:.82rem}html.mth-game-page :is(header,.header,.topbar){padding-top:5px!important;padding-bottom:5px!important}html.mth-game-page :is(button,input,select){font-size:.78rem!important}html.mth-game-page :is(h1,.title){font-size:clamp(1rem,3vw,1.55rem)!important}html.mth-game-page :is(h2,h3){margin-block:.25em!important}}
+    `;
+    document.head.appendChild(phoneStyle);
+
+    const prompt = document.createElement("div");
+    prompt.className = "mth-landscape-prompt";
+    prompt.setAttribute("role", "dialog");
+    prompt.setAttribute("aria-modal", "true");
+    prompt.innerHTML = '<div class="mth-landscape-card"><span class="mth-landscape-icon" aria-hidden="true">📱</span><h2>Landscape game view</h2><p>Tap below, then turn your phone sideways. The game will fit into one screen.</p><button type="button">Open landscape view</button></div>';
+    document.body.appendChild(prompt);
+    const promptCopy = {
+      en: ["Landscape game view", "Tap below, then turn your phone sideways. The game will fit into one screen.", "Open landscape view", "Please turn your phone sideways. The game will fit automatically."],
+      ms: ["Paparan permainan landskap", "Tekan di bawah, kemudian pusing telefon anda secara mendatar. Permainan akan muat dalam satu skrin.", "Buka paparan landskap", "Sila pusing telefon anda secara mendatar. Permainan akan dimuatkan secara automatik."],
+      zh: ["\u6a2a\u5c4f\u6e38\u620f\u89c6\u56fe", "\u70b9\u51fb\u4e0b\u65b9\u6309\u94ae\uff0c\u7136\u540e\u5c06\u624b\u673a\u6a2a\u653e\u3002\u6e38\u620f\u5c06\u81ea\u52a8\u9002\u5e94\u5355\u4e2a\u5c4f\u5e55\u3002", "\u6253\u5f00\u6a2a\u5c4f\u89c6\u56fe", "\u8bf7\u5c06\u624b\u673a\u6a2a\u653e\uff0c\u6e38\u620f\u5c06\u81ea\u52a8\u9002\u5e94\u3002"]
+    };
+    const updatePromptLanguage = language => {
+      const copy = promptCopy[language] || promptCopy.en;
+      prompt.querySelector("h2").textContent = copy[0];
+      prompt.querySelector("p").textContent = copy[1];
+      prompt.querySelector("button").textContent = copy[2];
+    };
+    updatePromptLanguage(new URLSearchParams(location.search).get("lang") || localStorage.getItem(STORAGE_KEY) || "en");
+
+    let fitting = false;
+    const isPhone = () => matchMedia("(pointer:coarse)").matches && Math.min(screen.width, screen.height) <= 600;
+    const clearFit = () => {
+      document.body.style.zoom = "";
+      document.body.style.width = "";
+      document.body.style.minHeight = "";
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
+    };
+    const fit = () => {
+      if (fitting) return;
+      fitting = true;
+      clearFit();
+      const phone = isPhone();
+      const portrait = innerHeight > innerWidth;
+      prompt.hidden = !phone || !portrait;
+      if (phone && !portrait) {
+        const naturalWidth = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth, innerWidth);
+        const naturalHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight, innerHeight);
+        const scale = Math.min(1, innerWidth / naturalWidth, innerHeight / naturalHeight);
+        document.body.style.zoom = String(scale);
+        document.body.style.width = `${100 / scale}%`;
+        document.body.style.minHeight = `${innerHeight / scale}px`;
+        document.documentElement.style.overflow = "hidden";
+        document.body.style.overflow = "hidden";
+      }
+      fitting = false;
+    };
+    prompt.querySelector("button").addEventListener("click", async () => {
+      try {
+        if (!document.fullscreenElement && document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen();
+        if (screen.orientation?.lock) await screen.orientation.lock("landscape");
+      } catch (_) {
+        const language = new URLSearchParams(location.search).get("lang") || localStorage.getItem(STORAGE_KEY) || "en";
+        prompt.querySelector("p").textContent = (promptCopy[language] || promptCopy.en)[3];
+      }
+      setTimeout(fit, 250);
+    });
+    addEventListener("resize", fit);
+    addEventListener("orientationchange", () => setTimeout(fit, 250));
+    addEventListener("load", fit, { once: true });
+    document.addEventListener("siteLanguageChanged", event => { updatePromptLanguage(event.detail.language); setTimeout(fit, 120); });
+    fit();
+    setTimeout(fit, 500);
+  }
+  setupSmartphoneGameView();
   ensureSelector();
 
   document.addEventListener("change", event => {
