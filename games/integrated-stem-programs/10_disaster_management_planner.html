@@ -10,5 +10,5 @@ build(l){let a,q,c;if(l==="easy"){let risks=[["Low",1],["Moderate",2],["High",3]
 else if(l==="medium"){let people=ri(80,300),capacity=ri(20,60);a=Math.ceil(people/capacity);q=`Evacuate ${people} people. Each vehicle carries ${capacity}. Minimum vehicles?`;c=[a,a+1,Math.max(1,a-1),Math.floor(people/capacity)];$("display").textContent=`${people} people • ${capacity}/vehicle`;$("meter").style.width=`${Math.min(100,people/3)}%`}
 else{let zones=[{n:"Zone A",risk:ri(1,5),people:ri(50,250)},{n:"Zone B",risk:ri(1,5),people:ri(50,250)},{n:"Zone C",risk:ri(1,5),people:ri(50,250)}];zones.forEach(z=>z.score=z.risk*z.people);zones.sort((a,b)=>b.score-a.score);a=zones[0].n;q=`Priority score = risk × population. A:${zones.find(z=>z.n==="Zone A").risk}×${zones.find(z=>z.n==="Zone A").people}, B:${zones.find(z=>z.n==="Zone B").risk}×${zones.find(z=>z.n==="Zone B").people}, C:${zones.find(z=>z.n==="Zone C").risk}×${zones.find(z=>z.n==="Zone C").people}. Highest priority?`;c=["Zone A","Zone B","Zone C","All equal"];$("display").textContent=`Highest score: ${zones[0].score}`;$("meter").style.width=`${Math.min(100,zones[0].risk*20)}%`}return{answer:a,question:q,choices:c}}};
 </script><script src="program_engine.js"></script>
-<script src="../../universal-language.js"></script>
+<script src="../../universal-language.js?v=20260811-2"></script>
 </body></html>

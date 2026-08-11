@@ -10,5 +10,5 @@ build(l){let a,q,c;if(l==="easy"){let options=["123456","password","Sabah2026","
 else if(l==="medium"){let n=ri(2,15),binary=n.toString(2);a=binary;q=`Convert decimal ${n} to binary.`;c=[binary,(n+1).toString(2),(n-1).toString(2),String(n*2)];$("display").textContent=`${n}₁₀ → ?₂`; $("meter").style.width=`${n/15*100}%`}
 else{let scenario=random([["A login arrives from an unknown device and location.","Verify identity and use multi-factor authentication"],["A user requests administrator access without a work reason.","Deny and apply least privilege"],["A suspicious link arrives by email.","Do not open it; report and verify sender"]]);a=scenario[1];q=scenario[0];c=[scenario[1],"Approve immediately","Share credentials","Disable all security logs"];$("display").textContent="Risk decision"; $("meter").style.width="85%"}return{answer:a,question:q,choices:c}}};
 </script><script src="program_engine.js"></script>
-<script src="../../universal-language.js"></script>
+<script src="../../universal-language.js?v=20260811-2"></script>
 </body></html>

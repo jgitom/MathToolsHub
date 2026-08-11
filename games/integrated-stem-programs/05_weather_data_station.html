@@ -10,5 +10,5 @@ build(l){let a,q,c;if(l==="easy"){let morning=ri(20,28),afternoon=ri(morning,35)
 else if(l==="medium"){let d=Array.from({length:5},()=>ri(20,35)),mean=d.reduce((s,x)=>s+x,0)/5;a=mean.toFixed(1);q=`Temperatures: ${d.join(", ")}°C. Mean temperature?`;c=[`${a}°C`,`${(mean+1).toFixed(1)}°C`,`${(mean-1).toFixed(1)}°C`,`${Math.max(...d)}°C`];a=`${a}°C`;$("display").textContent=d.join(" • ");$("meter").style.width=`${mean/40*100}%`}
 else{let rain=ri(50,180),limit=120;a=rain>=limit?"Flood alert":"Normal monitoring";q=`Weekly rainfall is ${rain} mm. Alert threshold is ${limit} mm. Best decision?`;c=["Flood alert","Normal monitoring","Heat alert","No data"]; $("display").textContent=`Rainfall ${rain} mm`; $("meter").style.width=`${Math.min(100,rain/180*100)}%`}return{answer:a,question:q,choices:c}}};
 </script><script src="program_engine.js"></script>
-<script src="../../universal-language.js"></script>
+<script src="../../universal-language.js?v=20260811-2"></script>
 </body></html>

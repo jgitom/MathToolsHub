@@ -237,7 +237,8 @@
   `;
   document.head.appendChild(style);
   function setupSmartphoneGameView() {
-    if (!location.pathname.includes("/games/")) return;
+    const gamePath = location.pathname.replace(/\/+$/, "");
+    if (!gamePath.includes("/games/") || /\/games(?:\/index\.html)?$/.test(gamePath)) return;
 
     document.documentElement.classList.add("mth-game-page");
     const phoneStyle = document.createElement("style");
@@ -270,7 +271,7 @@
     updatePromptLanguage(new URLSearchParams(location.search).get("lang") || localStorage.getItem(STORAGE_KEY) || "en");
 
     let fitting = false;
-    const isPhone = () => matchMedia("(pointer:coarse)").matches && Math.min(screen.width, screen.height) <= 600;
+    const isPhone = () => (matchMedia("(pointer:coarse)").matches || navigator.maxTouchPoints > 0) && Math.min(screen.width, screen.height) <= 768;
     const clearFit = () => {
       document.body.style.zoom = "";
       document.body.style.width = "";

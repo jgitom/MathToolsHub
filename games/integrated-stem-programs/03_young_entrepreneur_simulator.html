@@ -10,5 +10,5 @@ build(l){let a,q,c;if(l==="easy"){let units=ri(10,50),price=ri(3,12);a=units*pri
 else if(l==="medium"){let revenue=ri(40,100)*10,cost=ri(20,60)*10;a=revenue-cost;q=`Revenue RM${revenue}; total cost RM${cost}. Profit?`;c=[`RM${a}`,`RM${revenue+cost}`,`RM${cost}`,`RM${Math.abs(cost-revenue)}`];a=`RM${a}`;$("display").textContent=`Revenue RM${revenue}`;$("meter").style.width=`${Math.max(5,a/revenue*100)}%`}
 else{let fixed=ri(20,60)*10,price=ri(8,20),variable=ri(2,7);a=Math.ceil(fixed/(price-variable));q=`Fixed cost RM${fixed}; selling price RM${price}; variable cost RM${variable}. Break-even units?`;c=[a,a+1,Math.max(1,a-1),Math.ceil(fixed/price)];$("display").textContent=`Contribution RM${price-variable}`;$("meter").style.width=`${Math.min(100,a*3)}%`}return{answer:a,question:q,choices:c}}};
 </script><script src="program_engine.js"></script>
-<script src="../../universal-language.js"></script>
+<script src="../../universal-language.js?v=20260811-2"></script>
 </body></html>
