@@ -1,134 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Sniper: Shadow Ops | MathToolsHub</title>
-  <link rel="stylesheet" href="style.css" />
-<style>.mth-back{position:fixed;left:max(9px,env(safe-area-inset-left));top:max(8px,env(safe-area-inset-top));z-index:10000;padding:9px 13px;border:1px solid rgba(255,255,255,.25);border-radius:999px;color:#fff;background:rgba(3,8,18,.92);box-shadow:0 6px 18px rgba(0,0,0,.4);text-decoration:none;font:800 12px/1.2 Arial,sans-serif}.mth-back:focus-visible{outline:3px solid #66f0ff;outline-offset:2px}@media(max-width:760px){.topbar{padding-top:42px}.mth-back{padding:8px 10px}}</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Sniper: Shadow Ops | MathToolsHub Premium</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;color:#172033;background:#f4f7fa;font-family:Inter,"Segoe UI",Arial,sans-serif}.gate{width:min(480px,100%);padding:28px;border:1px solid #dbe3ec;border-radius:8px;background:#fff;text-align:center;box-shadow:0 18px 45px rgba(15,39,71,.12)}h1{margin:0 0 12px;color:#0f2747;font-size:1.6rem}p{margin:0;color:#64748b;line-height:1.6}.actions{display:grid;gap:10px;margin-top:20px}a{display:grid;place-items:center;min-height:46px;padding:10px 14px;border-radius:8px;color:#fff;background:#2563eb;font-weight:800;text-decoration:none}.secondary{color:#172033;background:#e8eef7}[hidden]{display:none!important}
+  </style>
 </head>
-<body>
-  <a class="mth-back" href="../" aria-label="Back to all games">← All Games</a>
-  <div id="app">
-    <header class="topbar">
-      <div>
-        <h1>SNIPER ELITE: SHADOW OPS</h1>
-        <p class="subtitle">Tactical Precision Simulator</p>
-      </div>
-      <button id="soundBtn" class="secondary-btn">Sound: ON</button>
-    </header>
-
-    <main>
-      <section id="startScreen" class="panel start-screen">
-        <div class="mission-card">
-          <span class="badge">MISSION 01</span>
-          <h2>Neon Hive Siege</h2>
-          <p>
-            Scan the tower block and neutralize alien infiltrators hiding in window bays.
-            Avoid disguised civilians and decoys.
-          </p>
-
-          <div class="mission-grid">
-            <div><span>Difficulty</span><strong id="difficultyValue">Normal</strong></div>
-            <div><span>Range</span><strong>220–640 m</strong></div>
-            <div><span>Ammo</span><strong id="ammoValue">8 rounds</strong></div>
-            <div><span>Time</span><strong id="timeValue">60 seconds</strong></div>
-          </div>
-
-          <div class="difficulty-picker" role="group" aria-label="Select difficulty">
-            <button class="difficulty-btn" data-difficulty="easy" type="button">Easy</button>
-            <button class="difficulty-btn active" data-difficulty="normal" type="button">Normal</button>
-            <button class="difficulty-btn" data-difficulty="hard" type="button">Hard</button>
-            <button class="difficulty-btn" data-difficulty="nightmare" type="button">Nightmare</button>
-          </div>
-
-          <button id="startBtn" class="primary-btn">Start Mission</button>
-        </div>
-
-        <aside class="intel-card">
-          <h3>Mission Intel</h3>
-          <ul>
-            <li>Green eyes indicate alien hostiles.</li>
-            <li>Blue silhouettes are civilian decoys.</li>
-            <li>Headshots earn bonus points.</li>
-            <li>Missed shots reduce accuracy.</li>
-          </ul>
-        </aside>
-      </section>
-
-      <section id="gameScreen" class="game-screen hidden">
-        <div class="hud">
-          <div><span>Score</span><strong id="score">0</strong></div>
-          <div><span>Ammo</span><strong id="ammo">8</strong></div>
-          <div><span>Time</span><strong id="timer">60</strong></div>
-          <div><span>Accuracy</span><strong id="accuracy">100%</strong></div>
-          <div><span>Threat</span><strong id="threatStatus">Low</strong></div>
-          <div>
-            <span>Health</span>
-            <strong id="health">100</strong>
-            <div class="health-bar" aria-hidden="true">
-              <div id="healthFill" class="health-fill"></div>
-            </div>
-          </div>
-        </div>
-
-        <div id="gameArea" class="game-area">
-          <div class="environment-layer stars"></div>
-          <div class="environment-layer skyline"></div>
-          <div class="environment-layer buildings"></div>
-          <div class="morse-laser" aria-label="Hidden Morse laser signal"><code>.--- ..- .. .-..</code></div>
-          <div class="environment-layer fog"></div>
-
-          <div id="targetLayer"></div>
-
-          <div id="scope" class="scope">
-            <div class="scope-ring"></div>
-            <div class="scope-line horizontal"></div>
-            <div class="scope-line vertical"></div>
-            <div class="scope-dot"></div>
-          </div>
-
-          <div id="shotFlash" class="shot-flash"></div>
-          <div id="enemyHitFlash" class="enemy-hit-flash"></div>
-
-          <div class="range-display">
-            RANGE: <span id="rangeValue">450</span> M
-          </div>
-
-          <div class="wind-display">
-            WIND: <span id="windValue">2.4</span> M/S →
-          </div>
-        </div>
-
-        <div class="controls">
-          <button id="reloadBtn" class="secondary-btn">Reload</button>
-          <button id="backBtn" class="secondary-btn">Back Menu</button>
-          <button id="abortBtn" class="danger-btn">Abort Mission</button>
-        </div>
-      </section>
-
-      <section id="resultScreen" class="panel result-screen hidden">
-        <span id="resultBadge" class="badge">MISSION COMPLETE</span>
-        <h2 id="resultTitle">Excellent work.</h2>
-
-        <div class="result-grid">
-          <div><span>Final Score</span><strong id="finalScore">0</strong></div>
-          <div><span>Accuracy</span><strong id="finalAccuracy">0%</strong></div>
-          <div><span>Aliens Hit</span><strong id="finalHits">0</strong></div>
-          <div><span>Decoys Hit</span><strong id="civilianHits">0</strong></div>
-        </div>
-
-        <button id="retryBtn" class="primary-btn">Retry Mission</button>
-      </section>
-    </main>
-
-    <footer>
-      Prototype build • Desktop recommended • Click to fire
-    </footer>
-  </div>
-
-  <script src="game.js"></script>
-  <script src="../../supabase-config.js"></script><script type="module" src="../../subscription-access.js"></script>
-<script src="../../universal-language.js"></script>
+<body data-premium-activity="game/sniper-shadow-ops">
+  <main class="gate"><h1>Sniper: Shadow Ops</h1><p id="gateStatus">Checking your Premium access...</p><div class="actions" id="gateActions" hidden><a id="accountLink" href="/account.html">Sign in or manage subscription</a><a class="secondary" href="/">Return to homepage</a></div></main>
+  <script src="/supabase-config.js"></script>
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+    const status = document.getElementById("gateStatus");
+    const actions = document.getElementById("gateActions");
+    const accountLink = document.getElementById("accountLink");
+    const activityId = document.body.dataset.premiumActivity;
+    const config = window.MATHTOOLSHUB_SUPABASE;
+    const returnPath = location.pathname + location.search + location.hash;
+    accountLink.href = "/account.html?return=" + encodeURIComponent(returnPath);
+    const fail = message => { status.textContent = message; actions.hidden = false; };
+    try {
+      const client = createClient(config.url, config.publishableKey, { auth: { persistSession:true, autoRefreshToken:true, detectSessionInUrl:true } });
+      const { data: { session } } = await client.auth.getSession();
+      if (!session) throw new Error("SIGN_IN");
+      const response = await fetch(config.url + "/functions/v1/premium-activity", {
+        method: "POST",
+        headers: { "Authorization":"Bearer " + session.access_token, "apikey":config.publishableKey, "content-type":"application/json" },
+        body: JSON.stringify({ activityId })
+      });
+      if (response.status === 403) throw new Error("PREMIUM_REQUIRED");
+      if (!response.ok) throw new Error("UNAVAILABLE");
+      const html = await response.text();
+      document.open(); document.write(html); document.close();
+    } catch (error) {
+      fail(error.message === "SIGN_IN" ? "Sign in to check your Premium access." : error.message === "PREMIUM_REQUIRED" ? "An active Premium subscription is required for this activity." : "This Premium activity is temporarily unavailable. Please try again.");
+    }
+  </script>
 </body>
 </html>

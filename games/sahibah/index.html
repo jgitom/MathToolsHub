@@ -1,198 +1,43 @@
 <!DOCTYPE html>
-<html lang="ms">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sahibah — Permainan Kata Nusantara</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Sahibah | MathToolsHub Premium</title>
   <style>
-    :root{
-      --bg:#f4efe4; --panel:#fffaf0; --ink:#2d332f; --accent:#176b5b;
-      --gold:#d5a53a; --line:#cdbf9e; --tile:#f4d58d; --danger:#a33a3a;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:
-      radial-gradient(circle at top,#fffdf7 0,#f4efe4 45%,#e9dfca 100%);color:var(--ink)}
-    header{padding:18px 24px;background:#173f38;color:white;display:flex;align-items:center;
-      justify-content:space-between;box-shadow:0 3px 12px #0002}
-    header h1{margin:0;font-size:clamp(24px,4vw,42px);letter-spacing:.04em}
-    header small{opacity:.8}.site-language-slot{display:flex;align-items:center;justify-content:center;flex:1}.header-status{white-space:nowrap}
-    .wrap{max-width:1280px;margin:auto;padding:20px;display:grid;grid-template-columns:minmax(520px,1fr) 330px;gap:20px}
-    .card{background:var(--panel);border:1px solid #d8ccb0;border-radius:18px;box-shadow:0 10px 28px #574b3520}
-    .board-wrap{padding:14px;overflow:auto}
-    #board{display:grid;grid-template-columns:repeat(15,36px);grid-template-rows:repeat(15,36px);
-      width:max-content;border:4px solid #705c37;background:#b99a64}
-    .cell{width:36px;height:36px;border:1px solid #8d7448;background:#e8ddc2;display:grid;place-items:center;
-      position:relative;font-size:10px;font-weight:800;color:#6a5b40;cursor:pointer;user-select:none}
-    .cell.tw{background:#b75252;color:white}.cell.dw{background:#e69b9b}.cell.tl{background:#3d7ea6;color:white}
-    .cell.dl{background:#8bc1d8}.cell.star{background:#d7a93d;color:white;font-size:18px}
-    .tile{width:31px;height:31px;background:linear-gradient(145deg,#ffe7a8,#e8bd63);border:1px solid #9a7739;
-      border-radius:5px;box-shadow:0 2px 3px #0004;display:flex;align-items:center;justify-content:center;
-      font-weight:900;font-size:19px;color:#2c2a24;position:relative}
-    .tile .val{position:absolute;right:2px;bottom:0;font-size:8px}
-    .temp{outline:3px solid #176b5b}
-    aside{padding:18px;display:flex;flex-direction:column;gap:15px}
-    .scorebox{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .player{padding:12px;border:2px solid transparent;border-radius:12px;background:#eee5d3}
-    .player.active{border-color:var(--accent);background:#dceee9}
-    .player b{display:block;font-size:22px}
-    #rack{min-height:62px;padding:9px;background:#80663e;border-radius:8px;display:flex;gap:7px;align-items:center;justify-content:center;flex-wrap:wrap}
-    .rack-tile{cursor:pointer}.rack-tile.selected{transform:translateY(-7px);outline:3px solid var(--accent)}
-    button{border:0;border-radius:10px;padding:11px 13px;font-weight:800;cursor:pointer;background:var(--accent);color:white}
-    button.secondary{background:#6d624e}button.warn{background:var(--danger)}
-    .buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    #message{min-height:48px;padding:11px;border-radius:10px;background:#eee5d3;font-size:14px;line-height:1.35}
-    .rules{font-size:13px;line-height:1.45}.rules h3{margin-bottom:4px}
-    input{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;background:white}
-    @media(max-width:920px){header{flex-wrap:wrap}.site-language-slot{order:3;flex-basis:100%}.site-language-slot .mth-universal-language-picker{width:100%;max-width:none}.wrap{grid-template-columns:1fr}.board-wrap{order:2}aside{order:1}#board{grid-template-columns:repeat(15,31px);grid-template-rows:repeat(15,31px)}.cell{width:31px;height:31px}.tile{width:27px;height:27px;font-size:16px}}
-      .mth-back{position:fixed;left:12px;bottom:12px;z-index:10;padding:9px 13px;border-radius:999px;background:#173f38;color:#fff;text-decoration:none;font-weight:800;box-shadow:0 4px 14px #0004}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;color:#172033;background:#f4f7fa;font-family:Inter,"Segoe UI",Arial,sans-serif}.gate{width:min(480px,100%);padding:28px;border:1px solid #dbe3ec;border-radius:8px;background:#fff;text-align:center;box-shadow:0 18px 45px rgba(15,39,71,.12)}h1{margin:0 0 12px;color:#0f2747;font-size:1.6rem}p{margin:0;color:#64748b;line-height:1.6}.actions{display:grid;gap:10px;margin-top:20px}a{display:grid;place-items:center;min-height:46px;padding:10px 14px;border-radius:8px;color:#fff;background:#2563eb;font-weight:800;text-decoration:none}.secondary{color:#172033;background:#e8eef7}[hidden]{display:none!important}
   </style>
 </head>
-<body>
-<header>
-  <div><h1>SAHIBAH</h1><small>Permainan Kata Nusantara</small></div>
-  <div id="siteLanguageSlot" class="site-language-slot"></div>
-  <div id="bagCount" class="header-status">Baki huruf: 0</div>
-</header>
-
-<main class="wrap">
-  <section class="card board-wrap"><div id="board"></div></section>
-  <aside class="card">
-    <div>
-      <label>Nama Pemain 1</label><input id="p1name" value="Pemain 1">
-      <label>Nama Pemain 2</label><input id="p2name" value="Pemain 2">
-    </div>
-    <div class="scorebox">
-      <div id="p1" class="player active"><span>Pemain 1</span><b>0</b> markah</div>
-      <div id="p2" class="player"><span>Pemain 2</span><b>0</b> markah</div>
-    </div>
-    <div><strong>Rak Huruf</strong><div id="rack"></div></div>
-    <div class="buttons">
-      <button id="submit">Hantar Kata</button>
-      <button id="undo" class="secondary">Batal Susunan</button>
-      <button id="exchange" class="secondary">Tukar Huruf</button>
-      <button id="pass" class="warn">Langkau Giliran</button>
-    </div>
-    <div id="message">Pilih huruf pada rak, kemudian klik petak papan.</div>
-    <div class="rules">
-      <h3>Peraturan ringkas</h3>
-      <div>• Giliran pertama mesti melalui petak ★.</div>
-      <div>• Semua huruf baharu mesti berada pada satu baris atau lajur.</div>
-      <div>• Huruf baharu mesti bersambung dengan perkataan sedia ada.</div>
-      <div>• Bonus DL/TL menggandakan huruf; DW/TW menggandakan perkataan.</div>
-    </div>
-  </aside>
-</main>
-
-<script>
-const SIZE=15;
-const letterValues={A:1,B:3,C:3,D:2,E:1,F:4,G:2,H:4,I:1,J:8,K:5,L:1,M:3,N:1,O:1,P:3,Q:10,R:1,S:1,T:1,U:1,V:4,W:4,X:8,Y:4,Z:10};
-const distribution={A:19,B:4,C:2,D:5,E:7,F:1,G:4,H:2,I:11,J:1,K:3,L:5,M:5,N:8,O:3,P:4,Q:1,R:6,S:8,T:5,U:8,V:1,W:1,X:1,Y:2,Z:1};
-let bag=[], board=Array.from({length:SIZE},()=>Array(SIZE).fill(null));
-let racks=[[],[]], scores=[0,0], current=0, selected=null, pending=[];
-
-const bonus={};
-function put(type, coords){coords.forEach(([r,c])=>bonus[`${r},${c}`]=type)}
-put('tw',[[0,0],[0,7],[0,14],[7,0],[7,14],[14,0],[14,7],[14,14]]);
-put('dw',[[1,1],[2,2],[3,3],[4,4],[10,10],[11,11],[12,12],[13,13],[1,13],[2,12],[3,11],[4,10],[10,4],[11,3],[12,2],[13,1]]);
-put('tl',[[1,5],[1,9],[5,1],[5,5],[5,9],[5,13],[9,1],[9,5],[9,9],[9,13],[13,5],[13,9]]);
-put('dl',[[0,3],[0,11],[2,6],[2,8],[3,0],[3,7],[3,14],[6,2],[6,6],[6,8],[6,12],[7,3],[7,11],[8,2],[8,6],[8,8],[8,12],[11,0],[11,7],[11,14],[12,6],[12,8],[14,3],[14,11]]);
-
-function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}}
-function initBag(){for(const [l,n] of Object.entries(distribution))for(let i=0;i<n;i++)bag.push(l);shuffle(bag)}
-function draw(player){while(racks[player].length<7 && bag.length)racks[player].push(bag.pop())}
-function tileHTML(l,extra=''){return `<div class="tile ${extra}"><span>${l}</span><span class="val">${letterValues[l]}</span></div>`}
-
-function renderBoard(){
- const el=document.getElementById('board'); el.innerHTML='';
- for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){
-   const d=document.createElement('div');d.className='cell';d.dataset.r=r;d.dataset.c=c;
-   const key=`${r},${c}`, b=bonus[key];
-   if(r===7&&c===7&&!board[r][c]){d.classList.add('star');d.textContent='★'}
-   else if(b&&!board[r][c]){d.classList.add(b);d.textContent=b.toUpperCase()}
-   if(board[r][c])d.innerHTML=tileHTML(board[r][c].letter,board[r][c].temp?'temp':'');
-   d.onclick=()=>place(r,c);el.appendChild(d);
- }
-}
-function renderRack(){
- const el=document.getElementById('rack');el.innerHTML='';
- racks[current].forEach((l,i)=>{
-   const w=document.createElement('div');w.innerHTML=tileHTML(l,'rack-tile'+(selected===i?' selected':''));
-   w.firstChild.onclick=()=>{selected=selected===i?null:i;renderRack()};el.appendChild(w.firstChild)
- });
- document.getElementById('bagCount').textContent=`Baki huruf: ${bag.length}`;
- document.querySelector('#p1 span').textContent=document.getElementById('p1name').value||'Pemain 1';
- document.querySelector('#p2 span').textContent=document.getElementById('p2name').value||'Pemain 2';
- document.querySelector('#p1 b').textContent=scores[0];document.querySelector('#p2 b').textContent=scores[1];
- document.getElementById('p1').classList.toggle('active',current===0);document.getElementById('p2').classList.toggle('active',current===1);
-}
-function msg(t){document.getElementById('message').textContent=t}
-function place(r,c){
- if(selected===null)return msg('Pilih satu huruf daripada rak dahulu.');
- if(board[r][c])return msg('Petak itu sudah mempunyai huruf.');
- const letter=racks[current][selected];
- board[r][c]={letter,temp:true};pending.push({r,c,letter});
- racks[current].splice(selected,1);selected=null;renderBoard();renderRack();
-}
-function undo(){
- pending.forEach(p=>{board[p.r][p.c]=null;racks[current].push(p.letter)});
- pending=[];selected=null;renderBoard();renderRack();msg('Susunan dibatalkan.');
-}
-function hasPermanent(){return board.some(row=>row.some(x=>x&&!x.temp))}
-function validate(){
- if(!pending.length)return {ok:false,text:'Letakkan sekurang-kurangnya satu huruf.'};
- const sameRow=pending.every(p=>p.r===pending[0].r),sameCol=pending.every(p=>p.c===pending[0].c);
- if(!sameRow&&!sameCol)return {ok:false,text:'Huruf baharu mesti berada pada satu baris atau satu lajur.'};
- const first=!hasPermanent();
- if(first&&!pending.some(p=>p.r===7&&p.c===7))return {ok:false,text:'Kata pertama mesti melalui petak ★.'};
- if(!first){
-   const connected=pending.some(p=>[[1,0],[-1,0],[0,1],[0,-1]].some(([dr,dc])=>{
-     const nr=p.r+dr,nc=p.c+dc;return nr>=0&&nr<SIZE&&nc>=0&&nc<SIZE&&board[nr][nc]&&!board[nr][nc].temp
-   }));
-   if(!connected)return {ok:false,text:'Susunan mesti bersambung dengan huruf yang sudah ada.'};
- }
- const sorted=[...pending].sort((a,b)=>sameRow?a.c-b.c:a.r-b.r);
- for(let i=1;i<sorted.length;i++){
-   let r=sorted[i-1].r,c=sorted[i-1].c;
-   while(true){if(sameRow)c++;else r++;if(r===sorted[i].r&&c===sorted[i].c)break;if(!board[r][c])return {ok:false,text:'Tidak boleh ada ruang kosong dalam perkataan.'}}
- }
- return {ok:true,sameRow};
-}
-function collectWord(r,c,dr,dc){
- while(r-dr>=0&&r-dr<SIZE&&c-dc>=0&&c-dc<SIZE&&board[r-dr][c-dc]){r-=dr;c-=dc}
- const cells=[];while(r>=0&&r<SIZE&&c>=0&&c<SIZE&&board[r][c]){cells.push({r,c,...board[r][c]});r+=dr;c+=dc}
- return cells;
-}
-function wordScore(cells){
- let total=0,mult=1;
- cells.forEach(x=>{let v=letterValues[x.letter];if(x.temp){const b=bonus[`${x.r},${x.c}`];if(b==='dl')v*=2;if(b==='tl')v*=3;if(b==='dw')mult*=2;if(b==='tw')mult*=3}total+=v});
- return total*mult;
-}
-function submit(){
- const v=validate();if(!v.ok)return msg(v.text);
- let words=[],seen=new Set();
- pending.forEach(p=>[[0,1],[1,0]].forEach(([dr,dc])=>{const w=collectWord(p.r,p.c,dr,dc);const key=w.map(x=>`${x.r},${x.c}`).join('|');if(w.length>1&&!seen.has(key)){seen.add(key);words.push(w)}}));
- if(!words.length&&pending.length===1)return msg('Satu huruf sahaja belum membentuk perkataan.');
- let gained=words.reduce((s,w)=>s+wordScore(w),0);if(pending.length===7)gained+=40;
- const labels=words.map(w=>w.map(x=>x.letter).join('')).join(', ');
- scores[current]+=gained;pending.forEach(p=>board[p.r][p.c].temp=false);pending=[];
- draw(current);msg(`${labels}: +${gained} markah.`);current=1-current;selected=null;draw(current);renderBoard();renderRack();
-}
-function pass(){if(pending.length)return msg('Batalkan susunan dahulu sebelum melangkau.');current=1-current;selected=null;draw(current);renderRack();msg('Giliran dilangkau.')}
-function exchange(){
- if(pending.length)return msg('Batalkan susunan sebelum menukar huruf.');
- if(selected===null)return msg('Pilih satu huruf yang hendak ditukar.');
- if(!bag.length)return msg('Beg huruf sudah kosong.');
- const old=racks[current].splice(selected,1)[0];racks[current].push(bag.pop());bag.unshift(old);shuffle(bag);selected=null;current=1-current;draw(current);renderRack();msg('Huruf ditukar. Giliran berpindah.');
-}
-document.getElementById('submit').onclick=submit;
-document.getElementById('undo').onclick=undo;
-document.getElementById('pass').onclick=pass;
-document.getElementById('exchange').onclick=exchange;
-document.getElementById('p1name').oninput=renderRack;document.getElementById('p2name').oninput=renderRack;
-initBag();draw(0);draw(1);renderBoard();renderRack();
-</script>
-<a class="mth-back" href="../">← Semua Permainan</a>
-<script src="../../supabase-config.js"></script><script type="module" src="../../subscription-access.js"></script>
-<script src="../../universal-language.js"></script>
+<body data-premium-activity="game/sahibah">
+  <main class="gate"><h1>Sahibah</h1><p id="gateStatus">Checking your Premium access...</p><div class="actions" id="gateActions" hidden><a id="accountLink" href="/account.html">Sign in or manage subscription</a><a class="secondary" href="/">Return to homepage</a></div></main>
+  <script src="/supabase-config.js"></script>
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+    const status = document.getElementById("gateStatus");
+    const actions = document.getElementById("gateActions");
+    const accountLink = document.getElementById("accountLink");
+    const activityId = document.body.dataset.premiumActivity;
+    const config = window.MATHTOOLSHUB_SUPABASE;
+    const returnPath = location.pathname + location.search + location.hash;
+    accountLink.href = "/account.html?return=" + encodeURIComponent(returnPath);
+    const fail = message => { status.textContent = message; actions.hidden = false; };
+    try {
+      const client = createClient(config.url, config.publishableKey, { auth: { persistSession:true, autoRefreshToken:true, detectSessionInUrl:true } });
+      const { data: { session } } = await client.auth.getSession();
+      if (!session) throw new Error("SIGN_IN");
+      const response = await fetch(config.url + "/functions/v1/premium-activity", {
+        method: "POST",
+        headers: { "Authorization":"Bearer " + session.access_token, "apikey":config.publishableKey, "content-type":"application/json" },
+        body: JSON.stringify({ activityId })
+      });
+      if (response.status === 403) throw new Error("PREMIUM_REQUIRED");
+      if (!response.ok) throw new Error("UNAVAILABLE");
+      const html = await response.text();
+      document.open(); document.write(html); document.close();
+    } catch (error) {
+      fail(error.message === "SIGN_IN" ? "Sign in to check your Premium access." : error.message === "PREMIUM_REQUIRED" ? "An active Premium subscription is required for this activity." : "This Premium activity is temporarily unavailable. Please try again.");
+    }
+  </script>
 </body>
 </html>
