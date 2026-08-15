@@ -1,96 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sniper Elite Hunter | MathToolsHub</title>
-  <link rel="stylesheet" href="style.css" />
-<style>.mth-back{position:fixed;left:max(9px,env(safe-area-inset-left));top:max(8px,env(safe-area-inset-top));z-index:10000;padding:9px 13px;border:1px solid rgba(255,255,255,.25);border-radius:999px;color:#fff;background:rgba(3,12,18,.9);box-shadow:0 6px 18px rgba(0,0,0,.35);text-decoration:none;font:800 12px/1.2 Arial,sans-serif}.mth-back:focus-visible{outline:3px solid #d4ff44;outline-offset:2px}@media(max-width:720px){.topbar{padding-top:42px}.mth-back{padding:8px 10px}}</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Sniper Elite Hunter | MathToolsHub Premium</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;color:#172033;background:#f4f7fa;font-family:Inter,"Segoe UI",Arial,sans-serif}.gate{width:min(480px,100%);padding:28px;border:1px solid #dbe3ec;border-radius:8px;background:#fff;text-align:center;box-shadow:0 18px 45px rgba(15,39,71,.12)}h1{margin:0 0 12px;color:#0f2747;font-size:1.6rem}p{margin:0;color:#64748b;line-height:1.6}.actions{display:grid;gap:10px;margin-top:20px}a{display:grid;place-items:center;min-height:46px;padding:10px 14px;border-radius:8px;color:#fff;background:#2563eb;font-weight:800;text-decoration:none}.secondary{color:#172033;background:#e8eef7}[hidden]{display:none!important}
+  </style>
 </head>
-<body>
-  <a class="mth-back" href="../" aria-label="Back to all games">← All Games</a>
-  <main id="game-shell">
-    <header class="topbar">
-      <div>
-        <h1>SNIPER ELITE HUNTER</h1>
-        <p>Arcade FPS Prototype</p>
-      </div>
-      <button id="fullscreenBtn" class="secondary-btn">Fullscreen</button>
-    </header>
-
-    <section id="hud">
-      <div class="hud-card"><span>Score</span><strong id="score">0</strong></div>
-      <div class="hud-card"><span>Wave</span><strong id="wave">1</strong></div>
-      <div class="hud-card"><span>Time</span><strong id="time">60</strong></div>
-      <div class="hud-card"><span>Ammo</span><strong id="ammo">5 / 20</strong></div>
-      <div class="hud-card"><span>Accuracy</span><strong id="accuracy">0%</strong></div>
-      <div class="hud-card action-card">
-        <span>Ammo Pack</span>
-        <button id="buyAmmoBtn" class="buy-btn">Buy 5 - 300</button>
-      </div>
-    </section>
-
-    <section id="canvas-wrap">
-      <canvas id="gameCanvas" width="1280" height="720" aria-label="Sniper game canvas"></canvas>
-
-      <div id="startOverlay" class="overlay visible">
-        <div class="panel">
-          <div class="badge" id="startBadge">MISSION 01</div>
-          <h2 id="startTitle">Mountain Relay Intercept</h2>
-          <p id="startDescription">Hit hostile steel targets before the timer reaches zero. Avoid civilian markers.</p>
-
-          <div id="missionList" class="mission-list"></div>
-
-          <div class="controls-grid">
-            <div><kbd>Mouse</kbd><span>Aim</span></div>
-            <div><kbd>Click</kbd><span>Fire</span></div>
-            <div><kbd>R</kbd><span>Reload</span></div>
-            <div><kbd>Shift</kbd><span>Steady aim</span></div>
-            <div><kbd>Right Click</kbd><span>Zoom</span></div>
-          </div>
-
-          <button id="startBtn" class="primary-btn">Start Mission</button>
-        </div>
-      </div>
-
-      <div id="gameOverOverlay" class="overlay">
-        <div class="panel">
-          <div class="badge" id="resultBadge">MISSION COMPLETE</div>
-          <h2 id="resultTitle">Operation Finished</h2>
-          <div class="result-grid">
-            <div><span>Final Score</span><strong id="finalScore">0</strong></div>
-            <div><span>Accuracy</span><strong id="finalAccuracy">0%</strong></div>
-            <div><span>Best Combo</span><strong id="finalCombo">0</strong></div>
-            <div><span>Targets Hit</span><strong id="finalHits">0</strong></div>
-          </div>
-
-          <div class="shop-panel">
-            <div class="shop-header">
-              <span>Upgrade Credits</span>
-              <strong id="creditsValue">0</strong>
-            </div>
-            <div id="shopList" class="shop-list"></div>
-          </div>
-
-          <button id="restartBtn" class="primary-btn">Start Next Mission</button>
-        </div>
-      </div>
-
-      <div id="reloadNotice">RELOADING...</div>
-      <div id="comboNotice"></div>
-      <div id="weatherNotice"></div>
-      <div id="hiddenMessage" class="morse-laser" aria-label="Hidden Morse laser signal"><code>.--- ..- .. .-..</code></div>
-      <div id="missionText">Eliminate hostile targets. Do not shoot civilian markers.</div>
-    </section>
-
-    <footer class="footer">
-      <span>Prototype v0.1</span>
-      <span>SNIPER Games Project</span>
-    </footer>
-  </main>
-
-  <script src="game.js"></script>
-  <script src="../../supabase-config.js"></script><script type="module" src="../../subscription-access.js"></script>
-<script src="../../universal-language.js"></script>
+<body data-premium-activity="game/sniper-elite-hunter">
+  <main class="gate"><h1>Sniper Elite Hunter</h1><p id="gateStatus">Checking your Premium access...</p><div class="actions" id="gateActions" hidden><a id="accountLink" href="/account.html">Sign in or manage subscription</a><a class="secondary" href="/">Return to homepage</a></div></main>
+  <script src="/supabase-config.js"></script>
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+    const status = document.getElementById("gateStatus");
+    const actions = document.getElementById("gateActions");
+    const accountLink = document.getElementById("accountLink");
+    const activityId = document.body.dataset.premiumActivity;
+    const config = window.MATHTOOLSHUB_SUPABASE;
+    const returnPath = location.pathname + location.search + location.hash;
+    accountLink.href = "/account.html?return=" + encodeURIComponent(returnPath);
+    const fail = message => { status.textContent = message; actions.hidden = false; };
+    try {
+      const client = createClient(config.url, config.publishableKey, { auth: { persistSession:true, autoRefreshToken:true, detectSessionInUrl:true } });
+      const { data: { session } } = await client.auth.getSession();
+      if (!session) throw new Error("SIGN_IN");
+      const response = await fetch(config.url + "/functions/v1/premium-activity", {
+        method: "POST",
+        headers: { "Authorization":"Bearer " + session.access_token, "apikey":config.publishableKey, "content-type":"application/json" },
+        body: JSON.stringify({ activityId })
+      });
+      if (response.status === 403) throw new Error("PREMIUM_REQUIRED");
+      if (!response.ok) throw new Error("UNAVAILABLE");
+      const html = await response.text();
+      document.open(); document.write(html); document.close();
+    } catch (error) {
+      fail(error.message === "SIGN_IN" ? "Sign in to check your Premium access." : error.message === "PREMIUM_REQUIRED" ? "An active Premium subscription is required for this activity." : "This Premium activity is temporarily unavailable. Please try again.");
+    }
+  </script>
 </body>
 </html>

@@ -1,5 +1,43 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>STEM Discovery Academy</title><style>
-body{margin:0;font-family:Arial;background:linear-gradient(145deg,#11314a,#071521);color:#fff;min-height:100vh}main{width:min(1140px,94vw);margin:30px auto}h1{text-align:center;font-size:clamp(2rem,5vw,3.5rem)}p{text-align:center;color:#d8edff}.grid{display:grid;grid-template-columns:repeat(3,minmax(230px,1fr));gap:18px;margin-top:28px}a{display:block;text-decoration:none;color:#263238;background:#fff;border:5px solid #2a9d8f;border-radius:22px;padding:24px;text-align:center;font-weight:900;box-shadow:0 9px 0 #176c62;transition:.16s}a:hover{transform:translateY(-5px)}.icon{font-size:4rem;display:block}.num{color:#ef476f}@media(max-width:820px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:540px){.grid{grid-template-columns:1fr}}</style><link rel="stylesheet" href="/mobile-control-safety.css">
-</head><body><a class="mth-back" href="../">← All Games</a><style>.mth-back{position:fixed;left:12px;top:12px;z-index:9999;padding:8px 12px;border-radius:999px;background:#10243b;color:#fff!important;text-decoration:none;font:800 12px/1.2 Arial,sans-serif;box-shadow:0 4px 12px #0005}@media(max-width:520px){.mth-back{position:static;display:inline-block;margin:8px 0 0 3vw}}</style><main><h1>🧭 STEM Discovery Academy</h1><p>Explore real-world challenges connecting mathematics with science, engineering, coding, business, geography, and sustainability.</p><div class="grid"><a href="01_stem_bridge_builder.html"><span class="icon">🌉</span><span class="num">01</span><br>STEM Bridge Builder</a><a href="02_eco_city_planner.html"><span class="icon">🌱</span><span class="num">02</span><br>Eco-City Planner</a><a href="03_young_entrepreneur_simulator.html"><span class="icon">💼</span><span class="num">03</span><br>Young Entrepreneur Simulator</a><a href="04_coding_with_mathematics.html"><span class="icon">💻</span><span class="num">04</span><br>Coding with Mathematics</a><a href="05_weather_data_station.html"><span class="icon">🌦️</span><span class="num">05</span><br>Weather Data Station</a><a href="06_robot_navigation_challenge.html"><span class="icon">🤖</span><span class="num">06</span><br>Robot Navigation Challenge</a><a href="07_sabah_wildlife_data_explorer.html"><span class="icon">🦧</span><span class="num">07</span><br>Sabah Wildlife Data Explorer</a><a href="08_mount_kinabalu_expedition.html"><span class="icon">🏔️</span><span class="num">08</span><br>Mount Kinabalu Expedition</a><a href="09_smart_farm_simulator.html"><span class="icon">🌾</span><span class="num">09</span><br>Smart Farm Simulator</a><a href="10_disaster_management_planner.html"><span class="icon">🚨</span><span class="num">10</span><br>Disaster Management Planner</a></div></main><script src="../../supabase-config.js"></script><script type="module" src="../../subscription-access.js"></script>
-<script src="../../universal-language.js"></script>
-</body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>STEM Discovery Academy | MathToolsHub Premium</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;color:#172033;background:#f4f7fa;font-family:Inter,"Segoe UI",Arial,sans-serif}.gate{width:min(480px,100%);padding:28px;border:1px solid #dbe3ec;border-radius:8px;background:#fff;text-align:center;box-shadow:0 18px 45px rgba(15,39,71,.12)}h1{margin:0 0 12px;color:#0f2747;font-size:1.6rem}p{margin:0;color:#64748b;line-height:1.6}.actions{display:grid;gap:10px;margin-top:20px}a{display:grid;place-items:center;min-height:46px;padding:10px 14px;border-radius:8px;color:#fff;background:#2563eb;font-weight:800;text-decoration:none}.secondary{color:#172033;background:#e8eef7}[hidden]{display:none!important}
+  </style>
+</head>
+<body data-premium-activity="game/integrated-stem-programs">
+  <main class="gate"><h1>STEM Discovery Academy</h1><p id="gateStatus">Checking your Premium access...</p><div class="actions" id="gateActions" hidden><a id="accountLink" href="/account.html">Sign in or manage subscription</a><a class="secondary" href="/">Return to homepage</a></div></main>
+  <script src="/supabase-config.js"></script>
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+    const status = document.getElementById("gateStatus");
+    const actions = document.getElementById("gateActions");
+    const accountLink = document.getElementById("accountLink");
+    const activityId = document.body.dataset.premiumActivity;
+    const config = window.MATHTOOLSHUB_SUPABASE;
+    const returnPath = location.pathname + location.search + location.hash;
+    accountLink.href = "/account.html?return=" + encodeURIComponent(returnPath);
+    const fail = message => { status.textContent = message; actions.hidden = false; };
+    try {
+      const client = createClient(config.url, config.publishableKey, { auth: { persistSession:true, autoRefreshToken:true, detectSessionInUrl:true } });
+      const { data: { session } } = await client.auth.getSession();
+      if (!session) throw new Error("SIGN_IN");
+      const response = await fetch(config.url + "/functions/v1/premium-activity", {
+        method: "POST",
+        headers: { "Authorization":"Bearer " + session.access_token, "apikey":config.publishableKey, "content-type":"application/json" },
+        body: JSON.stringify({ activityId })
+      });
+      if (response.status === 403) throw new Error("PREMIUM_REQUIRED");
+      if (!response.ok) throw new Error("UNAVAILABLE");
+      const html = await response.text();
+      document.open(); document.write(html); document.close();
+    } catch (error) {
+      fail(error.message === "SIGN_IN" ? "Sign in to check your Premium access." : error.message === "PREMIUM_REQUIRED" ? "An active Premium subscription is required for this activity." : "This Premium activity is temporarily unavailable. Please try again.");
+    }
+  </script>
+</body>
+</html>

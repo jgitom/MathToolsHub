@@ -1,30 +1,43 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0f2747">
-<meta name="description" content="Generate interactive Primary and Secondary School mathematics quizzes with automatic scoring.">
-<title>Math Quiz Generator | MathToolsHub</title>
-<style>
-:root{--navy:#0f2747;--blue:#2563eb;--ink:#172033;--muted:#64748b;--line:#dbe3ec;--soft:#eff6ff;--green:#15803d;--red:#b91c1c}*{box-sizing:border-box}body{margin:0;color:var(--ink);background:#f4f7fa;font-family:Inter,"Segoe UI",Arial,sans-serif}header{color:#fff;background:var(--navy);border-bottom:4px solid #3b82f6}.nav,.hero-inner,.shell{width:min(1080px,calc(100% - 32px));margin:auto}.nav{min-height:68px;display:flex;align-items:center;justify-content:space-between;gap:18px}.nav a{color:#fff;font-weight:800;text-decoration:none}.back{color:#dbeafe!important;font-size:.9rem}.hero{padding:48px 0;color:#fff;background:linear-gradient(125deg,#0f2747,#174d80 62%,#0d9488)}.hero h1{margin:0;font-size:clamp(2.2rem,7vw,4.1rem)}.hero p{max-width:700px;margin:15px 0 0;color:#dbeafe;line-height:1.65}.shell{padding:38px 0 70px}.builder{display:grid;grid-template-columns:310px 1fr;gap:22px}.panel{padding:24px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 14px 34px #0f274716}.field{margin-bottom:16px}label{display:block;margin-bottom:7px;color:var(--navy);font-weight:850}select{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;font:inherit}select:focus,button:focus-visible,input:focus-visible{outline:3px solid #bfdbfe;outline-offset:2px}.note{color:var(--muted);font-size:.84rem;line-height:1.55}.button{width:100%;min-height:44px;margin-top:8px;border:0;border-radius:10px;font:850 .92rem inherit;cursor:pointer}.primary{color:#fff;background:var(--blue)}.secondary{color:var(--navy);background:#e2e8f0}.quiz-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding-bottom:16px;border-bottom:1px solid var(--line)}.quiz-head h2{margin:0}.badge{padding:7px 10px;border-radius:999px;color:#1d4ed8;background:var(--soft);font-size:.75rem;font-weight:850}.empty{display:grid;place-items:center;min-height:440px;color:var(--muted);text-align:center}.question{padding:22px 0;border-bottom:1px solid var(--line)}.question:last-child{border-bottom:0}.question h3{margin:0 0 14px;font-size:1.05rem;line-height:1.5}.options{display:grid;grid-template-columns:1fr 1fr;gap:10px}.option{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid #cbd5e1;border-radius:10px;cursor:pointer}.option:hover{background:#f8fafc}.option.correct{border-color:#86efac;color:#166534;background:#f0fdf4}.option.wrong{border-color:#fca5a5;color:#991b1b;background:#fef2f2}.explanation{display:none;margin:12px 0 0;padding:11px 13px;border-radius:9px;color:#334155;background:#f8fafc;line-height:1.5}.question.marked .explanation{display:block}.result{display:none;margin:22px 0 0;padding:20px;border-radius:14px;text-align:center;background:var(--soft)}.result.show{display:block}.score{display:block;color:var(--navy);font-size:2.4rem;font-weight:900}.quiz-actions{display:none;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}.quiz-actions.show{display:grid}@media(max-width:800px){.builder{grid-template-columns:1fr}}@media(max-width:560px){.options{grid-template-columns:1fr}.quiz-actions{grid-template-columns:1fr}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Math Quiz Generator | MathToolsHub Premium</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;color:#172033;background:#f4f7fa;font-family:Inter,"Segoe UI",Arial,sans-serif}.gate{width:min(480px,100%);padding:28px;border:1px solid #dbe3ec;border-radius:8px;background:#fff;text-align:center;box-shadow:0 18px 45px rgba(15,39,71,.12)}h1{margin:0 0 12px;color:#0f2747;font-size:1.6rem}p{margin:0;color:#64748b;line-height:1.6}.actions{display:grid;gap:10px;margin-top:20px}a{display:grid;place-items:center;min-height:46px;padding:10px 14px;border-radius:8px;color:#fff;background:#2563eb;font-weight:800;text-decoration:none}.secondary{color:#172033;background:#e8eef7}[hidden]{display:none!important}
+  </style>
 </head>
-<body>
-<header><nav class="nav"><a href="../../index.html">Σ MathToolsHub</a><a class="back" href="../">← All Tools</a></nav></header>
-<section class="hero"><div class="hero-inner"><h1>Math Quiz Generator</h1><p>Create a fresh interactive mathematics quiz for Primary or Secondary School and receive an instant score with answer explanations.</p></div></section>
-<main class="shell"><div class="builder">
-<aside class="panel">
-<div class="field"><label for="level">School level</label><select id="level"><option value="primary" selected>Primary School</option><option value="secondary">Secondary School</option></select></div>
-<div class="field"><label for="yearForm">Year / Form</label><select id="yearForm"></select></div>
-<div class="field"><label for="topic">Topic</label><select id="topic"></select></div>
-<div class="field"><label for="difficulty">Difficulty</label><select id="difficulty"><option value="easy">Easy</option><option value="medium" selected>Medium</option><option value="hard">Hard</option></select></div>
-<div class="field"><label for="count">Number of questions</label><select id="count"><option>5</option><option selected>10</option><option>15</option><option>20</option></select></div>
-<button class="button primary" id="generate">Generate quiz</button>
-<p class="note" id="levelNote">Primary topics focus on whole-number arithmetic.</p>
-</aside>
-<section class="panel" id="quizPanel"><div class="empty" id="empty"><div><strong>Your quiz will appear here.</strong><br>Choose your options and select Generate quiz.</div></div><div id="quiz" hidden><div class="quiz-head"><h2 id="quizTitle">Mathematics Quiz</h2><span class="badge" id="quizBadge"></span></div><form id="questions"></form><div class="quiz-actions" id="quizActions"><button class="button primary" id="submit" type="button">Check answers</button><button class="button secondary" id="reset" type="button">Clear answers</button></div><div class="result" id="result" role="status"><span class="score" id="score"></span><span id="message"></span></div></div></section>
-</div></main>
-<script src="../exam-paper-generator/generator.js"></script>
-<script src="quiz.js"></script>
-<script src="../../supabase-config.js"></script><script type="module" src="../../subscription-access.js"></script>
-<script src="../../universal-language.js"></script>
-</body></html>
+<body data-premium-activity="tool/math-quiz-generator">
+  <main class="gate"><h1>Math Quiz Generator</h1><p id="gateStatus">Checking your Premium access...</p><div class="actions" id="gateActions" hidden><a id="accountLink" href="/account.html">Sign in or manage subscription</a><a class="secondary" href="/">Return to homepage</a></div></main>
+  <script src="/supabase-config.js"></script>
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+    const status = document.getElementById("gateStatus");
+    const actions = document.getElementById("gateActions");
+    const accountLink = document.getElementById("accountLink");
+    const activityId = document.body.dataset.premiumActivity;
+    const config = window.MATHTOOLSHUB_SUPABASE;
+    const returnPath = location.pathname + location.search + location.hash;
+    accountLink.href = "/account.html?return=" + encodeURIComponent(returnPath);
+    const fail = message => { status.textContent = message; actions.hidden = false; };
+    try {
+      const client = createClient(config.url, config.publishableKey, { auth: { persistSession:true, autoRefreshToken:true, detectSessionInUrl:true } });
+      const { data: { session } } = await client.auth.getSession();
+      if (!session) throw new Error("SIGN_IN");
+      const response = await fetch(config.url + "/functions/v1/premium-activity", {
+        method: "POST",
+        headers: { "Authorization":"Bearer " + session.access_token, "apikey":config.publishableKey, "content-type":"application/json" },
+        body: JSON.stringify({ activityId })
+      });
+      if (response.status === 403) throw new Error("PREMIUM_REQUIRED");
+      if (!response.ok) throw new Error("UNAVAILABLE");
+      const html = await response.text();
+      document.open(); document.write(html); document.close();
+    } catch (error) {
+      fail(error.message === "SIGN_IN" ? "Sign in to check your Premium access." : error.message === "PREMIUM_REQUIRED" ? "An active Premium subscription is required for this activity." : "This Premium activity is temporarily unavailable. Please try again.");
+    }
+  </script>
+</body>
+</html>
