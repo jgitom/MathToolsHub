@@ -141,5 +141,8 @@ insert into public.activity_entitlements (activity_id, access_tier, title, path,
 ('game/tennis-championship','premium','Tennis Championship','/games/tennis-championship/','game'),
 ('game/sniper-elite-hunter','premium','Sniper Elite Hunter','/games/sniper-elite-hunter/','game'),
 ('game/sniper-shadow-ops','premium','Sniper: Shadow Ops','/games/sniper-shadow-ops/','game'),
+('game/jutawan-pintar','premium','Jutawan Pintar','/games/jutawan-pintar/','game'),
+('game/sahibah','premium','Sahibah','/games/sahibah/','game'),
+('game/empire-kota','premium','Empire Kota','/games/empire-kota/','game'),
 ('tool/worksheet-generator','premium','Worksheet Generator','/tools/worksheet-generator/','tool')
 on conflict (activity_id) do update set access_tier=excluded.access_tier,title=excluded.title,path=excluded.path,category=excluded.category,active=true,updated_at=now();
