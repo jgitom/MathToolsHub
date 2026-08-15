@@ -8,6 +8,28 @@ const plans = new Map([
   [59900, { assetLimit: 10000, productName: "Asset Management — 10,000 Assets" }],
   [99900, { assetLimit: 100000, productName: "Asset Management — 100,000 Assets" }],
 ]);
+const bytesFromBase64 = (value: string) => Uint8Array.from(atob(value), character => character.charCodeAt(0));
+const base64FromBytes = (value: ArrayBuffer) => {
+  const bytes = new Uint8Array(value);
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary);
+};
+
+async function createLicense(sessionId: string, assetLimit: number) {
+  const privateKey = Deno.env.get("ASSET_LICENSE_PRIVATE_KEY") ?? "";
+  if (!privateKey) throw new Error("Licence signing is not configured");
+  const payload = {
+    version: 1,
+    product: "mathtoolshub-asset-management",
+    assetLimit,
+    purchaseId: sessionId,
+    issuedAt: new Date().toISOString(),
+  };
+  const key = await crypto.subtle.importKey("pkcs8", bytesFromBase64(privateKey), { name: "Ed25519" }, false, ["sign"]);
+  const signature = await crypto.subtle.sign("Ed25519", key, new TextEncoder().encode(JSON.stringify(payload)));
+  return { payload, signature: base64FromBytes(signature) };
+}
 
 Deno.serve(async request => {
   if (request.method === "OPTIONS") return new Response("ok", { headers: cors(request) });
@@ -29,7 +51,7 @@ Deno.serve(async request => {
     if (input.platform === "verify") return respond(request, { assetLimit: plan.assetLimit });
     const downloadUrl = new URL("https://mathtoolshub-asset-download.mathtoolshub-jgitom.workers.dev/download");
     downloadUrl.searchParams.set("session_id", input.sessionId!);
-    return respond(request, { assetLimit: plan.assetLimit, downloadUrl: downloadUrl.toString() });
+    return respond(request, { assetLimit: plan.assetLimit, downloadUrl: downloadUrl.toString(), license: await createLicense(session.id, plan.assetLimit) });
   } catch (error) {
     console.error("Asset download verification failed", error);
     return respond(request, { error: "Unable to verify this sandbox payment" }, 502);
