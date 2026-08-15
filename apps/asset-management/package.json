@@ -7,6 +7,7 @@
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
+    "test": "node --test test/*.test.cjs",
     "start": "electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
@@ -22,7 +23,7 @@
     "productName": "MathToolsHub Asset Management",
     "asar": true,
     "directories": { "output": "dist" },
-    "files": ["main.cjs", "preload.cjs", "index.html", "renderer.js"],
+    "files": ["main.cjs", "preload.cjs", "license.cjs", "index.html", "renderer.js"],
     "win": {
       "signAndEditExecutable": false,
       "target": [
