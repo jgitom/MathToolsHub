@@ -69,6 +69,15 @@ ipcMain.handle("assets:export", async (_event, store) => {
   await fs.writeFile(result.filePath, JSON.stringify(store, null, 2), "utf8");
   return { canceled: false, filePath: result.filePath };
 });
+ipcMain.handle("assets:export-csv", async (_event, store) => {
+  const result = await dialog.showSaveDialog({ title: "Export assets as CSV", defaultPath: "mathtoolshub-assets.csv", filters: [{ name: "CSV", extensions: ["csv"] }] });
+  if (result.canceled || !result.filePath) return { canceled: true };
+  const columns = ["assetId", "name", "category", "serial", "status", "assignee", "location", "purchaseDate", "value", "condition", "nextMaintenance", "notes"];
+  const quote = value => `"${String(value ?? "").replaceAll('"', '""')}"`;
+  const csv = [columns.join(","), ...(store.assets || []).map(asset => columns.map(key => quote(asset[key])).join(","))].join("\r\n");
+  await fs.writeFile(result.filePath, `\uFEFF${csv}`, "utf8");
+  return { canceled: false, filePath: result.filePath };
+});
 ipcMain.handle("assets:import", async () => {
   const result = await dialog.showOpenDialog({ title: "Import asset database", properties: ["openFile"], filters: [{ name: "JSON", extensions: ["json"] }] });
   if (result.canceled || !result.filePaths[0]) return { canceled: true };

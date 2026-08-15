@@ -1,63 +1,38 @@
 const $ = id => document.getElementById(id);
-let store = { version: 1, assets: [] };
-let licence = { valid: false };
-const fields = ["assetId","name","category","serial","status","assignee","location","purchaseDate","value","condition","notes"];
-const money = new Intl.NumberFormat("en-MY", { style: "currency", currency: "MYR", maximumFractionDigits: 0 });
-
-function toast(message) { const node = $("toast"); node.textContent = message; node.classList.add("show"); setTimeout(() => node.classList.remove("show"), 3000); }
-function escapeHTML(value="") { const node = document.createElement("span"); node.textContent = value; return node.innerHTML; }
-function filteredAssets() {
-  const query = $("search").value.trim().toLowerCase();
-  return store.assets.filter(asset => (!$("statusFilter").value || asset.status === $("statusFilter").value) && (!$("categoryFilter").value || asset.category === $("categoryFilter").value) && (!query || fields.some(key => String(asset[key] || "").toLowerCase().includes(query))));
+const money = new Intl.NumberFormat('en-MY',{style:'currency',currency:'MYR',maximumFractionDigits:0});
+const fields=['assetId','name','category','serial','status','assignee','location','purchaseDate','value','condition','nextMaintenance','notes'];
+let store={version:1,assets:[]}, licence={valid:false}, currentView='dashboard';
+const esc=(v='')=>{const n=document.createElement('span');n.textContent=v;return n.innerHTML};
+const toast=m=>{const n=$('toast');n.textContent=m;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),3000)};
+const dueDays=a=>a.nextMaintenance?Math.ceil((new Date(a.nextMaintenance+'T00:00:00')-new Date())/86400000):Infinity;
+const filtered=()=>{const q=$('search').value.toLowerCase();return store.assets.filter(a=>(!$('statusFilter').value||a.status===$('statusFilter').value)&&(!$('categoryFilter').value||a.category===$('categoryFilter').value)&&(!q||fields.some(k=>String(a[k]||'').toLowerCase().includes(q))))};
+function licenseText(){return licence.valid?'Active · '+Number(licence.assetLimit).toLocaleString()+' assets':'Not activated'}
+function renderDashboard(){
+ const assets=store.assets,total=assets.length,available=assets.filter(a=>a.status==='Available').length,assigned=assets.filter(a=>a.status==='Assigned').length;
+ $('totalStat').textContent=total;$('assignedNote').textContent=assigned+' assigned';$('availableStat').textContent=available;$('valueStat').textContent=money.format(assets.reduce((s,a)=>s+Number(a.value||0),0));
+ const due=assets.filter(a=>dueDays(a)<=30).sort((a,b)=>dueDays(a)-dueDays(b));$('maintenanceStat').textContent=due.length;
+ const states=['Available','Assigned','Maintenance','Retired','Lost'];$('statusChart').innerHTML=states.map(s=>{const n=assets.filter(a=>a.status===s).length,p=total?Math.round(n/total*100):0;return '<div class="status-row"><span>'+s+'</span><div class="bar"><i style="width:'+p+'%"></i></div><strong>'+n+'</strong></div>'}).join('');
+ $('attentionList').innerHTML=due.length?due.slice(0,6).map(a=>{const d=dueDays(a),label=d<0?Math.abs(d)+' days overdue':d===0?'Due today':'In '+d+' days';return '<div class="attention-item '+(d<=0?'overdue':'')+'"><strong>'+esc(a.name)+'</strong><small>'+esc(a.assetId)+' · '+label+'</small></div>'}).join(''):'<div class="empty"><strong>Nothing due soon</strong>Maintenance dates will appear here.</div>';
 }
-function render() {
-  $("totalStat").textContent = store.assets.length;
-  $("assignedStat").textContent = store.assets.filter(asset => asset.status === "Assigned").length;
-  $("availableStat").textContent = store.assets.filter(asset => asset.status === "Available").length;
-  $("valueStat").textContent = money.format(store.assets.reduce((sum, asset) => sum + Number(asset.value || 0), 0));
-  $("licenseStat").textContent = licence.valid ? `${licence.assetLimit.toLocaleString()} assets` : "Not activated";
-  const categories = [...new Set(store.assets.map(asset => asset.category).filter(Boolean))].sort();
-  const selected = $("categoryFilter").value;
-  $("categoryFilter").innerHTML = '<option value="">All categories</option>' + categories.map(value => `<option>${escapeHTML(value)}</option>`).join("");
-  $("categoryFilter").value = categories.includes(selected) ? selected : "";
-  const assets = filteredAssets();
-  $("tableHost").innerHTML = assets.length ? `<table><thead><tr><th>Asset</th><th>Category</th><th>Status</th><th>Assigned / location</th><th>Value</th><th>Actions</th></tr></thead><tbody>${assets.map(asset => `<tr><td><div class="asset-name">${escapeHTML(asset.name)}</div><div class="sub">${escapeHTML(asset.assetId)}${asset.serial ? ` - ${escapeHTML(asset.serial)}` : ""}</div></td><td>${escapeHTML(asset.category || "-")}</td><td><span class="badge ${asset.status.toLowerCase()}">${escapeHTML(asset.status)}</span><div class="sub">${escapeHTML(asset.condition || "")}</div></td><td>${escapeHTML(asset.assignee || "Unassigned")}<div class="sub">${escapeHTML(asset.location || "No location")}</div></td><td>${money.format(Number(asset.value || 0))}</td><td><button class="icon-btn" data-edit="${asset.id}">Edit</button> <button class="icon-btn danger" data-delete="${asset.id}">Delete</button></td></tr>`).join("")}</tbody></table>` : '<div class="empty"><strong>No assets found</strong>Add an asset or adjust the current filters.</div>';
+function renderAssets(){
+ const cats=[...new Set(store.assets.map(a=>a.category).filter(Boolean))].sort(),selected=$('categoryFilter').value;$('categoryFilter').innerHTML='<option value="">All categories</option>'+cats.map(c=>'<option>'+esc(c)+'</option>').join('');$('categoryFilter').value=cats.includes(selected)?selected:'';
+ const rows=filtered();$('tableHost').innerHTML=rows.length?'<table><thead><tr><th>Asset</th><th>Category</th><th>Status</th><th>Assigned / location</th><th>Value</th><th>Actions</th></tr></thead><tbody>'+rows.map(a=>'<tr><td><div class="asset-name">'+esc(a.name)+'</div><div class="sub">'+esc(a.assetId)+(a.serial?' · '+esc(a.serial):'')+'</div></td><td>'+esc(a.category||'-')+'</td><td><span class="badge '+String(a.status).toLowerCase()+'">'+esc(a.status)+'</span><div class="sub">'+esc(a.condition||'')+'</div></td><td>'+esc(a.assignee||'Unassigned')+'<div class="sub">'+esc(a.location||'No location')+'</div></td><td>'+money.format(Number(a.value||0))+'</td><td><button class="icon-btn" data-edit="'+a.id+'">Edit</button> <button class="icon-btn danger" data-delete="'+a.id+'">Delete</button></td></tr>').join('')+'</tbody></table>':'<div class="empty"><strong>No assets found</strong>Add an asset or adjust the filters.</div>';
 }
-function openEditor(asset) {
-  if (!asset && (!licence.valid || store.assets.length >= licence.assetLimit)) return toast(licence.valid ? `Your ${licence.assetLimit.toLocaleString()}-asset licence is full.` : "Activate a licence before adding assets.");
-  $("assetForm").reset(); $("recordId").value = asset?.id || ""; $("dialogTitle").textContent = asset ? "Edit asset" : "Add asset";
-  fields.forEach(key => { if (asset && asset[key] != null) $(key).value = asset[key]; });
-  $("assetDialog").showModal(); $("assetId").focus();
+function renderSecondary(){
+ const due=store.assets.filter(a=>Number.isFinite(dueDays(a))).sort((a,b)=>dueDays(a)-dueDays(b));$('maintenanceGrid').innerHTML=due.length?due.map(a=>'<article class="card info-card"><strong>'+esc(a.name)+'</strong><span class="large">'+(dueDays(a)<0?Math.abs(dueDays(a))+'d overdue':dueDays(a)+'d')+'</span><span class="sub">'+esc(a.nextMaintenance)+'</span></article>').join(''):'<div class="empty"><strong>No maintenance scheduled</strong>Add a next-maintenance date to an asset.</div>';
+ const cats=[...new Set(store.assets.map(a=>a.category).filter(Boolean))];$('reportsGrid').innerHTML='<article class="card info-card"><strong>Categories</strong><span class="large">'+cats.length+'</span><span class="sub">Across the portfolio</span></article><article class="card info-card"><strong>Assets recorded</strong><span class="large">'+store.assets.length+'</span><span class="sub">Current local database</span></article><article class="card info-card"><strong>Portfolio value</strong><span class="large">'+money.format(store.assets.reduce((s,a)=>s+Number(a.value||0),0))+'</span></article>';
+ $('pricingLicense').textContent=licenseText();$('pricingUsage').textContent=store.assets.length+' / '+(licence.valid?Number(licence.assetLimit).toLocaleString():'—');$('settingsLicense').textContent=licenseText();
+ $('labelGrid').innerHTML=store.assets.length?store.assets.slice(0,30).map(a=>'<div class="label-card"><strong>'+esc(a.name)+'</strong><span>'+esc(a.assetId)+'</span><span>'+esc(a.serial||'No serial number')+'</span></div>').join(''):'<div class="empty"><strong>No labels yet</strong>Add assets to create labels.</div>';
+ $('assistantSummary').textContent=store.assets.length?'You have '+store.assets.length+' assets. '+store.assets.filter(a=>dueDays(a)<=30).length+' require maintenance attention within 30 days.':'Add assets and the assistant will summarize inventory risks here.';
 }
-async function save(nextStore, message) {
-  try { store = await window.assetAPI.save(nextStore); render(); toast(message); return true; }
-  catch (error) { toast(error.message || "Save failed"); return false; }
-}
-
-$("assetForm").addEventListener("submit", async event => {
-  event.preventDefault();
-  const id = $("recordId").value || crypto.randomUUID();
-  const asset = { id, updatedAt: new Date().toISOString() };
-  fields.forEach(key => asset[key] = $(key).value.trim());
-  const duplicate = store.assets.find(item => item.assetId.toLowerCase() === asset.assetId.toLowerCase() && item.id !== id);
-  if (duplicate) return toast("Asset ID already exists");
-  const index = store.assets.findIndex(item => item.id === id);
-  if (index < 0 && (!licence.valid || store.assets.length >= licence.assetLimit)) return toast(licence.valid ? `Your ${licence.assetLimit.toLocaleString()}-asset licence is full.` : "Activate a licence before adding assets.");
-  const assets = [...store.assets];
-  if (index >= 0) assets[index] = { ...assets[index], ...asset }; else assets.unshift({ ...asset, createdAt: asset.updatedAt });
-  if (await save({ ...store, assets }, index >= 0 ? "Asset updated" : "Asset added")) $("assetDialog").close();
-});
-$("tableHost").addEventListener("click", async event => {
-  const edit = event.target.closest("[data-edit]"), remove = event.target.closest("[data-delete]");
-  if (edit) openEditor(store.assets.find(asset => asset.id === edit.dataset.edit));
-  if (remove) { const asset = store.assets.find(item => item.id === remove.dataset.delete); if (confirm(`Delete ${asset.name}? This cannot be undone.`)) await save({ ...store, assets: store.assets.filter(item => item.id !== asset.id) }, "Asset deleted"); }
-});
-$("addBtn").addEventListener("click", () => openEditor());
-$("closeDialog").addEventListener("click", () => $("assetDialog").close());
-$("cancelDialog").addEventListener("click", () => $("assetDialog").close());
-$("licenseBtn").addEventListener("click", async () => { try { const result = await window.assetAPI.importLicense(); if (!result.canceled) { licence = result.status; render(); toast(`Licence activated for ${licence.assetLimit.toLocaleString()} assets`); } } catch (error) { toast(error.message || "Licence activation failed"); } });
-["search","statusFilter","categoryFilter"].forEach(id => $(id).addEventListener("input", render));
-async function exportData() { const result = await window.assetAPI.exportData(store); if (!result.canceled) toast("Backup exported"); }
-$("exportBtn").addEventListener("click", exportData); $("exportSide").addEventListener("click", exportData);
-$("importBtn").addEventListener("click", async () => { try { const result = await window.assetAPI.importData(); if (!result.canceled) { store = result.store; render(); toast("Asset database imported"); } } catch (error) { toast(error.message || "Import failed"); } });
-(async () => { [store, licence] = await Promise.all([window.assetAPI.load(), window.assetAPI.licenseStatus()]); render(); })();
+function render(){renderDashboard();renderAssets();renderSecondary()}
+const viewCopy={dashboard:['Asset Dashboard','Current inventory, value, condition, and upcoming work.'],assets:['Assets','Search, edit, and manage every asset.'],maintenance:['Maintenance','Upcoming and overdue maintenance work.'],reports:['Reports','A concise view of your asset portfolio.'],pricing:['Pricing & Licence','Your purchased tier and enforced asset allowance.'],labels:['Scan & Labels','Printable identification labels for your assets.'],assistant:['AI Assistant','A quick operational summary of your inventory.'],settings:['Settings','Licence, backup, and data migration tools.']};
+function showView(name){currentView=name;document.querySelectorAll('.view').forEach(v=>v.hidden=v.dataset.view!==name);document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.view===name));[$('pageTitle').textContent,$('pageSubtitle').textContent]=viewCopy[name];$('pageActions').hidden=!['dashboard','assets'].includes(name)}
+function openEditor(a){if(!a&&(!licence.valid||store.assets.length>=licence.assetLimit))return toast(licence.valid?'Your '+Number(licence.assetLimit).toLocaleString()+'-asset licence is full.':'Activate a licence before adding assets.');$('assetForm').reset();$('recordId').value=a?.id||'';$('dialogTitle').textContent=a?'Edit asset':'Add asset';fields.forEach(k=>{if(a&&a[k]!=null)$(k).value=a[k]});$('assetDialog').showModal();$('assetId').focus()}
+async function save(next,message){try{store=await window.assetAPI.save(next);render();toast(message);return true}catch(e){toast(e.message||'Save failed');return false}}
+$('assetForm').addEventListener('submit',async e=>{e.preventDefault();const id=$('recordId').value||crypto.randomUUID(),a={id,updatedAt:new Date().toISOString()};fields.forEach(k=>a[k]=$(k).value.trim());const dup=store.assets.find(x=>x.assetId.toLowerCase()===a.assetId.toLowerCase()&&x.id!==id);if(dup)return toast('Asset ID already exists');const i=store.assets.findIndex(x=>x.id===id);if(i<0&&(!licence.valid||store.assets.length>=licence.assetLimit))return toast(licence.valid?'Your licence is full.':'Activate a licence first.');const assets=[...store.assets];if(i>=0)assets[i]={...assets[i],...a};else assets.unshift({...a,createdAt:a.updatedAt});if(await save({...store,assets},i>=0?'Asset updated':'Asset added'))$('assetDialog').close()});
+$('tableHost').addEventListener('click',async e=>{const edit=e.target.closest('[data-edit]'),del=e.target.closest('[data-delete]');if(edit)openEditor(store.assets.find(a=>a.id===edit.dataset.edit));if(del){const a=store.assets.find(x=>x.id===del.dataset.delete);if(confirm('Delete '+a.name+'? This cannot be undone.'))await save({...store,assets:store.assets.filter(x=>x.id!==a.id)},'Asset deleted')}});
+document.querySelectorAll('.nav-item').forEach(n=>n.addEventListener('click',()=>showView(n.dataset.view)));$('addBtn').addEventListener('click',()=>openEditor());$('closeDialog').addEventListener('click',()=>$('assetDialog').close());$('cancelDialog').addEventListener('click',()=>$('assetDialog').close());['search','statusFilter','categoryFilter'].forEach(id=>$(id).addEventListener('input',renderAssets));
+async function activate(){try{const r=await window.assetAPI.importLicense();if(!r.canceled){licence=r.status;render();toast('Licence activated for '+Number(licence.assetLimit).toLocaleString()+' assets')}}catch(e){toast(e.message||'Licence activation failed')}}document.querySelectorAll('.activate-license').forEach(b=>b.addEventListener('click',activate));
+$('exportBtn').addEventListener('click',async()=>{const r=await window.assetAPI.exportData(store);if(!r.canceled)toast('Backup exported')});$('importBtn').addEventListener('click',async()=>{try{const r=await window.assetAPI.importData();if(!r.canceled){store=r.store;render();toast('Asset database imported')}}catch(e){toast(e.message||'Import failed')}});$('csvBtn').addEventListener('click',async()=>{try{const r=await window.assetAPI.exportCsv(store);if(!r.canceled)toast('CSV exported')}catch(e){toast(e.message||'CSV export failed')}});
+(async()=>{[store,licence]=await Promise.all([window.assetAPI.load(),window.assetAPI.licenseStatus()]);render();showView(currentView)})();
