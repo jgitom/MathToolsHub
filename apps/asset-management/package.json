@@ -1,0 +1,49 @@
+{
+  "name": "mathtoolshub-asset-management",
+  "version": "1.0.0",
+  "description": "Offline desktop asset inventory and assignment management for schools and organisations.",
+  "main": "main.cjs",
+  "author": "MathToolsHub",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win nsis",
+    "dist:mac": "electron-builder --mac dmg zip"
+  },
+  "devDependencies": {
+    "electron": "38.1.2",
+    "electron-builder": "26.0.12"
+  },
+  "build": {
+    "appId": "com.mathtoolshub.assetmanagement",
+    "productName": "MathToolsHub Asset Management",
+    "asar": true,
+    "directories": { "output": "dist" },
+    "files": ["main.cjs", "preload.cjs", "index.html", "renderer.js"],
+    "win": {
+      "signAndEditExecutable": false,
+      "target": [
+        { "target": "nsis", "arch": ["x64"] }
+      ],
+      "artifactName": "MathToolsHub-Asset-Management-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "mac": {
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] },
+        { "target": "zip", "arch": ["x64", "arm64"] }
+      ],
+      "category": "public.app-category.business",
+      "artifactName": "MathToolsHub-Asset-Management-${version}-${arch}.${ext}"
+    },
+    "dmg": { "title": "MathToolsHub Asset Management" }
+  }
+}
