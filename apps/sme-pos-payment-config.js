@@ -20,7 +20,12 @@
   })
     .then(response => response.json())
     .then(config => {
-      if (!config || !Array.isArray(config.plans)) return;
+      // Checkout disabled (default until SME_POS_CHECKOUT_ENABLED=true) — keep plans but no URLs.
+      if (!config || config.mode === "disabled" || !Array.isArray(config.plans) || !config.plans.length) {
+        window.MATHTOOLSHUB_SME_POS_PAYMENT = Object.freeze({ mode: "disabled", product: "mathtoolshub-sme-pos", plans: FALLBACK.plans });
+        document.dispatchEvent(new CustomEvent("sme-pos-payment-ready"));
+        return;
+      }
       const merged = FALLBACK.plans.map(fallbackPlan => {
         const live = config.plans.find(plan => plan.itemLimit === fallbackPlan.itemLimit);
         return Object.freeze({ ...fallbackPlan, checkoutUrl: live?.checkoutUrl ?? fallbackPlan.checkoutUrl });
