@@ -27,6 +27,8 @@ button{cursor:pointer}
 .page{display:none}.page.active{display:block}
 .pos-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(330px,.9fr);gap:18px}
 .search-row{display:flex;gap:10px;margin-bottom:14px}.search-row input{flex:1}
+.scan-hint{color:var(--muted);font-size:12px;margin:-6px 0 12px;line-height:1.5}
+.scan-hint.active{color:#166534;font-weight:700}
 input,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:11px;background:#fff;outline:none}
 input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
 .btn{border:0;border-radius:11px;padding:11px 14px;font-weight:700;background:#e2e8f0;color:#0f172a}
@@ -74,6 +76,10 @@ input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
 .pkg .p-once{color:var(--muted);font-size:12px}
 .pkg.active{border:2px solid var(--brand);background:#eff6ff}
 .licence-activate{display:grid;grid-template-columns:1fr auto;gap:10px}
+.scanner-info{line-height:1.7;color:var(--muted)}
+.scanner-info p{margin:0 0 10px}
+.scanner-info ul{margin:0;padding-left:20px;display:grid;gap:6px}
+.scanner-info code{background:#f1f5f9;padding:2px 6px;border-radius:6px;color:#0f172a}
 @media(max-width:820px){.pkg-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:480px){.pkg-grid{grid-template-columns:1fr}.licence-activate{grid-template-columns:1fr}}
 .mobile-menu{display:none}
@@ -108,9 +114,10 @@ input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
       <div class="pos-grid">
         <div>
           <div class="search-row">
-            <input id="productSearch" placeholder="Search product / SKU / barcode..." autofocus />
-            <button class="btn" onclick="document.getElementById('productSearch').focus()">⌨ Scan</button>
+            <input id="productSearch" placeholder="Search or scan barcode / SKU..." autofocus autocomplete="off" autocapitalize="off" spellcheck="false" />
+            <button class="btn" onclick="manualScan()">⌨ Scan</button>
           </div>
+          <div class="scan-hint" id="scanHint">Scanning ready — works with any USB / Bluetooth / wireless barcode scanner (HID keyboard mode).</div>
           <div class="products-grid" id="productGrid"></div>
         </div>
         <div class="card cart">
@@ -180,6 +187,20 @@ input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
           <button class="btn" onclick="exportBackup()">Download Backup</button>
           <label class="btn">Restore Backup <input type="file" accept=".json" hidden onchange="restoreBackup(event)"></label>
           <button class="btn danger" onclick="resetDemo()">Reset Demo Data</button>
+        </div>
+      </div>
+      <div class="card section-card">
+        <h2>Barcode Scanner</h2>
+        <div class="scanner-info">
+          <p><strong>Compatible with any barcode scanner</strong> — USB, Bluetooth, and 2.4 GHz wireless models that emulate a keyboard (HID). Common brands (Zebra, Honeywell, Socket Mobile, Wasp, etc.) work out of the box.</p>
+          <ul>
+            <li>Plug the scanner in and it works immediately — no driver installation needed.</li>
+            <li>Scans are detected even when the search box is not focused.</li>
+            <li>Enter, Tab, or no-suffix scanners are all supported automatically.</li>
+            <li>Auto-commits when a barcode is scanned; beeps and shows feedback on the Point of Sale page.</li>
+            <li>Manual entry also works — click <strong>⌨ Scan</strong> or type a SKU and press Enter.</li>
+          </ul>
+          <p class="sub" style="margin:10px 0 0">If your scanner appends extra characters, most models can be configured in their setup manual (usually by scanning a "suffix none" or "enter suffix" barcode). The app already strips common suffixes such as <code>;</code>, <code>_</code>, <code>:</code>, and <code>/</code>.</p>
         </div>
       </div>
       <div class="card section-card">
@@ -321,14 +342,77 @@ function renderProducts(filter=''){
    <div class="p-icon">${esc(p.icon||'📦')}</div><div class="p-name">${esc(p.name)}</div>
    <div class="p-meta"><span>${money(p.price)}</span><span>Stock ${p.stock}</span></div></div>`).join('');
 }
-document.getElementById('productSearch').addEventListener('input',e=>renderProducts(e.target.value));
-document.getElementById('productSearch').addEventListener('keydown',e=>{
- if(e.key==='Enter'){
-  const q=e.target.value.trim().toLowerCase();
-  const exact=db.products.find(p=>String(p.sku).toLowerCase()===q);
-  if(exact){addToCart(exact.id); e.target.value='';renderProducts()}
+// ---- Universal barcode scanner support ----
+// Works with any HID/keyboard-emulating scanner (USB, Bluetooth, 2.4GHz):
+// - Captures keystrokes even when the search box is not focused
+// - Detects scanner bursts by fast inter-key timing (humans rarely type 2+ keys <60ms apart)
+// - Accepts Enter, Tab, or no suffix (auto-commit on pause after a fast burst)
+// - Strips common scanner prefixes/suffixes (e.g. ; _ : /)
+let scanBuf="",scanActive=false,scanTimer=null,scanLast=0,scanHintTimer=null;
+const SCAN_MAX_GAP=60;      // ms between keystrokes that still count as a scanner
+const SCAN_COMMIT_PAUSE=200;// ms pause after last key = end of scan (no-suffix scanners)
+const hintEl=()=>document.getElementById('scanHint');
+function scanBeep(ok){try{const ctx=new (window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=ok?1200:300;o.connect(g);g.connect(ctx.destination);g.gain.value=.06;o.start();setTimeout(()=>{o.stop();ctx.close()},ok?90:160)}catch(e){}}
+function scanFlash(ok){const h=hintEl();if(!h)return;h.classList.add('active');h.style.color=ok?'#166534':'#991b1b';h.textContent=ok?'Scan matched':'Barcode not found';clearTimeout(scanHintTimer);scanHintTimer=setTimeout(()=>{h.classList.remove('active');h.style.color='';h.textContent='Scanning ready — works with any USB / Bluetooth / wireless barcode scanner (HID keyboard mode).'},1800)}
+function normalizeScan(raw){
+ let s=String(raw||'').trim();
+ // Strip leading/trailing characters that common scanners append or prepend.
+ s=s.replace(/^[^A-Za-z0-9]+/,'').replace(/[^A-Za-z0-9]+$/,'');
+ return s;
+}
+function commitScan(){
+ if(scanTimer){clearTimeout(scanTimer);scanTimer=null}
+ const raw=scanBuf;scanBuf='';scanActive=false;
+ const code=normalizeScan(raw);
+ if(!code)return;
+ // Exact SKU match first, then SKU/name contains, case-insensitive.
+ const q=code.toLowerCase();
+ const p=db.products.find(x=>String(x.sku).toLowerCase()===q)
+      ||db.products.find(x=>String(x.sku).toLowerCase().includes(q))
+      ||db.products.find(x=>String(x.name).toLowerCase().includes(q));
+ if(p){addToCart(p.id);scanBeep(true);scanFlash(true);}
+ else{scanBeep(false);scanFlash(false);}
+ // Keep the search box tidy.
+ const s=document.getElementById('productSearch');
+ if(s&&document.activeElement===s){s.value='';renderProducts();}
+}
+document.addEventListener('keydown',e=>{
+ // Only capture when we are not typing inside a real form control other than the scan box.
+ const tag=(e.target&&e.target.tagName?e.target.tagName.toLowerCase():'');
+ const isField=(tag==='input'||tag==='textarea'||tag==='select');
+ if(isField&&e.target.id!=='productSearch')return; // let Settings/Product form behave normally
+ if(e.ctrlKey||e.altKey||e.metaKey)return;
+ const now=Date.now();
+ if(e.key&&e.key.length===1){
+  const gap=scanBuf?now-scanLast:0;
+  scanLast=now;
+  // Fast consecutive keystrokes identify a scanner burst.
+  if(scanBuf&&gap<=SCAN_MAX_GAP){scanActive=true;}
+  else if(scanBuf&&gap>SCAN_MAX_GAP){if(scanActive)commitScan();scanBuf='';scanActive=false;}
+  scanBuf+=e.key;
+  if(scanTimer)clearTimeout(scanTimer);
+  // Auto-commit only after a scanner burst, never for slow manual typing.
+  scanTimer=setTimeout(()=>{if(scanActive)commitScan();else{scanBuf='';scanActive=false;}},SCAN_COMMIT_PAUSE);
+  if(!(e.target&&e.target.id==='productSearch')){e.preventDefault();}
+  return;
+ }
+ // Enter / Tab / Return from scanner or manual = commit the pending scan.
+ if(e.key==='Enter'||e.key==='Tab'||e.key==='Return'){
+  if(scanBuf){e.preventDefault();commitScan();}
  }
 });
+function manualScan(){
+ const s=document.getElementById('productSearch');
+ if(!s)return;
+ const q=normalizeScan(s.value);
+ if(!q){toast('Type or scan a barcode first');s.focus();return}
+ scanBuf=q;commitScan();
+}
+document.getElementById('productSearch').addEventListener('keydown',e=>{
+ // Manual Enter in the scan box triggers the same matcher.
+ if(e.key==='Enter'){e.preventDefault();if(!scanBuf)manualScan();}
+});
+document.getElementById('productSearch').addEventListener('input',e=>renderProducts(e.target.value));
 function addToCart(id){
  const p=db.products.find(x=>x.id===id); if(!p||p.stock<=0){toast('Out of stock');return}
  let item=cart.find(x=>x.id===id);
