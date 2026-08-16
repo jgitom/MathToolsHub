@@ -113,7 +113,7 @@ input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
       <button data-page="dashboard">📊 Dashboard</button>
       <button data-page="settings">⚙️ Settings</button>
     </div>
-    <div class="side-note">Offline-first demo. Data is stored in this browser using localStorage.</div>
+    <div class="side-note">Offline-first demo. Data is stored securely in this browser using IndexedDB.</div>
   </aside>
 
   <main class="main">
@@ -205,6 +205,7 @@ input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
           <label class="btn">Restore Backup <input type="file" accept=".json" hidden onchange="restoreBackup(event)"></label>
           <button class="btn danger" onclick="resetDemo()">Reset Demo Data</button>
         </div>
+        <p class="sub" style="margin:12px 0 0">All data is stored locally in your browser's IndexedDB — no upload, and it survives restarts. Download a backup to move data between devices.</p>
       </div>
       <div class="card section-card">
         <h2>Barcode Scanner</h2>
@@ -265,6 +266,9 @@ input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
 
 <script>
 const KEY='sme_pos_v1';
+const LICENCE_KEY='sme_pos_licence_v1';
+// Synchronous snapshot used before the async IndexedDB boot completes.
+let memDb=null,memLicence=null;
 const defaultData={
  settings:{business:'My SME Store',phone:'012-3456789',address:'Sabah, Malaysia',tax:0,currency:'RM'},
  products:[
@@ -290,7 +294,6 @@ const PACKAGES=[
  {limit:50000,price:599},
  {limit:100000,price:799}
 ];
-const LICENCE_KEY='sme_pos_licence_v1';
 function loadLicence(){try{return JSON.parse(localStorage.getItem(LICENCE_KEY))||null}catch(e){return null}}
 function saveLicence(x){localStorage.setItem(LICENCE_KEY,JSON.stringify(x))}
 let licence=loadLicence();
@@ -309,6 +312,13 @@ async function verifyLicenceDoc(doc){
 function webCryptoSupported(){
  return typeof crypto!=="undefined"&&!!crypto.subtle&&(window.isSecureContext!==false);
 }
+function checkBrowser(){
+ // Licence verification needs Ed25519 WebCrypto (Chrome 91+, Firefox 101+, Safari 16.4+, Edge 91+).
+ const oldBrowser=!webCryptoSupported()||typeof crypto==="undefined"||!crypto.subtle;
+ const warn=document.getElementById('browserWarn');
+ if(warn&&oldBrowser)warn.hidden=false;
+}
+checkBrowser();
 async function activateLicence(){
  const raw=document.getElementById("licenceInput").value.trim();
  if(!raw){toast("Paste a licence file first");return}
@@ -328,17 +338,58 @@ function renderLicence(){
 }
 
 function clone(x){return JSON.parse(JSON.stringify(x))}
-function checkBrowser(){
- // Licence verification needs Ed25519 WebCrypto (Chrome 91+, Firefox 101+, Safari 16.4+, Edge 91+).
- const oldBrowser=!webCryptoSupported()||typeof crypto==="undefined"||!crypto.subtle;
- const warn=document.getElementById('browserWarn');
- if(warn&&oldBrowser)warn.hidden=false;
+// ---- IndexedDB storage layer (primary store, async) ----
+// Replaces localStorage as the authoritative persistence: larger capacity,
+// survives more browser privacy settings, and is ready for 100k-item catalogues.
+const IDB_NAME='sme_pos_db',IDB_VERSION=1,IDB_STORE='kv';
+let idbDb=null,idbOpening=null;
+function idbOpen(){
+ if(idbOpening)return idbOpening;
+ idbOpening=new Promise(resolve=>{
+  if(typeof indexedDB==='undefined'){idbDb=null;resolve(null);return}
+  const req=indexedDB.open(IDB_NAME,IDB_VERSION);
+  req.onupgradeneeded=()=>{const d=req.result;if(!d.objectStoreNames.contains(IDB_STORE))d.createObjectStore(IDB_STORE)};
+  req.onsuccess=()=>{idbDb=req.result;resolve(idbDb)};
+  req.onerror=()=>{idbDb=null;resolve(null)};
+ });
+ return idbOpening;
 }
-checkBrowser();
+async function idbGet(key){
+ try{const d=await idbOpen();if(!d)return null;return await new Promise(res=>{const r=d.transaction(IDB_STORE,'readonly').objectStore(IDB_STORE).get(key);r.onsuccess=()=>res(r.result??null);r.onerror=()=>res(null)})}catch(e){return null}
+}
+async function idbPut(key,val){
+ try{const d=await idbOpen();if(!d)return;await new Promise(res=>{const r=d.transaction(IDB_STORE,'readwrite').objectStore(IDB_STORE).put(val,key);r.onsuccess=()=>res();r.onerror=()=>res()})}catch(e){}
+}
+// Synchronous snapshot used before the async IndexedDB boot completes.
 function load(){
- try{const x=JSON.parse(localStorage.getItem(KEY));return x||clone(defaultData)}catch(e){return clone(defaultData)}
+ // 1) in-memory cache (set by boot from IndexedDB), 2) localStorage migration source, 3) defaults
+ if(memDb)return clone(memDb);
+ try{return JSON.parse(localStorage.getItem(KEY))||clone(defaultData)}catch(e){return clone(defaultData)}
 }
-function save(){localStorage.setItem(KEY,JSON.stringify(db))}
+function save(){
+ // Callers mutate `db` in memory; persist async to IndexedDB (authoritative) + localStorage (backup).
+ const snap=clone(db);
+ memDb=snap;
+ try{localStorage.setItem(KEY,JSON.stringify(snap))}catch(e){}
+ idbPut(KEY,snap);
+}
+// ---- Licence storage (also IndexedDB-backed) ----
+function loadLicence(){if(memLicence)return clone(memLicence);try{return JSON.parse(localStorage.getItem(LICENCE_KEY))||null}catch(e){return null}}
+function saveLicence(x){memLicence=x;try{localStorage.setItem(LICENCE_KEY,JSON.stringify(x))}catch(e){};idbPut(LICENCE_KEY,x)}
+// Boot: load authoritative data from IndexedDB, then refresh the UI.
+(async function boot(){
+ const [storedDb,storedLicence]=await Promise.all([idbGet(KEY),idbGet(LICENCE_KEY)]);
+ if(storedDb){memDb=storedDb;db={...clone(defaultData),...storedDb,assets:Array.isArray(storedDb.assets)?storedDb.assets:[]};}
+ else{
+  // Migrate any legacy localStorage data into IndexedDB exactly once.
+  try{const legacy=JSON.parse(localStorage.getItem(KEY));if(legacy){db={...clone(defaultData),...legacy,assets:Array.isArray(legacy.assets)?legacy.assets:[]};save();}}catch(e){}
+ }
+ if(storedLicence){memLicence=storedLicence;licence=storedLicence;}
+ else{
+  try{const legacy=JSON.parse(localStorage.getItem(LICENCE_KEY));if(legacy){licence=legacy;saveLicence(legacy);}}catch(e){}
+ }
+ try{applySettings();renderProducts();renderCart();renderStockAlerts();renderLicence();}catch(e){}
+})();
 function money(n){return `${db.settings.currency}${Number(n||0).toFixed(2)}`}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
@@ -551,7 +602,6 @@ function exportBackup(){download('sme-pos-backup.json',JSON.stringify(db,null,2)
 function restoreBackup(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{db=JSON.parse(r.result);save();location.reload()}catch{toast('Invalid backup file')}};r.readAsText(f)}
 function resetDemo(){if(!confirm('Reset all POS data?'))return;db=clone(defaultData);save();location.reload()}
 function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();URL.revokeObjectURL(a.href)}
-applySettings();renderProducts();renderCart();renderStockAlerts();
 </script>
 </body>
 </html>
