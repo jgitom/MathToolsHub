@@ -80,6 +80,7 @@ input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
 .scanner-info p{margin:0 0 10px}
 .scanner-info ul{margin:0;padding-left:20px;display:grid;gap:6px}
 .scanner-info code{background:#f1f5f9;padding:2px 6px;border-radius:6px;color:#0f172a}
+.browser-warn{margin-bottom:14px;padding:12px 14px;border:1px solid #fcd34d;border-radius:12px;color:#713f12;background:#fffbeb;font-size:13px;line-height:1.5}
 @media(max-width:820px){.pkg-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:480px){.pkg-grid{grid-template-columns:1fr}.licence-activate{grid-template-columns:1fr}}
 .mobile-menu{display:none}
@@ -105,6 +106,7 @@ input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
   </aside>
 
   <main class="main">
+    <div class="browser-warn" id="browserWarn" hidden>⚠️ This browser is quite old. For the best experience use a recent version of Chrome, Edge, Firefox, or Safari. Licence activation needs a browser from 2023 or newer.</div>
     <div class="topbar">
       <div><h1 id="pageTitle">Point of Sale</h1><div class="sub" id="businessLabel">My SME Store</div></div>
       <button class="btn mobile-menu" onclick="cyclePage()">☰ Menu</button>
@@ -282,11 +284,15 @@ async function verifyLicenceDoc(doc){
  if(!doc||typeof doc!=="object"||!doc.payload||typeof doc.signature!=="string")throw new Error("Invalid licence file.");
  const p=doc.payload;
  if(p.version!==1||p.product!==SME_POS_PRODUCT||![5000,10000,50000,100000].includes(p.assetLimit)||typeof p.purchaseId!=="string"||Number.isNaN(Date.parse(p.issuedAt)))throw new Error("Invalid licence details.");
+ if(typeof crypto==="undefined"||!crypto.subtle)throw new Error("Licence verification needs a secure connection (HTTPS) and a modern browser.");
  const key=await crypto.subtle.importKey("spki",Uint8Array.from(atob(SME_POS_PUBLIC_KEY),c=>c.charCodeAt(0)),{name:"Ed25519"},false,["verify"]);
  const sig=Uint8Array.from(atob(doc.signature),c=>c.charCodeAt(0));
  const ok=await crypto.subtle.verify("Ed25519",key,new TextEncoder().encode(JSON.stringify(p)),sig);
  if(!ok)throw new Error("The licence signature is invalid.");
  return Object.freeze({valid:true,assetLimit:p.assetLimit,purchaseId:p.purchaseId,issuedAt:p.issuedAt});
+}
+function webCryptoSupported(){
+ return typeof crypto!=="undefined"&&!!crypto.subtle&&(window.isSecureContext!==false);
 }
 async function activateLicence(){
  const raw=document.getElementById("licenceInput").value.trim();
@@ -307,6 +313,13 @@ function renderLicence(){
 }
 
 function clone(x){return JSON.parse(JSON.stringify(x))}
+function checkBrowser(){
+ // Licence verification needs Ed25519 WebCrypto (Chrome 91+, Firefox 101+, Safari 16.4+, Edge 91+).
+ const oldBrowser=!webCryptoSupported()||typeof crypto==="undefined"||!crypto.subtle;
+ const warn=document.getElementById('browserWarn');
+ if(warn&&oldBrowser)warn.hidden=false;
+}
+checkBrowser();
 function load(){
  try{const x=JSON.parse(localStorage.getItem(KEY));return x||clone(defaultData)}catch(e){return clone(defaultData)}
 }
