@@ -20,6 +20,8 @@ button{cursor:pointer}
 .nav{display:grid;gap:7px}.nav button{border:0;background:transparent;color:#cbd5e1;padding:12px 14px;border-radius:12px;text-align:left}
 .nav button:hover,.nav button.active{background:#1e293b;color:#fff}
 .side-note{margin-top:auto;padding:12px;color:#94a3b8;font-size:12px;line-height:1.5}
+.side-built{padding:10px 12px;border-top:1px solid #1e293b;color:#94a3b8;font-size:12px}
+.side-built strong{color:#e2e8f0}
 .main{padding:24px;overflow:auto}
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:12px}
 .topbar h1{margin:0;font-size:28px}.sub{color:var(--muted);font-size:14px}
@@ -71,6 +73,9 @@ input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
 .stock-badge.low{background:#ffedd5;color:#9a3412}.stock-badge.out{background:#fee2e2;color:#991b1b}
 .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.form-grid .full{grid-column:1/-1}
 .toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.report-month{display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;font-weight:700}
+.report-month input{width:auto;padding:9px 10px}
+.report-stats .stat .n.small{font-size:17px;line-height:1.3;word-break:break-word}
 .empty{text-align:center;color:var(--muted);padding:30px}
 .modal{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;align-items:center;justify-content:center;padding:16px;z-index:20}
 .modal.show{display:flex}.modal-card{background:#fff;border-radius:18px;width:min(560px,100%);max-height:90vh;overflow:auto;padding:20px}
@@ -110,10 +115,12 @@ input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
       <button class="active" data-page="pos">🧾 Point of Sale</button>
       <button data-page="products">📦 Products</button>
       <button data-page="sales">💳 Sales History</button>
+      <button data-page="reports">📈 Reports</button>
       <button data-page="dashboard">📊 Dashboard</button>
       <button data-page="settings">⚙️ Settings</button>
     </div>
     <div class="side-note">Offline-first demo. Data is stored securely in this browser using IndexedDB.</div>
+    <div class="side-built">Built by <strong>Juil Gitom</strong></div>
   </aside>
 
   <main class="main">
@@ -176,6 +183,24 @@ input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
       </div>
     </section>
 
+    <section class="page" id="page-reports">
+      <div class="card section-card">
+        <div class="toolbar">
+          <h2 style="margin:0">Monthly Sales Report</h2>
+          <label class="report-month"><span>Month</span><input type="month" id="reportMonth" onchange="renderMonthlyReport()"></label>
+          <button class="btn" onclick="exportMonthlyReportCSV()">Export Monthly CSV</button>
+        </div>
+        <div class="stats report-stats">
+          <div class="card stat"><div class="k">Monthly Sales</div><div class="n" id="reportTotal">RM0.00</div></div>
+          <div class="card stat"><div class="k">Transactions</div><div class="n" id="reportTx">0</div></div>
+          <div class="card stat"><div class="k">Items Sold</div><div class="n" id="reportItems">0</div></div>
+          <div class="card stat"><div class="k">Top Product</div><div class="n small" id="reportTop">—</div></div>
+        </div>
+        <div class="table-wrap" style="margin-top:18px"><table class="table"><thead><tr><th>Date</th><th>Transactions</th><th>Items</th><th>Sales</th><th>Payment mix</th></tr></thead><tbody id="reportTable"></tbody></table></div>
+        <p class="sub" style="margin:14px 0 0" id="reportEmpty">Select a month to view its sales summary.</p>
+      </div>
+    </section>
+
     <section class="page" id="page-dashboard">
       <div class="stats">
         <div class="card stat"><div class="k">Today's Sales</div><div class="n" id="todaySales">RM0.00</div></div>
@@ -230,6 +255,11 @@ input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
           <button class="btn primary" onclick="activateLicence()">Activate</button>
         </div>
         <p class="sub" style="margin:12px 0 0">Select a package, complete payment, and activate the licence file from the checkout success page to raise your item limit.</p>
+      </div>
+      <div class="card section-card">
+        <h2>About</h2>
+        <p class="sub" style="margin:0">SME POS System</p>
+        <p class="sub" style="margin:6px 0 0">Built by <strong style="color:var(--ink)">Juil Gitom</strong> · © 2026 MathToolsHub</p>
       </div>
     </section>
   </main>
@@ -396,7 +426,7 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
 function nextId(){return db.products.reduce((m,p)=>Math.max(m,p.id),0)+1}
 function receiptNo(){return 'R'+new Date().toISOString().replace(/\D/g,'').slice(2,14)+Math.floor(Math.random()*90+10)}
 
-const titles={pos:'Point of Sale',products:'Products & Inventory',sales:'Sales History',dashboard:'Dashboard',settings:'Settings'};
+const titles={pos:'Point of Sale',products:'Products & Inventory',sales:'Sales History',reports:'Monthly Sales Report',dashboard:'Dashboard',settings:'Settings'};
 document.getElementById('nav').addEventListener('click',e=>{
  const b=e.target.closest('button[data-page]');if(!b)return; showPage(b.dataset.page);
 });
@@ -407,10 +437,11 @@ function showPage(name){
  document.getElementById('pageTitle').textContent=titles[name];
  if(name==='products')renderProductsTable();
  if(name==='sales')renderSales();
+ if(name==='reports')initMonthlyReport();
  if(name==='dashboard')renderDashboard();
  if(name==='settings')fillSettings();
 }
-function cyclePage(){const order=['pos','products','sales','dashboard','settings'];let cur=order.find(x=>document.getElementById('page-'+x).classList.contains('active'));showPage(order[(order.indexOf(cur)+1)%order.length])}
+function cyclePage(){const order=['pos','products','sales','reports','dashboard','settings'];let cur=order.find(x=>document.getElementById('page-'+x).classList.contains('active'));showPage(order[(order.indexOf(cur)+1)%order.length])}
 
 function renderProducts(filter=''){
  const q=filter.trim().toLowerCase();
@@ -553,7 +584,8 @@ function showReceipt(s){
  <div class="total-line"><span>Discount</span><span>${money(s.discount)}</span></div>
  <div class="total-line"><span>Tax</span><span>${money(s.tax)}</span></div>
  <div class="total-line grand"><span>TOTAL</span><span>${money(s.total)}</span></div><hr>
- <div class="center">Thank you for your purchase!</div></div>`;
+ <div class="center">Thank you for your purchase!</div>
+ <div class="center" style="margin-top:6px;font-size:11px">Built by Juil Gitom</div></div>`;
  document.getElementById('receiptModal').classList.add('show');
 }
 function closeModal(id){document.getElementById(id).classList.remove('show')}
@@ -583,6 +615,46 @@ function renderSales(){
  salesTable.innerHTML=db.sales.length?db.sales.map(s=>`<tr><td>${esc(s.receipt)}</td><td>${new Date(s.date).toLocaleString()}</td><td>${s.items.reduce((a,i)=>a+i.qty,0)}</td><td>${esc(s.payment)}</td><td><strong>${money(s.total)}</strong></td><td><button class="btn sm" onclick="viewSale(${s.id})">Receipt</button></td></tr>`).join(''):'<tr><td colspan="6" class="empty">No sales yet.</td></tr>';
 }
 function viewSale(id){const s=db.sales.find(x=>x.id===id);if(s)showReceipt(s)}
+function initMonthlyReport(){
+ const input=document.getElementById('reportMonth');
+ if(input&&!input.value){
+  const now=new Date();
+  input.value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+ }
+ renderMonthlyReport();
+}
+function monthSales(monthValue){
+ // monthValue like "2026-08"
+ return db.sales.filter(s=>s.date&&s.date.startsWith(monthValue));
+}
+function renderMonthlyReport(){
+ const input=document.getElementById('reportMonth'),monthValue=input?input.value:'';
+ const empty=document.getElementById('reportEmpty'),table=document.getElementById('reportTable');
+ if(!monthValue){if(empty)empty.textContent='Select a month to view its sales summary.';return}
+ const sales=monthSales(monthValue);
+ const total=sales.reduce((a,s)=>a+s.total,0),tx=sales.length,items=sales.reduce((a,s)=>a+s.items.reduce((b,i)=>b+i.qty,0),0);
+ const sold={};sales.forEach(s=>s.items.forEach(i=>sold[i.name]=(sold[i.name]||0)+i.qty));
+ const topName=Object.entries(sold).sort((a,b)=>b[1]-a[1])[0];
+ document.getElementById('reportTotal').textContent=money(total);
+ document.getElementById('reportTx').textContent=tx;
+ document.getElementById('reportItems').textContent=items;
+ document.getElementById('reportTop').textContent=topName?`${topName[0]} (${topName[1]})`:'—';
+ if(!sales.length){table.innerHTML='<tr><td colspan="5" class="empty">No sales in this month.</td></tr>';if(empty)empty.textContent='';return}
+ const byDay={};
+ sales.forEach(s=>{const day=s.date.slice(0,10);byDay[day]=byDay[day]||{tx:0,items:0,total:0,payments:{}};const d=byDay[day];d.tx++;d.items+=s.items.reduce((a,i)=>a+i.qty,0);d.total+=s.total;d.payments[s.payment]=(d.payments[s.payment]||0)+1});
+ const days=Object.keys(byDay).sort();
+ table.innerHTML=days.map(day=>{const d=byDay[day];const mix=Object.entries(d.payments).map(([k,v])=>`${esc(k)} ${v}`).join(', ');return `<tr><td>${day}</td><td>${d.tx}</td><td>${d.items}</td><td><strong>${money(d.total)}</strong></td><td>${mix}</td></tr>`}).join('');
+ if(empty)empty.textContent=`Showing ${tx} transaction(s) for ${monthValue}.`;
+}
+function exportMonthlyReportCSV(){
+ const input=document.getElementById('reportMonth'),monthValue=input?input.value:'';
+ if(!monthValue){toast('Select a month first');return}
+ const sales=monthSales(monthValue);
+ const rows=[['Month','Date','Receipt','Payment','Items','Subtotal','Discount','Tax','Total'],...sales.map(s=>[monthValue,s.date.slice(0,10),s.receipt,s.payment,s.items.reduce((a,i)=>a+i.qty,0),s.subtotal,s.discount,s.tax,s.total])];
+ const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+ download(`sme-pos-monthly-${monthValue}.csv`,csv,'text/csv');
+ toast('Monthly report exported');
+}
 function renderDashboard(){
  const today=new Date().toDateString(),ts=db.sales.filter(s=>new Date(s.date).toDateString()===today);
  todaySales.textContent=money(ts.reduce((a,s)=>a+s.total,0));todayTx.textContent=ts.length;
