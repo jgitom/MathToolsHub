@@ -14,9 +14,9 @@
     "test": "node --test test/*.test.cjs",
     "start": "electron .",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder",
-    "dist:win": "electron-builder --win nsis",
-    "dist:mac": "electron-builder --mac dmg zip"
+    "dist": "electron-builder --publish never",
+    "dist:win": "electron-builder --win nsis --publish never",
+    "dist:mac": "electron-builder --mac dmg zip --publish never"
   },
   "devDependencies": {
     "electron": "38.1.2",
@@ -26,7 +26,6 @@
     "appId": "com.mathtoolshub.assetmanagement",
     "productName": "MathToolsHub Asset Management",
     "asar": true,
-    "publish": "never",
     "directories": { "output": "dist" },
     "files": ["main.cjs", "preload.cjs", "license.cjs", "index.html", "renderer.js"],
     "win": {
