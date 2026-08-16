@@ -1,86 +1,364 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0f2747">
-    <meta name="description" content="SME POS System — a lightweight point-of-sale application for small and medium enterprises from MathToolsHub.">
-    <title>SME POS System | MathToolsHub</title>
-    <style>
-        :root { --navy:#0f2747; --navy-light:#173b68; --blue:#2563eb; --ink:#172033; --muted:#64748b; --line:#dbe3ec; --surface:#fff; --background:#f4f7fa; }
-        * { box-sizing:border-box; }
-        body { margin:0; min-height:100vh; display:flex; flex-direction:column; color:var(--ink); background:var(--background); font-family:Inter,"Segoe UI",Arial,sans-serif; }
-        a { color:inherit; }
-        header { color:#fff; background:var(--navy); border-bottom:4px solid #3b82f6; }
-        .nav,.hero-inner,.content,.footer-inner { width:min(1120px,calc(100% - 40px)); margin:0 auto; }
-        .nav { min-height:72px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
-        .brand { display:flex; align-items:center; gap:12px; color:#fff; font-weight:750; text-decoration:none; }
-        .brand-mark { width:38px; height:38px; display:grid; place-items:center; border-radius:8px; color:var(--navy); background:#fff; font:800 1.25rem Georgia,serif; }
-        .home-link { color:#dbeafe; font-size:.9rem; font-weight:700; text-decoration:none; }
-        .home-link:hover,.home-link:focus-visible { color:#fff; text-decoration:underline; }
-        .hero { color:#fff; background:linear-gradient(125deg,var(--navy),var(--navy-light) 70%,#1e4d83); }
-        .hero-inner { padding:72px 0 68px; }
-        .eyebrow { margin:0 0 14px; color:#93c5fd; font-size:.78rem; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }
-        h1 { margin:0; font-size:clamp(2.5rem,7vw,4.5rem); letter-spacing:-.045em; }
-        .hero p:last-child { max-width:650px; margin:20px 0 0; color:#cbdcf0; font-size:1.08rem; line-height:1.7; }
-        main { flex:1; }
-        .content { padding:64px 0 80px; }
-        .section-heading { margin-bottom:28px; }
-        .section-heading h2 { margin:0 0 10px; color:var(--navy); font-size:clamp(1.8rem,4vw,2.5rem); }
-        .section-heading p { margin:0; color:var(--muted); line-height:1.65; }
-        .feature-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; }
-        .feature-card { min-height:240px; display:flex; flex-direction:column; padding:30px; border:1px solid var(--line); border-radius:14px; background:var(--surface); box-shadow:0 12px 32px rgba(15,39,71,.08); }
-        .feature-icon { width:56px; height:56px; display:grid; place-items:center; margin-bottom:22px; border-radius:14px; color:var(--blue); background:#eff6ff; font-size:1.5rem; font-weight:900; }
-        .feature-card h2 { margin:0 0 10px; color:var(--navy); font-size:1.3rem; }
-        .feature-card p { margin:0; color:var(--muted); line-height:1.7; }
-        .note { margin-top:34px; padding:20px; border:1px solid var(--line); border-radius:12px; color:var(--muted); background:var(--surface); line-height:1.7; }
-        .note strong { color:var(--navy); }
-        footer { padding:25px 0; border-top:1px solid var(--line); color:var(--muted); background:#fff; font-size:.82rem; }
-        @media(max-width:820px) { .feature-grid { grid-template-columns:1fr 1fr; } }
-        @media(max-width:560px) { .nav,.hero-inner,.content,.footer-inner { width:min(100% - 24px,1120px); } .hero-inner { padding:54px 0; } .content { padding:44px 0 60px; } .feature-grid { grid-template-columns:1fr; } }
-    </style>
-    <link rel="stylesheet" href="../responsive-layout.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SME POS</title>
+<style>
+:root{
+  --bg:#f5f7fb; --panel:#fff; --text:#152033; --muted:#64748b; --line:#e2e8f0;
+  --brand:#2563eb; --brand2:#1d4ed8; --danger:#dc2626; --ok:#16a34a; --warn:#d97706;
+  --shadow:0 10px 30px rgba(15,23,42,.08); --radius:18px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+.sidebar{background:#0f172a;color:#fff;padding:20px 14px;display:flex;flex-direction:column;gap:18px}
+.logo{font-size:22px;font-weight:800;padding:8px 10px}.logo span{color:#60a5fa}
+.nav{display:grid;gap:7px}.nav button{border:0;background:transparent;color:#cbd5e1;padding:12px 14px;border-radius:12px;text-align:left}
+.nav button:hover,.nav button.active{background:#1e293b;color:#fff}
+.side-note{margin-top:auto;padding:12px;color:#94a3b8;font-size:12px;line-height:1.5}
+.main{padding:24px;overflow:auto}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:12px}
+.topbar h1{margin:0;font-size:28px}.sub{color:var(--muted);font-size:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.page{display:none}.page.active{display:block}
+.pos-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(330px,.9fr);gap:18px}
+.search-row{display:flex;gap:10px;margin-bottom:14px}.search-row input{flex:1}
+input,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:11px;background:#fff;outline:none}
+input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
+.btn{border:0;border-radius:11px;padding:11px 14px;font-weight:700;background:#e2e8f0;color:#0f172a}
+.btn.primary{background:var(--brand);color:white}.btn.primary:hover{background:var(--brand2)}
+.btn.danger{background:#fee2e2;color:#991b1b}.btn.success{background:#dcfce7;color:#166534}
+.btn.sm{padding:7px 10px;font-size:13px}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px}
+.product{padding:14px;border:1px solid var(--line);border-radius:15px;background:#fff;cursor:pointer;transition:.15s}
+.product:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:#bfdbfe}
+.p-icon{height:70px;border-radius:12px;background:linear-gradient(135deg,#dbeafe,#eff6ff);display:grid;place-items:center;font-size:30px;margin-bottom:10px}
+.p-name{font-weight:750}.p-meta{display:flex;justify-content:space-between;gap:8px;margin-top:8px;font-size:13px;color:var(--muted)}
+.cart{padding:16px;position:sticky;top:20px}
+.cart-list{display:grid;gap:9px;max-height:42vh;overflow:auto;margin:12px 0}
+.cart-item{border:1px solid var(--line);border-radius:12px;padding:10px}
+.cart-item-top,.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.qty{display:flex;align-items:center;gap:7px;margin-top:8px}.qty button{width:28px;height:28px;border:0;border-radius:8px;background:#f1f5f9}
+.totals{border-top:1px dashed var(--line);padding-top:10px;display:grid;gap:8px}
+.total-line{display:flex;justify-content:space-between}.grand{font-size:22px;font-weight:850}
+.checkout{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.checkout .primary{grid-column:1/-1}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.stat{padding:18px}.stat .n{font-size:26px;font-weight:850;margin-top:6px}
+.stat .k{color:var(--muted);font-size:13px}
+.section-card{padding:18px;margin-bottom:18px}
+.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:720px}
+.table th,.table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
+.table th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.badge{display:inline-block;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:750;background:#e2e8f0}
+.badge.ok{background:#dcfce7;color:#166534}.badge.low{background:#ffedd5;color:#9a3412}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.form-grid .full{grid-column:1/-1}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.empty{text-align:center;color:var(--muted);padding:30px}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;align-items:center;justify-content:center;padding:16px;z-index:20}
+.modal.show{display:flex}.modal-card{background:#fff;border-radius:18px;width:min(560px,100%);max-height:90vh;overflow:auto;padding:20px}
+.receipt{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#111}.receipt h2{text-align:center;margin-bottom:4px}
+.receipt .center{text-align:center}.receipt hr{border:0;border-top:1px dashed #777}
+.toast{position:fixed;right:20px;bottom:20px;background:#0f172a;color:#fff;padding:12px 16px;border-radius:12px;opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s;z-index:30}
+.toast.show{opacity:1;transform:none}
+.mobile-menu{display:none}
+@media(max-width:980px){.app{grid-template-columns:1fr}.sidebar{display:none}.mobile-menu{display:block}.pos-grid{grid-template-columns:1fr}.cart{position:static}.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.main{padding:14px}.stats{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.checkout{grid-template-columns:1fr}.checkout .primary{grid-column:auto}}
+@media print{
+ body *{visibility:hidden}.modal.show,.modal.show *{visibility:visible}.modal{position:absolute;background:#fff;inset:0;padding:0}.modal-card{box-shadow:none;width:80mm;max-height:none}.no-print{display:none!important}
+}
+</style>
 </head>
 <body>
-    <header>
-        <nav class="nav" aria-label="SME POS System navigation">
-            <a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">Σ</span> MathToolsHub</a>
-            <a class="home-link" href="index.html">← Applications</a>
-        </nav>
-    </header>
-    <main>
-        <section class="hero">
-            <div class="hero-inner">
-                <p class="eyebrow">Business application</p>
-                <h1>SME POS System</h1>
-                <p>A lightweight point-of-sale application built for small and medium enterprises to manage sales, products, and daily transactions from one simple interface.</p>
-            </div>
-        </section>
-        <section class="content" aria-labelledby="features-heading">
-            <div class="section-heading">
-                <h2 id="features-heading">Built for everyday selling</h2>
-                <p>Manage your counter with tools designed for speed, accuracy, and offline reliability.</p>
-            </div>
-            <div class="feature-grid">
-                <article class="feature-card">
-                    <div class="feature-icon" aria-hidden="true">🛒</div>
-                    <h2>Sales at the counter</h2>
-                    <p>Add items quickly, apply quantities, and complete transactions with a clear, fast checkout flow.</p>
-                </article>
-                <article class="feature-card">
-                    <div class="feature-icon" aria-hidden="true">📦</div>
-                    <h2>Product catalogue</h2>
-                    <p>Keep a simple catalogue of products with prices, quantities, and categories that stay available offline.</p>
-                </article>
-                <article class="feature-card">
-                    <div class="feature-icon" aria-hidden="true">🧾</div>
-                    <h2>Daily reports</h2>
-                    <p>Review sales summaries and transaction history to understand how your business is performing.</p>
-                </article>
-            </div>
-            <div class="note"><strong>Availability:</strong> The SME POS System application is currently in preparation. Details about the installer and supported platforms will be announced here when it is ready for release.</div>
-        </section>
-    </main>
-    <footer><div class="footer-inner">© 2026 MathToolsHub</div></footer>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo"><span>SME</span> POS</div>
+    <div class="nav" id="nav">
+      <button class="active" data-page="pos">🧾 Point of Sale</button>
+      <button data-page="products">📦 Products</button>
+      <button data-page="sales">💳 Sales History</button>
+      <button data-page="dashboard">📊 Dashboard</button>
+      <button data-page="settings">⚙️ Settings</button>
+    </div>
+    <div class="side-note">Offline-first demo. Data is stored in this browser using localStorage.</div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div><h1 id="pageTitle">Point of Sale</h1><div class="sub" id="businessLabel">My SME Store</div></div>
+      <button class="btn mobile-menu" onclick="cyclePage()">☰ Menu</button>
+    </div>
+
+    <section class="page active" id="page-pos">
+      <div class="pos-grid">
+        <div>
+          <div class="search-row">
+            <input id="productSearch" placeholder="Search product / SKU / barcode..." autofocus />
+            <button class="btn" onclick="document.getElementById('productSearch').focus()">⌨ Scan</button>
+          </div>
+          <div class="products-grid" id="productGrid"></div>
+        </div>
+        <div class="card cart">
+          <div class="row"><strong style="font-size:20px">Current Sale</strong><button class="btn sm danger" onclick="clearCart()">Clear</button></div>
+          <div class="cart-list" id="cartList"></div>
+          <div class="totals">
+            <div class="total-line"><span>Subtotal</span><strong id="subtotal">RM0.00</strong></div>
+            <div class="total-line"><span>Discount</span><strong id="discountValue">RM0.00</strong></div>
+            <div class="total-line"><span>Tax</span><strong id="taxValue">RM0.00</strong></div>
+            <div class="total-line grand"><span>Total</span><span id="grandTotal">RM0.00</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+            <input id="discountInput" type="number" min="0" step="0.01" placeholder="Discount RM" oninput="renderCart()" />
+            <select id="paymentMethod"><option>Cash</option><option>Card</option><option>QR / E-Wallet</option><option>Bank Transfer</option></select>
+          </div>
+          <div class="checkout">
+            <button class="btn" onclick="holdSale()">Hold Sale</button>
+            <button class="btn" onclick="restoreHeld()">Restore Hold</button>
+            <button class="btn primary" onclick="checkout()">Complete Payment</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-products">
+      <div class="card section-card">
+        <div class="toolbar"><h2 style="margin:0">Product & Inventory</h2><button class="btn primary" onclick="openProductForm()">+ Add Product</button></div>
+        <div class="table-wrap"><table class="table"><thead><tr><th>SKU</th><th>Product</th><th>Category</th><th>Price</th><th>Cost</th><th>Stock</th><th>Action</th></tr></thead><tbody id="productsTable"></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-sales">
+      <div class="card section-card">
+        <div class="toolbar">
+          <h2 style="margin:0">Sales History</h2>
+          <button class="btn" onclick="exportSalesCSV()">Export CSV</button>
+        </div>
+        <div class="table-wrap"><table class="table"><thead><tr><th>Receipt</th><th>Date</th><th>Items</th><th>Payment</th><th>Total</th><th>Action</th></tr></thead><tbody id="salesTable"></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-dashboard">
+      <div class="stats">
+        <div class="card stat"><div class="k">Today's Sales</div><div class="n" id="todaySales">RM0.00</div></div>
+        <div class="card stat"><div class="k">Transactions Today</div><div class="n" id="todayTx">0</div></div>
+        <div class="card stat"><div class="k">Inventory Value</div><div class="n" id="inventoryValue">RM0.00</div></div>
+        <div class="card stat"><div class="k">Low Stock Items</div><div class="n" id="lowStockCount">0</div></div>
+      </div>
+      <div class="card section-card"><h2>Top Products</h2><div id="topProducts"></div></div>
+    </section>
+
+    <section class="page" id="page-settings">
+      <div class="card section-card">
+        <h2>Business Settings</h2>
+        <div class="form-grid">
+          <div><label>Business Name</label><input id="setBusiness"></div>
+          <div><label>Phone</label><input id="setPhone"></div>
+          <div class="full"><label>Address</label><input id="setAddress"></div>
+          <div><label>Tax Rate (%)</label><input id="setTax" type="number" min="0" step="0.01"></div>
+          <div><label>Currency</label><select id="setCurrency"><option value="RM">RM</option><option value="$">$</option><option value="SGD">SGD</option><option value="IDR">IDR</option></select></div>
+          <div class="full"><button class="btn primary" onclick="saveSettings()">Save Settings</button></div>
+        </div>
+      </div>
+      <div class="card section-card">
+        <h2>Data Backup</h2>
+        <div class="toolbar">
+          <button class="btn" onclick="exportBackup()">Download Backup</button>
+          <label class="btn">Restore Backup <input type="file" accept=".json" hidden onchange="restoreBackup(event)"></label>
+          <button class="btn danger" onclick="resetDemo()">Reset Demo Data</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="modal" id="productModal">
+  <div class="modal-card">
+    <div class="row"><h2 id="productModalTitle">Add Product</h2><button class="btn sm" onclick="closeModal('productModal')">✕</button></div>
+    <input type="hidden" id="prodId">
+    <div class="form-grid">
+      <div><label>Name</label><input id="prodName"></div>
+      <div><label>SKU / Barcode</label><input id="prodSku"></div>
+      <div><label>Category</label><input id="prodCategory"></div>
+      <div><label>Icon / Emoji</label><input id="prodIcon" value="📦"></div>
+      <div><label>Selling Price</label><input id="prodPrice" type="number" min="0" step="0.01"></div>
+      <div><label>Cost</label><input id="prodCost" type="number" min="0" step="0.01"></div>
+      <div><label>Stock Qty</label><input id="prodStock" type="number" min="0" step="1"></div>
+      <div><label>Low Stock Alert</label><input id="prodLow" type="number" min="0" step="1" value="5"></div>
+      <div class="full"><button class="btn primary" onclick="saveProduct()">Save Product</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="receiptModal">
+  <div class="modal-card">
+    <div id="receiptContent"></div>
+    <div class="row no-print" style="margin-top:14px">
+      <button class="btn" onclick="closeModal('receiptModal')">Close</button>
+      <button class="btn primary" onclick="window.print()">Print Receipt</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY='sme_pos_v1';
+const defaultData={
+ settings:{business:'My SME Store',phone:'012-3456789',address:'Sabah, Malaysia',tax:0,currency:'RM'},
+ products:[
+  {id:1,sku:'1001',name:'Mineral Water',category:'Beverage',icon:'💧',price:2.00,cost:0.90,stock:50,low:10},
+  {id:2,sku:'1002',name:'Coffee',category:'Beverage',icon:'☕',price:4.50,cost:1.50,stock:40,low:8},
+  {id:3,sku:'2001',name:'Chicken Rice',category:'Food',icon:'🍗',price:8.50,cost:4.00,stock:25,low:5},
+  {id:4,sku:'2002',name:'Nasi Lemak',category:'Food',icon:'🍛',price:7.00,cost:3.20,stock:30,low:5},
+  {id:5,sku:'3001',name:'Notebook',category:'Stationery',icon:'📒',price:5.90,cost:2.60,stock:18,low:5},
+  {id:6,sku:'3002',name:'Ball Pen',category:'Stationery',icon:'🖊️',price:1.80,cost:0.60,stock:80,low:15}
+ ],
+ sales:[], held:null
+};
+let db=load();
+let cart=[];
+
+function clone(x){return JSON.parse(JSON.stringify(x))}
+function load(){
+ try{const x=JSON.parse(localStorage.getItem(KEY));return x||clone(defaultData)}catch(e){return clone(defaultData)}
+}
+function save(){localStorage.setItem(KEY,JSON.stringify(db))}
+function money(n){return `${db.settings.currency}${Number(n||0).toFixed(2)}`}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+function nextId(){return db.products.reduce((m,p)=>Math.max(m,p.id),0)+1}
+function receiptNo(){return 'R'+new Date().toISOString().replace(/\D/g,'').slice(2,14)+Math.floor(Math.random()*90+10)}
+
+const titles={pos:'Point of Sale',products:'Products & Inventory',sales:'Sales History',dashboard:'Dashboard',settings:'Settings'};
+document.getElementById('nav').addEventListener('click',e=>{
+ const b=e.target.closest('button[data-page]');if(!b)return; showPage(b.dataset.page);
+});
+function showPage(name){
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+ document.getElementById('page-'+name).classList.add('active');
+ document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===name));
+ document.getElementById('pageTitle').textContent=titles[name];
+ if(name==='products')renderProductsTable();
+ if(name==='sales')renderSales();
+ if(name==='dashboard')renderDashboard();
+ if(name==='settings')fillSettings();
+}
+function cyclePage(){const order=['pos','products','sales','dashboard','settings'];let cur=order.find(x=>document.getElementById('page-'+x).classList.contains('active'));showPage(order[(order.indexOf(cur)+1)%order.length])}
+
+function renderProducts(filter=''){
+ const q=filter.trim().toLowerCase();
+ const items=db.products.filter(p=>!q||[p.name,p.sku,p.category].some(v=>String(v).toLowerCase().includes(q)));
+ const g=document.getElementById('productGrid');
+ if(!items.length){g.innerHTML='<div class="empty card">No products found.</div>';return}
+ g.innerHTML=items.map(p=>`<div class="product" onclick="addToCart(${p.id})">
+   <div class="p-icon">${esc(p.icon||'📦')}</div><div class="p-name">${esc(p.name)}</div>
+   <div class="p-meta"><span>${money(p.price)}</span><span>Stock ${p.stock}</span></div></div>`).join('');
+}
+document.getElementById('productSearch').addEventListener('input',e=>renderProducts(e.target.value));
+document.getElementById('productSearch').addEventListener('keydown',e=>{
+ if(e.key==='Enter'){
+  const q=e.target.value.trim().toLowerCase();
+  const exact=db.products.find(p=>String(p.sku).toLowerCase()===q);
+  if(exact){addToCart(exact.id); e.target.value='';renderProducts()}
+ }
+});
+function addToCart(id){
+ const p=db.products.find(x=>x.id===id); if(!p||p.stock<=0){toast('Out of stock');return}
+ let item=cart.find(x=>x.id===id);
+ if(item){if(item.qty>=p.stock){toast('Not enough stock');return}item.qty++}
+ else cart.push({id:p.id,name:p.name,price:p.price,qty:1});
+ renderCart();
+}
+function changeQty(id,d){
+ let i=cart.find(x=>x.id===id),p=db.products.find(x=>x.id===id);if(!i)return;
+ i.qty+=d;if(i.qty<=0)cart=cart.filter(x=>x.id!==id);else if(i.qty>p.stock){i.qty=p.stock;toast('Stock limit reached')}
+ renderCart();
+}
+function removeCart(id){cart=cart.filter(x=>x.id!==id);renderCart()}
+function clearCart(){cart=[];document.getElementById('discountInput').value='';renderCart()}
+function calc(){
+ const subtotal=cart.reduce((s,i)=>s+i.price*i.qty,0);
+ const discount=Math.min(Math.max(Number(document.getElementById('discountInput').value||0),0),subtotal);
+ const taxable=subtotal-discount;
+ const tax=taxable*(Number(db.settings.tax||0)/100);
+ return{subtotal,discount,tax,total:taxable+tax}
+}
+function renderCart(){
+ const el=document.getElementById('cartList');
+ el.innerHTML=cart.length?cart.map(i=>`<div class="cart-item">
+ <div class="cart-item-top"><div><strong>${esc(i.name)}</strong><div class="sub">${money(i.price)} each</div></div><button class="btn sm danger" onclick="removeCart(${i.id})">✕</button></div>
+ <div class="qty"><button onclick="changeQty(${i.id},-1)">−</button><strong>${i.qty}</strong><button onclick="changeQty(${i.id},1)">+</button><span style="margin-left:auto;font-weight:800">${money(i.price*i.qty)}</span></div>
+ </div>`).join(''):'<div class="empty">Cart is empty</div>';
+ const c=calc();subtotal.textContent=money(c.subtotal);discountValue.textContent=money(c.discount);taxValue.textContent=money(c.tax);grandTotal.textContent=money(c.total);
+}
+function holdSale(){if(!cart.length){toast('Nothing to hold');return}db.held={cart:clone(cart),discount:document.getElementById('discountInput').value};save();clearCart();toast('Sale held')}
+function restoreHeld(){if(!db.held){toast('No held sale');return}cart=clone(db.held.cart);document.getElementById('discountInput').value=db.held.discount||'';db.held=null;save();renderCart();toast('Held sale restored')}
+function checkout(){
+ if(!cart.length){toast('Add products first');return}
+ for(const i of cart){const p=db.products.find(x=>x.id===i.id);if(!p||p.stock<i.qty){toast('Stock changed. Review cart.');return}}
+ const c=calc(),sale={id:Date.now(),receipt:receiptNo(),date:new Date().toISOString(),items:clone(cart),payment:paymentMethod.value,...c};
+ cart.forEach(i=>{db.products.find(p=>p.id===i.id).stock-=i.qty});
+ db.sales.unshift(sale);save();showReceipt(sale);clearCart();renderProducts();toast('Payment completed')}
+function showReceipt(s){
+ const d=new Date(s.date);
+ receiptContent.innerHTML=`<div class="receipt"><h2>${esc(db.settings.business)}</h2>
+ <div class="center">${esc(db.settings.address)}<br>${esc(db.settings.phone)}</div><hr>
+ <div>Receipt: ${esc(s.receipt)}</div><div>${d.toLocaleString()}</div><div>Payment: ${esc(s.payment)}</div><hr>
+ ${s.items.map(i=>`<div>${esc(i.name)}<br><span>${i.qty} × ${money(i.price)}</span><span style="float:right">${money(i.qty*i.price)}</span></div>`).join('<br>')}
+ <hr><div class="total-line"><span>Subtotal</span><span>${money(s.subtotal)}</span></div>
+ <div class="total-line"><span>Discount</span><span>${money(s.discount)}</span></div>
+ <div class="total-line"><span>Tax</span><span>${money(s.tax)}</span></div>
+ <div class="total-line grand"><span>TOTAL</span><span>${money(s.total)}</span></div><hr>
+ <div class="center">Thank you for your purchase!</div></div>`;
+ document.getElementById('receiptModal').classList.add('show');
+}
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+
+function renderProductsTable(){
+ const t=document.getElementById('productsTable');
+ t.innerHTML=db.products.map(p=>`<tr><td>${esc(p.sku)}</td><td>${esc(p.icon)} ${esc(p.name)}</td><td>${esc(p.category)}</td><td>${money(p.price)}</td><td>${money(p.cost)}</td>
+ <td><span class="badge ${p.stock<=p.low?'low':'ok'}">${p.stock}</span></td><td><button class="btn sm" onclick="openProductForm(${p.id})">Edit</button> <button class="btn sm danger" onclick="deleteProduct(${p.id})">Delete</button></td></tr>`).join('');
+}
+function openProductForm(id){
+ const p=id?db.products.find(x=>x.id===id):null;
+ productModalTitle.textContent=p?'Edit Product':'Add Product';prodId.value=p?.id||'';prodName.value=p?.name||'';prodSku.value=p?.sku||'';prodCategory.value=p?.category||'';prodIcon.value=p?.icon||'📦';prodPrice.value=p?.price??'';prodCost.value=p?.cost??'';prodStock.value=p?.stock??0;prodLow.value=p?.low??5;
+ document.getElementById('productModal').classList.add('show');
+}
+function saveProduct(){
+ const name=prodName.value.trim(),sku=prodSku.value.trim();if(!name||!sku){toast('Name and SKU are required');return}
+ const dupe=db.products.find(p=>p.sku===sku&&String(p.id)!==prodId.value);if(dupe){toast('SKU already exists');return}
+ const obj={id:prodId.value?Number(prodId.value):nextId(),name,sku,category:prodCategory.value.trim()||'General',icon:prodIcon.value.trim()||'📦',price:Number(prodPrice.value||0),cost:Number(prodCost.value||0),stock:Number(prodStock.value||0),low:Number(prodLow.value||0)};
+ if(prodId.value)db.products[db.products.findIndex(p=>p.id===obj.id)]=obj;else db.products.push(obj);
+ save();closeModal('productModal');renderProductsTable();renderProducts();toast('Product saved');
+}
+function deleteProduct(id){if(!confirm('Delete this product?'))return;db.products=db.products.filter(p=>p.id!==id);save();renderProductsTable();renderProducts()}
+function renderSales(){
+ salesTable.innerHTML=db.sales.length?db.sales.map(s=>`<tr><td>${esc(s.receipt)}</td><td>${new Date(s.date).toLocaleString()}</td><td>${s.items.reduce((a,i)=>a+i.qty,0)}</td><td>${esc(s.payment)}</td><td><strong>${money(s.total)}</strong></td><td><button class="btn sm" onclick="viewSale(${s.id})">Receipt</button></td></tr>`).join(''):'<tr><td colspan="6" class="empty">No sales yet.</td></tr>';
+}
+function viewSale(id){const s=db.sales.find(x=>x.id===id);if(s)showReceipt(s)}
+function renderDashboard(){
+ const today=new Date().toDateString(),ts=db.sales.filter(s=>new Date(s.date).toDateString()===today);
+ todaySales.textContent=money(ts.reduce((a,s)=>a+s.total,0));todayTx.textContent=ts.length;
+ inventoryValue.textContent=money(db.products.reduce((a,p)=>a+p.cost*p.stock,0));lowStockCount.textContent=db.products.filter(p=>p.stock<=p.low).length;
+ const sold={};db.sales.forEach(s=>s.items.forEach(i=>sold[i.id]=(sold[i.id]||0)+i.qty));
+ const top=Object.entries(sold).sort((a,b)=>b[1]-a[1]).slice(0,5);
+ topProducts.innerHTML=top.length?top.map(([id,q],idx)=>{const p=db.products.find(x=>x.id==id);return `<div class="row" style="padding:10px 0;border-bottom:1px solid var(--line)"><span>${idx+1}. ${esc(p?.name||'Deleted product')}</span><strong>${q} sold</strong></div>`}).join(''):'<div class="empty">Sales data will appear here.</div>';
+}
+function fillSettings(){setBusiness.value=db.settings.business;setPhone.value=db.settings.phone;setAddress.value=db.settings.address;setTax.value=db.settings.tax;setCurrency.value=db.settings.currency}
+function saveSettings(){db.settings={business:setBusiness.value.trim()||'My SME Store',phone:setPhone.value.trim(),address:setAddress.value.trim(),tax:Number(setTax.value||0),currency:setCurrency.value};save();applySettings();renderCart();renderProducts();toast('Settings saved')}
+function applySettings(){businessLabel.textContent=db.settings.business}
+function exportSalesCSV(){
+ const rows=[['Receipt','Date','Payment','Items','Subtotal','Discount','Tax','Total'],...db.sales.map(s=>[s.receipt,s.date,s.payment,s.items.map(i=>`${i.name} x${i.qty}`).join('; '),s.subtotal,s.discount,s.tax,s.total])];
+ const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');download('sales.csv',csv,'text/csv');
+}
+function exportBackup(){download('sme-pos-backup.json',JSON.stringify(db,null,2),'application/json')}
+function restoreBackup(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{db=JSON.parse(r.result);save();location.reload()}catch{toast('Invalid backup file')}};r.readAsText(f)}
+function resetDemo(){if(!confirm('Reset all POS data?'))return;db=clone(defaultData);save();location.reload()}
+function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();URL.revokeObjectURL(a.href)}
+applySettings();renderProducts();renderCart();
+</script>
 </body>
 </html>
