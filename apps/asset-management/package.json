@@ -26,6 +26,7 @@
     "appId": "com.mathtoolshub.assetmanagement",
     "productName": "MathToolsHub Asset Management",
     "asar": true,
+    "publish": "never",
     "directories": { "output": "dist" },
     "files": ["main.cjs", "preload.cjs", "license.cjs", "index.html", "renderer.js"],
     "win": {
