@@ -1,0 +1,43 @@
+{
+  "name": "mathtoolshub-sme-pos",
+  "version": "1.0.0",
+  "description": "Offline point-of-sale system for small and medium enterprises — sales, products, barcode scanning, receipts, reports and 4-tier licensing.",
+  "main": "main.cjs",
+  "author": "MathToolsHub",
+  "license": "UNLICENSED",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jgitom/MathToolsHub.git"
+  },
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --publish never",
+    "dist:win": "electron-builder --win nsis --publish never"
+  },
+  "devDependencies": {
+    "electron": "38.1.2",
+    "electron-builder": "26.0.12"
+  },
+  "build": {
+    "appId": "com.mathtoolshub.smepos",
+    "productName": "MathToolsHub SME POS",
+    "asar": true,
+    "directories": { "output": "dist" },
+    "files": ["main.cjs", "preload.cjs", "index.html"],
+    "win": {
+      "signAndEditExecutable": false,
+      "target": [
+        { "target": "nsis", "arch": ["x64"] }
+      ],
+      "artifactName": "MathToolsHub-SME-POS-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}
