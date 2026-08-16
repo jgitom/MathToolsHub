@@ -38,6 +38,8 @@ input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
 .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px}
 .product{padding:14px;border:1px solid var(--line);border-radius:15px;background:#fff;cursor:pointer;transition:.15s}
 .product:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:#bfdbfe}
+.product.low-stock{border-color:#fed7aa;background:#fffaf5}
+.product.out{opacity:.55;border-color:#fecaca;background:#fff7f7;cursor:not-allowed}
 .p-icon{height:70px;border-radius:12px;background:linear-gradient(135deg,#dbeafe,#eff6ff);display:grid;place-items:center;font-size:30px;margin-bottom:10px}
 .p-name{font-weight:750}.p-meta{display:flex;justify-content:space-between;gap:8px;margin-top:8px;font-size:13px;color:var(--muted)}
 .cart{padding:16px;position:sticky;top:20px}
@@ -57,7 +59,16 @@ input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
 .table th,.table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
 .table th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
 .badge{display:inline-block;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:750;background:#e2e8f0}
-.badge.ok{background:#dcfce7;color:#166534}.badge.low{background:#ffedd5;color:#9a3412}
+.badge.ok{background:#dcfce7;color:#166534}.badge.low{background:#ffedd5;color:#9a3412}.badge.out{background:#fee2e2;color:#991b1b}
+.stock-alert{display:none;margin-bottom:14px;padding:12px 14px;border:1px solid #fca5a5;border-radius:12px;color:#7f1d1d;background:#fef2f2;font-size:13px;line-height:1.6}
+.stock-alert.show{display:block}
+.stock-alert strong{display:block;margin-bottom:4px}
+.stock-alert .alert-items{display:flex;flex-wrap:wrap;gap:6px}
+.stock-alert .alert-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;background:#fff;border:1px solid #fecaca}
+.stock-alert .alert-chip.out{background:#fee2e2;border-color:#fca5a5}
+.stock-alert .alert-chip b{color:#7f1d1d}
+.stock-badge{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:800}
+.stock-badge.low{background:#ffedd5;color:#9a3412}.stock-badge.out{background:#fee2e2;color:#991b1b}
 .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.form-grid .full{grid-column:1/-1}
 .toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
 .empty{text-align:center;color:var(--muted);padding:30px}
@@ -113,6 +124,10 @@ input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
     </div>
 
     <section class="page active" id="page-pos">
+      <div class="stock-alert" id="stockAlert" role="alert">
+        <strong>⚠️ Low stock alert</strong>
+        <div class="alert-items" id="stockAlertItems"></div>
+      </div>
       <div class="pos-grid">
         <div>
           <div class="search-row">
@@ -351,9 +366,19 @@ function renderProducts(filter=''){
  const items=db.products.filter(p=>!q||[p.name,p.sku,p.category].some(v=>String(v).toLowerCase().includes(q)));
  const g=document.getElementById('productGrid');
  if(!items.length){g.innerHTML='<div class="empty card">No products found.</div>';return}
- g.innerHTML=items.map(p=>`<div class="product" onclick="addToCart(${p.id})">
-   <div class="p-icon">${esc(p.icon||'📦')}</div><div class="p-name">${esc(p.name)}</div>
+ g.innerHTML=items.map(p=>`<div class="product ${p.stock<=0?'out':p.stock<=p.low?'low-stock':''}" onclick="addToCart(${p.id})">
+   <div class="p-icon">${esc(p.icon||'📦')}</div><div class="p-name">${esc(p.name)}${p.stock<=0?'<span class="stock-badge out">Out</span>':p.stock<=p.low?'<span class="stock-badge low">Low</span>':''}</div>
    <div class="p-meta"><span>${money(p.price)}</span><span>Stock ${p.stock}</span></div></div>`).join('');
+}
+function renderStockAlerts(){
+ const alert=document.getElementById('stockAlert'),items=document.getElementById('stockAlertItems');
+ if(!alert||!items)return;
+ const low=db.products.filter(p=>p.stock>0&&p.stock<=p.low);
+ const out=db.products.filter(p=>p.stock<=0);
+ if(!low.length&&!out.length){alert.classList.remove('show');return}
+ const chip=p=>`<span class="alert-chip ${p.stock<=0?'out':''}">${esc(p.icon||'📦')} ${esc(p.name)} <b>${p.stock<=0?'Out of stock':'Only '+p.stock+' left'}</b></span>`;
+ items.innerHTML=[...out,...low].slice(0,8).map(chip).join('')+(out.length+low.length>8?'<span class="alert-chip">+'+(out.length+low.length-8)+' more</span>':'');
+ alert.classList.add('show');
 }
 // ---- Universal barcode scanner support ----
 // Works with any HID/keyboard-emulating scanner (USB, Bluetooth, 2.4GHz):
@@ -462,7 +487,11 @@ function checkout(){
  for(const i of cart){const p=db.products.find(x=>x.id===i.id);if(!p||p.stock<i.qty){toast('Stock changed. Review cart.');return}}
  const c=calc(),sale={id:Date.now(),receipt:receiptNo(),date:new Date().toISOString(),items:clone(cart),payment:paymentMethod.value,...c};
  cart.forEach(i=>{db.products.find(p=>p.id===i.id).stock-=i.qty});
- db.sales.unshift(sale);save();showReceipt(sale);clearCart();renderProducts();toast('Payment completed')}
+ db.sales.unshift(sale);save();showReceipt(sale);clearCart();renderProducts();toast('Payment completed');
+ // Alert immediately if any sold item dropped to low/out of stock.
+ const alerts=cart.filter(i=>{const p=db.products.find(x=>x.id===i.id);return p&&p.stock<=p.low}).map(i=>i.name);
+ if(alerts.length){setTimeout(()=>toast('Low stock: '+alerts.join(', ')),1200);}
+ renderStockAlerts();}
 function showReceipt(s){
  const d=new Date(s.date);
  receiptContent.innerHTML=`<div class="receipt"><h2>${esc(db.settings.business)}</h2>
@@ -496,9 +525,9 @@ function saveProduct(){
  if(isNew&&db.products.length>=itemLimit()){toast(`Item limit reached (${itemLimit().toLocaleString()}). Activate a larger licence.`);return}
  const obj={id:prodId.value?Number(prodId.value):nextId(),name,sku,category:prodCategory.value.trim()||'General',icon:prodIcon.value.trim()||'📦',price:Number(prodPrice.value||0),cost:Number(prodCost.value||0),stock:Number(prodStock.value||0),low:Number(prodLow.value||0)};
  if(prodId.value)db.products[db.products.findIndex(p=>p.id===obj.id)]=obj;else db.products.push(obj);
- save();closeModal('productModal');renderProductsTable();renderProducts();toast('Product saved');
+ save();closeModal('productModal');renderProductsTable();renderProducts();renderStockAlerts();toast('Product saved');
 }
-function deleteProduct(id){if(!confirm('Delete this product?'))return;db.products=db.products.filter(p=>p.id!==id);save();renderProductsTable();renderProducts()}
+function deleteProduct(id){if(!confirm('Delete this product?'))return;db.products=db.products.filter(p=>p.id!==id);save();renderProductsTable();renderProducts();renderStockAlerts()}
 function renderSales(){
  salesTable.innerHTML=db.sales.length?db.sales.map(s=>`<tr><td>${esc(s.receipt)}</td><td>${new Date(s.date).toLocaleString()}</td><td>${s.items.reduce((a,i)=>a+i.qty,0)}</td><td>${esc(s.payment)}</td><td><strong>${money(s.total)}</strong></td><td><button class="btn sm" onclick="viewSale(${s.id})">Receipt</button></td></tr>`).join(''):'<tr><td colspan="6" class="empty">No sales yet.</td></tr>';
 }
@@ -522,7 +551,7 @@ function exportBackup(){download('sme-pos-backup.json',JSON.stringify(db,null,2)
 function restoreBackup(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{db=JSON.parse(r.result);save();location.reload()}catch{toast('Invalid backup file')}};r.readAsText(f)}
 function resetDemo(){if(!confirm('Reset all POS data?'))return;db=clone(defaultData);save();location.reload()}
 function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();URL.revokeObjectURL(a.href)}
-applySettings();renderProducts();renderCart();
+applySettings();renderProducts();renderCart();renderStockAlerts();
 </script>
 </body>
 </html>
