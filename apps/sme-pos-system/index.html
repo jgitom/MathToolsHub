@@ -179,7 +179,7 @@ input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
           <h2 style="margin:0">Sales History</h2>
           <button class="btn" onclick="exportSalesCSV()">Export CSV</button>
         </div>
-        <div class="table-wrap"><table class="table"><thead><tr><th>Receipt</th><th>Date</th><th>Items</th><th>Payment</th><th>Total</th><th>Action</th></tr></thead><tbody id="salesTable"></tbody></table></div>
+        <div class="table-wrap"><table class="table"><thead><tr><th>Receipt</th><th>Date</th><th>Cashier</th><th>Items</th><th>Payment</th><th>Tax</th><th>Total</th><th>Action</th></tr></thead><tbody id="salesTable"></tbody></table></div>
       </div>
     </section>
 
@@ -196,7 +196,7 @@ input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
           <div class="card stat"><div class="k">Items Sold</div><div class="n" id="reportItems">0</div></div>
           <div class="card stat"><div class="k">Top Product</div><div class="n small" id="reportTop">—</div></div>
         </div>
-        <div class="table-wrap" style="margin-top:18px"><table class="table"><thead><tr><th>Date</th><th>Transactions</th><th>Items</th><th>Sales</th><th>Payment mix</th></tr></thead><tbody id="reportTable"></tbody></table></div>
+        <div class="table-wrap" style="margin-top:18px"><table class="table"><thead><tr><th>Date</th><th>Transactions</th><th>Items</th><th>Sales</th><th>Tax</th><th>Payment mix</th></tr></thead><tbody id="reportTable"></tbody></table></div>
         <p class="sub" style="margin:14px 0 0" id="reportEmpty">Select a month to view its sales summary.</p>
       </div>
     </section>
@@ -217,8 +217,10 @@ input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
         <div class="form-grid">
           <div><label>Business Name</label><input id="setBusiness"></div>
           <div><label>Phone</label><input id="setPhone"></div>
+          <div><label>Cashier Name</label><input id="setCashier" placeholder="e.g. Owner"></div>
           <div class="full"><label>Address</label><input id="setAddress"></div>
           <div><label>Tax Rate (%)</label><input id="setTax" type="number" min="0" step="0.01"></div>
+          <div><label>Tax Name</label><input id="setTaxName" placeholder="SST / GST / VAT"></div>
           <div><label>Currency</label><select id="setCurrency"><option value="RM">RM</option><option value="$">$</option><option value="SGD">SGD</option><option value="IDR">IDR</option></select></div>
           <div class="full"><button class="btn primary" onclick="saveSettings()">Save Settings</button></div>
         </div>
@@ -292,6 +294,18 @@ input:focus,select:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
     </div>
   </div>
 </div>
+<div class="modal" id="resetModal">
+  <div class="modal-card">
+    <div class="row"><h2>Reset All Data</h2><button class="btn sm" onclick="closeModal('resetModal')">✕</button></div>
+    <p>This permanently wipes <strong>ALL sales, products and settings</strong> from this browser. This cannot be undone — download a backup first if needed.</p>
+    <p>Type <code>RESET</code> below to confirm:</p>
+    <input id="resetCode" placeholder="RESET" style="width:100%;box-sizing:border-box">
+    <div class="row" style="margin-top:14px">
+      <button class="btn" onclick="closeModal('resetModal')">Cancel</button>
+      <button class="btn danger" onclick="confirmReset()">Wipe All Data</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -300,7 +314,7 @@ const LICENCE_KEY='sme_pos_licence_v1';
 // Synchronous snapshot used before the async IndexedDB boot completes.
 let memDb=null,memLicence=null;
 const defaultData={
- settings:{business:'My SME Store',phone:'012-3456789',address:'Sabah, Malaysia',tax:0,currency:'RM'},
+ settings:{business:'My SME Store',phone:'012-3456789',address:'Sabah, Malaysia',tax:0,currency:'RM',taxName:'SST',cashier:'Owner'},
  products:[
   {id:1,sku:'1001',name:'Mineral Water',category:'Beverage',icon:'💧',price:2.00,cost:0.90,stock:50,low:10},
   {id:2,sku:'1002',name:'Coffee',category:'Beverage',icon:'☕',price:4.50,cost:1.50,stock:40,low:8},
@@ -309,7 +323,9 @@ const defaultData={
   {id:5,sku:'3001',name:'Notebook',category:'Stationery',icon:'📒',price:5.90,cost:2.60,stock:18,low:5},
   {id:6,sku:'3002',name:'Ball Pen',category:'Stationery',icon:'🖊️',price:1.80,cost:0.60,stock:80,low:15}
  ],
- sales:[], held:null
+ sales:[], held:null,
+ // Audit controls: sequential receipt counter (per-day) and cashier/tax identity.
+ receiptDate:'',receiptCounter:0
 };
 let db=load();
 let cart=[];
@@ -409,10 +425,10 @@ function saveLicence(x){memLicence=x;try{localStorage.setItem(LICENCE_KEY,JSON.s
 // Boot: load authoritative data from IndexedDB, then refresh the UI.
 (async function boot(){
  const [storedDb,storedLicence]=await Promise.all([idbGet(KEY),idbGet(LICENCE_KEY)]);
- if(storedDb){memDb=storedDb;db={...clone(defaultData),...storedDb,assets:Array.isArray(storedDb.assets)?storedDb.assets:[]};}
+ if(storedDb){memDb=storedDb;db={...clone(defaultData),...storedDb,settings:{...clone(defaultData.settings),...(storedDb.settings||{})},assets:Array.isArray(storedDb.assets)?storedDb.assets:[]};}
  else{
   // Migrate any legacy localStorage data into IndexedDB exactly once.
-  try{const legacy=JSON.parse(localStorage.getItem(KEY));if(legacy){db={...clone(defaultData),...legacy,assets:Array.isArray(legacy.assets)?legacy.assets:[]};save();}}catch(e){}
+  try{const legacy=JSON.parse(localStorage.getItem(KEY));if(legacy){db={...clone(defaultData),...legacy,settings:{...clone(defaultData.settings),...(legacy.settings||{})},assets:Array.isArray(legacy.assets)?legacy.assets:[]};save();}}catch(e){}
  }
  if(storedLicence){memLicence=storedLicence;licence=storedLicence;}
  else{
@@ -424,7 +440,14 @@ function money(n){return `${db.settings.currency}${Number(n||0).toFixed(2)}`}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
 function nextId(){return db.products.reduce((m,p)=>Math.max(m,p.id),0)+1}
-function receiptNo(){return 'R'+new Date().toISOString().replace(/\D/g,'').slice(2,14)+Math.floor(Math.random()*90+10)}
+// Sequential, gap-checkable receipt number with a per-day counter (audit-friendly).
+function nextReceiptNo(){
+ const today=new Date().toISOString().slice(0,10);
+ if(db.receiptDate!==today){db.receiptDate=today;db.receiptCounter=0;}
+ db.receiptCounter=(db.receiptCounter||0)+1;
+ const seq=String(db.receiptCounter).padStart(4,'0');
+ return `INV-${today.replace(/-/g,'')}-${seq}`;
+}
 
 const titles={pos:'Point of Sale',products:'Products & Inventory',sales:'Sales History',reports:'Monthly Sales Report',dashboard:'Dashboard',settings:'Settings'};
 document.getElementById('nav').addEventListener('click',e=>{
@@ -551,8 +574,9 @@ function calc(){
  const subtotal=cart.reduce((s,i)=>s+i.price*i.qty,0);
  const discount=Math.min(Math.max(Number(document.getElementById('discountInput').value||0),0),subtotal);
  const taxable=subtotal-discount;
- const tax=taxable*(Number(db.settings.tax||0)/100);
- return{subtotal,discount,tax,total:taxable+tax}
+ // Round tax to 2 decimal places so stored values match displayed values (audit consistency).
+ const tax=Math.round(taxable*(Number(db.settings.tax||0)/100)*100)/100;
+ return{subtotal:Math.round(subtotal*100)/100,discount:Math.round(discount*100)/100,tax,total:Math.round((taxable+tax)*100)/100}
 }
 function renderCart(){
  const el=document.getElementById('cartList');
@@ -567,7 +591,7 @@ function restoreHeld(){if(!db.held){toast('No held sale');return}cart=clone(db.h
 function checkout(){
  if(!cart.length){toast('Add products first');return}
  for(const i of cart){const p=db.products.find(x=>x.id===i.id);if(!p||p.stock<i.qty){toast('Stock changed. Review cart.');return}}
- const c=calc(),sale={id:Date.now(),receipt:receiptNo(),date:new Date().toISOString(),items:clone(cart),payment:paymentMethod.value,...c};
+ const c=calc(),sale={id:Date.now(),receipt:nextReceiptNo(),date:new Date().toISOString(),items:clone(cart),payment:paymentMethod.value,cashier:db.settings.cashier||'Owner',taxName:db.settings.taxName||'Tax',taxRate:Number(db.settings.tax||0),...c};
  cart.forEach(i=>{db.products.find(p=>p.id===i.id).stock-=i.qty});
  db.sales.unshift(sale);save();showReceipt(sale);clearCart();renderProducts();toast('Payment completed');
  // Alert immediately if any sold item dropped to low/out of stock.
@@ -578,16 +602,17 @@ function showReceipt(s){
  const d=new Date(s.date);
  receiptContent.innerHTML=`<div class="receipt"><h2>${esc(db.settings.business)}</h2>
  <div class="center">${esc(db.settings.address)}<br>${esc(db.settings.phone)}</div><hr>
- <div>Receipt: ${esc(s.receipt)}</div><div>${d.toLocaleString()}</div><div>Payment: ${esc(s.payment)}</div><hr>
+ <div>Receipt: ${esc(s.receipt)}</div><div>${d.toLocaleString()}</div><div>Cashier: ${esc(s.cashier||'Owner')}</div><div>Payment: ${esc(s.payment)}</div><hr>
  ${s.items.map(i=>`<div>${esc(i.name)}<br><span>${i.qty} × ${money(i.price)}</span><span style="float:right">${money(i.qty*i.price)}</span></div>`).join('<br>')}
  <hr><div class="total-line"><span>Subtotal</span><span>${money(s.subtotal)}</span></div>
  <div class="total-line"><span>Discount</span><span>${money(s.discount)}</span></div>
- <div class="total-line"><span>Tax</span><span>${money(s.tax)}</span></div>
+ <div class="total-line"><span>${esc(s.taxName||'Tax')}${s.taxRate?` (${s.taxRate}%)`:''}</span><span>${money(s.tax)}</span></div>
  <div class="total-line grand"><span>TOTAL</span><span>${money(s.total)}</span></div><hr>
  <div class="center">Thank you for your purchase!</div>
  <div class="center" style="margin-top:6px;font-size:11px">Built by Juil Gitom</div></div>`;
  document.getElementById('receiptModal').classList.add('show');
 }
+function openModal(id){document.getElementById(id).classList.add('show')}
 function closeModal(id){document.getElementById(id).classList.remove('show')}
 
 function renderProductsTable(){
@@ -612,7 +637,7 @@ function saveProduct(){
 }
 function deleteProduct(id){if(!confirm('Delete this product?'))return;db.products=db.products.filter(p=>p.id!==id);save();renderProductsTable();renderProducts();renderStockAlerts()}
 function renderSales(){
- salesTable.innerHTML=db.sales.length?db.sales.map(s=>`<tr><td>${esc(s.receipt)}</td><td>${new Date(s.date).toLocaleString()}</td><td>${s.items.reduce((a,i)=>a+i.qty,0)}</td><td>${esc(s.payment)}</td><td><strong>${money(s.total)}</strong></td><td><button class="btn sm" onclick="viewSale(${s.id})">Receipt</button></td></tr>`).join(''):'<tr><td colspan="6" class="empty">No sales yet.</td></tr>';
+ salesTable.innerHTML=db.sales.length?db.sales.map(s=>`<tr><td>${esc(s.receipt)}</td><td>${new Date(s.date).toLocaleString()}</td><td>${esc(s.cashier||'—')}</td><td>${s.items.reduce((a,i)=>a+i.qty,0)}</td><td>${esc(s.payment)}</td><td>${money(s.tax)}</td><td><strong>${money(s.total)}</strong></td><td><button class="btn sm" onclick="viewSale(${s.id})">Receipt</button></td></tr>`).join(''):'<tr><td colspan="8" class="empty">No sales yet.</td></tr>';
 }
 function viewSale(id){const s=db.sales.find(x=>x.id===id);if(s)showReceipt(s)}
 function initMonthlyReport(){
@@ -639,18 +664,18 @@ function renderMonthlyReport(){
  document.getElementById('reportTx').textContent=tx;
  document.getElementById('reportItems').textContent=items;
  document.getElementById('reportTop').textContent=topName?`${topName[0]} (${topName[1]})`:'—';
- if(!sales.length){table.innerHTML='<tr><td colspan="5" class="empty">No sales in this month.</td></tr>';if(empty)empty.textContent='';return}
+ if(!sales.length){table.innerHTML='<tr><td colspan="6" class="empty">No sales in this month.</td></tr>';if(empty)empty.textContent='';return}
  const byDay={};
- sales.forEach(s=>{const day=s.date.slice(0,10);byDay[day]=byDay[day]||{tx:0,items:0,total:0,payments:{}};const d=byDay[day];d.tx++;d.items+=s.items.reduce((a,i)=>a+i.qty,0);d.total+=s.total;d.payments[s.payment]=(d.payments[s.payment]||0)+1});
+ sales.forEach(s=>{const day=s.date.slice(0,10);byDay[day]=byDay[day]||{tx:0,items:0,total:0,tax:0,payments:{}};const d=byDay[day];d.tx++;d.items+=s.items.reduce((a,i)=>a+i.qty,0);d.total+=s.total;d.tax+=(s.tax||0);d.payments[s.payment]=(d.payments[s.payment]||0)+1});
  const days=Object.keys(byDay).sort();
- table.innerHTML=days.map(day=>{const d=byDay[day];const mix=Object.entries(d.payments).map(([k,v])=>`${esc(k)} ${v}`).join(', ');return `<tr><td>${day}</td><td>${d.tx}</td><td>${d.items}</td><td><strong>${money(d.total)}</strong></td><td>${mix}</td></tr>`}).join('');
+ table.innerHTML=days.map(day=>{const d=byDay[day];const mix=Object.entries(d.payments).map(([k,v])=>`${esc(k)} ${v}`).join(', ');return `<tr><td>${day}</td><td>${d.tx}</td><td>${d.items}</td><td><strong>${money(d.total)}</strong></td><td>${money(d.tax)}</td><td>${mix}</td></tr>`}).join('');
  if(empty)empty.textContent=`Showing ${tx} transaction(s) for ${monthValue}.`;
 }
 function exportMonthlyReportCSV(){
  const input=document.getElementById('reportMonth'),monthValue=input?input.value:'';
  if(!monthValue){toast('Select a month first');return}
  const sales=monthSales(monthValue);
- const rows=[['Month','Date','Receipt','Payment','Items','Subtotal','Discount','Tax','Total'],...sales.map(s=>[monthValue,s.date.slice(0,10),s.receipt,s.payment,s.items.reduce((a,i)=>a+i.qty,0),s.subtotal,s.discount,s.tax,s.total])];
+ const rows=[['Month','Date','Receipt','Cashier','Payment','Items','Subtotal','Discount','Tax','Total'],...sales.map(s=>[monthValue,s.date.slice(0,10),s.receipt,s.cashier||'',s.payment,s.items.reduce((a,i)=>a+i.qty,0),s.subtotal,s.discount,s.tax,s.total])];
  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
  download(`sme-pos-monthly-${monthValue}.csv`,csv,'text/csv');
  toast('Monthly report exported');
@@ -663,16 +688,26 @@ function renderDashboard(){
  const top=Object.entries(sold).sort((a,b)=>b[1]-a[1]).slice(0,5);
  topProducts.innerHTML=top.length?top.map(([id,q],idx)=>{const p=db.products.find(x=>x.id==id);return `<div class="row" style="padding:10px 0;border-bottom:1px solid var(--line)"><span>${idx+1}. ${esc(p?.name||'Deleted product')}</span><strong>${q} sold</strong></div>`}).join(''):'<div class="empty">Sales data will appear here.</div>';
 }
-function fillSettings(){setBusiness.value=db.settings.business;setPhone.value=db.settings.phone;setAddress.value=db.settings.address;setTax.value=db.settings.tax;setCurrency.value=db.settings.currency;renderLicence()}
-function saveSettings(){db.settings={business:setBusiness.value.trim()||'My SME Store',phone:setPhone.value.trim(),address:setAddress.value.trim(),tax:Number(setTax.value||0),currency:setCurrency.value};save();applySettings();renderCart();renderProducts();toast('Settings saved')}
+function fillSettings(){setBusiness.value=db.settings.business;setPhone.value=db.settings.phone;setAddress.value=db.settings.address;setTax.value=db.settings.tax;setCurrency.value=db.settings.currency;setCashier.value=db.settings.cashier||'';setTaxName.value=db.settings.taxName||'';renderLicence()}
+function saveSettings(){db.settings={business:setBusiness.value.trim()||'My SME Store',phone:setPhone.value.trim(),address:setAddress.value.trim(),tax:Number(setTax.value||0),currency:setCurrency.value,cashier:setCashier.value.trim()||'Owner',taxName:setTaxName.value.trim()||'Tax'};save();applySettings();renderCart();renderProducts();toast('Settings saved')}
 function applySettings(){businessLabel.textContent=db.settings.business}
 function exportSalesCSV(){
- const rows=[['Receipt','Date','Payment','Items','Subtotal','Discount','Tax','Total'],...db.sales.map(s=>[s.receipt,s.date,s.payment,s.items.map(i=>`${i.name} x${i.qty}`).join('; '),s.subtotal,s.discount,s.tax,s.total])];
+ const rows=[['Receipt','Date','Cashier','Payment','Items','Subtotal','Discount','Tax','Total'],...db.sales.map(s=>[s.receipt,s.date,s.cashier||'',s.payment,s.items.map(i=>`${i.name} x${i.qty}`).join('; '),s.subtotal,s.discount,s.tax,s.total])];
  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');download('sales.csv',csv,'text/csv');
 }
 function exportBackup(){download('sme-pos-backup.json',JSON.stringify(db,null,2),'application/json')}
 function restoreBackup(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{db=JSON.parse(r.result);save();location.reload()}catch{toast('Invalid backup file')}};r.readAsText(f)}
-function resetDemo(){if(!confirm('Reset all POS data?'))return;db=clone(defaultData);save();location.reload()}
+function resetDemo(){
+ // Audit protection: open the confirmation modal — a typed RESET is required before wiping.
+ const code=document.getElementById('resetCode');if(code)code.value='';
+ openModal('resetModal');
+}
+function confirmReset(){
+ const code=(document.getElementById('resetCode').value||'').trim();
+ if(code!=='RESET'){toast('Type RESET to confirm');return}
+ closeModal('resetModal');
+ db=clone(defaultData);save();location.reload();
+}
 function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();URL.revokeObjectURL(a.href)}
 </script>
 </body>
