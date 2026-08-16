@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f2747">
+    <meta name="description" content="SME POS System — a lightweight point-of-sale application for small and medium enterprises from MathToolsHub.">
+    <title>SME POS System | MathToolsHub</title>
+    <style>
+        :root { --navy:#0f2747; --navy-light:#173b68; --blue:#2563eb; --ink:#172033; --muted:#64748b; --line:#dbe3ec; --surface:#fff; --background:#f4f7fa; }
+        * { box-sizing:border-box; }
+        body { margin:0; min-height:100vh; display:flex; flex-direction:column; color:var(--ink); background:var(--background); font-family:Inter,"Segoe UI",Arial,sans-serif; }
+        a { color:inherit; }
+        header { color:#fff; background:var(--navy); border-bottom:4px solid #3b82f6; }
+        .nav,.hero-inner,.content,.footer-inner { width:min(1120px,calc(100% - 40px)); margin:0 auto; }
+        .nav { min-height:72px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+        .brand { display:flex; align-items:center; gap:12px; color:#fff; font-weight:750; text-decoration:none; }
+        .brand-mark { width:38px; height:38px; display:grid; place-items:center; border-radius:8px; color:var(--navy); background:#fff; font:800 1.25rem Georgia,serif; }
+        .home-link { color:#dbeafe; font-size:.9rem; font-weight:700; text-decoration:none; }
+        .home-link:hover,.home-link:focus-visible { color:#fff; text-decoration:underline; }
+        .hero { color:#fff; background:linear-gradient(125deg,var(--navy),var(--navy-light) 70%,#1e4d83); }
+        .hero-inner { padding:72px 0 68px; }
+        .eyebrow { margin:0 0 14px; color:#93c5fd; font-size:.78rem; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }
+        h1 { margin:0; font-size:clamp(2.5rem,7vw,4.5rem); letter-spacing:-.045em; }
+        .hero p:last-child { max-width:650px; margin:20px 0 0; color:#cbdcf0; font-size:1.08rem; line-height:1.7; }
+        main { flex:1; }
+        .content { padding:64px 0 80px; }
+        .section-heading { margin-bottom:28px; }
+        .section-heading h2 { margin:0 0 10px; color:var(--navy); font-size:clamp(1.8rem,4vw,2.5rem); }
+        .section-heading p { margin:0; color:var(--muted); line-height:1.65; }
+        .feature-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; }
+        .feature-card { min-height:240px; display:flex; flex-direction:column; padding:30px; border:1px solid var(--line); border-radius:14px; background:var(--surface); box-shadow:0 12px 32px rgba(15,39,71,.08); }
+        .feature-icon { width:56px; height:56px; display:grid; place-items:center; margin-bottom:22px; border-radius:14px; color:var(--blue); background:#eff6ff; font-size:1.5rem; font-weight:900; }
+        .feature-card h2 { margin:0 0 10px; color:var(--navy); font-size:1.3rem; }
+        .feature-card p { margin:0; color:var(--muted); line-height:1.7; }
+        .note { margin-top:34px; padding:20px; border:1px solid var(--line); border-radius:12px; color:var(--muted); background:var(--surface); line-height:1.7; }
+        .note strong { color:var(--navy); }
+        footer { padding:25px 0; border-top:1px solid var(--line); color:var(--muted); background:#fff; font-size:.82rem; }
+        @media(max-width:820px) { .feature-grid { grid-template-columns:1fr 1fr; } }
+        @media(max-width:560px) { .nav,.hero-inner,.content,.footer-inner { width:min(100% - 24px,1120px); } .hero-inner { padding:54px 0; } .content { padding:44px 0 60px; } .feature-grid { grid-template-columns:1fr; } }
+    </style>
+    <link rel="stylesheet" href="../responsive-layout.css">
+</head>
+<body>
+    <header>
+        <nav class="nav" aria-label="SME POS System navigation">
+            <a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">Σ</span> MathToolsHub</a>
+            <a class="home-link" href="index.html">← Applications</a>
+        </nav>
+    </header>
+    <main>
+        <section class="hero">
+            <div class="hero-inner">
+                <p class="eyebrow">Business application</p>
+                <h1>SME POS System</h1>
+                <p>A lightweight point-of-sale application built for small and medium enterprises to manage sales, products, and daily transactions from one simple interface.</p>
+            </div>
+        </section>
+        <section class="content" aria-labelledby="features-heading">
+            <div class="section-heading">
+                <h2 id="features-heading">Built for everyday selling</h2>
+                <p>Manage your counter with tools designed for speed, accuracy, and offline reliability.</p>
+            </div>
+            <div class="feature-grid">
+                <article class="feature-card">
+                    <div class="feature-icon" aria-hidden="true">🛒</div>
+                    <h2>Sales at the counter</h2>
+                    <p>Add items quickly, apply quantities, and complete transactions with a clear, fast checkout flow.</p>
+                </article>
+                <article class="feature-card">
+                    <div class="feature-icon" aria-hidden="true">📦</div>
+                    <h2>Product catalogue</h2>
+                    <p>Keep a simple catalogue of products with prices, quantities, and categories that stay available offline.</p>
+                </article>
+                <article class="feature-card">
+                    <div class="feature-icon" aria-hidden="true">🧾</div>
+                    <h2>Daily reports</h2>
+                    <p>Review sales summaries and transaction history to understand how your business is performing.</p>
+                </article>
+            </div>
+            <div class="note"><strong>Availability:</strong> The SME POS System application is currently in preparation. Details about the installer and supported platforms will be announced here when it is ready for release.</div>
+        </section>
+    </main>
+    <footer><div class="footer-inner">© 2026 MathToolsHub</div></footer>
+</body>
+</html>
