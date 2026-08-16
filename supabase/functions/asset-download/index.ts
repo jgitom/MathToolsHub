@@ -8,6 +8,9 @@ const plans = new Map([
   [59900, { assetLimit: 10000, productName: "Asset Management — 10,000 Assets" }],
   [99900, { assetLimit: 100000, productName: "Asset Management — 100,000 Assets" }],
 ]);
+// Live Payment Link URLs are stored in Supabase secrets named after each plan product.
+const paymentLinkSecret = (assetLimit: number) => `Asset Management — ${assetLimit.toLocaleString("en-US")} Assets`;
+const livePaymentLink = (assetLimit: number) => Deno.env.get(paymentLinkSecret(assetLimit)) ?? "";
 const bytesFromBase64 = (value: string) => Uint8Array.from(atob(value), character => character.charCodeAt(0));
 const base64FromBytes = (value: ArrayBuffer) => {
   const bytes = new Uint8Array(value);
@@ -34,10 +37,18 @@ async function createLicense(sessionId: string, assetLimit: number) {
 Deno.serve(async request => {
   if (request.method === "OPTIONS") return new Response("ok", { headers: cors(request) });
   if (request.method !== "POST") return respond(request, { error: "Method not allowed" }, 405);
-  const stripeKey = Deno.env.get("STRIPE_ASSET_LIVE_SECRET_KEY") ?? "";
-  if (!stripeKey) return respond(request, { error: "Download verification is not configured" }, 503);
   let input: { sessionId?: string; platform?: string };
   try { input = await request.json(); } catch { return respond(request, { error: "Invalid request" }, 400); }
+
+  // Live checkout configuration, served to the download page from plan secrets.
+  if (input.platform === "config") {
+    const checkoutUrls = [...plans.values()].map(plan => ({ assetLimit: plan.assetLimit, checkoutUrl: livePaymentLink(plan.assetLimit) })).filter(item => item.checkoutUrl);
+    if (!checkoutUrls.length) return respond(request, { error: "Live checkout is not configured yet" }, 503);
+    return respond(request, { mode: "live", plans: checkoutUrls });
+  }
+
+  const stripeKey = Deno.env.get("STRIPE_ASSET_LIVE_SECRET_KEY") ?? "";
+  if (!stripeKey) return respond(request, { error: "Download verification is not configured" }, 503);
   if (!/^cs_(test|live)_[A-Za-z0-9_]+$/.test(input.sessionId ?? "")) return respond(request, { error: "Invalid Checkout Session" }, 400);
   if (input.platform !== "windows" && input.platform !== "verify") return respond(request, { error: "This platform installer is not available yet" }, 404);
   try {
@@ -46,7 +57,9 @@ Deno.serve(async request => {
     const plan = plans.get(session.amount_total ?? 0);
     const product = session.line_items?.data[0]?.price?.product;
     const productName = typeof product === "object" && product && "name" in product ? product.name : "";
-    const isValid = session.currency === "myr" && session.payment_status === "paid" && session.mode === "payment" && session.livemode && Boolean(session.payment_link) && session.line_items?.data.length === 1 && productName === plan?.productName;
+    const expectedLink = plan ? livePaymentLink(plan.assetLimit) : "";
+    const sessionLink = typeof session.payment_link === "object" && session.payment_link && "url" in session.payment_link ? session.payment_link.url : "";
+    const isValid = session.currency === "myr" && session.payment_status === "paid" && session.mode === "payment" && session.livemode && Boolean(session.payment_link) && session.line_items?.data.length === 1 && productName === plan?.productName && (!expectedLink || sessionLink === expectedLink);
     if (!plan || !isValid) return respond(request, { error: "A completed Asset Management payment was not found" }, 403);
     if (input.platform === "verify") return respond(request, { assetLimit: plan.assetLimit });
     const downloadUrl = new URL("https://mathtoolshub-asset-download.mathtoolshub-jgitom.workers.dev/download");
