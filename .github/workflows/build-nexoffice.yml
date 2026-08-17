@@ -22,6 +22,29 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: apps/nexoffice-desktop/package-lock.json
+      # Pre-seed the NSIS cache BEFORE npm ci's postinstall runs nsis-ms-patch.js.
+      # The patch script localizes NSIS's Malay.nsh (adds MultiUser LangStrings),
+      # but on a fresh runner the NSIS cache doesn't exist yet at postinstall time,
+      # so makensis would warn "LangString ... for language Malay is missing"
+      # and electron-builder treats that warning as an error.
+      - name: Pre-seed NSIS cache (for Malay.nsh localization patch)
+        shell: pwsh
+        run: |
+          $nsisRoot = Join-Path $env:LOCALAPPDATA 'electron-builder\Cache\nsis'
+          $nsisDir = Join-Path $nsisRoot 'nsis-3.0.4.1'
+          if (-not (Test-Path (Join-Path $nsisDir 'Bin\makensis.exe'))) {
+            New-Item -ItemType Directory -Force -Path $nsisDir | Out-Null
+            Invoke-WebRequest -Uri 'https://github.com/electron-userland/electron-builder-binaries/releases/download/nsis-3.0.4.1/nsis-3.0.4.1.7z' -OutFile "$env:TEMP\nsis-3.0.4.1.7z" -UseBasicParsing
+            tar -xf "$env:TEMP\nsis-3.0.4.1.7z" -C $nsisDir
+            Remove-Item "$env:TEMP\nsis-3.0.4.1.7z" -Force
+          }
+          $resDir = Join-Path $nsisRoot 'nsis-resources-3.4.1'
+          if (-not (Test-Path (Join-Path $resDir 'plugins'))) {
+            New-Item -ItemType Directory -Force -Path $resDir | Out-Null
+            Invoke-WebRequest -Uri 'https://github.com/electron-userland/electron-builder-binaries/releases/download/nsis-resources-3.4.1/nsis-resources-3.4.1.7z' -OutFile "$env:TEMP\nsis-resources.7z" -UseBasicParsing
+            tar -xf "$env:TEMP\nsis-resources.7z" -C $resDir
+            Remove-Item "$env:TEMP\nsis-resources.7z" -Force
+          }
       - run: npm ci
       - run: npm run dist:win
         env:
