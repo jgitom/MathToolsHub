@@ -1,0 +1,27 @@
+NEXOFFICE — SISTEM PENGURUSAN PEJABAT
+NexOffice — Office Management System
+================================================================
+
+BAHASA MELAYU
+-------------
+Terima kasih kerana memasang NexOffice.
+
+Aplikasi ini disediakan untuk kegunaan dalaman pejabat/organisasi anda.
+Semua data (staf, gaji, cuti, kehadiran dan laporan) disimpan secara
+tempatan dalam komputer ini (IndexedDB di folder data aplikasi) dan
+tidak dihantar ke mana-mana pelayan luar.
+
+Anda digalakkan membuat sandaran (backup) data secara berkala melalui
+halaman Laporan > Sandarkan Data (JSON).
+
+ENGLISH
+-------
+Thank you for installing NexOffice.
+
+This application is provided for internal use within your office or
+organisation. All data (staff, payroll, leave, attendance and reports)
+is stored locally on this computer (IndexedDB in the app data folder)
+and is not sent to any external server.
+
+We recommend backing up your data regularly via
+Reports > Backup Data (JSON).
