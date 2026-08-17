@@ -610,6 +610,17 @@ dialog form{display:block;margin:0}
         <div class="chips" id="attToday"></div>
       </div>
       <div class="card" style="margin-bottom:16px">
+        <h3>📥 Import dari Mesin Kehadiran</h3>
+        <p class="subtitle" style="margin-bottom:14px">Muat naik fail CSV / teks yang dieksport daripada mesin kehadiran (ZKTeco, fingerprint, dsb.). Punch pertama pada satu tarikh = Clock In, punch terakhir = Clock Out. ID pada fail mesti sama dengan ID staf dalam NexOffice (atau gunakan nama staf jika tiada ID).</p>
+        <div class="toolbar">
+          <div class="left">
+            <input type="file" id="attImportFile" accept=".csv,.txt,text/csv,text/plain" onchange="importAttendanceFile(this)">
+            <button class="btn btn-ghost" onclick="clearImport()">✖ Batal</button>
+          </div>
+        </div>
+        <div id="attImportResult"></div>
+      </div>
+      <div class="card" style="margin-bottom:16px">
         <h3 data-i18n="att.trend7">Trend 7 Hari</h3>
         <div id="attWeekCard"></div>
       </div>
@@ -2562,6 +2573,148 @@ function clockOut(){
   a.out = new Date().toLocaleTimeString(localeTag(),{hour:'2-digit',minute:'2-digit'});
   renderAll();
   toast(t('att.clockedOut'),'success');
+}
+
+/* ================================================================
+   IMPORT — Time attendance machine (CSV / text file)
+   ================================================================ */
+let attImportState = null;
+function toIsoDate(v){
+  const s = String(v==null?'':v).trim();
+  let m = s.match(/(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);
+  if(m) return m[1]+'-'+m[2].padStart(2,'0')+'-'+m[3].padStart(2,'0');
+  m = s.match(/(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);
+  if(m) return m[3]+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0');
+  return '';
+}
+function toHM(v){
+  const m = String(v==null?'':v).trim().match(/(\d{1,2}):(\d{2})(?::\d{2})?/);
+  if(!m) return '';
+  const h = +m[1]; if(h>23) return '';
+  return String(h).padStart(2,'0')+':'+m[2];
+}
+function attCellId(cells, name){
+  for(const cell of cells){
+    const v = String(cell).trim();
+    if(v && !toIsoDate(v) && !toHM(v) && v!==name) return v;
+  }
+  return '';
+}
+function parseAttendanceText(text){
+  const lines = String(text||'').replace(/\uFEFF/g,'').split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  if(!lines.length) return [];
+  let delim = /\s+/; let best = 1;
+  for(const d of [',',';','\t','|']){ const c = lines[0].split(d).length; if(c>best){ best=c; delim=d; } }
+  const cells = l => l.split(delim).map(c=>c.replace(/^["']+|["']+$/g,'').trim());
+  const head = cells(lines[0]).map(h=>h.toLowerCase());
+  const hasHeader = /date|tarikh|tanggal|time|jam|waktu|masa/.test(head.join(' '));
+  const rows = [];
+  if(hasHeader){
+    let colId=-1,colName=-1,colDate=-1,colTime=-1;
+    head.forEach((h,i)=>{
+      if(colTime<0 && /time|jam|waktu|masa|punch|check/.test(h)) colTime=i;
+      else if(colDate<0 && /date|tarikh|tanggal/.test(h)) colDate=i;
+      else if(colId<0 && /(^|[^a-z])(id|user\s*id|emp(?:loyee)?\s*no\.?|no\.?|nombor|badge|nip|staff\s*id|staf\s*id)([^a-z]|$)/.test(h)) colId=i;
+      else if(colName<0 && /name|nama/.test(h)) colName=i;
+    });
+    for(let i=1;i<lines.length;i++){
+      const c = cells(lines[i]);
+      let d = colDate>=0 ? toIsoDate(c[colDate]) : '';
+      let t = colTime>=0 ? toHM(c[colTime]) : '';
+      if(!d || !t) for(const cell of c){ if(!d) d=toIsoDate(cell); if(!t) t=toHM(cell); if(d&&t) break; }
+      const name = colName>=0 ? c[colName] : '';
+      const rawId = (colId>=0 ? c[colId] : '') || attCellId(c, name);
+      if(d && t) rows.push({rawId, name, date:d, time:t});
+    }
+  } else {
+    for(const line of lines){
+      const c = cells(line);
+      let d='',t='',rawId='',name='';
+      for(const cell of c){ if(!d) d=toIsoDate(cell); if(!t) t=toHM(cell); }
+      for(const cell of c){
+        const v = String(cell).trim();
+        if(v && !toIsoDate(v) && !toHM(v)){ if(!rawId) rawId=v; else if(!name) name=v; }
+      }
+      if(d && t && rawId) rows.push({rawId, name, date:d, time:t});
+    }
+  }
+  return rows;
+}
+function importAttendanceFile(input){
+  const f = input && input.files && input.files[0];
+  if(!f){ toast('Sila pilih fail CSV/TXT dahulu','warning'); return; }
+  const reader = new FileReader();
+  reader.onload = () => buildAttendanceImport(parseAttendanceText(reader.result));
+  reader.readAsText(f);
+}
+function buildAttendanceImport(parsed){
+  const box = document.getElementById('attImportResult');
+  if(!parsed || !parsed.length){ box.innerHTML = '<div class="hint-note">Tiada rekod sah ditemui dalam fail. Pastikan fail mengandungi lajur Tarikh, Masa dan ID staf.</div>'; attImportState=null; return; }
+  const groups = {}, unmatched = [];
+  for(const p of parsed){
+    const s = staffById(p.rawId) || data.staff.find(x=>x.name.toLowerCase()===String(p.name||'').trim().toLowerCase());
+    if(!s){ unmatched.push(p); continue; }
+    const key = s.id+'|'+p.date;
+    if(!groups[key]) groups[key] = {staffId:s.id, name:s.name, date:p.date, in:'', out:''};
+    const g = groups[key];
+    if(!g.in || p.time<g.in) g.in = p.time;
+    if(!g.out || p.time>g.out) g.out = p.time;
+  }
+  let skipped = 0;
+  const items = [];
+  for(const g of Object.values(groups)){
+    if(data.attendance.some(a=>a.staffId===g.staffId && a.date===g.date)){ skipped++; continue; }
+    items.push(g);
+  }
+  items.sort((a,b)=>(a.date+a.staffId).localeCompare(b.date+b.staffId));
+  attImportState = {items, unmatched, skipped};
+  renderImportPreview();
+}
+function renderImportPreview(){
+  const box = document.getElementById('attImportResult');
+  const st = attImportState;
+  if(!box || !st) return;
+  const n = st.items.length, un = st.unmatched.length, sk = st.skipped;
+  let html = `<div class="chips" style="margin:12px 0">
+    <span class="chip"><b>${n}</b> baharu</span>
+    <span class="chip">${un} tidak sepadan</span>
+    ${sk?`<span class="chip">${sk} dilangkau (sudah wujud)</span>`:''}</div>`;
+  if(n){
+    html += `<div class="table-wrap" style="max-height:260px;overflow:auto"><table>
+      <thead><tr><th>Tarikh</th><th>Staf</th><th>Clock In</th><th>Clock Out</th><th>Jam</th></tr></thead><tbody>`;
+    html += st.items.map(g=>{
+      const s = staffById(g.staffId);
+      const hrs = hoursWorked(g);
+      return `<tr><td>${esc(g.date)}</td><td><div class="person">${s?avatar(s):''}<div><b>${esc(g.name)}</b></div></div></td><td>${esc(g.in)}</td><td>${esc(g.out)}</td><td><b>${hrs?esc(hrs)+' jam':'-'}</b></td></tr>`;
+    }).join('');
+    html += `</tbody></table></div>
+      <div class="toolbar" style="margin-top:12px"><button class="btn btn-success" onclick="confirmImportAttendance()">✅ Import ${n} Rekod</button> <button class="btn btn-ghost" onclick="clearImport()">✖ Batal</button></div>`;
+  } else {
+    html += '<div class="hint-note">Tiada rekod baharu untuk diimport — semua sudah wujud atau tidak sepadan.</div>';
+  }
+  if(un){
+    const ids = [...new Set(st.unmatched.slice(0,10).map(u=>u.rawId||u.name))];
+    html += `<div class="hint-note" style="margin-top:8px">⚠️ ID tanpa padanan: ${ids.map(esc).join(', ')}${un>10?' … (+'+(un-10)+')':''}. Pastikan ID pada fail sama dengan ID staf dalam NexOffice, atau tambah staf tersebut dahulu.</div>`;
+  }
+  box.innerHTML = html;
+}
+async function confirmImportAttendance(){
+  const st = attImportState;
+  if(!st || !st.items.length) return;
+  const ok = await confirmDialog(`Import <b>${st.items.length}</b> rekod kehadiran dari mesin? Hanya rekod baharu akan ditambah (sedia ada dilangkau).`);
+  if(!ok) return;
+  for(const g of st.items) data.attendance.push({staffId:g.staffId, date:g.date, in:g.in, out:g.out});
+  save(); attImportState=null;
+  const f = document.getElementById('attImportFile'); if(f) f.value='';
+  const b = document.getElementById('attImportResult'); if(b) b.innerHTML='';
+  renderAll();
+  toast(st.items.length+' rekod kehadiran diimport dari mesin','success');
+  if(st.unmatched.length) toast(st.unmatched.length+' ID tidak sepadan — semak senarai ID staf','warning');
+}
+function clearImport(){
+  attImportState=null;
+  const f = document.getElementById('attImportFile'); if(f) f.value='';
+  const b = document.getElementById('attImportResult'); if(b) b.innerHTML='';
 }
 
 /* ================================================================
