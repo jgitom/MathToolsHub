@@ -6,10 +6,14 @@
   "author": "NexOffice",
   "license": "MIT",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jgitom/MathToolsHub.git"
+  },
   "scripts": {
     "start": "electron .",
     "pack": "electron-builder --dir",
-    "dist:win": "electron-builder --win",
+    "dist:win": "electron-builder --win --publish never",
     "dist:win:dir": "electron-builder --win --dir",
     "dist:mac": "electron-builder --mac",
     "postinstall": "node nsis-ms-patch.js"
