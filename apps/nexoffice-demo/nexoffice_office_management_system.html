@@ -513,7 +513,7 @@ dialog form{display:block;margin:0}
       <div class="card" style="margin-bottom:16px">
         <div class="toolbar">
           <div class="left">
-            <input type="month" id="payrollMonth" style="width:190px">
+            <input type="month" id="payrollMonth" style="width:190px" onchange="renderPayroll()">
             <button class="btn btn-primary" onclick="generatePayroll()" data-i18n="payroll.generate">⚡ Jana Payroll</button>
             <span class="subtitle" id="payrollMeta"></span>
           </div>
@@ -532,6 +532,24 @@ dialog form{display:block;margin:0}
           <table>
             <thead><tr><th data-i18n="staff.th.staff">Staf</th><th class="right-align" data-i18n="modal.basic">Basic</th><th class="right-align" data-i18n="modal.allowance">Allowance</th><th class="right-align" data-i18n="modal.ot">OT</th><th class="right-align" data-i18n="payslip.epf">EPF</th><th class="right-align" data-i18n="payslip.socso">SOCSO</th><th class="right-align" data-i18n="payslip.pcb">PCB</th><th class="right-align" data-i18n="payslip.epfEmp">EPF Majikan</th><th class="right-align" data-i18n="payslip.socsoEmp">SOCSO Majikan</th><th class="right-align" data-i18n="payroll.th.net">Gaji Bersih</th><th data-i18n="staff.th.actions">Tindakan</th></tr></thead>
             <tbody id="payrollBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <h3>OT Manual (Tarikh &amp; Jam)</h3>
+        <p class="subtitle" style="margin-bottom:12px">Tambah OT secara manual mengikut tarikh dan jam. Amaun OT = jam &times; kadar, dan dimasukkan ke dalam gaji bulan tersebut selepas Jana Payroll.</p>
+        <div class="toolbar">
+          <div class="left">
+            <select id="otStaff" style="min-width:180px"></select>
+            <input type="date" id="otDate" style="width:160px">
+            <input type="number" id="otHours" min="0" step="0.5" placeholder="Jam" style="width:90px">
+            <button class="btn btn-primary" onclick="addManualOt()">+ Tambah OT</button>
+          </div>
+        </div>
+        <div class="table-wrap" style="margin-top:12px">
+          <table>
+            <thead><tr><th>Tarikh</th><th>Staf</th><th class="right-align">Jam</th><th class="right-align">Amaun (RM)</th><th></th></tr></thead>
+            <tbody id="otBody"></tbody>
           </table>
         </div>
       </div>
@@ -1573,6 +1591,7 @@ function freshData(){
       {id:3,staffId:'STF001',type:'Emergency Leave',start:'2026-08-17',end:'2026-08-17',reason:'Kecemasan keluarga',status:'Approved'}
     ],
     attendance: att,
+    otRecords: [],
     payrollRuns: [],
     notifications: [
       {id:'seed1',type:'info',msg:'Selamat datang ke NexOffice v2! Sistem telah dinaik taraf.',time:Date.now(),read:false}
@@ -1593,6 +1612,7 @@ function normalize(d){
   }));
   d.leaves = (d.leaves||[]).map(l=>({id:l.id,staffId:l.staffId,type:l.type||'Annual Leave',start:l.start,end:l.end,reason:l.reason||'',status:l.status||'Pending'}));
   d.attendance = (d.attendance||[]).map(a=>({staffId:a.staffId,date:a.date,in:a.in||'',out:a.out||''}));
+  d.otRecords = (d.otRecords||[]).map(r=>({id:r.id, staffId:r.staffId, date:r.date, hours:+r.hours||0}));
   d.payrollRuns = (d.payrollRuns||[]).map(r=>({id:r.id,month:r.month,generatedOn:r.generatedOn,records:r.records||[]}));
   d.notifications = (d.notifications||[]).map(n=>({id:n.id,type:n.type||'info',msg:n.msg,time:n.time,read:!!n.read}));
   d.settings = Object.assign({orgName:'',orgReg:'',orgAddress:'',epfRate:11,socsoRate:0.5,theme:'light',lang:'ms',leaveQuotas:{annual:14,medical:14,emergency:7},lateTime:'09:00',otAuto:false,otThreshold:8,otRate:10,pcbAuto:true,epfEmpRate:12,socsoEmpRate:1.75}, d.settings||{});
@@ -1664,6 +1684,7 @@ function idbPersist(d){
     catch(e){ console.warn('IDB transaction gagal', e); res(); return; }
     tx.objectStore('meta').put({key:'version', value:d.version});
     tx.objectStore('meta').put({key:'settings', value:d.settings});
+    tx.objectStore('meta').put({key:'otRecords', value:d.otRecords||[]});
     const put = (name, arr)=>{
       const st = tx.objectStore(name);
       st.clear();
@@ -1695,7 +1716,8 @@ async function init(){
       const attendance = (await idbGetAll('attendance')).map(a=>({staffId:a.staffId,date:a.date,in:a.in||'',out:a.out||''}));
       const payrollRuns = await idbGetAll('payrollRuns');
       const notifications = await idbGetAll('notifications');
-      data = normalize({version:2, staff, leaves, attendance, payrollRuns, notifications, settings});
+      const otRecords = (meta.find(m=>m.key==='otRecords')||{}).value || [];
+      data = normalize({version:2, staff, leaves, attendance, otRecords, payrollRuns, notifications, settings});
     } else {
       // first run → migrate from localStorage (v2/v1) or seed fresh, then persist to DB
       data = load();
@@ -1773,6 +1795,43 @@ function otHoursForMonth(staffId, month){
   return Math.round(mins/6)/10;                            // total hours, 1 decimal
 }
 
+/* ---------- Manual OT (added by admin: date + hours) ---------- */
+function manualOtHoursForMonth(staffId, month){
+  return (data.otRecords||[]).filter(r=>r.staffId===staffId && (!month || (r.date||'').startsWith(month))).reduce((s,r)=>s+(Number(r.hours)||0),0);
+}
+function renderManualOT(){
+  const month = (document.getElementById('payrollMonth')?.value) || currentRun || new Date().toISOString().slice(0,7);
+  const sel = document.getElementById('otStaff');
+  if(sel && !sel.options.length){
+    sel.innerHTML = '<option value="">Pilih staf…</option>' + data.staff.filter(s=>s.status==='Aktif').map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('');
+  }
+  const rate = Number(data.settings.otRate || 10);
+  const rows = (data.otRecords||[]).filter(r=>(r.date||'').startsWith(month)).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const tb = document.getElementById('otBody');
+  tb.innerHTML = rows.length ? rows.map(r=>{
+    const s = staffById(r.staffId);
+    const amt = (Number(r.hours)||0)*rate;
+    return `<tr><td>${esc(r.date)}</td><td><div class="person">${s?avatar(s):''}<div><b>${esc(s?s.name:'?')}</b><div class="subtitle">${esc(s?s.id:'')}</div></div></div></td><td class="right-align">${Number(r.hours)||0}</td><td class="right-align">${money(amt)}</td><td><button class="btn btn-danger btn-sm" onclick="deleteManualOt('${esc(r.id)}')">🗑</button></td></tr>`;
+  }).join('') : '<tr><td colspan="5" class="empty">Tiada OT manual untuk bulan ini.</td></tr>';
+}
+function addManualOt(){
+  const staffId = document.getElementById('otStaff').value;
+  const date = document.getElementById('otDate').value;
+  const hours = Number(document.getElementById('otHours').value);
+  if(!staffId){ toast('Pilih staf dahulu','warning'); return; }
+  if(!date){ toast('Pilih tarikh OT','warning'); return; }
+  if(!(hours>0)){ toast('Masukkan jam OT','warning'); return; }
+  data.otRecords = data.otRecords || [];
+  data.otRecords.push({id:uid(), staffId, date, hours});
+  save(); renderManualOT(); renderPayroll();
+  toast('OT ditambah — jana payroll untuk masukkan ke gaji');
+}
+function deleteManualOt(id){
+  data.otRecords = (data.otRecords||[]).filter(r=>r.id!==id);
+  save(); renderManualOT(); renderPayroll();
+  toast('OT dipadam');
+}
+
 /* ---------- Payroll calc ---------- */
 // Simplified Malaysian monthly PCB (MTD) estimate based on the annual progressive
 // tax brackets (YA 2024/25). EPF employee share capped at RM400/month; RM400 rebate
@@ -1794,14 +1853,16 @@ function payroll(s, month){ return payrollWith(s, data.settings, month); }
 function payrollWith(s, cfg, month){
   const manual = Number(s.ot||0);
   const autoHours = otHoursForMonth(s.id, month);
-  const ot = (cfg.otAuto && autoHours>0) ? Math.round(autoHours*Number(cfg.otRate||10)*100)/100 : manual;
+  const manualHours = manualOtHoursForMonth(s.id, month);
+  const otHours = Math.round(((cfg.otAuto ? autoHours : 0) + manualHours) * 10) / 10;
+  const ot = otHours > 0 ? Math.round(otHours*Number(cfg.otRate||10)*100)/100 : manual;
   const gross = Number(s.basic||0)+Number(s.allowance||0)+ot;
   const epf = gross*(Number(cfg.epfRate||11)/100);
   const socso = gross*(Number(cfg.socsoRate||0.5)/100);
   const pcb = (cfg.pcbAuto!==false) ? calcPCB(gross) : Number(s.pcb||0);
   const epfEmp = Math.round(gross*(Number(cfg.epfEmpRate||12)/100)*100)/100;
   const socsoEmp = Math.round(gross*(Number(cfg.socsoEmpRate||1.75)/100)*100)/100;
-  return {gross, epf, socso, pcb, epfEmp, socsoEmp, empTotal: epfEmp+socsoEmp, net: gross-epf-socso-pcb, ot, otHours: autoHours};
+  return {gross, epf, socso, pcb, epfEmp, socsoEmp, empTotal: epfEmp+socsoEmp, net: gross-epf-socso-pcb, ot, otHours};
 }
 
 /* ---------- Leave balance (derived) ---------- */
@@ -2166,6 +2227,7 @@ function renderPayroll(){
       <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteRun('${r.month}')">🗑</button>
     </div>`;
   }).join('') : '<div class="empty">'+t('payroll.historyEmpty')+'</div>';
+  renderManualOT();
 }
 function viewRun(month){
   document.getElementById('payrollMonth').value = month;
