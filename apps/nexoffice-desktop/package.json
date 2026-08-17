@@ -1,0 +1,21 @@
+{
+  "name": "nexoffice",
+  "version": "1.0.0",
+  "description": "NexOffice — Office Management System (sistem pengurusan pejabat: staf, gaji, cuti, kehadiran, laporan)",
+  "main": "electron/main.js",
+  "author": "NexOffice",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist:win": "electron-builder --win",
+    "dist:win:dir": "electron-builder --win --dir",
+    "dist:mac": "electron-builder --mac",
+    "postinstall": "node nsis-ms-patch.js"
+  },
+  "devDependencies": {
+    "electron": "^31.7.6",
+    "electron-builder": "^24.13.3"
+  }
+}
