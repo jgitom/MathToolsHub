@@ -2,7 +2,7 @@
   const SUPABASE_URL = "https://cenayutywkiljwqyxfii.supabase.co";
   const PUBLISHABLE_KEY = "sb_publishable_yzzaOuTuhztpDyeRsx2BhA_maGOdj0W";
   const FALLBACK = Object.freeze({
-    mode: "live",
+    mode: "disabled",
     plans: Object.freeze([
       Object.freeze({ assetLimit: 1000, amount: 199, checkoutUrl: "" }),
       Object.freeze({ assetLimit: 10000, amount: 599, checkoutUrl: "" }),
@@ -18,7 +18,12 @@
   })
     .then(response => response.json())
     .then(config => {
-      if (!config || !Array.isArray(config.plans)) return;
+      // Checkout disabled (default until ASSET_CHECKOUT_ENABLED=true) — keep plans but no URLs.
+      if (!config || config.mode === "disabled" || !Array.isArray(config.plans) || !config.plans.length) {
+        window.MATHTOOLSHUB_ASSET_PAYMENT = Object.freeze({ mode: "disabled", plans: FALLBACK.plans });
+        document.dispatchEvent(new CustomEvent("asset-payment-ready"));
+        return;
+      }
       const merged = FALLBACK.plans.map(fallbackPlan => {
         const live = config.plans.find(plan => plan.assetLimit === fallbackPlan.assetLimit);
         return Object.freeze({ ...fallbackPlan, checkoutUrl: live?.checkoutUrl ?? fallbackPlan.checkoutUrl });
