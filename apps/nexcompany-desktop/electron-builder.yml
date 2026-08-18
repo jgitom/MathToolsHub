@@ -27,7 +27,7 @@ win:
     - target: nsis
       arch:
         - x64
-  icon: build/icon.png
+  icon: build/icon.ico
   executableName: NexCompanyAI
 
 nsis:
@@ -40,8 +40,8 @@ nsis:
   artifactName: "NexCompany-Setup-${version}.${ext}"
   deleteAppDataOnUninstall: false
   license: build/license.txt
-  installerIcon: build/icon.png
-  uninstallerIcon: build/icon.png
+  installerIcon: build/icon.ico
+  uninstallerIcon: build/icon.ico
 
 # ---------- macOS (optional) ----------
 mac:
