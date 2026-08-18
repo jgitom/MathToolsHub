@@ -1,0 +1,18 @@
+{
+  "name": "NexCompany AI",
+  "short_name": "NexCompany",
+  "description": "Integrated company management system — HR, payroll, finance, CRM, memos and audit.",
+  "id": "nexcompany-ai",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b1020",
+  "theme_color": "#1f6feb",
+  "categories": ["business", "productivity"],
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
