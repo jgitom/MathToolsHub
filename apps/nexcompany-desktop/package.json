@@ -1,0 +1,24 @@
+{
+  "name": "nexcompany",
+  "version": "2.0.0",
+  "description": "NexCompany AI — integrated company management system (HR, payroll, finance, CRM, memos, audit, offline-first)",
+  "main": "electron/main.js",
+  "author": "NexCompany",
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jgitom/MathToolsHub.git"
+  },
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist:win": "electron-builder --win --publish never",
+    "dist:win:dir": "electron-builder --win --dir",
+    "dist:mac": "electron-builder --mac"
+  },
+  "devDependencies": {
+    "electron": "^31.7.6",
+    "electron-builder": "^24.13.3"
+  }
+}
