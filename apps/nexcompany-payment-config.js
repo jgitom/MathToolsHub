@@ -5,9 +5,9 @@
     mode: "disabled",
     product: "mathtoolshub-nexcompany",
     plans: Object.freeze([
-      Object.freeze({ edition: "Starter", amount: 19900, checkoutUrl: "" }),
-      Object.freeze({ edition: "Standard", amount: 39900, checkoutUrl: "" }),
-      Object.freeze({ edition: "Business", amount: 89900, checkoutUrl: "" })
+      Object.freeze({ edition: "Starter", amount: 39900, checkoutUrl: "" }),
+      Object.freeze({ edition: "Standard", amount: 59900, checkoutUrl: "" }),
+      Object.freeze({ edition: "Business", amount: 109900, checkoutUrl: "" })
     ])
   });
   window.MATHTOOLSHUB_NEXCOMPANY_PAYMENT = FALLBACK;
