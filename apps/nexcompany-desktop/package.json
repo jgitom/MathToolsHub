@@ -1,7 +1,7 @@
 {
   "name": "nexcompany",
   "version": "2.0.0",
-  "description": "NexCompany AI — integrated company management system (HR, payroll, finance, CRM, memos, audit, offline-first)",
+  "description": "NexCompany AI - integrated company management system (HR, payroll, finance, CRM, memos, audit, offline-first)",
   "main": "electron/main.js",
   "author": "NexCompany",
   "license": "MIT",
