@@ -1,0 +1,2865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Modern and ancient unit converter by Juil Gitom with historical notes — browse by civilization, save favorites, editable two-way conversions." />
+<meta name="theme-color" content="#080b12" />
+<title>ChronoConvert by Juil Gitom — The Chronographer's Archive</title>
+<style>
+:root{
+  --bg0:#080b12; --bg1:#0c101c; --panel:#111726; --panel2:#0d1322;
+  --line:#26304a; --line2:#3a466b; --text:#ece5d6; --muted:#a29378;
+  --gold:#d9b36a; --gold2:#f2dcab; --bronze:#b5814f; --teal:#8ec6b0;
+  --danger:#e0786d; --ink:#06080f;
+  --shadow:0 24px 60px rgba(0,0,0,.45);
+  --serif:Georgia,"Times New Roman",serif;
+  --sans:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;color:var(--text);font-family:var(--sans);
+  background:
+    radial-gradient(1200px 620px at 85% -10%, rgba(217,179,106,.10), transparent 60%),
+    radial-gradient(900px 520px at -12% 0%, rgba(142,198,176,.08), transparent 55%),
+    radial-gradient(640px 320px at 50% 120%, rgba(181,129,79,.10), transparent 60%),
+    var(--bg0);
+}
+body:before{ /* faint constellation dots */
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.45;
+  background-image:radial-gradient(rgba(236,229,214,.13) 1px, transparent 1.5px);
+  background-size:26px 26px;
+}
+body:after{ /* gold accent bar */
+  content:"";position:fixed;inset:0 0 auto;height:4px;z-index:20;
+  background:linear-gradient(90deg,var(--gold),var(--bronze),var(--teal),var(--gold));
+}
+button,input,select{font:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.container{position:relative;z-index:1;width:min(1240px,92vw);margin:auto;padding:40px 0 44px}
+
+/* ---------- header ---------- */
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;padding-bottom:22px;border-bottom:1px solid rgba(58,70,107,.45);margin-bottom:26px}
+.brand{display:flex;gap:18px;align-items:center}
+.medallion{
+  width:66px;height:66px;border-radius:50%;display:grid;place-items:center;flex:none;
+  background:radial-gradient(circle at 32% 26%, #22304c, #0a0f1b 72%);
+  border:1px solid rgba(217,179,106,.55);
+  box-shadow:0 0 0 4px rgba(217,179,106,.10), 0 0 0 1px rgba(217,179,106,.22), inset 0 0 20px rgba(217,179,106,.10), var(--shadow);
+  transition:box-shadow .25s, transform .25s;
+}
+.brand:hover .medallion{transform:translateY(-1px);box-shadow:0 0 0 5px rgba(217,179,106,.16), 0 0 0 1px rgba(217,179,106,.35), inset 0 0 22px rgba(217,179,106,.16), var(--shadow)}
+.monogram{
+  font-family:var(--serif);font-weight:700;font-size:27px;letter-spacing:.04em;
+  background:linear-gradient(160deg,#f6e6c0 5%,#caa05c 55%,#8a5b25 95%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.byline{margin:.5rem 0 0;font-family:var(--sans);font-size:.68rem;font-weight:800;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:10px}
+.byline:before,.byline:after{content:"";height:1px;width:24px;flex:none}
+.byline:before{background:linear-gradient(90deg,transparent,var(--gold))}
+.byline:after{background:linear-gradient(90deg,var(--gold),transparent)}
+h1{
+  margin:0;font-family:var(--serif);font-weight:500;font-size:clamp(2.2rem,5vw,3.9rem);
+  line-height:.95;letter-spacing:-.05em;
+  background:linear-gradient(180deg,#f4ecd9,#c9a05c);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.subtitle{color:var(--muted);margin:.45rem 0 0;line-height:1.5;font-size:.95rem;max-width:600px}
+.badges{display:flex;gap:8px;align-items:center}
+.badge{
+  border:1px solid var(--line2);background:rgba(217,179,106,.06);color:var(--gold2);
+  padding:7px 12px;border-radius:999px;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;white-space:nowrap;
+}
+.lang-sel{width:auto;max-width:130px;border:1px solid var(--line2);border-radius:999px;background:var(--panel);color:var(--gold2);padding:7px 10px;font-size:.76rem;cursor:pointer;font-weight:700}
+.lang-sel option{background:#0b1120;color:var(--text)}
+[dir="rtl"] .side-tag{margin-left:0;margin-right:6px}
+[dir="rtl"] .result:after{right:auto;left:14px}
+.help-btn{
+  width:34px;height:34px;border-radius:50%;border:1px solid var(--line2);background:var(--panel);
+  color:var(--gold);font-weight:800;font-size:1rem;
+}
+.help-btn:hover{border-color:var(--gold);color:var(--gold2)}
+
+/* ---------- civilization filter ---------- */
+.era-row{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 22px}
+.era-chip{
+  border:1px solid var(--line);background:var(--panel);color:var(--muted);
+  padding:7px 13px;border-radius:999px;cursor:pointer;font-size:.8rem;
+}
+.era-chip:hover{color:var(--gold2);border-color:var(--line2)}
+.era-chip.active{
+  background:linear-gradient(180deg,#1a2337,#141c2c);color:var(--gold2);
+  border-color:var(--gold);box-shadow:0 0 0 3px rgba(217,179,106,.12);font-weight:700;
+}
+
+/* ---------- layout ---------- */
+.grid{display:grid;grid-template-columns:1.4fr .6fr;gap:22px;align-items:start}
+.card{
+  background:linear-gradient(180deg,rgba(17,23,38,.97),rgba(12,18,31,.98));
+  border:1px solid var(--line);border-radius:6px;box-shadow:var(--shadow);position:relative;
+}
+.card:before{content:"";position:absolute;inset:6px;border:1px solid rgba(217,179,106,.10);pointer-events:none;border-radius:3px}
+.main{padding:26px}.side{padding:22px}
+
+/* ---------- category tabs ---------- */
+.tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:22px}
+.tab{
+  font-family:var(--sans);background:none;border:0;color:var(--muted);padding:8px 11px;
+  border-radius:4px;cursor:pointer;font-size:.84rem;position:relative;
+}
+.tab:hover{color:var(--text);background:var(--panel2)}
+.tab.active{color:var(--gold2);background:linear-gradient(180deg,#1b2438,#121a2b);font-weight:700}
+.tab.active:after{content:"";position:absolute;left:10px;right:10px;bottom:-15px;height:2px;background:var(--gold)}
+.tab-count{margin-left:5px;font-size:.66rem;color:var(--muted)}
+.tab.active .tab-count{color:var(--gold)}
+.tab.empty{opacity:.38}
+
+/* ---------- converter ---------- */
+.converter{display:grid;grid-template-columns:1fr 54px 1fr;gap:16px;align-items:end}
+label{display:block;color:var(--muted);font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px}
+.side-tag{font-weight:600;color:var(--muted);text-transform:none;letter-spacing:.02em;font-size:.7rem;margin-left:6px}
+.side-tag.live{color:var(--gold)}
+input,select{
+  width:100%;border:1px solid var(--line);border-radius:4px;background:#0b1120;color:var(--text);
+  padding:13px 14px;outline:none;font-family:var(--sans);
+}
+input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(217,179,106,.14)}
+select option{background:#0b1120;color:var(--text)}
+.mid-col{display:grid;place-items:center}
+.swap{
+  height:48px;width:48px;border-radius:4px;border:1px solid var(--line2);background:var(--panel2);
+  color:var(--gold);font-size:20px;box-shadow:0 3px 0 #0a0f1c;
+}
+.swap:hover{transform:rotate(180deg);transition:.3s;color:var(--gold2);border-color:var(--gold)}
+.swap:active{translate:0 2px;box-shadow:0 1px 0 #0a0f1c}
+
+/* ---------- quick values ---------- */
+.quick{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:16px}
+.quick button,.history-clear,.action-btn{
+  border:1px solid var(--line);background:var(--panel2);color:var(--text);
+  border-radius:4px;padding:9px 12px;font-family:var(--sans);font-size:.82rem;
+}
+.quick button:hover,.action-btn:hover{border-color:var(--gold);color:var(--gold2)}
+
+/* ---------- result ---------- */
+.result{
+  position:relative;margin-top:22px;padding:24px;border-radius:4px;
+  background:linear-gradient(180deg,rgba(217,179,106,.08),rgba(217,179,106,.03));
+  border:1px solid rgba(217,179,106,.28);border-left:5px solid var(--gold);
+}
+.result:after{
+  content:"CONVERSION RECORD";position:absolute;right:14px;top:12px;
+  color:rgba(236,229,214,.16);font:700 .6rem var(--sans);letter-spacing:.18em;
+}
+.result-label{font-family:var(--sans);color:var(--gold);font-weight:800;text-transform:uppercase;letter-spacing:.12em;font-size:.68rem}
+.result-value{font-family:var(--serif);font-size:clamp(1.6rem,3.6vw,2.7rem);margin:10px 0 8px;font-weight:500;overflow-wrap:anywhere}
+.formula{color:var(--muted);font-family:var(--mono);font-size:.86rem}
+.result-actions{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+.action-btn.fav.on{background:rgba(217,179,106,.16);border-color:var(--gold);color:var(--gold2)}
+
+/* ---------- history ---------- */
+.history{margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
+.history-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.history h3{font-family:var(--serif);font-weight:500;margin:0;font-size:1.05rem}
+.history-clear{font-size:.72rem;padding:6px 9px}
+.history-list{display:flex;flex-direction:column;gap:6px;max-height:290px;overflow:auto}
+.history-row{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  border:1px solid var(--line);border-radius:4px;background:var(--panel2);padding:9px 11px;
+}
+.history-row:hover{border-color:var(--line2)}
+.h-line{font-size:.9rem;font-variant-numeric:tabular-nums;display:flex;gap:7px;align-items:baseline;flex-wrap:wrap}
+.h-arrow{color:var(--gold)}
+.h-to{color:var(--gold2);font-weight:700}
+.h-meta{color:var(--muted);font-size:.68rem;margin-top:3px;display:flex;gap:10px;text-transform:uppercase;letter-spacing:.06em}
+.h-actions{display:flex;gap:4px;flex:none}
+.h-btn{border:1px solid var(--line);background:#0b1120;color:var(--muted);width:26px;height:26px;border-radius:4px;cursor:pointer;font-size:.85rem;line-height:1}
+.h-btn:hover{color:var(--gold2);border-color:var(--gold)}
+.history-empty{color:var(--muted);font-size:.85rem;padding:8px 2px}
+
+/* ---------- side panel / unit browser ---------- */
+.search-wrap{margin-bottom:14px}
+.browser-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+.unit-list{max-height:520px;overflow:auto;padding-right:6px}
+.unit-item{padding:12px 10px;border-bottom:1px solid rgba(38,48,74,.6);cursor:pointer}
+.unit-item:hover{background:var(--panel2)}
+.unit-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.unit-name{font-weight:600;font-size:.95rem}
+.unit-name .unit-sym{color:var(--muted);font-weight:400}
+.unit-meta{color:var(--muted);font-size:.76rem;margin-top:4px;line-height:1.45}
+.ancient .unit-name{color:var(--gold2)}
+.unit-fav{border:0;background:none;color:var(--muted);cursor:pointer;font-size:1.05rem;padding:2px 4px;line-height:1}
+.unit-fav.on{color:var(--gold)}
+.unit-fav:hover{color:var(--gold2)}
+.notice{margin-top:18px;padding:13px;border-radius:4px;background:rgba(142,198,176,.07);border:1px solid rgba(142,198,176,.22);color:#c9e3d8;font-size:.8rem;line-height:1.55}
+
+/* ---------- footer ---------- */
+footer{margin-top:34px;color:var(--muted);text-align:center;font-size:.8rem;line-height:1.7}
+.colophon{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:16px}
+.colophon-mark{
+  width:46px;height:46px;border-radius:50%;display:grid;place-items:center;flex:none;
+  font-family:var(--serif);font-weight:700;font-size:18px;color:var(--gold2);
+  background:radial-gradient(circle at 32% 26%, #22304c, #0a0f1b 72%);
+  border:1px solid rgba(217,179,106,.5);
+  box-shadow:0 0 0 3px rgba(217,179,106,.08), inset 0 0 14px rgba(217,179,106,.10);
+}
+.colophon-text{text-align:left}
+.colophon-title{margin:0;font-family:var(--serif);font-size:1.1rem;color:var(--gold2);line-height:1.2}
+.colophon-creator{margin:2px 0 0;font-size:.68rem;font-weight:800;letter-spacing:.28em;text-transform:uppercase;color:var(--gold)}
+.colophon-desc{margin:6px 0 0;color:var(--muted);font-size:.78rem;max-width:520px}
+.ornament{color:var(--gold);letter-spacing:.9em;display:block;margin:0 0 12px}
+.copyright{margin:0;font-size:.7rem;color:var(--muted);letter-spacing:.06em}
+.licensing{margin:4px 0 0;font-size:.7rem;color:var(--gold);letter-spacing:.04em}
+.shortcuts-hint{font-size:.72rem;color:var(--muted);margin:10px 0 0}
+kbd{border:1px solid var(--line2);border-bottom-width:2px;border-radius:3px;padding:0 5px;background:var(--panel2);font-family:var(--mono);font-size:.68rem;color:var(--gold2)}
+
+/* ---------- help panel ---------- */
+.help-panel{
+  position:fixed;inset:auto 22px 22px auto;z-index:25;width:min(370px,92vw);
+  background:#111726;border:1px solid var(--line2);border-radius:6px;box-shadow:var(--shadow);padding:20px;
+}
+.help-panel h4{margin:0 0 12px;font-family:var(--serif);font-weight:500;color:var(--gold2);font-size:1.05rem}
+.help-panel ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.help-panel li{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:.82rem}
+.help-panel p{color:var(--muted);font-size:.74rem;margin:14px 0 0;line-height:1.5}
+.help-close{position:absolute;top:10px;right:12px;background:none;border:0;color:var(--muted);cursor:pointer;font-size:1.05rem;line-height:1}
+.help-close:hover{color:var(--gold2)}
+
+/* ---------- toast ---------- */
+.toast{
+  position:fixed;left:50%;bottom:26px;translate:-50% 20px;z-index:60;
+  background:#1a2337;border:1px solid var(--gold);color:var(--gold2);
+  padding:11px 18px;border-radius:4px;font:700 .8rem var(--sans);
+  opacity:0;pointer-events:none;transition:.22s;box-shadow:var(--shadow);
+}
+.toast.show{opacity:1;translate:-50% 0}
+
+/* ---------- map & measure ---------- */
+.map-open-btn{
+  border:1px solid var(--gold);background:linear-gradient(180deg,#1a2337,#141c2c);
+  color:var(--gold2);padding:8px 14px;border-radius:999px;font-size:.78rem;font-weight:700;
+  letter-spacing:.04em;white-space:nowrap;
+}
+.map-open-btn:hover{border-color:var(--gold2);box-shadow:0 0 0 3px rgba(217,179,106,.15)}
+.map-modal{position:fixed;inset:0;z-index:40;background:rgba(6,8,15,.74);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:grid;place-items:center;padding:24px}
+.map-modal[hidden]{display:none!important}
+.map-frame{width:min(1020px,96vw);height:min(720px,92vh);background:var(--panel);border:1px solid var(--line2);border-radius:6px;box-shadow:var(--shadow);display:grid;grid-template-rows:auto 1fr auto;overflow:hidden}
+.map-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line)}
+.map-title{font-family:var(--serif);font-size:1.1rem;color:var(--gold2)}
+.map-tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.m-btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:4px;padding:7px 12px;font-size:.8rem;font-family:var(--sans)}
+.m-btn:hover{border-color:var(--gold);color:var(--gold2)}
+.m-btn.active{background:linear-gradient(180deg,#1a2337,#141c2c);border-color:var(--gold);color:var(--gold2);font-weight:700}
+.m-btn:disabled{opacity:.35;cursor:default}
+.m-btn:disabled:hover{border-color:var(--line);color:var(--text)}
+.m-btn.close{width:30px;height:30px;padding:0;font-size:1.1rem;line-height:1;margin-left:6px}
+.m-sep{width:1px;height:22px;background:var(--line2);margin:0 4px}
+.map-canvas{position:relative;width:100%;height:100%;background:#0d1117}
+.map-hint{position:absolute;left:50%;top:12px;translate:-50% 0;z-index:1000;background:rgba(6,8,15,.85);border:1px solid var(--line2);color:var(--muted);padding:6px 14px;border-radius:999px;font-size:.72rem;pointer-events:none}
+.map-coord{position:absolute;left:12px;top:12px;z-index:1000;background:rgba(6,8,15,.88);border:1px solid var(--line2);color:var(--gold2);padding:6px 12px;border-radius:999px;font:600 .74rem ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;letter-spacing:.02em;pointer-events:none;opacity:.55;transition:opacity .15s}
+.map-coord.live{opacity:1;border-color:rgba(217,179,106,.5)}
+.map-coord-entry{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 16px;border-bottom:1px solid var(--line);background:rgba(6,8,15,.35)}
+.map-coord-entry .coord-pin{font-size:1rem;line-height:1}
+.map-coord-entry label{display:inline;margin:0;text-transform:none;letter-spacing:.02em;color:var(--gold);font-size:.7rem;font-weight:800}
+.map-coord-entry input{width:120px;padding:7px 10px;font-size:.82rem}
+.m-btn.primary{background:linear-gradient(180deg,#1a2337,#141c2c);border-color:var(--gold);color:var(--gold2);font-weight:700}
+@media(max-width:640px){.map-coord-entry input{width:96px}}
+.map-result{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:12px 16px;border-top:1px solid var(--line);background:rgba(217,179,106,.05)}
+.map-value{font-family:var(--serif);font-size:1.35rem;color:var(--gold2);font-variant-numeric:tabular-nums;min-width:150px}
+.map-conv{color:var(--muted);font-size:.82rem;flex:1;min-width:200px;line-height:1.5}
+.map-conv b{color:var(--gold);font-weight:600}
+.leaflet-container{font-family:var(--sans)}
+.leaflet-bar a{background:rgba(6,8,15,.88)!important;color:var(--gold2)!important;border-color:var(--line2)!important}
+.leaflet-control-attribution{background:rgba(6,8,15,.88)!important;color:var(--muted)!important;font-size:.62rem!important}
+.leaflet-control-attribution a{color:var(--gold2)!important}
+@media(max-width:640px){
+  .map-modal{padding:0}
+  .map-frame{width:100vw;height:100vh;border-radius:0;border:0}
+  .map-head{padding:10px 12px}
+  .map-result{padding:10px 12px}
+}
+
+@media(max-width:880px){.grid{grid-template-columns:1fr}}
+@media(max-width:640px){
+  .container{width:min(94vw,640px);padding-top:26px}
+  header{flex-wrap:wrap;gap:14px}
+  .converter{grid-template-columns:1fr}
+  .swap{transform:rotate(90deg)}
+  .quick{grid-template-columns:repeat(3,1fr)}
+  .badges .badge{display:none}
+  .brand{gap:12px}.medallion{width:54px;height:54px}.monogram{font-size:22px}
+  .colophon{flex-direction:column;gap:10px}
+  .colophon-text{text-align:center}
+}
+@media(prefers-reduced-motion:reduce){
+  *{transition:none!important;scroll-behavior:auto!important}
+  .swap:hover{transform:none}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="brand">
+      <div class="medallion" aria-hidden="true"><span class="monogram">JG</span></div>
+      <div>
+        <h1>ChronoConvert</h1>
+        <p class="byline">Juil Gitom</p>
+        <p class="subtitle" data-i18n="subtitle">A field guide to measurement — across laboratories, empires, markets, and millennia. Browse by civilization, convert both ways, and keep a scholar&rsquo;s log.</p>
+      </div>
+    </div>
+    <div class="badges">
+      <select id="langSel" class="lang-sel" aria-label="Language"></select>
+      <span class="badge" id="statCat">…</span>
+      <span class="badge" id="statUnit">…</span>
+      <button class="map-open-btn" id="mapOpenBtn" type="button" data-i18n="mapBtn" data-i18n-title="mapBtnTitle">🗺️ Map &amp; Measure</button>
+      <button class="help-btn" id="helpBtn" type="button" data-i18n-aria="helpBtnTitle" data-i18n-title="helpBtnTitle">?</button>
+    </div>
+  </header>
+
+  <div class="era-row" id="eraRow" aria-label="Filter units by civilization" data-i18n-aria="eraAria"></div>
+
+  <div class="grid">
+    <section class="card main">
+      <div class="tabs" id="tabs" role="tablist" aria-label="Measurement categories" data-i18n-aria="tabsAria"></div>
+
+      <div class="converter">
+        <div>
+          <label for="fromValue"><span data-i18n="labelValue">Value</span> <span class="side-tag" id="fromTag">source</span></label>
+          <input id="fromValue" type="text" inputmode="decimal" value="1" aria-label="Input value" data-i18n-aria="fromValueAria" />
+          <div style="height:12px"></div>
+          <label for="fromUnit" data-i18n="labelFromUnit">From unit</label>
+          <select id="fromUnit" aria-label="From unit"></select>
+        </div>
+        <div class="mid-col">
+          <button class="swap" id="swapBtn" type="button" aria-label="Swap units" title="Swap units" data-i18n-aria="swapTitle" data-i18n-title="swapTitle">⇄</button>
+        </div>
+        <div>
+          <label for="toValue"><span data-i18n="labelConverted">Converted</span> <span class="side-tag" id="toTag">result</span></label>
+          <input id="toValue" type="text" inputmode="decimal" aria-label="Converted value (editable)" data-i18n-aria="toValueAria" />
+          <div style="height:12px"></div>
+          <label for="toUnit" data-i18n="labelToUnit">To unit</label>
+          <select id="toUnit" aria-label="To unit"></select>
+        </div>
+      </div>
+
+      <div class="quick">
+        <button data-v="1" type="button">1</button>
+        <button data-v="10" type="button">10</button>
+        <button data-v="100" type="button">100</button>
+        <button data-v="1000" type="button">1,000</button>
+        <button data-v="0.5" type="button">½</button>
+        <button id="clearBtn" type="button" data-i18n="clear">Clear</button>
+      </div>
+
+      <div class="result" id="resultCard">
+        <div class="result-label" data-i18n="resultLabel">Conversion record</div>
+        <div class="result-value" id="resultValue" role="status" aria-live="polite">—</div>
+        <div class="formula" id="formula">Select units to begin</div>
+        <div class="result-actions">
+          <button class="action-btn" id="copyBtn" type="button" data-i18n="copy" data-i18n-title="copyTitle">⧉ Copy</button>
+          <button class="action-btn" id="reverseBtn" type="button" data-i18n="reverse" data-i18n-title="reverseTitle">⇄ Reverse</button>
+          <button class="action-btn fav" id="favBtn" type="button" data-i18n-title="saveTitle" aria-pressed="false">☆ Save</button>
+        </div>
+      </div>
+
+      <div class="history">
+        <div class="history-head">
+          <h3 data-i18n="recent">Recent conversions</h3>
+          <button class="history-clear" id="clearHistoryBtn" type="button" data-i18n="clearAll">Clear all</button>
+        </div>
+        <div class="history-list" id="historyList"></div>
+      </div>
+    </section>
+
+    <aside class="card side">
+      <div class="search-wrap">
+        <label for="unitSearch" data-i18n="searchLabel">Search measures</label>
+        <input id="unitSearch" placeholder="cubit, shekel, denarius…" data-i18n-ph="searchPh" />
+      </div>
+      <div class="browser-head"><span id="browserTitle">All measures — Length</span></div>
+      <div class="unit-list" id="unitList" role="list"></div>
+      <div class="notice">
+        <strong data-i18n="noticeTitle">Accuracy note:</strong> <span data-i18n="noticeBody">Ancient units varied by era, region, ruler, and artifact. Values marked &ldquo;approx.&rdquo; are practical scholarly estimates, not universal constants.</span>
+      </div>
+    </aside>
+  </div>
+
+  <footer>
+    <div class="colophon">
+      <span class="colophon-mark" aria-hidden="true">JG</span>
+      <div class="colophon-text">
+        <p class="colophon-title">ChronoConvert</p>
+        <p class="colophon-creator">Juil Gitom</p>
+        <p class="colophon-desc"><span data-i18n="footerText">offline-ready single-file application. Historical conversions are educational approximations.</span></p>
+      </div>
+    </div>
+    <span class="ornament">◆&nbsp;&nbsp;◆&nbsp;&nbsp;◆</span>
+    <p class="copyright">© 2026 Juil Gitom</p>
+    <p class="licensing">Available for commercial licensing &amp; white-label</p>
+    <p class="shortcuts-hint" id="shortcutsHint" data-i18n-html="shortcutsHint"></p>
+  </footer>
+</div>
+
+<div class="map-modal" id="mapWin" hidden>
+  <div class="map-frame">
+    <div class="map-head">
+      <div class="map-title" data-i18n="mapTitle">🗺️ Map &amp; Measure</div>
+      <div class="map-tools">
+        <button class="m-btn active" id="modeDistance" type="button" data-i18n="modeDistance">Distance</button>
+        <button class="m-btn" id="modeArea" type="button" data-i18n="modeArea">Area</button>
+        <span class="m-sep"></span>
+        <button class="m-btn" id="mapUndo" type="button" disabled data-i18n="undo">↶ Undo</button>
+        <button class="m-btn" id="mapClear" type="button" disabled data-i18n="clearM">✕ Clear</button>
+        <button class="m-btn close" id="mapClose" type="button" aria-label="Close map" data-i18n-aria="closeMap">×</button>
+      </div>
+    </div>
+    <div class="map-coord-entry">
+      <span class="coord-pin" aria-hidden="true">📍</span>
+      <label for="mapLat" data-i18n="latitude">Latitude</label>
+      <input id="mapLat" type="number" step="any" placeholder="28.6139" />
+      <label for="mapLng" data-i18n="longitude">Longitude</label>
+      <input id="mapLng" type="number" step="any" placeholder="77.2090" />
+      <button class="m-btn primary" id="mapLocateBtn" type="button" data-i18n="locate">Locate</button>
+      <button class="m-btn" id="mapAddPointBtn" type="button" data-i18n="addPoint">Add point</button>
+    </div>
+    <div class="map-canvas" id="mapEl">
+      <div class="map-coord" id="mapCoord">—</div>
+    </div>
+    <div class="map-result">
+      <div class="map-value" id="mapValue">—</div>
+      <div class="map-conv" id="mapConv" data-i18n="clickToAdd">Click the map to add points</div>
+      <button class="action-btn" id="mapSend" type="button" disabled data-i18n="send">Send to converter</button>
+    </div>
+  </div>
+</div>
+
+<div class="help-panel" id="helpPanel" hidden>
+  <button class="help-close" id="helpClose" type="button" data-i18n-aria="closeHelp">×</button>
+  <h4 data-i18n="helpTitle">Archive shortcuts</h4>
+  <ul>
+    <li><span data-i18n="helpCopy">Copy result</span><kbd>⌘/Ctrl C</kbd></li>
+    <li><span data-i18n="helpFocus">Focus value field</span><kbd>⌘/Ctrl E</kbd></li>
+    <li><span data-i18n="helpSearch">Search units</span><kbd>⌘/Ctrl F</kbd></li>
+    <li><span data-i18n="helpSave">Save conversion</span><kbd>⌘/Ctrl S</kbd></li>
+    <li><span data-i18n="helpReset">Reset / close</span><kbd>Esc</kbd></li>
+  </ul>
+  <p data-i18n="helpBody">Type into either value field to convert in that direction. ★ marks a favorite unit or saved conversion — both persist in your browser only.</p>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const categories = {
+  length:{label:"Length",icon:"📏",base:"metre",units:[
+    {n:"Metre",s:"m",f:1,civ:"Modern"},
+    {n:"Kilometre",s:"km",f:1000,civ:"Modern"},
+    {n:"Centimetre",s:"cm",f:.01,civ:"Modern"},
+    {n:"Millimetre",s:"mm",f:.001,civ:"Modern"},
+    {n:"Micrometre",s:"µm",f:1e-6,civ:"Modern"},
+    {n:"Nanometre",s:"nm",f:1e-9,civ:"Modern"},
+    {n:"Inch",s:"in",f:.0254,civ:"Modern"},
+    {n:"Foot",s:"ft",f:.3048,civ:"Modern"},
+    {n:"Yard",s:"yd",f:.9144,civ:"Modern"},
+    {n:"Mile",s:"mi",f:1609.344,civ:"Modern"},
+    {n:"Nautical mile",s:"nmi",f:1852,civ:"Modern"},
+    {n:"Astronomical unit",s:"au",f:1.495978707e11,civ:"Modern"},
+    {n:"Light-second",s:"ls",f:299792458,civ:"Modern"},
+    {n:"Egyptian royal cubit",s:"royal cubit",f:.525,anc:true,civ:"Egypt",note:"approx. 52.5 cm; standards varied by period"},
+    {n:"Egyptian common cubit",s:"cubit",f:.45,anc:true,civ:"Egypt",note:"approx. 45 cm"},
+    {n:"Egyptian digit",s:"digit",f:.01875,anc:true,civ:"Egypt",note:"1/28 royal cubit; approx."},
+    {n:"Roman foot (pes)",s:"pes",f:.296,anc:true,civ:"Rome",note:"approx. 296 mm"},
+    {n:"Roman digitus",s:"digitus",f:.0185,anc:true,civ:"Rome",note:"1/16 pes; approx."},
+    {n:"Roman palm",s:"palma",f:.074,anc:true,civ:"Rome",note:"1/4 pes; approx."},
+    {n:"Roman pace (passus)",s:"passus",f:1.48,anc:true,civ:"Rome",note:"5 Roman feet"},
+    {n:"Roman mile",s:"Roman mile",f:1480,anc:true,civ:"Rome",note:"approx. 1.48 km"},
+    {n:"Greek foot (pous)",s:"pous",f:.308,anc:true,civ:"Greece",note:"approx.; regional, Attic ~0.30 m"},
+    {n:"Greek fathom (orgyia)",s:"orgyia",f:1.85,anc:true,civ:"Greece",note:"6 podes; approx."},
+    {n:"Greek stadion",s:"stadion",f:185,anc:true,civ:"Greece",note:"representative Attic/Roman-era value"},
+    {n:"Biblical common cubit",s:"biblical cubit",f:.445,anc:true,civ:"Levant",note:"approx. average; historically variable"},
+    {n:"Biblical span (zeret)",s:"span",f:.2225,anc:true,civ:"Levant",note:"half a cubit; approx."},
+    {n:"Chinese chi (Han)",s:"chi",f:.231,anc:true,civ:"China",note:"approx.; dynasty-dependent"},
+    {n:"Indian hasta",s:"hasta",f:.4572,anc:true,civ:"India",note:"approx. 18 inches"},
+    {n:"Mesopotamian cubit (kush)",s:"kush",f:.5,anc:true,civ:"Mesopotamia",note:"approx.; standard varied"},
+    {n:"Persian parasang",s:"parasang",f:5550,anc:true,civ:"Persia",note:"approx.; often given as 30 stadia"},
+    {n:"Norse ell (alen)",s:"ell",f:.6,anc:true,civ:"Norse",note:"approx.; varied by region"}
+  ]},
+  area:{label:"Area",icon:"◫",base:"square metre",units:[
+    {n:"Square metre",s:"m²",f:1,civ:"Modern"},
+    {n:"Square kilometre",s:"km²",f:1e6,civ:"Modern"},
+    {n:"Hectare",s:"ha",f:1e4,civ:"Modern"},
+    {n:"Acre",s:"ac",f:4046.8564224,civ:"Modern"},
+    {n:"Square foot",s:"ft²",f:.09290304,civ:"Modern"},
+    {n:"Square yard",s:"yd²",f:.83612736,civ:"Modern"},
+    {n:"Square mile",s:"mi²",f:2589988.110336,civ:"Modern"},
+    {n:"Roman iugerum",s:"iugerum",f:2523,anc:true,civ:"Rome",note:"approx. 0.623 acre"},
+    {n:"Roman actus",s:"actus",f:1260,anc:true,civ:"Rome",note:"approx.; square of 120 pes"},
+    {n:"Egyptian aroura",s:"aroura",f:2756.25,anc:true,civ:"Egypt",note:"approx.; square of 100 royal cubits"},
+    {n:"Greek plethron²",s:"plethron²",f:950,anc:true,civ:"Greece",note:"approx.; regional variation"},
+    {n:"Mesopotamian iku",s:"iku",f:3600,anc:true,civ:"Mesopotamia",note:"approx.; field unit"}
+  ]},
+  mass:{label:"Mass",icon:"⚖️",base:"kilogram",units:[
+    {n:"Kilogram",s:"kg",f:1,civ:"Modern"},
+    {n:"Gram",s:"g",f:.001,civ:"Modern"},
+    {n:"Milligram",s:"mg",f:1e-6,civ:"Modern"},
+    {n:"Metric tonne",s:"t",f:1000,civ:"Modern"},
+    {n:"Ounce",s:"oz",f:.028349523125,civ:"Modern"},
+    {n:"Pound",s:"lb",f:.45359237,civ:"Modern"},
+    {n:"Stone",s:"st",f:6.35029318,civ:"Modern"},
+    {n:"Carat",s:"ct",f:.0002,civ:"Modern"},
+    {n:"Grain",s:"gr",f:6.479891e-5,civ:"Modern"},
+    {n:"Roman libra",s:"libra",f:.32745,anc:true,civ:"Rome",note:"approx. 327.45 g"},
+    {n:"Roman uncia",s:"uncia",f:.0272875,anc:true,civ:"Rome",note:"1/12 libra"},
+    {n:"Mesopotamian shekel",s:"shekel",f:.00833,anc:true,civ:"Mesopotamia",note:"approx. 8.33 g; standards varied"},
+    {n:"Mesopotamian mina",s:"mina",f:.4998,anc:true,civ:"Mesopotamia",note:"60 shekels; representative"},
+    {n:"Mesopotamian talent",s:"talent",f:29.988,anc:true,civ:"Mesopotamia",note:"60 minas; representative"},
+    {n:"Egyptian deben",s:"deben",f:.091,anc:true,civ:"Egypt",note:"approx. New Kingdom value (~91 g)"},
+    {n:"Egyptian kite",s:"kite",f:.0091,anc:true,civ:"Egypt",note:"1/10 deben"},
+    {n:"Greek Attic drachma",s:"drachma",f:.0043,anc:true,civ:"Greece",note:"approx. 4.3 g"},
+    {n:"Greek obol",s:"obol",f:.0007167,anc:true,civ:"Greece",note:"1/6 drachma"},
+    {n:"Greek Attic mina",s:"Attic mina",f:.43,anc:true,civ:"Greece",note:"100 drachmai"},
+    {n:"Greek Attic talent",s:"Attic talent",f:25.8,anc:true,civ:"Greece",note:"60 minas"},
+    {n:"Hebrew shekel",s:"shekel",f:.0114,anc:true,civ:"Levant",note:"approx.; standards varied"},
+    {n:"Indian karsha",s:"karsha",f:.0588,anc:true,civ:"India",note:"approx.; ~58.8 g"},
+    {n:"Persian daric",s:"daric",f:.00835,anc:true,civ:"Persia",note:"Achaemenid gold coin; approx."}
+  ]},
+  volume:{label:"Volume",icon:"🏺",base:"litre",units:[
+    {n:"Litre",s:"L",f:1,civ:"Modern"},
+    {n:"Millilitre",s:"mL",f:.001,civ:"Modern"},
+    {n:"Cubic metre",s:"m³",f:1000,civ:"Modern"},
+    {n:"US gallon",s:"US gal",f:3.785411784,civ:"Modern"},
+    {n:"Imperial gallon",s:"imp gal",f:4.54609,civ:"Modern"},
+    {n:"US quart",s:"US qt",f:.946352946,civ:"Modern"},
+    {n:"US pint",s:"US pt",f:.473176473,civ:"Modern"},
+    {n:"Fluid ounce",s:"fl oz",f:.0295735295625,civ:"Modern"},
+    {n:"Cup (metric)",s:"cup",f:.25,civ:"Modern"},
+    {n:"Tablespoon (metric)",s:"tbsp",f:.015,civ:"Modern"},
+    {n:"Teaspoon (metric)",s:"tsp",f:.005,civ:"Modern"},
+    {n:"Roman cyathus",s:"cyathus",f:.0455,anc:true,civ:"Rome",note:"approx.; 1/12 sextarius"},
+    {n:"Roman sextarius",s:"sextarius",f:.546,anc:true,civ:"Rome",note:"approx."},
+    {n:"Roman congius",s:"congius",f:3.276,anc:true,civ:"Rome",note:"6 sextarii"},
+    {n:"Roman amphora",s:"amphora",f:26.208,anc:true,civ:"Rome",note:"approx. 48 sextarii"},
+    {n:"Greek kotyle",s:"kotyle",f:.27,anc:true,civ:"Greece",note:"approx.; polis-dependent"},
+    {n:"Greek chous",s:"chous",f:3.24,anc:true,civ:"Greece",note:"approx.; 12 kotylai"},
+    {n:"Greek amphora (metretes)",s:"metretes",f:26.2,anc:true,civ:"Greece",note:"representative value"},
+    {n:"Biblical log",s:"log",f:.306,anc:true,civ:"Levant",note:"approx.; smallest biblical liquid measure"},
+    {n:"Biblical hin",s:"hin",f:3.67,anc:true,civ:"Levant",note:"approx.; scholarly estimates vary"},
+    {n:"Biblical bath",s:"bath",f:22,anc:true,civ:"Levant",note:"approx.; ~6 hin"},
+    {n:"Biblical homer",s:"homer",f:220,anc:true,civ:"Levant",note:"approx.; 10 bath"},
+    {n:"Egyptian heqat",s:"heqat",f:4.8,anc:true,civ:"Egypt",note:"approx. Middle/New Kingdom"},
+    {n:"Egyptian ro",s:"ro",f:.00024,anc:true,civ:"Egypt",note:"approx.; 1/320 heqat"},
+    {n:"Mesopotamian sila",s:"sila",f:1,anc:true,civ:"Mesopotamia",note:"approx.; varied ~0.8–1 L"}
+  ]},
+  temperature:{label:"Temperature",icon:"🌡️",special:true,units:[
+    {n:"Celsius",s:"°C",civ:"Modern"},
+    {n:"Fahrenheit",s:"°F",civ:"Modern"},
+    {n:"Kelvin",s:"K",civ:"Modern"},
+    {n:"Rankine",s:"°R",civ:"Modern"}
+  ]},
+  time:{label:"Time",icon:"⏳",base:"second",units:[
+    {n:"Second",s:"s",f:1,civ:"Modern"},
+    {n:"Minute",s:"min",f:60,civ:"Modern"},
+    {n:"Hour",s:"h",f:3600,civ:"Modern"},
+    {n:"Day",s:"day",f:86400,civ:"Modern"},
+    {n:"Week",s:"week",f:604800,civ:"Modern"},
+    {n:"Julian year",s:"a",f:31557600,civ:"Modern"},
+    {n:"Babylonian time degree (uš)",s:"uš",f:240,anc:true,civ:"Mesopotamia",note:"1/360 of a day = 4 minutes"},
+    {n:"Egyptian decan interval",s:"decan",f:864000,anc:true,civ:"Egypt",note:"10-day civil interval"},
+    {n:"Roman hora (seasonal)",s:"hora",f:3600,anc:true,civ:"Rome",note:"shown as 1 modern hour; daylight hours varied by season"},
+    {n:"Chinese ke (quarter)",s:"ke",f:900,anc:true,civ:"China",note:"approx.; 1/96 of a day in later systems"}
+  ]},
+  speed:{label:"Speed",icon:"🏎️",base:"m/s",units:[
+    {n:"Metre per second",s:"m/s",f:1,civ:"Modern"},
+    {n:"Kilometre per hour",s:"km/h",f:1/3.6,civ:"Modern"},
+    {n:"Mile per hour",s:"mph",f:.44704,civ:"Modern"},
+    {n:"Knot",s:"kn",f:.5144444444,civ:"Modern"},
+    {n:"Roman mile per hour",s:"Roman mi/h",f:1480/3600,anc:true,civ:"Rome",note:"uses approx. Roman mile; illustrative"}
+  ]},
+  data:{label:"Digital",icon:"💾",base:"byte",units:[
+    {n:"Byte",s:"B",f:1,civ:"Modern"},
+    {n:"Kilobyte",s:"kB",f:1000,civ:"Modern"},
+    {n:"Megabyte",s:"MB",f:1e6,civ:"Modern"},
+    {n:"Gigabyte",s:"GB",f:1e9,civ:"Modern"},
+    {n:"Terabyte",s:"TB",f:1e12,civ:"Modern"},
+    {n:"Petabyte",s:"PB",f:1e15,civ:"Modern"},
+    {n:"Kibibyte",s:"KiB",f:1024,civ:"Modern"},
+    {n:"Mebibyte",s:"MiB",f:1048576,civ:"Modern"},
+    {n:"Gibibyte",s:"GiB",f:1073741824,civ:"Modern"},
+    {n:"Tebibyte",s:"TiB",f:1099511627776,civ:"Modern"}
+  ]},
+  force:{label:"Force",icon:"🧲",base:"newton",units:[
+    {n:"Newton",s:"N",f:1,civ:"Modern"},
+    {n:"Kilonewton",s:"kN",f:1000,civ:"Modern"},
+    {n:"Dyne",s:"dyn",f:1e-5,civ:"Modern"},
+    {n:"Pound-force",s:"lbf",f:4.4482216152605,civ:"Modern"},
+    {n:"Kilogram-force",s:"kgf",f:9.80665,civ:"Modern"},
+    {n:"Poundal",s:"pdl",f:.138254954376,civ:"Modern"}
+  ]},
+  energy:{label:"Energy",icon:"⚡",base:"joule",units:[
+    {n:"Joule",s:"J",f:1,civ:"Modern"},
+    {n:"Kilojoule",s:"kJ",f:1000,civ:"Modern"},
+    {n:"Calorie",s:"cal",f:4.184,civ:"Modern"},
+    {n:"Kilocalorie",s:"kcal",f:4184,civ:"Modern"},
+    {n:"Kilowatt-hour",s:"kWh",f:3600000,civ:"Modern"},
+    {n:"Electronvolt",s:"eV",f:1.602176634e-19,civ:"Modern"},
+    {n:"British thermal unit",s:"BTU",f:1055.05585262,civ:"Modern"},
+    {n:"Erg",s:"erg",f:1e-7,civ:"Modern"},
+    {n:"Foot-pound",s:"ft·lb",f:1.3558179483314004,civ:"Modern"}
+  ]},
+  pressure:{label:"Pressure",icon:"🌬️",base:"pascal",units:[
+    {n:"Pascal",s:"Pa",f:1,civ:"Modern"},
+    {n:"Kilopascal",s:"kPa",f:1000,civ:"Modern"},
+    {n:"Hectopascal",s:"hPa",f:100,civ:"Modern"},
+    {n:"Bar",s:"bar",f:100000,civ:"Modern"},
+    {n:"Millibar",s:"mbar",f:100,civ:"Modern"},
+    {n:"Atmosphere",s:"atm",f:101325,civ:"Modern"},
+    {n:"Torr",s:"Torr",f:133.3223684211,civ:"Modern"},
+    {n:"Millimetre of mercury",s:"mmHg",f:133.322387415,civ:"Modern"},
+    {n:"Pound per square inch",s:"psi",f:6894.757293168,civ:"Modern"}
+  ]},
+  coinage:{label:"Coinage",icon:"🪙",base:"gram (of metal)",units:[
+    {n:"Attic drachma (silver)",s:"drachma",f:4.3,anc:true,civ:"Greece",note:"approx. 4.3 g silver; Attic standard"},
+    {n:"Attic tetradrachm (silver)",s:"tetradrachm",f:17.2,anc:true,civ:"Greece",note:"4 drachmai; the Athenian 'owl'"},
+    {n:"Attic mina (silver)",s:"Attic mina",f:430,anc:true,civ:"Greece",note:"100 drachmai"},
+    {n:"Attic talent (silver)",s:"Attic talent",f:25800,anc:true,civ:"Greece",note:"60 minas"},
+    {n:"Roman denarius (silver)",s:"denarius",f:3.9,anc:true,civ:"Rome",note:"approx. silver content; declined over centuries"},
+    {n:"Roman sestertius",s:"sestertius",f:1.1,anc:true,civ:"Rome",note:"approx.; 1/4 denarius"},
+    {n:"Roman as (bronze)",s:"as",f:11,anc:true,civ:"Rome",note:"approx.; bronze, ~11 g"},
+    {n:"Roman aureus (gold)",s:"aureus",f:7.9,anc:true,civ:"Rome",note:"gold; approx. weight"},
+    {n:"Hebrew shekel of silver",s:"shekel",f:11.4,anc:true,civ:"Levant",note:"approx.; temple standard"},
+    {n:"Hebrew talent of silver",s:"talent",f:34200,anc:true,civ:"Levant",note:"approx.; ~3000 shekels"},
+    {n:"Mesopotamian shekel of silver",s:"shekel",f:8.33,anc:true,civ:"Mesopotamia",note:"approx.; silver standard"},
+    {n:"Mesopotamian mina (silver)",s:"mina",f:499.8,anc:true,civ:"Mesopotamia",note:"60 shekels"},
+    {n:"Mesopotamian talent (silver)",s:"talent",f:29988,anc:true,civ:"Mesopotamia",note:"60 minas"},
+    {n:"Egyptian deben (silver)",s:"deben",f:91,anc:true,civ:"Egypt",note:"approx.; New Kingdom silver deben"},
+    {n:"Egyptian kite (silver)",s:"kite",f:9.1,anc:true,civ:"Egypt",note:"1/10 deben"},
+    {n:"Persian daric (gold)",s:"daric",f:8.35,anc:true,civ:"Persia",note:"Achaemenid gold; approx."},
+    {n:"Persian siglos (silver)",s:"siglos",f:5.4,anc:true,civ:"Persia",note:"Achaemenid silver; approx."}
+  ]}
+};
+
+const $=id=>document.getElementById(id);
+const tabs=$("tabs"), fromUnit=$("fromUnit"), toUnit=$("toUnit"),
+fromValue=$("fromValue"), toValue=$("toValue"), resultValue=$("resultValue"),
+formula=$("formula"), unitList=$("unitList"), unitSearch=$("unitSearch"),
+historyList=$("historyList"), eraRow=$("eraRow"), fromTag=$("fromTag"), toTag=$("toTag"),
+favBtn=$("favBtn"), toast=$("toast"), helpPanel=$("helpPanel"), browserTitle=$("browserTitle");
+
+/* ---------- internationalization ---------- */
+const LANGS={
+  en:{label:"English",dir:"ltr",locale:"en-US"},
+  es:{label:"Español",dir:"ltr",locale:"es-ES"},
+  fr:{label:"Français",dir:"ltr",locale:"fr-FR"},
+  de:{label:"Deutsch",dir:"ltr",locale:"de-DE"},
+  pt:{label:"Português",dir:"ltr",locale:"pt-BR"},
+  it:{label:"Italiano",dir:"ltr",locale:"it-IT"},
+  zh:{label:"中文",dir:"ltr",locale:"zh-CN"},
+  ja:{label:"日本語",dir:"ltr",locale:"ja-JP"},
+  ar:{label:"العربية",dir:"rtl",locale:"ar-EG-u-nu-latn"},
+  hi:{label:"हिन्दी",dir:"ltr",locale:"hi-IN"}
+};
+const UI={
+en:{
+subtitle:"A field guide to measurement — across laboratories, empires, markets, and millennia. Browse by civilization, convert both ways, and keep a scholar's log.",
+mapBtn:"🗺️ Map & Measure",mapBtnTitle:"Open the map to measure distance or area",
+helpBtnTitle:"Help & shortcuts",langAria:"Language",eraAria:"Filter units by civilization",tabsAria:"Measurement categories",
+labelValue:"Value",labelFromUnit:"From unit",labelConverted:"Converted",labelToUnit:"To unit",fromValueAria:"Input value",toValueAria:"Converted value (editable)",swapTitle:"Swap units",
+clear:"Clear",resultLabel:"Conversion record",selectUnits:"Select units to begin",enterNumber:"Enter a numeric value",approxSuffix:"historical value is approximate",tempTransform:"Temperature scale transformation",
+copy:"⧉ Copy",copyTitle:"Copy result (⌘/Ctrl C)",reverse:"⇄ Reverse",reverseTitle:"Reverse units",save:"☆ Save",saved:"★ Saved",saveTitle:"Save this conversion (⌘/Ctrl S)",
+recent:"Recent conversions",clearAll:"Clear all",searchLabel:"Search measures",searchPh:"cubit, shekel, denarius…",
+noMatch:"No matching measures.",modernUnit:"Modern / standardized unit",approxNote:"approximate historical value",
+noticeTitle:"Accuracy note:",noticeBody:"Ancient units varied by era, region, ruler, and artifact. Values marked “approx.” are practical scholarly estimates, not universal constants.",
+footerText:"offline-ready single-file application. Historical conversions are educational approximations.",
+shortcutsHint:"Shortcuts: <kbd>⌘/Ctrl C</kbd> copy · <kbd>⌘/Ctrl E</kbd> value · <kbd>⌘/Ctrl F</kbd> search · <kbd>⌘/Ctrl S</kbd> save · <kbd>Esc</kbd> reset",
+historyEmpty:"No conversions yet — your log will appear here.",loadConv:"Load this conversion",removeEntry:"Remove entry",
+unitFavTitle:"Favorite this unit",unitFavRemove:"Remove favorite",allMeasures:"All measures",acrossCollections:"across all collections",source:"source",result:"result",
+nothingToCopy:"Nothing to copy yet",copied:"Result copied",swapped:"Units swapped",histCleared:"History cleared",entryRemoved:"Entry removed",restored:"Conversion restored",
+favRemoved:"Saved conversion removed",favSaved:"Conversion saved to favorites",unitFavOn:"Unit favorited",unitFavOff:"Unit un-favorited",
+showAllCiv:"Showing all civilizations",filterBy:"Filtering by {civ}",sentToConverter:"Measurement sent to converter",
+mapTitle:"🗺️ Map & Measure",modeDistance:"Distance",modeArea:"Area",undo:"↶ Undo",clearM:"✕ Clear",closeMap:"Close map",
+clickToAdd:"Click the map to add points",addPoints:"Add at least 3 points ({n} so far)",loading:"Loading map…",mapNeedsNet:"Map tiles need an internet connection — reconnect and reopen.",send:"Send to converter",stadia:"stadia",iugera:"iugera",
+helpTitle:"Archive shortcuts",helpCopy:"Copy result",helpFocus:"Focus value field",helpSearch:"Search units",helpSave:"Save conversion",helpReset:"Reset / close",helpBody:"Type into either value field to convert in that direction. ★ marks a favorite unit or saved conversion — both persist in your browser only.",closeHelp:"Close help",
+collections:"{n} collections",measuresUnit:"{n} measures · {m} ancient",lat:"Lat",lng:"Lng",latitude:"Latitude",longitude:"Longitude",locate:"Locate",addPoint:"Add point",coordInvalid:"Enter valid latitude (−90 to 90) and longitude (−180 to 180)"
+},
+es:{
+subtitle:"Una guía de campo sobre la medida — a través de laboratorios, imperios, mercados y milenios. Explora por civilización, convierte en ambos sentidos y guarda un diario de estudioso.",
+mapBtn:"🗺️ Mapa y Medición",mapBtnTitle:"Abre el mapa para medir distancia o área",
+helpBtnTitle:"Ayuda y atajos",langAria:"Idioma",eraAria:"Filtrar unidades por civilización",tabsAria:"Categorías de medida",
+labelValue:"Valor",labelFromUnit:"Unidad de origen",labelConverted:"Convertido",labelToUnit:"Unidad de destino",fromValueAria:"Valor de entrada",toValueAria:"Valor convertido (editable)",swapTitle:"Intercambiar unidades",
+clear:"Limpiar",resultLabel:"Registro de conversión",selectUnits:"Selecciona unidades para empezar",enterNumber:"Introduce un valor numérico",approxSuffix:"el valor histórico es aproximado",tempTransform:"Transformación de escala de temperatura",
+copy:"⧉ Copiar",copyTitle:"Copiar resultado (⌘/Ctrl C)",reverse:"⇄ Invertir",reverseTitle:"Invertir unidades",save:"☆ Guardar",saved:"★ Guardado",saveTitle:"Guardar esta conversión (⌘/Ctrl S)",
+recent:"Conversiones recientes",clearAll:"Borrar todo",searchLabel:"Buscar medidas",searchPh:"codo, siclo, denario…",
+noMatch:"No hay medidas que coincidan.",modernUnit:"Unidad moderna / estandarizada",approxNote:"valor histórico aproximado",
+noticeTitle:"Nota de exactitud:",noticeBody:"Las unidades antiguas variaban según la época, la región, el gobernante y el artefacto. Los valores marcados «aprox.» son estimaciones académicas prácticas, no constantes universales.",
+footerText:"aplicación de un solo archivo, lista para usarse sin conexión. Las conversiones históricas son aproximaciones educativas.",
+shortcutsHint:"Atajos: <kbd>⌘/Ctrl C</kbd> copiar · <kbd>⌘/Ctrl E</kbd> valor · <kbd>⌘/Ctrl F</kbd> buscar · <kbd>⌘/Ctrl S</kbd> guardar · <kbd>Esc</kbd> reiniciar",
+historyEmpty:"Aún no hay conversiones: aquí aparecerá tu registro.",loadConv:"Cargar esta conversión",removeEntry:"Eliminar entrada",
+unitFavTitle:"Marcar esta unidad como favorita",unitFavRemove:"Quitar de favoritas",allMeasures:"Todas las medidas",acrossCollections:"en todas las colecciones",source:"origen",result:"resultado",
+nothingToCopy:"No hay nada que copiar todavía",copied:"Resultado copiado",swapped:"Unidades intercambiadas",histCleared:"Historial borrado",entryRemoved:"Entrada eliminada",restored:"Conversión restaurada",
+favRemoved:"Conversión guardada eliminada",favSaved:"Conversión guardada en favoritos",unitFavOn:"Unidad marcada como favorita",unitFavOff:"Unidad quitada de favoritas",
+showAllCiv:"Mostrando todas las civilizaciones",filterBy:"Filtrando por {civ}",sentToConverter:"Medición enviada al conversor",
+mapTitle:"🗺️ Mapa y Medición",modeDistance:"Distancia",modeArea:"Área",undo:"↶ Deshacer",clearM:"✕ Limpiar",closeMap:"Cerrar mapa",
+clickToAdd:"Haz clic en el mapa para añadir puntos",addPoints:"Añade al menos 3 puntos ({n} hasta ahora)",loading:"Cargando mapa…",mapNeedsNet:"Las teselas del mapa necesitan conexión a internet: reconéctate y vuelve a abrirlo.",send:"Enviar al conversor",stadia:"estadios",iugera:"yugadas",
+helpTitle:"Atajos del archivo",helpCopy:"Copiar resultado",helpFocus:"Centrar en el valor",helpSearch:"Buscar unidades",helpSave:"Guardar conversión",helpReset:"Reiniciar / cerrar",helpBody:"Escribe en cualquiera de los campos de valor para convertir en esa dirección. ★ marca una unidad o conversión favorita; ambas se guardan solo en tu navegador.",closeHelp:"Cerrar ayuda",
+collections:"{n} colecciones",measuresUnit:"{n} medidas · {m} antiguas",lat:"Lat",lng:"Lng",latitude:"Latitud",longitude:"Longitud",locate:"Localizar",addPoint:"Añadir punto",coordInvalid:"Introduce una latitud válida (−90 a 90) y una longitud válida (−180 a 180)"
+},
+fr:{
+subtitle:"Un guide de terrain de la mesure — à travers laboratoires, empires, marchés et millénaires. Parcourez par civilisation, convertissez dans les deux sens et tenez un journal d'érudit.",
+mapBtn:"🗺️ Carte & Mesure",mapBtnTitle:"Ouvrir la carte pour mesurer une distance ou une surface",
+helpBtnTitle:"Aide et raccourcis",langAria:"Langue",eraAria:"Filtrer les unités par civilisation",tabsAria:"Catégories de mesure",
+labelValue:"Valeur",labelFromUnit:"Unité d'origine",labelConverted:"Converti",labelToUnit:"Unité de destination",fromValueAria:"Valeur de départ",toValueAria:"Valeur convertie (modifiable)",swapTitle:"Inverser les unités",
+clear:"Effacer",resultLabel:"Registre de conversion",selectUnits:"Sélectionnez des unités pour commencer",enterNumber:"Saisissez une valeur numérique",approxSuffix:"la valeur historique est approximative",tempTransform:"Transformation d'échelle de température",
+copy:"⧉ Copier",copyTitle:"Copier le résultat (⌘/Ctrl C)",reverse:"⇄ Inverser",reverseTitle:"Inverser les unités",save:"☆ Enregistrer",saved:"★ Enregistré",saveTitle:"Enregistrer cette conversion (⌘/Ctrl S)",
+recent:"Conversions récentes",clearAll:"Tout effacer",searchLabel:"Rechercher des mesures",searchPh:"coudée, sicle, denier…",
+noMatch:"Aucune mesure ne correspond.",modernUnit:"Unité moderne / normalisée",approxNote:"valeur historique approximative",
+noticeTitle:"Note de précision :",noticeBody:"Les unités anciennes variaient selon l'époque, la région, le souverain et l'artefact. Les valeurs marquées « approx. » sont des estimations savantes pratiques, pas des constantes universelles.",
+footerText:"application autonome prête hors ligne. Les conversions historiques sont des approximations pédagogiques.",
+shortcutsHint:"Raccourcis : <kbd>⌘/Ctrl C</kbd> copier · <kbd>⌘/Ctrl E</kbd> valeur · <kbd>⌘/Ctrl F</kbd> rechercher · <kbd>⌘/Ctrl S</kbd> enregistrer · <kbd>Échap</kbd> réinitialiser",
+historyEmpty:"Aucune conversion pour l'instant — votre journal apparaîtra ici.",loadConv:"Charger cette conversion",removeEntry:"Supprimer l'entrée",
+unitFavTitle:"Marquer cette unité comme favorite",unitFavRemove:"Retirer des favoris",allMeasures:"Toutes les mesures",acrossCollections:"dans toutes les collections",source:"source",result:"résultat",
+nothingToCopy:"Rien à copier pour l'instant",copied:"Résultat copié",swapped:"Unités inversées",histCleared:"Historique effacé",entryRemoved:"Entrée supprimée",restored:"Conversion restaurée",
+favRemoved:"Conversion enregistrée supprimée",favSaved:"Conversion enregistrée dans les favoris",unitFavOn:"Unité ajoutée aux favoris",unitFavOff:"Unité retirée des favoris",
+showAllCiv:"Affichage de toutes les civilisations",filterBy:"Filtrage par {civ}",sentToConverter:"Mesure envoyée au convertisseur",
+mapTitle:"🗺️ Carte & Mesure",modeDistance:"Distance",modeArea:"Surface",undo:"↶ Annuler",clearM:"✕ Effacer",closeMap:"Fermer la carte",
+clickToAdd:"Cliquez sur la carte pour ajouter des points",addPoints:"Ajoutez au moins 3 points ({n} jusqu'ici)",loading:"Chargement de la carte…",mapNeedsNet:"Les tuiles de carte nécessitent une connexion internet — reconnectez-vous et rouvrez.",send:"Envoyer au convertisseur",stadia:"stades",iugera:"jugères",
+helpTitle:"Raccourcis de l'archive",helpCopy:"Copier le résultat",helpFocus:"Aller au champ valeur",helpSearch:"Rechercher des unités",helpSave:"Enregistrer la conversion",helpReset:"Réinitialiser / fermer",helpBody:"Saisissez dans l'un ou l'autre champ de valeur pour convertir dans ce sens. ★ marque une unité ou une conversion favorite — tout est conservé uniquement dans votre navigateur.",closeHelp:"Fermer l'aide",
+collections:"{n} collections",measuresUnit:"{n} mesures · {m} anciennes",lat:"Lat",lng:"Lng",latitude:"Latitude",longitude:"Longitude",locate:"Localiser",addPoint:"Ajouter un point",coordInvalid:"Saisissez une latitude valide (−90 à 90) et une longitude valide (−180 à 180)"
+},
+de:{
+subtitle:"Ein Feldführer zur Messung — über Labore, Imperien, Märkte und Jahrtausende hinweg. Entdecken Sie nach Zivilisation, rechnen Sie in beide Richtungen um und führen Sie ein Gelehrten-Tagebuch.",
+mapBtn:"🗺️ Karte & Messen",mapBtnTitle:"Karte öffnen, um Entfernung oder Fläche zu messen",
+helpBtnTitle:"Hilfe und Tastenkürzel",langAria:"Sprache",eraAria:"Einheiten nach Zivilisation filtern",tabsAria:"Messkategorien",
+labelValue:"Wert",labelFromUnit:"Von Einheit",labelConverted:"Umgerechnet",labelToUnit:"Zu Einheit",fromValueAria:"Eingabewert",toValueAria:"Umgerechneter Wert (bearbeitbar)",swapTitle:"Einheiten tauschen",
+clear:"Löschen",resultLabel:"Umrechnungsprotokoll",selectUnits:"Einheiten auswählen, um zu beginnen",enterNumber:"Numerischen Wert eingeben",approxSuffix:"historischer Wert ist ungefähr",tempTransform:"Temperaturskalen-Umrechnung",
+copy:"⧉ Kopieren",copyTitle:"Ergebnis kopieren (⌘/Ctrl C)",reverse:"⇄ Umdrehen",reverseTitle:"Einheiten umdrehen",save:"☆ Speichern",saved:"★ Gespeichert",saveTitle:"Diese Umrechnung speichern (⌘/Ctrl S)",
+recent:"Letzte Umrechnungen",clearAll:"Alles löschen",searchLabel:"Maße durchsuchen",searchPh:"Elle, Schekel, Denar…",
+noMatch:"Keine passenden Maße.",modernUnit:"Moderne / standardisierte Einheit",approxNote:"ungefährer historischer Wert",
+noticeTitle:"Genauigkeitshinweis:",noticeBody:"Antike Einheiten variierten je nach Epoche, Region, Herrscher und Artefakt. Als „ca.“ markierte Werte sind praktische wissenschaftliche Schätzungen, keine universellen Konstanten.",
+footerText:"eigenständige Einzeldatei-Anwendung, offline einsatzbereit. Historische Umrechnungen sind bildungsbezogene Näherungen.",
+shortcutsHint:"Tastenkürzel: <kbd>⌘/Ctrl C</kbd> kopieren · <kbd>⌘/Ctrl E</kbd> Wert · <kbd>⌘/Ctrl F</kbd> suchen · <kbd>⌘/Ctrl S</kbd> speichern · <kbd>Esc</kbd> zurücksetzen",
+historyEmpty:"Noch keine Umrechnungen — Ihr Protokoll erscheint hier.",loadConv:"Diese Umrechnung laden",removeEntry:"Eintrag entfernen",
+unitFavTitle:"Diese Einheit als Favorit markieren",unitFavRemove:"Aus Favoriten entfernen",allMeasures:"Alle Maße",acrossCollections:"in allen Sammlungen",source:"Quelle",result:"Ergebnis",
+nothingToCopy:"Noch nichts zu kopieren",copied:"Ergebnis kopiert",swapped:"Einheiten getauscht",histCleared:"Verlauf gelöscht",entryRemoved:"Eintrag entfernt",restored:"Umrechnung wiederhergestellt",
+favRemoved:"Gespeicherte Umrechnung entfernt",favSaved:"Umrechnung zu Favoriten hinzugefügt",unitFavOn:"Einheit favorisiert",unitFavOff:"Einheit nicht mehr favorisiert",
+showAllCiv:"Alle Zivilisationen werden angezeigt",filterBy:"Filter: {civ}",sentToConverter:"Messung an den Umrechner gesendet",
+mapTitle:"🗺️ Karte & Messen",modeDistance:"Entfernung",modeArea:"Fläche",undo:"↶ Rückgängig",clearM:"✕ Löschen",closeMap:"Karte schließen",
+clickToAdd:"Klicken Sie auf die Karte, um Punkte hinzuzufügen",addPoints:"Fügen Sie mindestens 3 Punkte hinzu ({n} bisher)",loading:"Karte wird geladen…",mapNeedsNet:"Die Kartenkacheln benötigen eine Internetverbindung — verbinden Sie sich neu und öffnen Sie die Karte erneut.",send:"An Umrechner senden",stadia:"Stadien",iugera:"Jugera",
+helpTitle:"Tastenkürzel des Archivs",helpCopy:"Ergebnis kopieren",helpFocus:"Zum Wertfeld",helpSearch:"Einheiten suchen",helpSave:"Umrechnung speichern",helpReset:"Zurücksetzen / schließen",helpBody:"Geben Sie in eines der beiden Wertfelder ein, um in diese Richtung umzurechnen. ★ markiert eine Favoriten-Einheit oder gespeicherte Umrechnung — beides bleibt nur in Ihrem Browser.",closeHelp:"Hilfe schließen",
+collections:"{n} Sammlungen",measuresUnit:"{n} Maße · {m} antike",lat:"Lat",lng:"Lng",latitude:"Breitengrad",longitude:"Längengrad",locate:"Ort",addPoint:"Punkt hinzufügen",coordInvalid:"Gültige Breite (−90 bis 90) und Länge (−180 bis 180) eingeben"
+},
+pt:{
+subtitle:"Um guia de campo da medição — por laboratórios, impérios, mercados e milênios. Explore por civilização, converta nos dois sentidos e guarde um diário de estudioso.",
+mapBtn:"🗺️ Mapa e Medição",mapBtnTitle:"Abrir o mapa para medir distância ou área",
+helpBtnTitle:"Ajuda e atalhos",langAria:"Idioma",eraAria:"Filtrar unidades por civilização",tabsAria:"Categorias de medida",
+labelValue:"Valor",labelFromUnit:"Unidade de origem",labelConverted:"Convertido",labelToUnit:"Unidade de destino",fromValueAria:"Valor de entrada",toValueAria:"Valor convertido (editável)",swapTitle:"Trocar unidades",
+clear:"Limpar",resultLabel:"Registro de conversão",selectUnits:"Selecione unidades para começar",enterNumber:"Digite um valor numérico",approxSuffix:"o valor histórico é aproximado",tempTransform:"Transformação de escala de temperatura",
+copy:"⧉ Copiar",copyTitle:"Copiar resultado (⌘/Ctrl C)",reverse:"⇄ Inverter",reverseTitle:"Inverter unidades",save:"☆ Salvar",saved:"★ Salvo",saveTitle:"Salvar esta conversão (⌘/Ctrl S)",
+recent:"Conversões recentes",clearAll:"Limpar tudo",searchLabel:"Buscar medidas",searchPh:"côvado, siclo, denário…",
+noMatch:"Nenhuma medida correspondente.",modernUnit:"Unidade moderna / padronizada",approxNote:"valor histórico aproximado",
+noticeTitle:"Nota de precisão:",noticeBody:"As unidades antigas variavam por época, região, governante e artefato. Os valores marcados como «aprox.» são estimativas acadêmicas práticas, não constantes universais.",
+footerText:"aplicativo de arquivo único, pronto para uso offline. Conversões históricas são aproximações educativas.",
+shortcutsHint:"Atalhos: <kbd>⌘/Ctrl C</kbd> copiar · <kbd>⌘/Ctrl E</kbd> valor · <kbd>⌘/Ctrl F</kbd> buscar · <kbd>⌘/Ctrl S</kbd> salvar · <kbd>Esc</kbd> redefinir",
+historyEmpty:"Ainda não há conversões — seu registro aparecerá aqui.",loadConv:"Carregar esta conversão",removeEntry:"Remover entrada",
+unitFavTitle:"Marcar esta unidade como favorita",unitFavRemove:"Remover das favoritas",allMeasures:"Todas as medidas",acrossCollections:"em todas as coleções",source:"origem",result:"resultado",
+nothingToCopy:"Nada para copiar ainda",copied:"Resultado copiado",swapped:"Unidades trocadas",histCleared:"Histórico limpo",entryRemoved:"Entrada removida",restored:"Conversão restaurada",
+favRemoved:"Conversão salva removida",favSaved:"Conversão salva nos favoritos",unitFavOn:"Unidade favoritada",unitFavOff:"Unidade desfavoritada",
+showAllCiv:"Mostrando todas as civilizações",filterBy:"Filtrando por {civ}",sentToConverter:"Medição enviada ao conversor",
+mapTitle:"🗺️ Mapa e Medição",modeDistance:"Distância",modeArea:"Área",undo:"↶ Desfazer",clearM:"✕ Limpar",closeMap:"Fechar mapa",
+clickToAdd:"Clique no mapa para adicionar pontos",addPoints:"Adicione pelo menos 3 pontos ({n} até agora)",loading:"Carregando mapa…",mapNeedsNet:"Os tiles do mapa precisam de conexão com a internet — reconecte-se e reabra.",send:"Enviar ao conversor",stadia:"estádios",iugera:"jugeras",
+helpTitle:"Atalhos do arquivo",helpCopy:"Copiar resultado",helpFocus:"Ir ao campo de valor",helpSearch:"Buscar unidades",helpSave:"Salvar conversão",helpReset:"Redefinir / fechar",helpBody:"Digite em qualquer um dos campos de valor para converter nesse sentido. ★ marca uma unidade ou conversão favorita — ambos são salvos apenas no seu navegador.",closeHelp:"Fechar ajuda",
+collections:"{n} coleções",measuresUnit:"{n} medidas · {m} antigas",lat:"Lat",lng:"Lng",latitude:"Latitude",longitude:"Longitude",locate:"Localizar",addPoint:"Adicionar ponto",coordInvalid:"Insira latitude válida (−90 a 90) e longitude válida (−180 a 180)"
+},
+it:{
+subtitle:"Una guida sul campo alla misura — tra laboratori, imperi, mercati e millenni. Esplora per civiltà, converti in entrambe le direzioni e tieni un diario da studioso.",
+mapBtn:"🗺️ Mappa e Misura",mapBtnTitle:"Apri la mappa per misurare distanza o area",
+helpBtnTitle:"Aiuto e scorciatoie",langAria:"Lingua",eraAria:"Filtra le unità per civiltà",tabsAria:"Categorie di misura",
+labelValue:"Valore",labelFromUnit:"Unità di origine",labelConverted:"Convertito",labelToUnit:"Unità di destinazione",fromValueAria:"Valore di ingresso",toValueAria:"Valore convertito (modificabile)",swapTitle:"Scambia unità",
+clear:"Cancella",resultLabel:"Registro di conversione",selectUnits:"Seleziona le unità per iniziare",enterNumber:"Inserisci un valore numerico",approxSuffix:"il valore storico è approssimativo",tempTransform:"Trasformazione di scala della temperatura",
+copy:"⧉ Copia",copyTitle:"Copia il risultato (⌘/Ctrl C)",reverse:"⇄ Inverti",reverseTitle:"Inverti le unità",save:"☆ Salva",saved:"★ Salvato",saveTitle:"Salva questa conversione (⌘/Ctrl S)",
+recent:"Conversioni recenti",clearAll:"Cancella tutto",searchLabel:"Cerca misure",searchPh:"cubito, siclo, denario…",
+noMatch:"Nessuna misura corrispondente.",modernUnit:"Unità moderna / standardizzata",approxNote:"valore storico approssimativo",
+noticeTitle:"Nota di accuratezza:",noticeBody:"Le unità antiche variavano per epoca, regione, sovrano e manufatto. I valori marcati «circa» sono stime accademiche pratiche, non costanti universali.",
+footerText:"applicazione offline a file singolo. Le conversioni storiche sono approssimazioni a scopo didattico.",
+shortcutsHint:"Scorciatoie: <kbd>⌘/Ctrl C</kbd> copia · <kbd>⌘/Ctrl E</kbd> valore · <kbd>⌘/Ctrl F</kbd> cerca · <kbd>⌘/Ctrl S</kbd> salva · <kbd>Esc</kbd> ripristina",
+historyEmpty:"Ancora nessuna conversione: il tuo registro apparirà qui.",loadConv:"Carica questa conversione",removeEntry:"Rimuovi voce",
+unitFavTitle:"Segna questa unità come preferita",unitFavRemove:"Rimuovi dai preferiti",allMeasures:"Tutte le misure",acrossCollections:"in tutte le collezioni",source:"origine",result:"risultato",
+nothingToCopy:"Niente da copiare per ora",copied:"Risultato copiato",swapped:"Unità scambiate",histCleared:"Cronologia cancellata",entryRemoved:"Voce rimossa",restored:"Conversione ripristinata",
+favRemoved:"Conversione salvata rimossa",favSaved:"Conversione salvata nei preferiti",unitFavOn:"Unità aggiunta ai preferiti",unitFavOff:"Unità rimossa dai preferiti",
+showAllCiv:"Mostra tutte le civiltà",filterBy:"Filtro per {civ}",sentToConverter:"Misurazione inviata al convertitore",
+mapTitle:"🗺️ Mappa e Misura",modeDistance:"Distanza",modeArea:"Area",undo:"↶ Annulla",clearM:"✕ Cancella",closeMap:"Chiudi mappa",
+clickToAdd:"Clicca sulla mappa per aggiungere punti",addPoints:"Aggiungi almeno 3 punti ({n} finora)",loading:"Caricamento mappa…",mapNeedsNet:"Le tessere della mappa richiedono una connessione internet: riconnettiti e riapri.",send:"Invia al convertitore",stadia:"stadi",iugera:"iugeri",
+helpTitle:"Scorciatoie dell'archivio",helpCopy:"Copia risultato",helpFocus:"Al campo valore",helpSearch:"Cerca unità",helpSave:"Salva conversione",helpReset:"Ripristina / chiudi",helpBody:"Digita in uno dei due campi valore per convertire in quella direzione. ★ segna un'unità o una conversione preferita: entrambe restano solo nel tuo browser.",closeHelp:"Chiudi aiuto",
+collections:"{n} collezioni",measuresUnit:"{n} misure · {m} antiche",lat:"Lat",lng:"Lng",latitude:"Latitudine",longitude:"Longitudine",locate:"Localizza",addPoint:"Aggiungi punto",coordInvalid:"Inserisci latitudine valida (−90 a 90) e longitudine valida (−180 a 180)"
+},
+zh:{
+subtitle:"一份关于测量的实地指南——横跨实验室、帝国、市场与千年。按文明浏览、双向换算，并保留一份学者的记录。",
+mapBtn:"🗺️ 地图与测量",mapBtnTitle:"打开地图以测量距离或面积",
+helpBtnTitle:"帮助与快捷键",langAria:"语言",eraAria:"按文明筛选单位",tabsAria:"度量类别",
+labelValue:"数值",labelFromUnit:"从单位",labelConverted:"换算结果",labelToUnit:"到单位",fromValueAria:"输入数值",toValueAria:"换算结果（可编辑）",swapTitle:"交换单位",
+clear:"清除",resultLabel:"换算记录",selectUnits:"请选择单位开始",enterNumber:"请输入数值",approxSuffix:"历史数值为近似值",tempTransform:"温度标度换算",
+copy:"⧉ 复制",copyTitle:"复制结果（⌘/Ctrl C）",reverse:"⇄ 反转",reverseTitle:"反转单位",save:"☆ 保存",saved:"★ 已保存",saveTitle:"保存此换算（⌘/Ctrl S）",
+recent:"最近的换算",clearAll:"全部清除",searchLabel:"搜索度量",searchPh:"库比特、舍客勒、第纳里乌斯……",
+noMatch:"没有匹配的度量。",modernUnit:"现代 / 标准化单位",approxNote:"近似历史数值",
+noticeTitle:"精确性说明：",noticeBody:"古代单位因时代、地区、统治者和文物而异。标记为“约”的数值是实用的学术估算，并非普遍常数。",
+footerText:"单文件应用，可离线使用。历史换算是教育性近似值。",
+shortcutsHint:"快捷键：<kbd>⌘/Ctrl C</kbd> 复制 · <kbd>⌘/Ctrl E</kbd> 数值 · <kbd>⌘/Ctrl F</kbd> 搜索 · <kbd>⌘/Ctrl S</kbd> 保存 · <kbd>Esc</kbd> 重置",
+historyEmpty:"暂无换算——您的记录将显示在这里。",loadConv:"载入此换算",removeEntry:"删除条目",
+unitFavTitle:"将此单位加入收藏",unitFavRemove:"取消收藏",allMeasures:"所有度量",acrossCollections:"全部收藏集",source:"源",result:"结果",
+nothingToCopy:"暂无内容可复制",copied:"结果已复制",swapped:"单位已交换",histCleared:"历史已清除",entryRemoved:"条目已删除",restored:"换算已恢复",
+favRemoved:"已删除保存的换算",favSaved:"换算已保存到收藏",unitFavOn:"单位已加入收藏",unitFavOff:"单位已取消收藏",
+showAllCiv:"正在显示所有文明",filterBy:"按{civ}筛选",sentToConverter:"测量已发送到换算器",
+mapTitle:"🗺️ 地图与测量",modeDistance:"距离",modeArea:"面积",undo:"↶ 撤销",clearM:"✕ 清除",closeMap:"关闭地图",
+clickToAdd:"点击地图添加点",addPoints:"请至少添加 3 个点（目前 {n} 个）",loading:"正在加载地图……",mapNeedsNet:"地图瓦片需要互联网连接——请重新连接后重开。",send:"发送到换算器",stadia:"斯塔迪昂",iugera:"尤格鲁姆",
+helpTitle:"档案快捷键",helpCopy:"复制结果",helpFocus:"聚焦数值",helpSearch:"搜索单位",helpSave:"保存换算",helpReset:"重置 / 关闭",helpBody:"在任一数值字段中输入即可朝该方向换算。★ 标记收藏单位或已保存换算——两者仅保存在您的浏览器中。",closeHelp:"关闭帮助",
+collections:"{n} 个收藏集",measuresUnit:"{n} 个度量 · {m} 个古代",lat:"纬度",lng:"经度",latitude:"纬度",longitude:"经度",locate:"定位",addPoint:"添加点",coordInvalid:"请输入有效纬度（−90 至 90）和经度（−180 至 180）"
+},
+ja:{
+subtitle:"計測のフィールドガイド——実験室、帝国、市場、そして千年の時を超えて。文明ごとに閲覧し、双方向に換算し、研究者の記録を残しましょう。",
+mapBtn:"🗺️ 地図と測定",mapBtnTitle:"地図を開いて距離や面積を測定",
+helpBtnTitle:"ヘルプとショートカット",langAria:"言語",eraAria:"文明で単位を絞り込む",tabsAria:"計測カテゴリ",
+labelValue:"値",labelFromUnit:"変換元の単位",labelConverted:"換算結果",labelToUnit:"変換先の単位",fromValueAria:"入力値",toValueAria:"換算結果（編集可）",swapTitle:"単位を入れ替え",
+clear:"クリア",resultLabel:"換算記録",selectUnits:"単位を選択してください",enterNumber:"数値を入力してください",approxSuffix:"歴史的な値は概算です",tempTransform:"温度スケールの変換",
+copy:"⧉ コピー",copyTitle:"結果をコピー（⌘/Ctrl C）",reverse:"⇄ 反転",reverseTitle:"単位を反転",save:"☆ 保存",saved:"★ 保存済み",saveTitle:"この換算を保存（⌘/Ctrl S）",
+recent:"最近の換算",clearAll:"すべてクリア",searchLabel:"単位を検索",searchPh:"キュビット、シェケル、デナリウス…",
+noMatch:"一致する単位がありません。",modernUnit:"現代 / 標準単位",approxNote:"おおよその歴史的値",
+noticeTitle:"精度に関する注記：",noticeBody:"古代の単位は時代・地域・支配者・遺物によって異なりました。「約」と記した値は実用的な学術推定値であり、普遍的な定数ではありません。",
+footerText:"オフラインで使える単一ファイルのアプリ。歴史的な換算は教育的な近似値です。",
+shortcutsHint:"ショートカット：<kbd>⌘/Ctrl C</kbd> コピー · <kbd>⌘/Ctrl E</kbd> 値 · <kbd>⌘/Ctrl F</kbd> 検索 · <kbd>⌘/Ctrl S</kbd> 保存 · <kbd>Esc</kbd> リセット",
+historyEmpty:"まだ換算はありません——ここに記録が表示されます。",loadConv:"この換算を読み込む",removeEntry:"項目を削除",
+unitFavTitle:"この単位をお気に入りに",unitFavRemove:"お気に入りから外す",allMeasures:"すべての単位",acrossCollections:"すべてのコレクションから",source:"変換元",result:"結果",
+nothingToCopy:"コピーするものがありません",copied:"結果をコピーしました",swapped:"単位を入れ替えました",histCleared:"履歴をクリアしました",entryRemoved:"項目を削除しました",restored:"換算を復元しました",
+favRemoved:"保存した換算を削除しました",favSaved:"換算をお気に入りに保存しました",unitFavOn:"単位をお気に入りに追加",unitFavOff:"単位をお気に入りから削除",
+showAllCiv:"すべての文明を表示中",filterBy:"{civ}で絞り込み中",sentToConverter:"測定値をコンバーターに送信しました",
+mapTitle:"🗺️ 地図と測定",modeDistance:"距離",modeArea:"面積",undo:"↶ 元に戻す",clearM:"✕ クリア",closeMap:"地図を閉じる",
+clickToAdd:"地図をクリックして点を追加",addPoints:"少なくとも3点追加してください（現在{n}点）",loading:"地図を読み込み中…",mapNeedsNet:"地図タイルにはインターネット接続が必要です——再接続して開き直してください。",send:"コンバーターに送信",stadia:"スタディオン",iugera:"ユゲラ",
+helpTitle:"アーカイブのショートカット",helpCopy:"結果をコピー",helpFocus:"値フィールドへ",helpSearch:"単位を検索",helpSave:"換算を保存",helpReset:"リセット / 閉じる",helpBody:"どちらかの値フィールドに入力すると、その方向に換算されます。★ はお気に入りの単位や保存した換算を示します——いずれもブラウザ内のみに保存されます。",closeHelp:"ヘルプを閉じる",
+collections:"{n} コレクション",measuresUnit:"{n} 単位 · 古代{m}",lat:"緯度",lng:"経度",latitude:"緯度",longitude:"経度",locate:"位置へ",addPoint:"点を追加",coordInvalid:"有効な緯度（−90〜90）と経度（−180〜180）を入力してください"
+},
+ar:{
+subtitle:"دليل ميداني للقياس — عبر المختبرات والإمبراطوريات والأسواق وآلاف السنين. تصفّح حسب الحضارة، وحوّل في الاتجاهين، واحتفظ بسجل الباحث.",
+mapBtn:"🗺️ الخريطة والقياس",mapBtnTitle:"افتح الخريطة لقياس المسافة أو المساحة",
+helpBtnTitle:"المساعدة والاختصارات",langAria:"اللغة",eraAria:"تصفية الوحدات حسب الحضارة",tabsAria:"فئات القياس",
+labelValue:"القيمة",labelFromUnit:"من وحدة",labelConverted:"محوّل",labelToUnit:"إلى وحدة",fromValueAria:"قيمة الإدخال",toValueAria:"القيمة المحوّلة (قابلة للتحرير)",swapTitle:"تبديل الوحدات",
+clear:"مسح",resultLabel:"سجل التحويل",selectUnits:"اختر الوحدات للبدء",enterNumber:"أدخل قيمة رقمية",approxSuffix:"القيمة التاريخية تقريبية",tempTransform:"تحويل مقياس درجة الحرارة",
+copy:"⧉ نسخ",copyTitle:"نسخ النتيجة (⌘/Ctrl C)",reverse:"⇄ عكس",reverseTitle:"عكس الوحدات",save:"☆ حفظ",saved:"★ محفوظ",saveTitle:"حفظ هذا التحويل (⌘/Ctrl S)",
+recent:"التحويلات الأخيرة",clearAll:"مسح الكل",searchLabel:"البحث في المقاييس",searchPh:"ذراع، شاقل، ديناريوس…",
+noMatch:"لا توجد مقاييس مطابقة.",modernUnit:"وحدة حديثة / موحّدة",approxNote:"قيمة تاريخية تقريبية",
+noticeTitle:"ملاحظة الدقة:",noticeBody:"اختلفت الوحدات القديمة حسب العصر والمنطقة والحاكم والأثر. القيم المعلَّمة «تقريبيًا» تقديرات علمية عملية، وليست ثوابت عامة.",
+footerText:"تطبيق بملف واحد، جاهز للعمل دون اتصال. التحويلات التاريخية تقريبات تعليمية.",
+shortcutsHint:"اختصارات: <kbd>⌘/Ctrl C</kbd> نسخ · <kbd>⌘/Ctrl E</kbd> قيمة · <kbd>⌘/Ctrl F</kbd> بحث · <kbd>⌘/Ctrl S</kbd> حفظ · <kbd>Esc</kbd> إعادة تعيين",
+historyEmpty:"لا توجد تحويلات بعد — سيظهر سجلك هنا.",loadConv:"تحميل هذا التحويل",removeEntry:"حذف الإدخال",
+unitFavTitle:"إضافة هذه الوحدة إلى المفضلة",unitFavRemove:"إزالة من المفضلة",allMeasures:"جميع المقاييس",acrossCollections:"عبر جميع المجموعات",source:"المصدر",result:"النتيجة",
+nothingToCopy:"لا يوجد شيء للنسخ بعد",copied:"تم نسخ النتيجة",swapped:"تم تبديل الوحدات",histCleared:"تم مسح السجل",entryRemoved:"تم حذف الإدخال",restored:"تمت استعادة التحويل",
+favRemoved:"تم حذف التحويل المحفوظ",favSaved:"تم حفظ التحويل في المفضلة",unitFavOn:"تمت إضافة الوحدة إلى المفضلة",unitFavOff:"أُزيلت الوحدة من المفضلة",
+showAllCiv:"عرض جميع الحضارات",filterBy:"التصفية حسب {civ}",sentToConverter:"تم إرسال القياس إلى المحوّل",
+mapTitle:"🗺️ الخريطة والقياس",modeDistance:"مسافة",modeArea:"مساحة",undo:"↶ تراجع",clearM:"✕ مسح",closeMap:"إغلاق الخريطة",
+clickToAdd:"انقر على الخريطة لإضافة نقاط",addPoints:"أضف 3 نقاط على الأقل ({n} حتى الآن)",loading:"جارٍ تحميل الخريطة…",mapNeedsNet:"بلاطات الخريطة تحتاج اتصالًا بالإنترنت — أعد الاتصال ثم أعد الفتح.",send:"إرسال إلى المحوّل",stadia:"ستاديا",iugera:"يوجيرا",
+helpTitle:"اختصارات الأرشيف",helpCopy:"نسخ النتيجة",helpFocus:"الانتقال إلى حقل القيمة",helpSearch:"البحث عن الوحدات",helpSave:"حفظ التحويل",helpReset:"إعادة تعيين / إغلاق",helpBody:"اكتب في أي من حقلي القيمة للتحويل في هذا الاتجاه. ★ تعيّن وحدة أو تحويلًا مفضلًا — كلاهما يُحفظ في متصفحك فقط.",closeHelp:"إغلاق المساعدة",
+collections:"{n} مجموعات",measuresUnit:"{n} مقاييس · {m} قديمة",lat:"خط العرض",lng:"خط الطول",latitude:"خط العرض",longitude:"خط الطول",locate:"تحديد الموقع",addPoint:"إضافة نقطة",coordInvalid:"أدخل خط عرض صالحًا (من −90 إلى 90) وخط طول صالحًا (من −180 إلى 180)"
+},
+hi:{
+subtitle:"मापन के लिए एक फ़ील्ड गाइड — प्रयोगशालाओं, साम्राज्यों, बाज़ारों और सहस्राब्दियों के पार। सभ्यता के अनुसार ब्राउज़ करें, दोनों दिशाओं में बदलें और एक विद्वान का रिकॉर्ड रखें।",
+mapBtn:"🗺️ मानचित्र और मापन",mapBtnTitle:"दूरी या क्षेत्रफल मापने के लिए मानचित्र खोलें",
+helpBtnTitle:"सहायता और शॉर्टकट",langAria:"भाषा",eraAria:"सभ्यता के अनुसार इकाइयाँ फ़िल्टर करें",tabsAria:"माप श्रेणियाँ",
+labelValue:"मान",labelFromUnit:"किस इकाई से",labelConverted:"परिवर्तित",labelToUnit:"किस इकाई में",fromValueAria:"इनपुट मान",toValueAria:"परिवर्तित मान (संपादन योग्य)",swapTitle:"इकाइयाँ बदलें",
+clear:"साफ़ करें",resultLabel:"रूपांतरण रिकॉर्ड",selectUnits:"शुरू करने के लिए इकाइयाँ चुनें",enterNumber:"कोई संख्यात्मक मान दर्ज करें",approxSuffix:"ऐतिहासिक मान अनुमानित है",tempTransform:"तापमान पैमाना रूपांतरण",
+copy:"⧉ कॉपी करें",copyTitle:"परिणाम कॉपी करें (⌘/Ctrl C)",reverse:"⇄ उलटें",reverseTitle:"इकाइयाँ उलटें",save:"☆ सहेजें",saved:"★ सहेजा गया",saveTitle:"यह रूपांतरण सहेजें (⌘/Ctrl S)",
+recent:"हाल के रूपांतरण",clearAll:"सभी साफ़ करें",searchLabel:"माप खोजें",searchPh:"हाथ, शेकेल, डेनारियस…",
+noMatch:"कोई मेल खाता माप नहीं।",modernUnit:"आधुनिक / मानकीकृत इकाई",approxNote:"अनुमानित ऐतिहासिक मान",
+noticeTitle:"सटीकता नोट:",noticeBody:"प्राचीन इकाइयाँ युग, क्षेत्र, शासक और वस्तु के अनुसार बदलती थीं। «लगभग» चिह्नित मान व्यावहारिक विद्वान अनुमान हैं, सार्वभौमिक स्थिरांक नहीं।",
+footerText:"ऑफ़लाइन उपयोग हेतु तैयार एकल-फ़ाइल एप्लिकेशन। ऐतिहासिक रूपांतरण शैक्षिक अनुमान हैं।",
+shortcutsHint:"शॉर्टकट: <kbd>⌘/Ctrl C</kbd> कॉपी · <kbd>⌘/Ctrl E</kbd> मान · <kbd>⌘/Ctrl F</kbd> खोज · <kbd>⌘/Ctrl S</kbd> सहेजें · <kbd>Esc</kbd> रीसेट",
+historyEmpty:"अभी तक कोई रूपांतरण नहीं — आपका रिकॉर्ड यहाँ दिखेगा।",loadConv:"यह रूपांतरण लोड करें",removeEntry:"प्रविष्टि हटाएँ",
+unitFavTitle:"इस इकाई को पसंदीदा बनाएँ",unitFavRemove:"पसंदीदा से हटाएँ",allMeasures:"सभी माप",acrossCollections:"सभी संग्रहों में",source:"स्रोत",result:"परिणाम",
+nothingToCopy:"कॉपी करने के लिए अभी कुछ नहीं",copied:"परिणाम कॉपी हो गया",swapped:"इकाइयाँ बदल गईं",histCleared:"इतिहास साफ़ हुआ",entryRemoved:"प्रविष्टि हटाई गई",restored:"रूपांतरण पुनर्स्थापित हुआ",
+favRemoved:"सहेजा गया रूपांतरण हटा दिया",favSaved:"रूपांतरण पसंदीदा में सहेजा गया",unitFavOn:"इकाई पसंदीदा बनी",unitFavOff:"इकाई पसंदीदा से हटी",
+showAllCiv:"सभी सभ्यताएँ दिखाई जा रही हैं",filterBy:"{civ} के अनुसार फ़िल्टर",sentToConverter:"माप कनवर्टर को भेजा गया",
+mapTitle:"🗺️ मानचित्र और मापन",modeDistance:"दूरी",modeArea:"क्षेत्रफल",undo:"↶ पूर्ववत्",clearM:"✕ साफ़ करें",closeMap:"मानचित्र बंद करें",
+clickToAdd:"बिंदु जोड़ने के लिए मानचित्र पर क्लिक करें",addPoints:"कम से कम 3 बिंदु जोड़ें (अब तक {n})",loading:"मानचित्र लोड हो रहा है…",mapNeedsNet:"मानचित्र टाइल्स के लिए इंटरनेट कनेक्शन चाहिए — पुनः कनेक्ट करके दोबारा खोलें।",send:"कनवर्टर को भेजें",stadia:"स्टेडिया",iugera:"युगेरा",
+helpTitle:"अभिलेख शॉर्टकट",helpCopy:"परिणाम कॉपी करें",helpFocus:"मान फ़ील्ड पर जाएँ",helpSearch:"इकाइयाँ खोजें",helpSave:"रूपांतरण सहेजें",helpReset:"रीसेट / बंद करें",helpBody:"किसी भी मान फ़ील्ड में टाइप करें ताकि उस दिशा में रूपांतरण हो। ★ किसी पसंदीदा इकाई या सहेजे गए रूपांतरण को दर्शाता है — दोनों केवल आपके ब्राउज़र में रहते हैं।",closeHelp:"सहायता बंद करें",
+collections:"{n} संग्रह",measuresUnit:"{n} माप · {m} प्राचीन",lat:"अक्षांश",lng:"देशांतर",latitude:"अक्षांश",longitude:"देशांतर",locate:"स्थान खोजें",addPoint:"बिंदु जोड़ें",coordInvalid:"मान्य अक्षांश (−90 से 90) और देशांतर (−180 से 180) दर्ज करें"
+}
+};
+const CATLAB={
+en:{length:"Length",area:"Area",mass:"Mass",volume:"Volume",temperature:"Temperature",time:"Time",speed:"Speed",data:"Digital",force:"Force",energy:"Energy",pressure:"Pressure",coinage:"Coinage"},
+es:{length:"Longitud",area:"Área",mass:"Masa",volume:"Volumen",temperature:"Temperatura",time:"Tiempo",speed:"Velocidad",data:"Digital",force:"Fuerza",energy:"Energía",pressure:"Presión",coinage:"Monedas"},
+fr:{length:"Longueur",area:"Surface",mass:"Masse",volume:"Volume",temperature:"Température",time:"Temps",speed:"Vitesse",data:"Numérique",force:"Force",energy:"Énergie",pressure:"Pression",coinage:"Monnaies"},
+de:{length:"Länge",area:"Fläche",mass:"Masse",volume:"Volumen",temperature:"Temperatur",time:"Zeit",speed:"Geschwindigkeit",data:"Digital",force:"Kraft",energy:"Energie",pressure:"Druck",coinage:"Münzen"},
+pt:{length:"Comprimento",area:"Área",mass:"Massa",volume:"Volume",temperature:"Temperatura",time:"Tempo",speed:"Velocidade",data:"Digital",force:"Força",energy:"Energia",pressure:"Pressão",coinage:"Moedas"},
+it:{length:"Lunghezza",area:"Area",mass:"Massa",volume:"Volume",temperature:"Temperatura",time:"Tempo",speed:"Velocità",data:"Digitale",force:"Forza",energy:"Energia",pressure:"Pressione",coinage:"Monete"},
+zh:{length:"长度",area:"面积",mass:"质量",volume:"体积",temperature:"温度",time:"时间",speed:"速度",data:"数字",force:"力",energy:"能量",pressure:"压强",coinage:"货币"},
+ja:{length:"長さ",area:"面積",mass:"質量",volume:"体積",temperature:"温度",time:"時間",speed:"速度",data:"デジタル",force:"力",energy:"エネルギー",pressure:"圧力",coinage:"硬貨"},
+ar:{length:"الطول",area:"المساحة",mass:"الكتلة",volume:"الحجم",temperature:"درجة الحرارة",time:"الزمن",speed:"السرعة",data:"رقمي",force:"القوة",energy:"الطاقة",pressure:"الضغط",coinage:"العملات"},
+hi:{length:"लंबाई",area:"क्षेत्रफल",mass:"द्रव्यमान",volume:"आयतन",temperature:"तापमान",time:"समय",speed:"गति",data:"डिजिटल",force:"बल",energy:"ऊर्जा",pressure:"दाब",coinage:"सिक्के"}
+};
+const CIVLAB={
+en:{All:"All",Modern:"Modern",Egypt:"Egypt",Rome:"Rome",Greece:"Greece",Mesopotamia:"Mesopotamia",Levant:"Levant",China:"China",India:"India",Persia:"Persia",Norse:"Norse"},
+es:{All:"Todas",Modern:"Moderno",Egypt:"Egipto",Rome:"Roma",Greece:"Grecia",Mesopotamia:"Mesopotamia",Levant:"Levante",China:"China",India:"India",Persia:"Persia",Norse:"Nórdico"},
+fr:{All:"Toutes",Modern:"Moderne",Egypt:"Égypte",Rome:"Rome",Greece:"Grèce",Mesopotamia:"Mésopotamie",Levant:"Levant",China:"Chine",India:"Inde",Persia:"Perse",Norse:"Nordique"},
+de:{All:"Alle",Modern:"Modern",Egypt:"Ägypten",Rome:"Rom",Greece:"Griechenland",Mesopotamia:"Mesopotamien",Levant:"Levante",China:"China",India:"Indien",Persia:"Persien",Norse:"Nordisch"},
+pt:{All:"Todas",Modern:"Moderno",Egypt:"Egito",Rome:"Roma",Greece:"Grécia",Mesopotamia:"Mesopotâmia",Levant:"Levante",China:"China",India:"Índia",Persia:"Pérsia",Norse:"Nórdico"},
+it:{All:"Tutte",Modern:"Moderno",Egypt:"Egitto",Rome:"Roma",Greece:"Grecia",Mesopotamia:"Mesopotamia",Levant:"Levante",China:"Cina",India:"India",Persia:"Persia",Norse:"Nordico"},
+zh:{All:"全部",Modern:"现代",Egypt:"埃及",Rome:"罗马",Greece:"希腊",Mesopotamia:"美索不达米亚",Levant:"黎凡特",China:"中国",India:"印度",Persia:"波斯",Norse:"北欧"},
+ja:{All:"すべて",Modern:"現代",Egypt:"エジプト",Rome:"ローマ",Greece:"ギリシャ",Mesopotamia:"メソポタミア",Levant:"レバント",China:"中国",India:"インド",Persia:"ペルシャ",Norse:"北欧"},
+ar:{All:"الكل",Modern:"حديث",Egypt:"مصر",Rome:"روما",Greece:"اليونان",Mesopotamia:"بلاد الرافدين",Levant:"المشرق",China:"الصين",India:"الهند",Persia:"فارس",Norse:"نوردي"},
+hi:{All:"सभी",Modern:"आधुनिक",Egypt:"मिस्र",Rome:"रोम",Greece:"यूनान",Mesopotamia:"मेसोपोटामिया",Levant:"लेवांत",China:"चीन",India:"भारत",Persia:"फ़ारस",Norse:"नॉर्स"}
+};
+const LEX={
+ es:{
+"Metre":["Metro",""],
+"Kilometre":["Kilómetro",""],
+"Centimetre":["Centímetro",""],
+"Millimetre":["Milímetro",""],
+"Micrometre":["Micrómetro",""],
+"Nanometre":["Nanómetro",""],
+"Inch":["Pulgada",""],
+"Foot":["Pie",""],
+"Yard":["Yarda",""],
+"Mile":["Milla",""],
+"Nautical mile":["Milla náutica",""],
+"Astronomical unit":["Unidad astronómica",""],
+"Light-second":["Segundo luz",""],
+"Egyptian royal cubit":["Codo real egipcio","aprox. 52.5 cm; los estándares variaban según el periodo"],
+"Egyptian common cubit":["Codo común egipcio","aprox. 45 cm"],
+"Egyptian digit":["Dedo egipcio","1/28 codo real; aprox."],
+"Roman foot (pes)":["Pie romano (pes)","aprox. 296 mm"],
+"Roman digitus":["Dedo romano (digitus)","1/16 pes; aprox."],
+"Roman palm":["Palma romana","1/4 pes; aprox."],
+"Roman pace (passus)":["Paso romano (passus)","5 pies romanos"],
+"Roman mile":["Milla romana","aprox. 1.48 km"],
+"Greek foot (pous)":["Pie griego (pous)","aprox.; regional, ático ~0.30 m"],
+"Greek fathom (orgyia)":["Braza griega (orguia)","6 podes; aprox."],
+"Greek stadion":["Estadio griego","valor representativo de la era ática/romana"],
+"Biblical common cubit":["Codo común bíblico","aprox. promedio; históricamente variable"],
+"Biblical span (zeret)":["Palmo bíblico (zeret)","medio codo; aprox."],
+"Chinese chi (Han)":["Chi chino (Han)","aprox.; dependiente de la dinastía"],
+"Indian hasta":["Hasta indio","aprox. 18 pulgadas"],
+"Mesopotamian cubit (kush)":["Codo mesopotámico (kush)","aprox.; el estándar variaba"],
+"Persian parasang":["Parasanga persa","aprox.; a menudo se da como 30 estadios"],
+"Norse ell (alen)":["Vara nórdica (alen)","aprox.; variaba según la región"],
+"Square metre":["Metro cuadrado",""],
+"Square kilometre":["Kilómetro cuadrado",""],
+"Hectare":["Hectárea",""],
+"Acre":["Acre",""],
+"Square foot":["Pie cuadrado",""],
+"Square yard":["Yarda cuadrada",""],
+"Square mile":["Milla cuadrada",""],
+"Roman iugerum":["Yugada romana (iugerum)","aprox. 0.623 acre"],
+"Roman actus":["Actus romano","aprox.; cuadrado de 120 pes"],
+"Egyptian aroura":["Arura egipcia","aprox.; cuadrado de 100 codos reales"],
+"Greek plethron²":["Plétrón griego²","aprox.; variación regional"],
+"Mesopotamian iku":["Iku mesopotámico","aprox.; unidad de campo"],
+"Kilogram":["Kilogramo",""],
+"Gram":["Gramo",""],
+"Milligram":["Miligramo",""],
+"Metric tonne":["Tonelada métrica",""],
+"Ounce":["Onza",""],
+"Pound":["Libra",""],
+"Stone":["Stone",""],
+"Carat":["Quilate",""],
+"Grain":["Grano",""],
+"Roman libra":["Libra romana","aprox. 327.45 g"],
+"Roman uncia":["Onza romana (uncia)","1/12 libra"],
+"Mesopotamian shekel":["Siclo mesopotámico","aprox. 8.33 g; los estándares variaban"],
+"Mesopotamian mina":["Mina mesopotámica","60 siclos; representativo"],
+"Mesopotamian talent":["Talento mesopotámico","60 minas; representativo"],
+"Egyptian deben":["Deben egipcio","aprox. valor del Imperio Nuevo (~91 g)"],
+"Egyptian kite":["Kite egipcio","1/10 deben"],
+"Greek Attic drachma":["Dracma ática griega","aprox. 4.3 g"],
+"Greek obol":["Óbolo griego","1/6 dracma"],
+"Greek Attic mina":["Mina ática griega","100 dracmas"],
+"Greek Attic talent":["Talento ático griego","60 minas"],
+"Hebrew shekel":["Siclo hebreo","aprox.; los estándares variaban"],
+"Indian karsha":["Karsha indio","aprox.; ~58.8 g"],
+"Persian daric":["Darico persa","moneda de oro aqueménida; aprox."],
+"Litre":["Litro",""],
+"Millilitre":["Mililitro",""],
+"Cubic metre":["Metro cúbico",""],
+"US gallon":["Galón estadounidense",""],
+"Imperial gallon":["Galón imperial",""],
+"US quart":["Cuarto estadounidense",""],
+"US pint":["Pinta estadounidense",""],
+"Fluid ounce":["Onza líquida",""],
+"Cup (metric)":["Taza (métrica)",""],
+"Tablespoon (metric)":["Cucharada (métrica)",""],
+"Teaspoon (metric)":["Cucharadita (métrica)",""],
+"Roman cyathus":["Cáti romano (cyathus)","aprox.; 1/12 sextario"],
+"Roman sextarius":["Sextario romano","aprox."],
+"Roman congius":["Congio romano","6 sextarios"],
+"Roman amphora":["Ánfora romana","aprox. 48 sextarios"],
+"Greek kotyle":["Cotila griega","aprox.; dependiente de la polis"],
+"Greek chous":["Cús griego","aprox.; 12 cotilas"],
+"Greek amphora (metretes)":["Ánfora griega (metretes)","valor representativo"],
+"Biblical log":["Log bíblico","aprox.; medida bíblica de líquidos más pequeña"],
+"Biblical hin":["Hin bíblico","aprox.; las estimaciones académicas varían"],
+"Biblical bath":["Bat bíblico","aprox.; ~6 hin"],
+"Biblical homer":["Hómer bíblico","aprox.; 10 bat"],
+"Egyptian heqat":["Heqat egipcio","aprox. Imperio Medio/Nuevo"],
+"Egyptian ro":["Ro egipcio","aprox.; 1/320 heqat"],
+"Mesopotamian sila":["Sila mesopotámico","aprox.; variaba ~0.8–1 L"],
+"Celsius":["Celsius",""],
+"Fahrenheit":["Fahrenheit",""],
+"Kelvin":["Kelvin",""],
+"Rankine":["Rankine",""],
+"Second":["Segundo",""],
+"Minute":["Minuto",""],
+"Hour":["Hora",""],
+"Day":["Día",""],
+"Week":["Semana",""],
+"Julian year":["Año juliano",""],
+"Babylonian time degree (uš)":["Grado de tiempo babilónico (uš)","1/360 de un día = 4 minutos"],
+"Egyptian decan interval":["Intervalo decano egipcio","intervalo civil de 10 días"],
+"Roman hora (seasonal)":["Hora romana (estacional)","mostrada como 1 hora moderna; las horas de luz variaban según la estación"],
+"Chinese ke (quarter)":["Ke chino (cuarto)","aprox.; 1/96 de un día en sistemas posteriores"],
+"Metre per second":["Metro por segundo",""],
+"Kilometre per hour":["Kilómetro por hora",""],
+"Mile per hour":["Milla por hora",""],
+"Knot":["Nudo",""],
+"Roman mile per hour":["Milla romana por hora","usa la milla romana aprox.; ilustrativo"],
+"Byte":["Byte",""],
+"Kilobyte":["Kilobyte",""],
+"Megabyte":["Megabyte",""],
+"Gigabyte":["Gigabyte",""],
+"Terabyte":["Terabyte",""],
+"Petabyte":["Petabyte",""],
+"Kibibyte":["Kibibyte",""],
+"Mebibyte":["Mebibyte",""],
+"Gibibyte":["Gibibyte",""],
+"Tebibyte":["Tebibyte",""],
+"Newton":["Newton",""],
+"Kilonewton":["Kilonewton",""],
+"Dyne":["Dina",""],
+"Pound-force":["Libra-fuerza",""],
+"Kilogram-force":["Kilogramo-fuerza",""],
+"Poundal":["Poundal",""],
+"Joule":["Julio",""],
+"Kilojoule":["Kilojulio",""],
+"Calorie":["Caloría",""],
+"Kilocalorie":["Kilocaloría",""],
+"Kilowatt-hour":["Kilovatio-hora",""],
+"Electronvolt":["Electronvoltio",""],
+"British thermal unit":["Unidad térmica británica",""],
+"Erg":["Ergio",""],
+"Foot-pound":["Pie-libra",""],
+"Pascal":["Pascal",""],
+"Kilopascal":["Kilopascal",""],
+"Hectopascal":["Hectopascal",""],
+"Bar":["Bar",""],
+"Millibar":["Millibar",""],
+"Atmosphere":["Atmósfera",""],
+"Torr":["Torr",""],
+"Millimetre of mercury":["Milímetro de mercurio",""],
+"Pound per square inch":["Libra por pulgada cuadrada",""],
+"Attic drachma (silver)":["Dracma ática (plata)","aprox. 4.3 g de plata; estándar ático"],
+"Attic tetradrachm (silver)":["Tetradracma ática (plata)","4 dracmas; el 'búho' ateniense"],
+"Attic mina (silver)":["Mina ática (plata)","100 dracmas"],
+"Attic talent (silver)":["Talento ático (plata)","60 minas"],
+"Roman denarius (silver)":["Denario romano (plata)","aprox. contenido de plata; decayó a lo largo de los siglos"],
+"Roman sestertius":["Sestercio romano","aprox.; 1/4 denario"],
+"Roman as (bronze)":["As romano (bronce)","aprox.; bronce, ~11 g"],
+"Roman aureus (gold)":["Áureo romano (oro)","oro; peso aprox."],
+"Hebrew shekel of silver":["Siclo hebreo de plata","aprox.; estándar del templo"],
+"Hebrew talent of silver":["Talento hebreo de plata","aprox.; ~3000 siclos"],
+"Mesopotamian shekel of silver":["Siclo mesopotámico de plata","aprox.; estándar de plata"],
+"Mesopotamian mina (silver)":["Mina mesopotámica (plata)","60 siclos"],
+"Mesopotamian talent (silver)":["Talento mesopotámico (plata)","60 minas"],
+"Egyptian deben (silver)":["Deben egipcio (plata)","aprox.; deben de plata del Imperio Nuevo"],
+"Egyptian kite (silver)":["Kite egipcio (plata)","1/10 deben"],
+"Persian daric (gold)":["Darico persa (oro)","oro aqueménida; aprox."],
+"Persian siglos (silver)":["Siglo persa (plata)","plata aqueménida; aprox."],
+ },
+ fr:{
+"Metre":["Mètre",""],
+"Kilometre":["Kilomètre",""],
+"Centimetre":["Centimètre",""],
+"Millimetre":["Millimètre",""],
+"Micrometre":["Micromètre",""],
+"Nanometre":["Nanomètre",""],
+"Inch":["Pouce",""],
+"Foot":["Pied",""],
+"Yard":["Yard",""],
+"Mile":["Mille",""],
+"Nautical mile":["Mille marin",""],
+"Astronomical unit":["Unité astronomique",""],
+"Light-second":["Seconde-lumière",""],
+"Egyptian royal cubit":["Coudée royale égyptienne","env. 52.5 cm ; les étalons variaient selon l'époque"],
+"Egyptian common cubit":["Coudée égyptienne commune","env. 45 cm"],
+"Egyptian digit":["Doigt égyptien","1/28 de coudée royale ; env."],
+"Roman foot (pes)":["Pied romain (pes)","env. 296 mm"],
+"Roman digitus":["Doigt romain (digitus)","1/16 de pes ; env."],
+"Roman palm":["Paume romaine","1/4 de pes ; env."],
+"Roman pace (passus)":["Pas romain (passus)","5 pieds romains"],
+"Roman mile":["Mille romain","env. 1.48 km"],
+"Greek foot (pous)":["Pied grec (pous)","env. ; régional, attique ~0.30 m"],
+"Greek fathom (orgyia)":["Brasse grecque (orgyia)","6 podes ; env."],
+"Greek stadion":["Stade grec","valeur représentative de l'époque attique/romaine"],
+"Biblical common cubit":["Coudée commune biblique","env. moyenne ; historiquement variable"],
+"Biblical span (zeret)":["Empan biblique (zeret)","moitié d'une coudée ; env."],
+"Chinese chi (Han)":["Chi chinois (Han)","env. ; dépend de la dynastie"],
+"Indian hasta":["Hasta indien","env. 18 pouces"],
+"Mesopotamian cubit (kush)":["Coudée mésopotamienne (kush)","env. ; l'étalon variait"],
+"Persian parasang":["Parasange perse","env. ; souvent donnée comme 30 stades"],
+"Norse ell (alen)":["Aune nordique (alen)","env. ; variait selon la région"],
+"Square metre":["Mètre carré",""],
+"Square kilometre":["Kilomètre carré",""],
+"Hectare":["Hectare",""],
+"Acre":["Acre",""],
+"Square foot":["Pied carré",""],
+"Square yard":["Yard carré",""],
+"Square mile":["Mille carré",""],
+"Roman iugerum":["Jugère romain","env. 0.623 acre"],
+"Roman actus":["Actus romain","env. ; carré de 120 pes"],
+"Egyptian aroura":["Aroure égyptienne","env. ; carré de 100 coudées royales"],
+"Greek plethron²":["Plèthre grec²","env. ; variations régionales"],
+"Mesopotamian iku":["Iku mésopotamien","env. ; unité agraire"],
+"Kilogram":["Kilogramme",""],
+"Gram":["Gramme",""],
+"Milligram":["Milligramme",""],
+"Metric tonne":["Tonne métrique",""],
+"Ounce":["Once",""],
+"Pound":["Livre",""],
+"Stone":["Stone",""],
+"Carat":["Carat",""],
+"Grain":["Grain",""],
+"Roman libra":["Livre romaine","env. 327.45 g"],
+"Roman uncia":["Once romaine","1/12 de livre"],
+"Mesopotamian shekel":["Sicle mésopotamien","env. 8.33 g ; les étalons variaient"],
+"Mesopotamian mina":["Mine mésopotamienne","60 sicles ; valeur représentative"],
+"Mesopotamian talent":["Talent mésopotamien","60 mines ; valeur représentative"],
+"Egyptian deben":["Dében égyptien","env. valeur du Nouvel Empire (~91 g)"],
+"Egyptian kite":["Kité égyptien","1/10 de dében"],
+"Greek Attic drachma":["Drachme attique grecque","env. 4.3 g"],
+"Greek obol":["Obole grecque","1/6 de drachme"],
+"Greek Attic mina":["Mine attique grecque","100 drachmes"],
+"Greek Attic talent":["Talent attique grec","60 mines"],
+"Hebrew shekel":["Sicle hébreu","env. ; les étalons variaient"],
+"Indian karsha":["Karsha indien","env. ; ~58.8 g"],
+"Persian daric":["Darique perse","pièce d'or achéménide ; env."],
+"Litre":["Litre",""],
+"Millilitre":["Millilitre",""],
+"Cubic metre":["Mètre cube",""],
+"US gallon":["Gallon américain",""],
+"Imperial gallon":["Gallon impérial",""],
+"US quart":["Quart américain",""],
+"US pint":["Pinte américaine",""],
+"Fluid ounce":["Once liquide",""],
+"Cup (metric)":["Tasse (métrique)",""],
+"Tablespoon (metric)":["Cuillère à soupe (métrique)",""],
+"Teaspoon (metric)":["Cuillère à café (métrique)",""],
+"Roman cyathus":["Cyathe romain","env. ; 1/12 de sextarius"],
+"Roman sextarius":["Sextarius romain","env."],
+"Roman congius":["Congius romain","6 sextarii"],
+"Roman amphora":["Amphore romaine","env. 48 sextarii"],
+"Greek kotyle":["Cotyle grec","env. ; dépend de la polis"],
+"Greek chous":["Chous grec","env. ; 12 kotylai"],
+"Greek amphora (metretes)":["Amphore grecque (metretes)","valeur représentative"],
+"Biblical log":["Log biblique","env. ; plus petite mesure de liquide biblique"],
+"Biblical hin":["Hin biblique","env. ; les estimations savantes varient"],
+"Biblical bath":["Bat biblique","env. ; ~6 hin"],
+"Biblical homer":["Homère biblique","env. ; 10 bat"],
+"Egyptian heqat":["Héqat égyptien","env. Moyen/Nouvel Empire"],
+"Egyptian ro":["Ro égyptien","env. ; 1/320 de héqat"],
+"Mesopotamian sila":["Sila mésopotamien","env. ; variait ~0.8–1 L"],
+"Celsius":["Celsius",""],
+"Fahrenheit":["Fahrenheit",""],
+"Kelvin":["Kelvin",""],
+"Rankine":["Rankine",""],
+"Second":["Seconde",""],
+"Minute":["Minute",""],
+"Hour":["Heure",""],
+"Day":["Jour",""],
+"Week":["Semaine",""],
+"Julian year":["Année julienne",""],
+"Babylonian time degree (uš)":["Degré de temps babylonien (uš)","1/360 de jour = 4 minutes"],
+"Egyptian decan interval":["Intervalle de décade égyptien","intervalle civil de 10 jours"],
+"Roman hora (seasonal)":["Heure romaine (saisonnière)","affichée comme 1 heure moderne ; les heures de jour variaient selon la saison"],
+"Chinese ke (quarter)":["Ke chinois (quart)","env. ; 1/96 de jour dans les systèmes tardifs"],
+"Metre per second":["Mètre par seconde",""],
+"Kilometre per hour":["Kilomètre par heure",""],
+"Mile per hour":["Mille par heure",""],
+"Knot":["Nœud",""],
+"Roman mile per hour":["Mille romain par heure","utilise le mille romain approx. ; illustratif"],
+"Byte":["Byte",""],
+"Kilobyte":["Kilobyte",""],
+"Megabyte":["Megabyte",""],
+"Gigabyte":["Gigabyte",""],
+"Terabyte":["Terabyte",""],
+"Petabyte":["Petabyte",""],
+"Kibibyte":["Kibioctet",""],
+"Mebibyte":["Mébioctet",""],
+"Gibibyte":["Gibioctet",""],
+"Tebibyte":["Tébioctet",""],
+"Newton":["Newton",""],
+"Kilonewton":["Kilonewton",""],
+"Dyne":["Dyne",""],
+"Pound-force":["Livre-force",""],
+"Kilogram-force":["Kilogramme-force",""],
+"Poundal":["Poundal",""],
+"Joule":["Joule",""],
+"Kilojoule":["Kilojoule",""],
+"Calorie":["Calorie",""],
+"Kilocalorie":["Kilocalorie",""],
+"Kilowatt-hour":["Kilowatt-heure",""],
+"Electronvolt":["Électronvolt",""],
+"British thermal unit":["Unité thermique britannique",""],
+"Erg":["Erg",""],
+"Foot-pound":["Pied-livre",""],
+"Pascal":["Pascal",""],
+"Kilopascal":["Kilopascal",""],
+"Hectopascal":["Hectopascal",""],
+"Bar":["Bar",""],
+"Millibar":["Millibar",""],
+"Atmosphere":["Atmosphère",""],
+"Torr":["Torr",""],
+"Millimetre of mercury":["Millimètre de mercure",""],
+"Pound per square inch":["Livre par pouce carré",""],
+"Attic drachma (silver)":["Drachme attique (argent)","env. 4.3 g d'argent ; étalon attique"],
+"Attic tetradrachm (silver)":["Tétradrachme attique (argent)","4 drachmes ; la « chouette » athénienne"],
+"Attic mina (silver)":["Mine attique (argent)","100 drachmes"],
+"Attic talent (silver)":["Talent attique (argent)","60 mines"],
+"Roman denarius (silver)":["Denier romain (argent)","env. teneur en argent ; a décliné au fil des siècles"],
+"Roman sestertius":["Sesterce romain","env. ; 1/4 de denier"],
+"Roman as (bronze)":["As romain (bronze)","env. ; bronze, ~11 g"],
+"Roman aureus (gold)":["Aureus romain (or)","or ; poids env."],
+"Hebrew shekel of silver":["Sicle d'argent hébreu","env. ; étalon du Temple"],
+"Hebrew talent of silver":["Talent d'argent hébreu","env. ; ~3000 sicles"],
+"Mesopotamian shekel of silver":["Sicle d'argent mésopotamien","env. ; étalon d'argent"],
+"Mesopotamian mina (silver)":["Mine mésopotamienne (argent)","60 sicles"],
+"Mesopotamian talent (silver)":["Talent mésopotamien (argent)","60 mines"],
+"Egyptian deben (silver)":["Dében égyptien (argent)","env. ; dében d'argent du Nouvel Empire"],
+"Egyptian kite (silver)":["Kité égyptien (argent)","1/10 de dében"],
+"Persian daric (gold)":["Darique perse (or)","or achéménide ; env."],
+"Persian siglos (silver)":["Sicle perse (argent)","argent achéménide ; env."],
+ },
+ de:{
+"Metre":["Meter",""],
+"Kilometre":["Kilometer",""],
+"Centimetre":["Zentimeter",""],
+"Millimetre":["Millimeter",""],
+"Micrometre":["Mikrometer",""],
+"Nanometre":["Nanometer",""],
+"Inch":["Zoll",""],
+"Foot":["Fuß",""],
+"Yard":["Yard",""],
+"Mile":["Meile",""],
+"Nautical mile":["Seemeile",""],
+"Astronomical unit":["Astronomische Einheit",""],
+"Light-second":["Lichtsekunde",""],
+"Egyptian royal cubit":["Ägyptische Königselle","ca. 52.5 cm; Standards variierten je nach Epoche"],
+"Egyptian common cubit":["Ägyptische gewöhnliche Elle","ca. 45 cm"],
+"Egyptian digit":["Ägyptischer Fingerbreit","1/28 Königselle; ca."],
+"Roman foot (pes)":["Römischer Fuß (pes)","ca. 296 mm"],
+"Roman digitus":["Römischer Digitus","1/16 pes; ca."],
+"Roman palm":["Römische Handbreit","1/4 pes; ca."],
+"Roman pace (passus)":["Römischer Schritt (passus)","5 römische Fuß"],
+"Roman mile":["Römische Meile","ca. 1.48 km"],
+"Greek foot (pous)":["Griechischer Fuß (pous)","ca.; regional, attisch ~0.30 m"],
+"Greek fathom (orgyia)":["Griechischer Klafter (orgyia)","6 podes; ca."],
+"Greek stadion":["Griechisches Stadion","repräsentativer Wert aus attischer/römischer Zeit"],
+"Biblical common cubit":["Biblische gewöhnliche Elle","ca. Durchschnitt; historisch variabel"],
+"Biblical span (zeret)":["Biblische Spanne (zeret)","eine halbe Elle; ca."],
+"Chinese chi (Han)":["Chinesischer Chi (Han)","ca.; je nach Dynastie unterschiedlich"],
+"Indian hasta":["Indische Hasta","ca. 18 Zoll"],
+"Mesopotamian cubit (kush)":["Mesopotamische Kusch-Elle (kush)","ca.; Standard variierte"],
+"Persian parasang":["Persische Parasange","ca.; oft als 30 Stadien angegeben"],
+"Norse ell (alen)":["Nordische Elle (alen)","ca.; regional unterschiedlich"],
+"Square metre":["Quadratmeter",""],
+"Square kilometre":["Quadratkilometer",""],
+"Hectare":["Hektar",""],
+"Acre":["Acre",""],
+"Square foot":["Quadratfuß",""],
+"Square yard":["Quadratyard",""],
+"Square mile":["Quadratmeile",""],
+"Roman iugerum":["Römisches Jugerum","ca. 0.623 Acre"],
+"Roman actus":["Römischer Actus","ca.; Quadrat aus 120 pes"],
+"Egyptian aroura":["Ägyptische Arure","ca.; Quadrat aus 100 Königselen"],
+"Greek plethron²":["Griechisches Plethron²","ca.; regionale Abweichungen"],
+"Mesopotamian iku":["Mesopotamisches Iku","ca.; Feldeinheit"],
+"Kilogram":["Kilogramm",""],
+"Gram":["Gramm",""],
+"Milligram":["Milligramm",""],
+"Metric tonne":["Tonne",""],
+"Ounce":["Unze",""],
+"Pound":["Pfund",""],
+"Stone":["Stone",""],
+"Carat":["Karat",""],
+"Grain":["Gran",""],
+"Roman libra":["Römisches Pfund","ca. 327.45 g"],
+"Roman uncia":["Römische Unze","1/12 libra"],
+"Mesopotamian shekel":["Mesopotamischer Schekel","ca. 8.33 g; Standards variierten"],
+"Mesopotamian mina":["Mesopotamische Mine","60 Schekel; repräsentativ"],
+"Mesopotamian talent":["Mesopotamisches Talent","60 Minen; repräsentativ"],
+"Egyptian deben":["Ägyptischer Deben","ca. Wert des Neuen Reiches (~91 g)"],
+"Egyptian kite":["Ägyptischer Kite","1/10 Deben"],
+"Greek Attic drachma":["Griechische Attische Drachme","ca. 4.3 g"],
+"Greek obol":["Griechischer Obolus","1/6 Drachme"],
+"Greek Attic mina":["Griechische Attische Mine","100 Drachmen"],
+"Greek Attic talent":["Griechisches Attisches Talent","60 Minen"],
+"Hebrew shekel":["Hebräischer Schekel","ca.; Standards variierten"],
+"Indian karsha":["Indische Karsha","ca.; ~58.8 g"],
+"Persian daric":["Persische Dareike","Achämenidische Goldmünze; ca."],
+"Litre":["Liter",""],
+"Millilitre":["Milliliter",""],
+"Cubic metre":["Kubikmeter",""],
+"US gallon":["US-Gallone",""],
+"Imperial gallon":["Imperiale Gallone",""],
+"US quart":["US-Quart",""],
+"US pint":["US-Pint",""],
+"Fluid ounce":["Flüssigunze",""],
+"Cup (metric)":["Tasse (metrisch)",""],
+"Tablespoon (metric)":["Esslöffel (metrisch)",""],
+"Teaspoon (metric)":["Teelöffel (metrisch)",""],
+"Roman cyathus":["Römischer Kyathos","ca.; 1/12 sextarius"],
+"Roman sextarius":["Römischer Sextarius","ca."],
+"Roman congius":["Römischer Congius","6 sextarii"],
+"Roman amphora":["Römische Amphore","ca. 48 sextarii"],
+"Greek kotyle":["Griechische Kotyle","ca.; je nach Polis unterschiedlich"],
+"Greek chous":["Griechischer Chus","ca.; 12 Kotylen"],
+"Greek amphora (metretes)":["Griechische Amphore (Metretes)","repräsentativer Wert"],
+"Biblical log":["Biblischer Log","ca.; kleinstes biblisches Flüssigkeitsmaß"],
+"Biblical hin":["Biblischer Hin","ca.; Schätzungen variieren"],
+"Biblical bath":["Biblisches Bat","ca.; ~6 Hin"],
+"Biblical homer":["Biblischer Homer","ca.; 10 Bat"],
+"Egyptian heqat":["Ägyptische Hekat","ca. Mittleres/Neues Reich"],
+"Egyptian ro":["Ägyptisches Ro","ca.; 1/320 Hekat"],
+"Mesopotamian sila":["Mesopotamische Sila","ca.; variierte ~0.8–1 L"],
+"Celsius":["Celsius",""],
+"Fahrenheit":["Fahrenheit",""],
+"Kelvin":["Kelvin",""],
+"Rankine":["Rankine",""],
+"Second":["Sekunde",""],
+"Minute":["Minute",""],
+"Hour":["Stunde",""],
+"Day":["Tag",""],
+"Week":["Woche",""],
+"Julian year":["Julianisches Jahr",""],
+"Babylonian time degree (uš)":["Babylonisches Zeitgrad (uš)","1/360 eines Tages = 4 Minuten"],
+"Egyptian decan interval":["Ägyptisches Dekadenintervall","10-tägiges ziviles Intervall"],
+"Roman hora (seasonal)":["Römische Stunde (saisonal)","dargestellt als 1 moderne Stunde; Tagesstunden variierten je nach Jahreszeit"],
+"Chinese ke (quarter)":["Chinesisches Ke (Viertel)","ca.; 1/96 eines Tages in späteren Systemen"],
+"Metre per second":["Meter pro Sekunde",""],
+"Kilometre per hour":["Kilometer pro Stunde",""],
+"Mile per hour":["Meilen pro Stunde",""],
+"Knot":["Knoten",""],
+"Roman mile per hour":["Römische Meile pro Stunde","nutzt ca. römische Meile; illustrativ"],
+"Byte":["Byte",""],
+"Kilobyte":["Kilobyte",""],
+"Megabyte":["Megabyte",""],
+"Gigabyte":["Gigabyte",""],
+"Terabyte":["Terabyte",""],
+"Petabyte":["Petabyte",""],
+"Kibibyte":["Kibibyte",""],
+"Mebibyte":["Mebibyte",""],
+"Gibibyte":["Gibibyte",""],
+"Tebibyte":["Tebibyte",""],
+"Newton":["Newton",""],
+"Kilonewton":["Kilonewton",""],
+"Dyne":["Dyn",""],
+"Pound-force":["Pound-force",""],
+"Kilogram-force":["Kilopond",""],
+"Poundal":["Poundal",""],
+"Joule":["Joule",""],
+"Kilojoule":["Kilojoule",""],
+"Calorie":["Kalorie",""],
+"Kilocalorie":["Kilokalorie",""],
+"Kilowatt-hour":["Kilowattstunde",""],
+"Electronvolt":["Elektronenvolt",""],
+"British thermal unit":["Britische Wärmeeinheit",""],
+"Erg":["Erg",""],
+"Foot-pound":["Foot-pound",""],
+"Pascal":["Pascal",""],
+"Kilopascal":["Kilopascal",""],
+"Hectopascal":["Hektopascal",""],
+"Bar":["Bar",""],
+"Millibar":["Millibar",""],
+"Atmosphere":["Atmosphäre",""],
+"Torr":["Torr",""],
+"Millimetre of mercury":["Millimeter Quecksilbersäule",""],
+"Pound per square inch":["Pfund pro Quadratzoll",""],
+"Attic drachma (silver)":["Attische Drachme (Silber)","ca. 4.3 g Silber; attischer Standard"],
+"Attic tetradrachm (silver)":["Attische Tetradrachme (Silber)","4 Drachmen; die athenische 'Eule'"],
+"Attic mina (silver)":["Attische Mine (Silber)","100 Drachmen"],
+"Attic talent (silver)":["Attisches Talent (Silber)","60 Minen"],
+"Roman denarius (silver)":["Römischer Denar (Silber)","ca. Silbergehalt; nahm über Jahrhunderte ab"],
+"Roman sestertius":["Römischer Sesterz","ca.; 1/4 Denar"],
+"Roman as (bronze)":["Römischer As (Bronze)","ca.; Bronze, ~11 g"],
+"Roman aureus (gold)":["Römischer Aureus (Gold)","Gold; ca. Gewicht"],
+"Hebrew shekel of silver":["Hebräischer Schekel aus Silber","ca.; Tempelstandard"],
+"Hebrew talent of silver":["Hebräisches Talent aus Silber","ca.; ~3000 Schekel"],
+"Mesopotamian shekel of silver":["Mesopotamischer Schekel aus Silber","ca.; Silberstandard"],
+"Mesopotamian mina (silver)":["Mesopotamische Mine (Silber)","60 Schekel"],
+"Mesopotamian talent (silver)":["Mesopotamisches Talent (Silber)","60 Minen"],
+"Egyptian deben (silver)":["Ägyptischer Deben (Silber)","ca.; Silber-Deben des Neuen Reiches"],
+"Egyptian kite (silver)":["Ägyptischer Kite (Silber)","1/10 Deben"],
+"Persian daric (gold)":["Persische Dareike (Gold)","Achämenidisches Gold; ca."],
+"Persian siglos (silver)":["Persischer Siglos (Silber)","Achämenidisches Silber; ca."],
+ },
+ pt:{
+"Metre":["Metro",""],
+"Kilometre":["Quilômetro",""],
+"Centimetre":["Centímetro",""],
+"Millimetre":["Milímetro",""],
+"Micrometre":["Micrômetro",""],
+"Nanometre":["Nanômetro",""],
+"Inch":["Polegada",""],
+"Foot":["Pé",""],
+"Yard":["Jarda",""],
+"Mile":["Milha",""],
+"Nautical mile":["Milha náutica",""],
+"Astronomical unit":["Unidade astronômica",""],
+"Light-second":["Segundo-luz",""],
+"Egyptian royal cubit":["Côvado real egípcio","aprox. 52.5 cm; os padrões variavam por período"],
+"Egyptian common cubit":["Côvado comum egípcio","aprox. 45 cm"],
+"Egyptian digit":["Dedo egípcio","1/28 de côvado real; aprox."],
+"Roman foot (pes)":["Pé romano (pes)","aprox. 296 mm"],
+"Roman digitus":["Dedo romano","1/16 de pé; aprox."],
+"Roman palm":["Palmo romano","1/4 de pé; aprox."],
+"Roman pace (passus)":["Passo romano (passus)","5 pés romanos"],
+"Roman mile":["Milha romana","aprox. 1.48 km"],
+"Greek foot (pous)":["Pé grego (pous)","aprox.; regional, ático ~0.30 m"],
+"Greek fathom (orgyia)":["Braça grega (orgyia)","6 pés; aprox."],
+"Greek stadion":["Estádio grego","valor representativo da era ática/romana"],
+"Biblical common cubit":["Côvado comum bíblico","aprox. média; historicamente variável"],
+"Biblical span (zeret)":["Palmo bíblico (zeret)","meio côvado; aprox."],
+"Chinese chi (Han)":["Chi chinês (Han)","aprox.; dependente da dinastia"],
+"Indian hasta":["Hasta indiana","aprox. 18 polegadas"],
+"Mesopotamian cubit (kush)":["Côvado mesopotâmico (kush)","aprox.; o padrão variava"],
+"Persian parasang":["Parasanga persa","aprox.; frequentemente dada como 30 estádios"],
+"Norse ell (alen)":["Vara nórdica (alen)","aprox.; variava por região"],
+"Square metre":["Metro quadrado",""],
+"Square kilometre":["Quilômetro quadrado",""],
+"Hectare":["Hectare",""],
+"Acre":["Acre",""],
+"Square foot":["Pé quadrado",""],
+"Square yard":["Jarda quadrada",""],
+"Square mile":["Milha quadrada",""],
+"Roman iugerum":["Jugera romana","aprox. 0.623 acre"],
+"Roman actus":["Actus romano","aprox.; quadrado de 120 pés"],
+"Egyptian aroura":["Aroura egípcia","aprox.; quadrado de 100 côvados reais"],
+"Greek plethron²":["Plethron² grego","aprox.; variação regional"],
+"Mesopotamian iku":["Iku mesopotâmico","aprox.; unidade de campo"],
+"Kilogram":["Quilograma",""],
+"Gram":["Grama",""],
+"Milligram":["Miligrama",""],
+"Metric tonne":["Tonelada métrica",""],
+"Ounce":["Onça",""],
+"Pound":["Libra",""],
+"Stone":["Stone",""],
+"Carat":["Quilate",""],
+"Grain":["Grão",""],
+"Roman libra":["Libra romana","aprox. 327.45 g"],
+"Roman uncia":["Onça romana","1/12 de libra"],
+"Mesopotamian shekel":["Siclo mesopotâmico","aprox. 8.33 g; os padrões variavam"],
+"Mesopotamian mina":["Mina mesopotâmica","60 siclos; representativo"],
+"Mesopotamian talent":["Talento mesopotâmico","60 minas; representativo"],
+"Egyptian deben":["Deben egípcio","aprox. valor do Novo Reino (~91 g)"],
+"Egyptian kite":["Kite egípcio","1/10 de deben"],
+"Greek Attic drachma":["Dracma ática grega","aprox. 4.3 g"],
+"Greek obol":["Óbolo grego","1/6 de dracma"],
+"Greek Attic mina":["Mina ática grega","100 dracmas"],
+"Greek Attic talent":["Talento ático grego","60 minas"],
+"Hebrew shekel":["Siclo hebraico","aprox.; os padrões variavam"],
+"Indian karsha":["Cársia indiana","aprox.; ~58.8 g"],
+"Persian daric":["Dárico persa","moeda de ouro aquemênida; aprox."],
+"Litre":["Litro",""],
+"Millilitre":["Mililitro",""],
+"Cubic metre":["Metro cúbico",""],
+"US gallon":["Galão americano",""],
+"Imperial gallon":["Galão imperial",""],
+"US quart":["Quarto americano",""],
+"US pint":["Pinta americana",""],
+"Fluid ounce":["Onça líquida",""],
+"Cup (metric)":["Xícara (métrica)",""],
+"Tablespoon (metric)":["Colher de sopa (métrica)",""],
+"Teaspoon (metric)":["Colher de chá (métrica)",""],
+"Roman cyathus":["Ciato romano","aprox.; 1/12 de sextário"],
+"Roman sextarius":["Sextário romano","aprox."],
+"Roman congius":["Côngio romano","6 sextários"],
+"Roman amphora":["Ânfora romana","aprox. 48 sextários"],
+"Greek kotyle":["Cótila grega","aprox.; dependente da pólis"],
+"Greek chous":["Cous grego","aprox.; 12 cótilas"],
+"Greek amphora (metretes)":["Ânfora grega (metretes)","valor representativo"],
+"Biblical log":["Log bíblico","aprox.; a menor medida líquida bíblica"],
+"Biblical hin":["Him bíblico","aprox.; as estimativas acadêmicas variam"],
+"Biblical bath":["Bato bíblico","aprox.; ~6 him"],
+"Biblical homer":["Hômer bíblico","aprox.; 10 batos"],
+"Egyptian heqat":["Heqat egípcio","aprox. Médio/Novo Reino"],
+"Egyptian ro":["Ro egípcio","aprox.; 1/320 de heqat"],
+"Mesopotamian sila":["Sila mesopotâmico","aprox.; variava ~0.8–1 L"],
+"Celsius":["Celsius",""],
+"Fahrenheit":["Fahrenheit",""],
+"Kelvin":["Kelvin",""],
+"Rankine":["Rankine",""],
+"Second":["Segundo",""],
+"Minute":["Minuto",""],
+"Hour":["Hora",""],
+"Day":["Dia",""],
+"Week":["Semana",""],
+"Julian year":["Ano juliano",""],
+"Babylonian time degree (uš)":["Grau de tempo babilônico (uš)","1/360 de um dia = 4 minutos"],
+"Egyptian decan interval":["Intervalo de decano egípcio","intervalo civil de 10 dias"],
+"Roman hora (seasonal)":["Hora romana (sazonal)","mostrada como 1 hora moderna; as horas de luz do dia variavam por estação"],
+"Chinese ke (quarter)":["Ke chinês (quarto)","aprox.; 1/96 de um dia em sistemas posteriores"],
+"Metre per second":["Metro por segundo",""],
+"Kilometre per hour":["Quilômetro por hora",""],
+"Mile per hour":["Milha por hora",""],
+"Knot":["Nó",""],
+"Roman mile per hour":["Milha romana por hora","usa a milha romana aproximada; ilustrativo"],
+"Byte":["Byte",""],
+"Kilobyte":["Kilobyte",""],
+"Megabyte":["Megabyte",""],
+"Gigabyte":["Gigabyte",""],
+"Terabyte":["Terabyte",""],
+"Petabyte":["Petabyte",""],
+"Kibibyte":["Kibibyte",""],
+"Mebibyte":["Mebibyte",""],
+"Gibibyte":["Gibibyte",""],
+"Tebibyte":["Tebibyte",""],
+"Newton":["Newton",""],
+"Kilonewton":["Kilonewton",""],
+"Dyne":["Dina",""],
+"Pound-force":["Libra-força",""],
+"Kilogram-force":["Quilograma-força",""],
+"Poundal":["Poundal",""],
+"Joule":["Joule",""],
+"Kilojoule":["Quilojoule",""],
+"Calorie":["Caloria",""],
+"Kilocalorie":["Quilocaloria",""],
+"Kilowatt-hour":["Quilowatt-hora",""],
+"Electronvolt":["Elétron-volt",""],
+"British thermal unit":["Unidade térmica britânica",""],
+"Erg":["Erg",""],
+"Foot-pound":["Pé-libra",""],
+"Pascal":["Pascal",""],
+"Kilopascal":["Quilopascal",""],
+"Hectopascal":["Hectopascal",""],
+"Bar":["Bar",""],
+"Millibar":["Millibar",""],
+"Atmosphere":["Atmosfera",""],
+"Torr":["Torr",""],
+"Millimetre of mercury":["Milímetro de mercúrio",""],
+"Pound per square inch":["Libra por polegada quadrada",""],
+"Attic drachma (silver)":["Dracma ática (prata)","aprox. 4.3 g de prata; padrão ático"],
+"Attic tetradrachm (silver)":["Tetradracma ática (prata)","4 dracmas; a 'coruja' ateniense"],
+"Attic mina (silver)":["Mina ática (prata)","100 dracmas"],
+"Attic talent (silver)":["Talento ático (prata)","60 minas"],
+"Roman denarius (silver)":["Denário romano (prata)","aprox. teor de prata; declinou ao longo dos séculos"],
+"Roman sestertius":["Sestércio romano","aprox.; 1/4 de denário"],
+"Roman as (bronze)":["As romano (bronze)","aprox.; bronze, ~11 g"],
+"Roman aureus (gold)":["Áureo romano (ouro)","ouro; peso aproximado"],
+"Hebrew shekel of silver":["Siclo hebraico de prata","aprox.; padrão do templo"],
+"Hebrew talent of silver":["Talento hebraico de prata","aprox.; ~3000 siclos"],
+"Mesopotamian shekel of silver":["Siclo mesopotâmico de prata","aprox.; padrão de prata"],
+"Mesopotamian mina (silver)":["Mina mesopotâmica (prata)","60 siclos"],
+"Mesopotamian talent (silver)":["Talento mesopotâmico (prata)","60 minas"],
+"Egyptian deben (silver)":["Deben egípcio (prata)","aprox.; deben de prata do Novo Reino"],
+"Egyptian kite (silver)":["Kite egípcio (prata)","1/10 de deben"],
+"Persian daric (gold)":["Dárico persa (ouro)","ouro aquemênida; aprox."],
+"Persian siglos (silver)":["Siglos persa (prata)","prata aquemênida; aprox."],
+ },
+ it:{
+"Metre":["Metro",""],
+"Kilometre":["Chilometro",""],
+"Centimetre":["Centimetro",""],
+"Millimetre":["Millimetro",""],
+"Micrometre":["Micrometro",""],
+"Nanometre":["Nanometro",""],
+"Inch":["Pollice",""],
+"Foot":["Piede",""],
+"Yard":["Iarda",""],
+"Mile":["Miglio",""],
+"Nautical mile":["Miglio marino",""],
+"Astronomical unit":["Unità astronomica",""],
+"Light-second":["Secondo luce",""],
+"Egyptian royal cubit":["Cubito reale egizio","circa 52.5 cm; gli standard variavano a seconda del periodo"],
+"Egyptian common cubit":["Cubito comune egizio","circa 45 cm"],
+"Egyptian digit":["Dito egizio","1/28 di cubito reale; circa"],
+"Roman foot (pes)":["Piede romano (pes)","circa 296 mm"],
+"Roman digitus":["Dito romano","1/16 di pes; circa"],
+"Roman palm":["Palmo romano","1/4 di pes; circa"],
+"Roman pace (passus)":["Passo romano (passus)","5 piedi romani"],
+"Roman mile":["Miglio romano","circa 1.48 km"],
+"Greek foot (pous)":["Piede greco (pous)","circa; regionale, attico ~0.30 m"],
+"Greek fathom (orgyia)":["Braccio greco (orgyia)","6 podes; circa"],
+"Greek stadion":["Stadio greco","valore rappresentativo dell'epoca attica/romana"],
+"Biblical common cubit":["Cubito comune biblico","circa valore medio; storicamente variabile"],
+"Biblical span (zeret)":["Spanna biblica (zeret)","mezzo cubito; circa"],
+"Chinese chi (Han)":["Chi cinese (Han)","circa; dipende dalla dinastia"],
+"Indian hasta":["Hasta indiana","circa 18 pollici"],
+"Mesopotamian cubit (kush)":["Cubito mesopotamico (kush)","circa; lo standard variava"],
+"Persian parasang":["Parasanga persiana","circa; spesso data come 30 stadi"],
+"Norse ell (alen)":["Braccio nordico (alen)","circa; variava a seconda della regione"],
+"Square metre":["Metro quadrato",""],
+"Square kilometre":["Chilometro quadrato",""],
+"Hectare":["Ettaro",""],
+"Acre":["Acro",""],
+"Square foot":["Piede quadrato",""],
+"Square yard":["Iarda quadrata",""],
+"Square mile":["Miglio quadrato",""],
+"Roman iugerum":["Iugero romano","circa 0.623 acro"],
+"Roman actus":["Actus romano","circa; quadrato di 120 pes"],
+"Egyptian aroura":["Aroura egizia","circa; quadrato di 100 cubiti reali"],
+"Greek plethron²":["Plettro greco²","circa; variazione regionale"],
+"Mesopotamian iku":["Iku mesopotamico","circa; unità agraria"],
+"Kilogram":["Chilogrammo",""],
+"Gram":["Grammo",""],
+"Milligram":["Milligrammo",""],
+"Metric tonne":["Tonnellata metrica",""],
+"Ounce":["Oncia",""],
+"Pound":["Libbra",""],
+"Stone":["Stone",""],
+"Carat":["Carato",""],
+"Grain":["Grano",""],
+"Roman libra":["Libbra romana","circa 327.45 g"],
+"Roman uncia":["Oncia romana","1/12 di libbra"],
+"Mesopotamian shekel":["Siclo mesopotamico","circa 8.33 g; gli standard variavano"],
+"Mesopotamian mina":["Mina mesopotamica","60 sicli; rappresentativa"],
+"Mesopotamian talent":["Talento mesopotamico","60 mine; rappresentativo"],
+"Egyptian deben":["Deben egizio","circa valore del Nuovo Regno (~91 g)"],
+"Egyptian kite":["Kite egizio","1/10 di deben"],
+"Greek Attic drachma":["Dramma attica greca","circa 4.3 g"],
+"Greek obol":["Obolo greco","1/6 di dramma"],
+"Greek Attic mina":["Mina attica greca","100 dramme"],
+"Greek Attic talent":["Talento attico greco","60 mine"],
+"Hebrew shekel":["Siclo ebraico","circa; gli standard variavano"],
+"Indian karsha":["Carsha indiana","circa; ~58.8 g"],
+"Persian daric":["Darico persiano","moneta d'oro achemenide; circa"],
+"Litre":["Litro",""],
+"Millilitre":["Millilitro",""],
+"Cubic metre":["Metro cubo",""],
+"US gallon":["Gallone USA",""],
+"Imperial gallon":["Gallone imperiale",""],
+"US quart":["Quarto USA",""],
+"US pint":["Pinta USA",""],
+"Fluid ounce":["Oncia liquida",""],
+"Cup (metric)":["Tazza (metrica)",""],
+"Tablespoon (metric)":["Cucchiaio (metrico)",""],
+"Teaspoon (metric)":["Cucchiaino (metrico)",""],
+"Roman cyathus":["Ciato romano","circa; 1/12 di sestario"],
+"Roman sextarius":["Sestario romano","circa"],
+"Roman congius":["Congio romano","6 sestari"],
+"Roman amphora":["Anfora romana","circa 48 sestari"],
+"Greek kotyle":["Cotile greco","circa; dipendeva dalla polis"],
+"Greek chous":["Coo greco","circa; 12 cotili"],
+"Greek amphora (metretes)":["Anfora greca (metretes)","valore rappresentativo"],
+"Biblical log":["Log biblico","circa; la più piccola misura liquida biblica"],
+"Biblical hin":["Hin biblico","circa; le stime degli studiosi variano"],
+"Biblical bath":["Bat biblico","circa; ~6 hin"],
+"Biblical homer":["Homer biblico","circa; 10 bat"],
+"Egyptian heqat":["Heqat egizio","circa Medio/Nuovo Regno"],
+"Egyptian ro":["Ro egizio","circa; 1/320 di heqat"],
+"Mesopotamian sila":["Sila mesopotamico","circa; variava ~0.8–1 L"],
+"Celsius":["Celsius",""],
+"Fahrenheit":["Fahrenheit",""],
+"Kelvin":["Kelvin",""],
+"Rankine":["Rankine",""],
+"Second":["Secondo",""],
+"Minute":["Minuto",""],
+"Hour":["Ora",""],
+"Day":["Giorno",""],
+"Week":["Settimana",""],
+"Julian year":["Anno giuliano",""],
+"Babylonian time degree (uš)":["Grado di tempo babilonese (uš)","1/360 di un giorno = 4 minuti"],
+"Egyptian decan interval":["Intervallo decanico egizio","intervallo civile di 10 giorni"],
+"Roman hora (seasonal)":["Ora romana (stagionale)","mostrata come 1 ora moderna; le ore diurne variavano a seconda della stagione"],
+"Chinese ke (quarter)":["Ke cinese (quarto)","circa; 1/96 di un giorno nei sistemi successivi"],
+"Metre per second":["Metro al secondo",""],
+"Kilometre per hour":["Chilometro all'ora",""],
+"Mile per hour":["Miglio all'ora",""],
+"Knot":["Nodo",""],
+"Roman mile per hour":["Miglio romano all'ora","usa il miglio romano approssimato; illustrativo"],
+"Byte":["Byte",""],
+"Kilobyte":["Kilobyte",""],
+"Megabyte":["Megabyte",""],
+"Gigabyte":["Gigabyte",""],
+"Terabyte":["Terabyte",""],
+"Petabyte":["Petabyte",""],
+"Kibibyte":["Kibibyte",""],
+"Mebibyte":["Mebibyte",""],
+"Gibibyte":["Gibibyte",""],
+"Tebibyte":["Tebibyte",""],
+"Newton":["Newton",""],
+"Kilonewton":["Kilonewton",""],
+"Dyne":["Dina",""],
+"Pound-force":["Libbra-forza",""],
+"Kilogram-force":["Chilogrammo-forza",""],
+"Poundal":["Poundal",""],
+"Joule":["Joule",""],
+"Kilojoule":["Kilojoule",""],
+"Calorie":["Caloria",""],
+"Kilocalorie":["Chilocaloria",""],
+"Kilowatt-hour":["Chilowattora",""],
+"Electronvolt":["Elettronvolt",""],
+"British thermal unit":["Unità termica britannica",""],
+"Erg":["Erg",""],
+"Foot-pound":["Piede-libbra",""],
+"Pascal":["Pascal",""],
+"Kilopascal":["Chilopascal",""],
+"Hectopascal":["Ettopascal",""],
+"Bar":["Bar",""],
+"Millibar":["Millibar",""],
+"Atmosphere":["Atmosfera",""],
+"Torr":["Torr",""],
+"Millimetre of mercury":["Millimetro di mercurio",""],
+"Pound per square inch":["Libbra per pollice quadrato",""],
+"Attic drachma (silver)":["Dramma attica (argento)","circa 4.3 g d'argento; standard attico"],
+"Attic tetradrachm (silver)":["Tetradramma attica (argento)","4 dramme; la 'civetta' ateniese"],
+"Attic mina (silver)":["Mina attica (argento)","100 dramme"],
+"Attic talent (silver)":["Talento attico (argento)","60 mine"],
+"Roman denarius (silver)":["Denario romano (argento)","circa contenuto d'argento; diminuito nel corso dei secoli"],
+"Roman sestertius":["Sesterzio romano","circa; 1/4 di denario"],
+"Roman as (bronze)":["Asse romano (bronzo)","circa; bronzo, ~11 g"],
+"Roman aureus (gold)":["Aureo romano (oro)","oro; peso approssimativo"],
+"Hebrew shekel of silver":["Siclo ebraico d'argento","circa; standard del tempio"],
+"Hebrew talent of silver":["Talento ebraico d'argento","circa; ~3000 sicli"],
+"Mesopotamian shekel of silver":["Siclo mesopotamico d'argento","circa; standard d'argento"],
+"Mesopotamian mina (silver)":["Mina mesopotamica (argento)","60 sicli"],
+"Mesopotamian talent (silver)":["Talento mesopotamico (argento)","60 mine"],
+"Egyptian deben (silver)":["Deben egizio (argento)","circa; deben d'argento del Nuovo Regno"],
+"Egyptian kite (silver)":["Kite egizio (argento)","1/10 di deben"],
+"Persian daric (gold)":["Darico persiano (oro)","oro achemenide; circa"],
+"Persian siglos (silver)":["Siglo persiano (argento)","argento achemenide; circa"],
+ },
+ zh:{
+"Metre":["米",""],
+"Kilometre":["千米",""],
+"Centimetre":["厘米",""],
+"Millimetre":["毫米",""],
+"Micrometre":["微米",""],
+"Nanometre":["纳米",""],
+"Inch":["英寸",""],
+"Foot":["英尺",""],
+"Yard":["码",""],
+"Mile":["英里",""],
+"Nautical mile":["海里",""],
+"Astronomical unit":["天文单位",""],
+"Light-second":["光秒",""],
+"Egyptian royal cubit":["古埃及王室肘尺","约 52.5 厘米；标准随时代而异"],
+"Egyptian common cubit":["古埃及普通肘尺","约 45 厘米"],
+"Egyptian digit":["古埃及指宽","1/28 王室肘尺；约"],
+"Roman foot (pes)":["古罗马尺 (pes)","约 296 毫米"],
+"Roman digitus":["古罗马指宽 (digitus)","1/16 pes；约"],
+"Roman palm":["古罗马掌宽","1/4 pes；约"],
+"Roman pace (passus)":["古罗马步 (passus)","5 古罗马尺"],
+"Roman mile":["古罗马里","约 1.48 千米"],
+"Greek foot (pous)":["古希腊尺 (pous)","约；因地区而异，阿提卡 ~0.30 米"],
+"Greek fathom (orgyia)":["古希腊寻 (orgyia)","6 podes；约"],
+"Greek stadion":["古希腊斯塔德","阿提卡/罗马时代的代表性数值"],
+"Biblical common cubit":["圣经普通肘尺","约平均值；历史上变化不定"],
+"Biblical span (zeret)":["圣经拃 (zeret)","半肘尺；约"],
+"Chinese chi (Han)":["中国尺（汉代）","约；随朝代而异"],
+"Indian hasta":["古印度哈斯塔","约 18 英寸"],
+"Mesopotamian cubit (kush)":["美索不达米亚肘尺 (kush)","约；标准不固定"],
+"Persian parasang":["波斯帕拉桑","约；常以 30 斯塔德计"],
+"Norse ell (alen)":["北欧厄尔 (alen)","约；因地区而异"],
+"Square metre":["平方米",""],
+"Square kilometre":["平方千米",""],
+"Hectare":["公顷",""],
+"Acre":["英亩",""],
+"Square foot":["平方英尺",""],
+"Square yard":["平方码",""],
+"Square mile":["平方英里",""],
+"Roman iugerum":["古罗马尤格鲁姆","约 0.623 英亩"],
+"Roman actus":["古罗马阿克图斯","约；120 pes 见方"],
+"Egyptian aroura":["古埃及阿鲁拉","约；100 王室肘尺见方"],
+"Greek plethron²":["古希腊普勒特隆²","约；因地区而异"],
+"Mesopotamian iku":["美索不达米亚伊库","约；田地单位"],
+"Kilogram":["千克",""],
+"Gram":["克",""],
+"Milligram":["毫克",""],
+"Metric tonne":["公吨",""],
+"Ounce":["盎司",""],
+"Pound":["磅",""],
+"Stone":["英石",""],
+"Carat":["克拉",""],
+"Grain":["格令",""],
+"Roman libra":["古罗马里布拉","约 327.45 克"],
+"Roman uncia":["古罗马温西亚","1/12 里布拉"],
+"Mesopotamian shekel":["美索不达米亚舍客勒","约 8.33 克；标准不固定"],
+"Mesopotamian mina":["美索不达米亚弥拿","60 舍客勒；代表性"],
+"Mesopotamian talent":["美索不达米亚塔兰特","60 弥拿；代表性"],
+"Egyptian deben":["古埃及德本","约新王国时期数值（~91 克）"],
+"Egyptian kite":["古埃及凯特","1/10 德本"],
+"Greek Attic drachma":["古希腊阿提卡德拉克马","约 4.3 克"],
+"Greek obol":["古希腊奥波勒斯","1/6 德拉克马"],
+"Greek Attic mina":["古希腊阿提卡弥拿","100 德拉克马"],
+"Greek Attic talent":["古希腊阿提卡塔兰特","60 弥拿"],
+"Hebrew shekel":["希伯来舍客勒","约；标准不固定"],
+"Indian karsha":["古印度卡尔夏","约；~58.8 克"],
+"Persian daric":["波斯大流克","阿契美尼德金币；约"],
+"Litre":["升",""],
+"Millilitre":["毫升",""],
+"Cubic metre":["立方米",""],
+"US gallon":["美制加仑",""],
+"Imperial gallon":["英制加仑",""],
+"US quart":["美制夸脱",""],
+"US pint":["美制品脱",""],
+"Fluid ounce":["液量盎司",""],
+"Cup (metric)":["杯（公制）",""],
+"Tablespoon (metric)":["汤匙（公制）",""],
+"Teaspoon (metric)":["茶匙（公制）",""],
+"Roman cyathus":["古罗马基亚托斯","约；1/12 塞克斯塔留斯"],
+"Roman sextarius":["古罗马塞克斯塔留斯","约"],
+"Roman congius":["古罗马孔吉乌斯","6 塞克斯塔留斯"],
+"Roman amphora":["古罗马安弗拉","约 48 塞克斯塔留斯"],
+"Greek kotyle":["古希腊科提莱","约；因城邦而异"],
+"Greek chous":["古希腊库斯","约；12 科提莱"],
+"Greek amphora (metretes)":["古希腊安弗拉 (metretes)","代表性数值"],
+"Biblical log":["圣经罗格","约；圣经中最小的液体计量单位"],
+"Biblical hin":["圣经欣","约；学者估算不一"],
+"Biblical bath":["圣经巴特","约；~6 欣"],
+"Biblical homer":["圣经贺梅珥","约；10 巴特"],
+"Egyptian heqat":["古埃及赫卡特","约中/新王国时期"],
+"Egyptian ro":["古埃及罗","约；1/320 赫卡特"],
+"Mesopotamian sila":["美索不达米亚西拉","约；在 ~0.8–1 升之间变化"],
+"Celsius":["摄氏度",""],
+"Fahrenheit":["华氏度",""],
+"Kelvin":["开尔文",""],
+"Rankine":["兰氏度",""],
+"Second":["秒",""],
+"Minute":["分",""],
+"Hour":["时",""],
+"Day":["日",""],
+"Week":["周",""],
+"Julian year":["儒略年",""],
+"Babylonian time degree (uš)":["巴比伦时间度 (uš)","一天的 1/360 = 4 分钟"],
+"Egyptian decan interval":["古埃及旬间","10 日民用时段"],
+"Roman hora (seasonal)":["古罗马时（季节性）","以 1 现代小时显示；白天时长随季节而异"],
+"Chinese ke (quarter)":["中国刻（四分之一）","约；在后世体系中为一天的 1/96"],
+"Metre per second":["米每秒",""],
+"Kilometre per hour":["千米每小时",""],
+"Mile per hour":["英里每小时",""],
+"Knot":["节",""],
+"Roman mile per hour":["古罗马里每小时","使用约略的古罗马里；示例性"],
+"Byte":["字节",""],
+"Kilobyte":["千字节",""],
+"Megabyte":["兆字节",""],
+"Gigabyte":["吉字节",""],
+"Terabyte":["太字节",""],
+"Petabyte":["拍字节",""],
+"Kibibyte":["Kibibyte（千位二进制字节）",""],
+"Mebibyte":["Mebibyte",""],
+"Gibibyte":["Gibibyte",""],
+"Tebibyte":["Tebibyte",""],
+"Newton":["牛顿",""],
+"Kilonewton":["千牛顿",""],
+"Dyne":["达因",""],
+"Pound-force":["磅力",""],
+"Kilogram-force":["千克力",""],
+"Poundal":["磅达",""],
+"Joule":["焦耳",""],
+"Kilojoule":["千焦",""],
+"Calorie":["卡路里",""],
+"Kilocalorie":["千卡",""],
+"Kilowatt-hour":["千瓦时",""],
+"Electronvolt":["电子伏特",""],
+"British thermal unit":["英制热量单位",""],
+"Erg":["尔格",""],
+"Foot-pound":["英尺磅",""],
+"Pascal":["帕斯卡",""],
+"Kilopascal":["千帕",""],
+"Hectopascal":["百帕",""],
+"Bar":["巴",""],
+"Millibar":["毫巴",""],
+"Atmosphere":["标准大气压",""],
+"Torr":["托",""],
+"Millimetre of mercury":["毫米汞柱",""],
+"Pound per square inch":["磅每平方英寸",""],
+"Attic drachma (silver)":["阿提卡德拉克马（银）","约 4.3 克银；阿提卡标准"],
+"Attic tetradrachm (silver)":["阿提卡四德拉克马（银）","4 德拉克马；雅典的“猫头鹰”币"],
+"Attic mina (silver)":["阿提卡弥拿（银）","100 德拉克马"],
+"Attic talent (silver)":["阿提卡塔兰特（银）","60 弥拿"],
+"Roman denarius (silver)":["古罗马第纳里乌斯（银）","约略含银量；几个世纪以来不断下降"],
+"Roman sestertius":["古罗马塞斯特斯","约；1/4 第纳里乌斯"],
+"Roman as (bronze)":["古罗马阿斯（青铜）","约；青铜，~11 克"],
+"Roman aureus (gold)":["古罗马奥雷乌斯（金）","金；约略重量"],
+"Hebrew shekel of silver":["希伯来银舍客勒","约；圣殿标准"],
+"Hebrew talent of silver":["希伯来银塔兰特","约；~3000 舍客勒"],
+"Mesopotamian shekel of silver":["美索不达米亚银舍客勒","约；银标准"],
+"Mesopotamian mina (silver)":["美索不达米亚弥拿（银）","60 舍客勒"],
+"Mesopotamian talent (silver)":["美索不达米亚塔兰特（银）","60 弥拿"],
+"Egyptian deben (silver)":["古埃及德本（银）","约；新王国银德本"],
+"Egyptian kite (silver)":["古埃及凯特（银）","1/10 德本"],
+"Persian daric (gold)":["波斯大流克（金）","阿契美尼德金币；约"],
+"Persian siglos (silver)":["波斯西格罗斯（银）","阿契美尼德银币；约"],
+ },
+ ja:{
+"Metre":["メートル",""],
+"Kilometre":["キロメートル",""],
+"Centimetre":["センチメートル",""],
+"Millimetre":["ミリメートル",""],
+"Micrometre":["マイクロメートル",""],
+"Nanometre":["ナノメートル",""],
+"Inch":["インチ",""],
+"Foot":["フィート",""],
+"Yard":["ヤード",""],
+"Mile":["マイル",""],
+"Nautical mile":["海里",""],
+"Astronomical unit":["天文単位",""],
+"Light-second":["光秒",""],
+"Egyptian royal cubit":["古代エジプトの王キュビット","約52.5 cm；時代によって規格が異なった"],
+"Egyptian common cubit":["古代エジプトの常用キュビット","約45 cm"],
+"Egyptian digit":["古代エジプトの指幅","王キュビットの1/28；約"],
+"Roman foot (pes)":["古代ローマのフィート（pes）","約296 mm"],
+"Roman digitus":["古代ローマのディギトゥス","pesの1/16；約"],
+"Roman palm":["古代ローマの掌幅","pesの1/4；約"],
+"Roman pace (passus)":["古代ローマの歩幅（passus）","ローマ・フィート5"],
+"Roman mile":["ローママイル","約1.48 km"],
+"Greek foot (pous)":["古代ギリシャのフィート（pous）","約；地域差があり、アッティカでは約0.30 m"],
+"Greek fathom (orgyia)":["古代ギリシャのファソム（orgyia）","ポウス6；約"],
+"Greek stadion":["スタディオン","アッティカ／ローマ時代の代表値"],
+"Biblical common cubit":["聖書の常用キュビット","約、平均値；歴史的に変動"],
+"Biblical span (zeret)":["聖書のスパン（zeret）","キュビットの半分；約"],
+"Chinese chi (Han)":["中国の尺（漢）","約；王朝によって異なる"],
+"Indian hasta":["古代インドのハスタ","約18インチ"],
+"Mesopotamian cubit (kush)":["メソポタミアのキュビット（kush）","約；規格は変動した"],
+"Persian parasang":["ペルシャのパラサング","約；しばしば30スタディアとされる"],
+"Norse ell (alen)":["北欧のエル（alen）","約；地域によって異なった"],
+"Square metre":["平方メートル",""],
+"Square kilometre":["平方キロメートル",""],
+"Hectare":["ヘクタール",""],
+"Acre":["エーカー",""],
+"Square foot":["平方フィート",""],
+"Square yard":["平方ヤード",""],
+"Square mile":["平方マイル",""],
+"Roman iugerum":["ユゲルム","約0.623エーカー"],
+"Roman actus":["アクトゥス","約；120ペスの正方形"],
+"Egyptian aroura":["アルーラ","約；王キュビット100の正方形"],
+"Greek plethron²":["プレトロン²","約；地域差あり"],
+"Mesopotamian iku":["イク","約；耕地の単位"],
+"Kilogram":["キログラム",""],
+"Gram":["グラム",""],
+"Milligram":["ミリグラム",""],
+"Metric tonne":["トン",""],
+"Ounce":["オンス",""],
+"Pound":["ポンド",""],
+"Stone":["ストーン",""],
+"Carat":["カラット",""],
+"Grain":["グレーン",""],
+"Roman libra":["リブラ","約327.45 g"],
+"Roman uncia":["ウンチア","リブラの1/12"],
+"Mesopotamian shekel":["メソポタミアのシェケル","約8.33 g；規格は変動した"],
+"Mesopotamian mina":["メソポタミアのミナ","シェケル60；代表値"],
+"Mesopotamian talent":["メソポタミアのタレント","ミナ60；代表値"],
+"Egyptian deben":["デベン","約、新王国時代の値（約91 g）"],
+"Egyptian kite":["キテ","デベンの1/10"],
+"Greek Attic drachma":["アッティカのドラクマ","約4.3 g"],
+"Greek obol":["オボロス","ドラクマの1/6"],
+"Greek Attic mina":["アッティカのミナ","ドラクマ100"],
+"Greek Attic talent":["アッティカのタレント","ミナ60"],
+"Hebrew shekel":["ヘブライのシェケル","約；規格は変動した"],
+"Indian karsha":["カルシャ","約；約58.8 g"],
+"Persian daric":["ダリク","アケメネス朝の金貨；約"],
+"Litre":["リットル",""],
+"Millilitre":["ミリリットル",""],
+"Cubic metre":["立方メートル",""],
+"US gallon":["米ガロン",""],
+"Imperial gallon":["英ガロン",""],
+"US quart":["米クォート",""],
+"US pint":["米パイント",""],
+"Fluid ounce":["液量オンス",""],
+"Cup (metric)":["カップ（メートル法）",""],
+"Tablespoon (metric)":["大さじ（メートル法）",""],
+"Teaspoon (metric)":["小さじ（メートル法）",""],
+"Roman cyathus":["キュアトゥス","約；セクスタリウスの1/12"],
+"Roman sextarius":["セクスタリウス","約"],
+"Roman congius":["コンギウス","セクスタリウス6"],
+"Roman amphora":["アンフォラ","約48セクスタリウス"],
+"Greek kotyle":["コチュレ","約；ポリスによって異なる"],
+"Greek chous":["コウス","約；コチュレ12"],
+"Greek amphora (metretes)":["ギリシャのアンフォラ（metretes）","代表値"],
+"Biblical log":["ログ","約；聖書最小の液体容量単位"],
+"Biblical hin":["ヒン","約；学者によって推定値が異なる"],
+"Biblical bath":["バト","約；約ヒン6"],
+"Biblical homer":["ホメル","約；バト10"],
+"Egyptian heqat":["ヘカト","約、中王国／新王国時代"],
+"Egyptian ro":["ロ","約；ヘカトの1/320"],
+"Mesopotamian sila":["シラ","約；約0.8–1 Lで変動"],
+"Celsius":["摂氏",""],
+"Fahrenheit":["華氏",""],
+"Kelvin":["ケルビン",""],
+"Rankine":["ランキン",""],
+"Second":["秒",""],
+"Minute":["分",""],
+"Hour":["時",""],
+"Day":["日",""],
+"Week":["週",""],
+"Julian year":["ユリウス年",""],
+"Babylonian time degree (uš)":["バビロニアの時間度数（uš）","1日の1/360 ＝ 4分"],
+"Egyptian decan interval":["デカン間隔","10日間の暦上の間隔"],
+"Roman hora (seasonal)":["ローマの時（季節による）","現代の1時間として表示；昼間の長さは季節によって異なった"],
+"Chinese ke (quarter)":["刻","約；後期の体系では1日の1/96"],
+"Metre per second":["メートル毎秒",""],
+"Kilometre per hour":["キロメートル毎時",""],
+"Mile per hour":["マイル毎時",""],
+"Knot":["ノット",""],
+"Roman mile per hour":["ローママイル毎時","約のローママイルを使用；参考値"],
+"Byte":["バイト",""],
+"Kilobyte":["キロバイト",""],
+"Megabyte":["メガバイト",""],
+"Gigabyte":["ギガバイト",""],
+"Terabyte":["テラバイト",""],
+"Petabyte":["ペタバイト",""],
+"Kibibyte":["キビバイト",""],
+"Mebibyte":["メビバイト",""],
+"Gibibyte":["ギビバイト",""],
+"Tebibyte":["テビバイト",""],
+"Newton":["ニュートン",""],
+"Kilonewton":["キロニュートン",""],
+"Dyne":["ダイン",""],
+"Pound-force":["重量ポンド",""],
+"Kilogram-force":["重量キログラム",""],
+"Poundal":["パウンダル",""],
+"Joule":["ジュール",""],
+"Kilojoule":["キロジュール",""],
+"Calorie":["カロリー",""],
+"Kilocalorie":["キロカロリー",""],
+"Kilowatt-hour":["キロワット時",""],
+"Electronvolt":["電子ボルト",""],
+"British thermal unit":["英熱量単位",""],
+"Erg":["エルグ",""],
+"Foot-pound":["フィート重量ポンド",""],
+"Pascal":["パスカル",""],
+"Kilopascal":["キロパスカル",""],
+"Hectopascal":["ヘクトパスカル",""],
+"Bar":["バール",""],
+"Millibar":["ミリバール",""],
+"Atmosphere":["気圧",""],
+"Torr":["トル",""],
+"Millimetre of mercury":["水銀柱ミリメートル",""],
+"Pound per square inch":["重量ポンド毎平方インチ",""],
+"Attic drachma (silver)":["アッティカのドラクマ（銀）","銀約4.3 g；アッティカ基準"],
+"Attic tetradrachm (silver)":["アッティカのテトラドラクマ（銀）","ドラクマ4；アテネの「フクロウ」"],
+"Attic mina (silver)":["アッティカのミナ（銀）","ドラクマ100"],
+"Attic talent (silver)":["アッティカのタレント（銀）","ミナ60"],
+"Roman denarius (silver)":["デナリウス（銀）","銀含有量は約；数世紀かけて低下"],
+"Roman sestertius":["セステルティウス","約；デナリウスの1/4"],
+"Roman as (bronze)":["アス（青銅）","約；青銅、約11 g"],
+"Roman aureus (gold)":["アウレウス（金）","金；重量は約"],
+"Hebrew shekel of silver":["銀シェケル","約；神殿の基準"],
+"Hebrew talent of silver":["銀タレント","約；約3000シェケル"],
+"Mesopotamian shekel of silver":["メソポタミアの銀シェケル","約；銀基準"],
+"Mesopotamian mina (silver)":["メソポタミアのミナ（銀）","シェケル60"],
+"Mesopotamian talent (silver)":["メソポタミアのタレント（銀）","ミナ60"],
+"Egyptian deben (silver)":["デベン（銀）","約；新王国時代の銀デベン"],
+"Egyptian kite (silver)":["キテ（銀）","デベンの1/10"],
+"Persian daric (gold)":["ダリク（金）","アケメネス朝の金；約"],
+"Persian siglos (silver)":["シグロス（銀）","アケメネス朝の銀；約"],
+ },
+ ar:{
+"Metre":["متر",""],
+"Kilometre":["كيلومتر",""],
+"Centimetre":["سنتيمتر",""],
+"Millimetre":["ميليمتر",""],
+"Micrometre":["ميكرومتر",""],
+"Nanometre":["نانومتر",""],
+"Inch":["بوصة",""],
+"Foot":["قدم",""],
+"Yard":["ياردة",""],
+"Mile":["ميل",""],
+"Nautical mile":["ميل بحري",""],
+"Astronomical unit":["وحدة فلكية",""],
+"Light-second":["ثانية ضوئية",""],
+"Egyptian royal cubit":["ذراع ملكي مصري قديم","تقريبًا 52.5 سم؛ اختلفت المعايير حسب الفترة"],
+"Egyptian common cubit":["ذراع مصري قديم عادي","تقريبًا 45 سم"],
+"Egyptian digit":["إصبع مصري قديم","1/28 من الذراع الملكي؛ تقريبًا"],
+"Roman foot (pes)":["قدم روماني (pes)","تقريبًا 296 مم"],
+"Roman digitus":["إصبع روماني (digitus)","1/16 من القدم؛ تقريبًا"],
+"Roman palm":["راحة رومانية","1/4 من القدم؛ تقريبًا"],
+"Roman pace (passus)":["خطوة رومانية (passus)","5 أقدام رومانية"],
+"Roman mile":["ميل روماني","تقريبًا 1.48 كم"],
+"Greek foot (pous)":["قدم يوناني (pous)","تقريبًا؛ إقليمي، الأتيكي ~0.30 م"],
+"Greek fathom (orgyia)":["قامة يونانية (orgyia)","6 أقدام؛ تقريبًا"],
+"Greek stadion":["ستاديا يونانية","قيمة تمثيلية من العصر الأتيكي/الروماني"],
+"Biblical common cubit":["ذراع توراتي عادي","تقريبًا متوسط؛ متغير تاريخيًا"],
+"Biblical span (zeret)":["شبر توراتي (zeret)","نصف ذراع؛ تقريبًا"],
+"Chinese chi (Han)":["شي صيني (هان)","تقريبًا؛ يعتمد على السلالة"],
+"Indian hasta":["هاستا هندية","تقريبًا 18 بوصة"],
+"Mesopotamian cubit (kush)":["ذراع بلاد الرافدين (kush)","تقريبًا؛ اختلف المعيار"],
+"Persian parasang":["فرسخ فارسي","تقريبًا؛ يُعطى غالبًا 30 ستاديا"],
+"Norse ell (alen)":["إل شمالي (alen)","تقريبًا؛ يختلف حسب المنطقة"],
+"Square metre":["متر مربع",""],
+"Square kilometre":["كيلومتر مربع",""],
+"Hectare":["هكتار",""],
+"Acre":["فدان (أو آكر)",""],
+"Square foot":["قدم مربع",""],
+"Square yard":["ياردة مربعة",""],
+"Square mile":["ميل مربع",""],
+"Roman iugerum":["يوجرا رومانية","تقريبًا 0.623 فدان"],
+"Roman actus":["أكتوس روماني","تقريبًا؛ مربع من 120 قدم"],
+"Egyptian aroura":["أرورا مصرية قديمة","تقريبًا؛ مربع من 100 ذراع ملكي"],
+"Greek plethron²":["بليثرون يوناني²","تقريبًا؛ اختلاف إقليمي"],
+"Mesopotamian iku":["إيكو بلاد الرافدين","تقريبًا؛ وحدة أرض"],
+"Kilogram":["كيلوغرام",""],
+"Gram":["غرام",""],
+"Milligram":["ميليغرام",""],
+"Metric tonne":["طن متري",""],
+"Ounce":["أونصة",""],
+"Pound":["باوند",""],
+"Stone":["ستون",""],
+"Carat":["قيراط",""],
+"Grain":["حبة",""],
+"Roman libra":["ليبرا رومانية","تقريبًا 327.45 غرام"],
+"Roman uncia":["أونسية رومانية","1/12 من الليبرا"],
+"Mesopotamian shekel":["شاقل بلاد الرافدين","تقريبًا 8.33 غرام؛ اختلفت المعايير"],
+"Mesopotamian mina":["مينا بلاد الرافدين","60 شاقلًا؛ قيمة تمثيلية"],
+"Mesopotamian talent":["تالنت بلاد الرافدين","60 مينا؛ قيمة تمثيلية"],
+"Egyptian deben":["ديبن مصري قديم","تقريبًا قيمة الدولة الحديثة (~91 غرام)"],
+"Egyptian kite":["كايت مصري قديم","1/10 من الديبن"],
+"Greek Attic drachma":["دراخما يونانية أتيكية","تقريبًا 4.3 غرام"],
+"Greek obol":["أوبول يوناني","1/6 من الدراخما"],
+"Greek Attic mina":["مينا يونانية أتيكية","100 دراخما"],
+"Greek Attic talent":["تالنت يوناني أتيكي","60 مينا"],
+"Hebrew shekel":["شاقل عبري","تقريبًا؛ اختلفت المعايير"],
+"Indian karsha":["كارشا هندية","تقريبًا؛ ~58.8 غرام"],
+"Persian daric":["داريك فارسي","عملة ذهبية أخمينية؛ تقريبًا"],
+"Litre":["لتر",""],
+"Millilitre":["ميليلتر",""],
+"Cubic metre":["متر مكعب",""],
+"US gallon":["غالون أمريكي",""],
+"Imperial gallon":["غالون إمبراطوري",""],
+"US quart":["كوارت أمريكي",""],
+"US pint":["باينت أمريكي",""],
+"Fluid ounce":["أونصة سائلة",""],
+"Cup (metric)":["كوب (متري)",""],
+"Tablespoon (metric)":["ملعقة كبيرة (متري)",""],
+"Teaspoon (metric)":["ملعقة صغيرة (متري)",""],
+"Roman cyathus":["كياتوس روماني","تقريبًا؛ 1/12 من السيكستاريوس"],
+"Roman sextarius":["سيكستاريوس روماني","تقريبًا"],
+"Roman congius":["كونجيوس روماني","6 سيكستاريوس"],
+"Roman amphora":["أمفورا رومانية","تقريبًا 48 سيكستاريوس"],
+"Greek kotyle":["كوتيلي يونانية","تقريبًا؛ يختلف حسب المدينة"],
+"Greek chous":["خوس يوناني","تقريبًا؛ 12 كوتيلي"],
+"Greek amphora (metretes)":["أمفورا يونانية (metretes)","قيمة تمثيلية"],
+"Biblical log":["لوغ توراتي","تقريبًا؛ أصغر مكيال سائل توراتي"],
+"Biblical hin":["هين توراتي","تقريبًا؛ تختلف التقديرات العلمية"],
+"Biblical bath":["بات توراتي","تقريبًا؛ ~6 هين"],
+"Biblical homer":["هومر توراتي","تقريبًا؛ 10 بات"],
+"Egyptian heqat":["هكات مصري قديم","تقريبًا من عصر الدولة الوسطى/الحديثة"],
+"Egyptian ro":["رو مصري قديم","تقريبًا؛ 1/320 من الهكات"],
+"Mesopotamian sila":["سيلا بلاد الرافدين","تقريبًا؛ تتفاوت ~0.8–1 لتر"],
+"Celsius":["سيلسيوس",""],
+"Fahrenheit":["فهرنهايت",""],
+"Kelvin":["كلفن",""],
+"Rankine":["رانكين",""],
+"Second":["ثانية",""],
+"Minute":["دقيقة",""],
+"Hour":["ساعة",""],
+"Day":["يوم",""],
+"Week":["أسبوع",""],
+"Julian year":["سنة يولية",""],
+"Babylonian time degree (uš)":["درجة زمنية بابلية (uš)","1/360 من اليوم = 4 دقائق"],
+"Egyptian decan interval":["فاصل عشري مصري قديم","فاصل مدني من 10 أيام"],
+"Roman hora (seasonal)":["ساعة رومانية (موسمية)","تُعرض كساعة حديثة واحدة؛ اختلفت ساعات النهار حسب الفصل"],
+"Chinese ke (quarter)":["كه صيني (ربع ساعة)","تقريبًا؛ 1/96 من اليوم في الأنظمة اللاحقة"],
+"Metre per second":["متر لكل ثانية",""],
+"Kilometre per hour":["كيلومتر لكل ساعة",""],
+"Mile per hour":["ميل لكل ساعة",""],
+"Knot":["عقدة",""],
+"Roman mile per hour":["ميل روماني لكل ساعة","يستخدم الميل الروماني التقريبي؛ توضيحي"],
+"Byte":["بايت",""],
+"Kilobyte":["كيلوبايت",""],
+"Megabyte":["ميجابايت",""],
+"Gigabyte":["جيجابايت",""],
+"Terabyte":["تيرابايت",""],
+"Petabyte":["بيتابايت",""],
+"Kibibyte":["كيبيبايت",""],
+"Mebibyte":["ميبيبايت",""],
+"Gibibyte":["جيبيبايت",""],
+"Tebibyte":["تيبيبايت",""],
+"Newton":["نيوتن",""],
+"Kilonewton":["كيلونيوتن",""],
+"Dyne":["داين",""],
+"Pound-force":["باوند-قوة",""],
+"Kilogram-force":["كيلوغرام-قوة",""],
+"Poundal":["باوندال",""],
+"Joule":["جول",""],
+"Kilojoule":["كيلوجول",""],
+"Calorie":["سعرة حرارية",""],
+"Kilocalorie":["كيلوسعرة",""],
+"Kilowatt-hour":["كيلوواط ساعي",""],
+"Electronvolt":["إلكترون فولت",""],
+"British thermal unit":["وحدة حرارية بريطانية",""],
+"Erg":["إرج",""],
+"Foot-pound":["قدم-باوند",""],
+"Pascal":["باسكال",""],
+"Kilopascal":["كيلوباسكال",""],
+"Hectopascal":["هكتوباسكال",""],
+"Bar":["بار",""],
+"Millibar":["ميليبار",""],
+"Atmosphere":["جو",""],
+"Torr":["تور",""],
+"Millimetre of mercury":["ميليمتر زئبقي",""],
+"Pound per square inch":["باوند لكل بوصة مربعة",""],
+"Attic drachma (silver)":["دراخما أتيكية (فضة)","تقريبًا 4.3 غرام من الفضة؛ معيار أتيكي"],
+"Attic tetradrachm (silver)":["تترادراخما أتيكية (فضة)","4 دراخما؛ «بومة» أثينا"],
+"Attic mina (silver)":["مينا أتيكية (فضة)","100 دراخما"],
+"Attic talent (silver)":["تالنت أتيكي (فضة)","60 مينا"],
+"Roman denarius (silver)":["ديناريوس روماني (فضة)","تقريبًا محتوى الفضة؛ تراجع عبر القرون"],
+"Roman sestertius":["سيسترس روماني","تقريبًا؛ 1/4 من الديناريوس"],
+"Roman as (bronze)":["آس روماني (برونز)","تقريبًا؛ برونز، ~11 غرام"],
+"Roman aureus (gold)":["أوريس روماني (ذهب)","ذهب؛ وزن تقريبي"],
+"Hebrew shekel of silver":["شاقل عبري من الفضة","تقريبًا؛ معيار الهيكل"],
+"Hebrew talent of silver":["تالنت عبري من الفضة","تقريبًا؛ ~3000 شاقل"],
+"Mesopotamian shekel of silver":["شاقل بلاد الرافدين من الفضة","تقريبًا؛ معيار الفضة"],
+"Mesopotamian mina (silver)":["مينا بلاد الرافدين (فضة)","60 شاقلًا"],
+"Mesopotamian talent (silver)":["تالنت بلاد الرافدين (فضة)","60 مينا"],
+"Egyptian deben (silver)":["ديبن مصري قديم (فضة)","تقريبًا؛ ديبن فضي من الدولة الحديثة"],
+"Egyptian kite (silver)":["كايت مصري قديم (فضة)","1/10 من الديبن"],
+"Persian daric (gold)":["داريك فارسي (ذهب)","ذهب أخميني؛ تقريبًا"],
+"Persian siglos (silver)":["سيجلوس فارسي (فضة)","فضة أخمينية؛ تقريبًا"],
+ },
+ hi:{
+"Metre":["मीटर",""],
+"Kilometre":["किलोमीटर",""],
+"Centimetre":["सेंटीमीटर",""],
+"Millimetre":["मिलीमीटर",""],
+"Micrometre":["माइक्रोमीटर",""],
+"Nanometre":["नैनोमीटर",""],
+"Inch":["इंच",""],
+"Foot":["फुट",""],
+"Yard":["गज़",""],
+"Mile":["मील",""],
+"Nautical mile":["समुद्री मील",""],
+"Astronomical unit":["खगोलीय इकाई",""],
+"Light-second":["प्रकाश-सेकंड",""],
+"Egyptian royal cubit":["मिस्री शाही हाथ","लगभग 52.5 cm; मानक काल के अनुसार भिन्न थे"],
+"Egyptian common cubit":["मिस्री सामान्य हाथ","लगभग 45 cm"],
+"Egyptian digit":["मिस्री अंगुल","1/28 शाही हाथ; लगभग"],
+"Roman foot (pes)":["रोमन पैर (pes)","लगभग 296 mm"],
+"Roman digitus":["रोमन डिजिटस","1/16 pes; लगभग"],
+"Roman palm":["रोमन हथेली","1/4 pes; लगभग"],
+"Roman pace (passus)":["रोमन क़दम (passus)","5 रोमन पैर"],
+"Roman mile":["रोमन मील","लगभग 1.48 km"],
+"Greek foot (pous)":["यूनानी पैर (pous)","लगभग; क्षेत्रीय, एटिक ~0.30 m"],
+"Greek fathom (orgyia)":["यूनानी बाहु (फ़ैदम) (orgyia)","6 podes; लगभग"],
+"Greek stadion":["यूनानी स्टेडियन","प्रतिनिधि एटिक/रोमन-युग मान"],
+"Biblical common cubit":["बाइबिल सामान्य हाथ","लगभग औसत; ऐतिहासिक रूप से परिवर्तनशील"],
+"Biblical span (zeret)":["बाइबिल बित्ता (zeret)","आधा हाथ; लगभग"],
+"Chinese chi (Han)":["चीनी ची (हान)","लगभग; राजवंश पर निर्भर"],
+"Indian hasta":["भारतीय हस्त","लगभग 18 इंच"],
+"Mesopotamian cubit (kush)":["मेसोपोटामियाई हाथ (kush)","लगभग; मानक भिन्न था"],
+"Persian parasang":["फ़ारसी परसांग","लगभग; प्रायः 30 स्टेडिया के रूप में दिया जाता है"],
+"Norse ell (alen)":["नॉर्स एल (alen)","लगभग; क्षेत्र के अनुसार भिन्न"],
+"Square metre":["वर्ग मीटर",""],
+"Square kilometre":["वर्ग किलोमीटर",""],
+"Hectare":["हेक्टेयर",""],
+"Acre":["एकड़",""],
+"Square foot":["वर्ग फुट",""],
+"Square yard":["वर्ग गज़",""],
+"Square mile":["वर्ग मील",""],
+"Roman iugerum":["रोमन युगेरम","लगभग 0.623 एकड़"],
+"Roman actus":["रोमन एक्टस","लगभग; 120 pes का वर्ग"],
+"Egyptian aroura":["मिस्री अरौरा","लगभग; 100 शाही हाथों का वर्ग"],
+"Greek plethron²":["यूनानी प्लेथ्रोन²","लगभग; क्षेत्रीय भिन्नता"],
+"Mesopotamian iku":["मेसोपोटामियाई इकू","लगभग; क्षेत्र इकाई"],
+"Kilogram":["किलोग्राम",""],
+"Gram":["ग्राम",""],
+"Milligram":["मिलीग्राम",""],
+"Metric tonne":["मीट्रिक टन",""],
+"Ounce":["औंस",""],
+"Pound":["पाउंड",""],
+"Stone":["स्टोन",""],
+"Carat":["कैरेट",""],
+"Grain":["ग्रेन",""],
+"Roman libra":["रोमन लिब्रा","लगभग 327.45 g"],
+"Roman uncia":["रोमन अंशिया","1/12 लिब्रा"],
+"Mesopotamian shekel":["मेसोपोटामियाई शेकेल","लगभग 8.33 g; मानक भिन्न थे"],
+"Mesopotamian mina":["मेसोपोटामियाई मीना","60 शेकेल; प्रतिनिधि"],
+"Mesopotamian talent":["मेसोपोटामियाई तालेंट","60 मीना; प्रतिनिधि"],
+"Egyptian deben":["मिस्री डेबन","लगभग नव-राज्य मान (~91 g)"],
+"Egyptian kite":["मिस्री काइट","1/10 डेबन"],
+"Greek Attic drachma":["यूनानी एटिक ड्रैक्मा","लगभग 4.3 g"],
+"Greek obol":["यूनानी ओबोल","1/6 ड्रैक्मा"],
+"Greek Attic mina":["यूनानी एटिक मीना","100 ड्रैक्माई"],
+"Greek Attic talent":["यूनानी एटिक तालेंट","60 मीना"],
+"Hebrew shekel":["इब्रानी शेकेल","लगभग; मानक भिन्न थे"],
+"Indian karsha":["भारतीय कर्ष","लगभग; ~58.8 g"],
+"Persian daric":["फ़ारसी डेरिक","अख़मेनी सोने का सिक्का; लगभग"],
+"Litre":["लीटर",""],
+"Millilitre":["मिलीलीटर",""],
+"Cubic metre":["घन मीटर",""],
+"US gallon":["अमेरिकी गैलन",""],
+"Imperial gallon":["इंपीरियल गैलन",""],
+"US quart":["अमेरिकी क्वार्ट",""],
+"US pint":["अमेरिकी पिंट",""],
+"Fluid ounce":["फ्लूइड औंस",""],
+"Cup (metric)":["कप (मीट्रिक)",""],
+"Tablespoon (metric)":["बड़ा चम्मच (मीट्रिक)",""],
+"Teaspoon (metric)":["छोटा चम्मच (मीट्रिक)",""],
+"Roman cyathus":["रोमन साइथस","लगभग; 1/12 सेक्सटेरियस"],
+"Roman sextarius":["रोमन सेक्सटेरियस","लगभग"],
+"Roman congius":["रोमन कॉन्गियस","6 सेक्सटेरी"],
+"Roman amphora":["रोमन एम्फोरा","लगभग 48 सेक्सटेरी"],
+"Greek kotyle":["यूनानी कोटाइल","लगभग; नगर-राज्य पर निर्भर"],
+"Greek chous":["यूनानी खोस","लगभग; 12 कोटाइल"],
+"Greek amphora (metretes)":["यूनानी एम्फोरा (metretes)","प्रतिनिधि मान"],
+"Biblical log":["बाइबिल लोग","लगभग; सबसे छोटा बाइबिल द्रव माप"],
+"Biblical hin":["बाइबिल हिन","लगभग; विद्वानों के अनुमान भिन्न हैं"],
+"Biblical bath":["बाइबिल बाथ","लगभग; ~6 हिन"],
+"Biblical homer":["बाइबिल होमर","लगभग; 10 बाथ"],
+"Egyptian heqat":["मिस्री हेकाट","लगभग मध्य/नव-राज्य"],
+"Egyptian ro":["मिस्री रो","लगभग; 1/320 हेकाट"],
+"Mesopotamian sila":["मेसोपोटामियाई सीला","लगभग; ~0.8–1 L तक भिन्न"],
+"Celsius":["सेल्सियस",""],
+"Fahrenheit":["फ़ारेनहाइट",""],
+"Kelvin":["केल्विन",""],
+"Rankine":["रैंकिन",""],
+"Second":["सेकंड",""],
+"Minute":["मिनट",""],
+"Hour":["घंटा",""],
+"Day":["दिन",""],
+"Week":["सप्ताह",""],
+"Julian year":["जूलियन वर्ष",""],
+"Babylonian time degree (uš)":["बेबीलोनी समय अंश (uš)","1/360 दिन = 4 मिनट"],
+"Egyptian decan interval":["मिस्री डेकन अंतराल","10-दिवसीय नागरिक अंतराल"],
+"Roman hora (seasonal)":["रोमन घंटा (मौसमी)","1 आधुनिक घंटे के रूप में दिखाया गया; दिन के उजाले के घंटे मौसम के अनुसार भिन्न थे"],
+"Chinese ke (quarter)":["चीनी के (चतुर्थांश)","लगभग; बाद की प्रणालियों में दिन का 1/96"],
+"Metre per second":["मीटर प्रति सेकंड",""],
+"Kilometre per hour":["किलोमीटर प्रति घंटा",""],
+"Mile per hour":["मील प्रति घंटा",""],
+"Knot":["नॉट",""],
+"Roman mile per hour":["रोमन मील प्रति घंटा","लगभग रोमन मील का उपयोग करता है; उदाहरणात्मक"],
+"Byte":["बाइट",""],
+"Kilobyte":["किलोबाइट",""],
+"Megabyte":["मेगाबाइट",""],
+"Gigabyte":["गीगाबाइट",""],
+"Terabyte":["टेराबाइट",""],
+"Petabyte":["पेटाबाइट",""],
+"Kibibyte":["किबिबाइट",""],
+"Mebibyte":["मेबिबाइट",""],
+"Gibibyte":["गिबिबाइट",""],
+"Tebibyte":["टेबिबाइट",""],
+"Newton":["न्यूटन",""],
+"Kilonewton":["किलोन्यूटन",""],
+"Dyne":["डाइन",""],
+"Pound-force":["पाउंड-बल",""],
+"Kilogram-force":["किलोग्राम-बल",""],
+"Poundal":["पाउंडल",""],
+"Joule":["जूल",""],
+"Kilojoule":["किलोजूल",""],
+"Calorie":["कैलोरी",""],
+"Kilocalorie":["किलोकैलोरी",""],
+"Kilowatt-hour":["किलोवाट-घंटा",""],
+"Electronvolt":["इलेक्ट्रॉनवोल्ट",""],
+"British thermal unit":["ब्रिटिश थर्मल इकाई",""],
+"Erg":["अर्ग",""],
+"Foot-pound":["फुट-पाउंड",""],
+"Pascal":["पास्कल",""],
+"Kilopascal":["किलोपास्कल",""],
+"Hectopascal":["हेक्टोपास्कल",""],
+"Bar":["बार",""],
+"Millibar":["मिलीबार",""],
+"Atmosphere":["वायुमंडल",""],
+"Torr":["टॉर",""],
+"Millimetre of mercury":["मिलीमीटर पारा",""],
+"Pound per square inch":["पाउंड प्रति वर्ग इंच",""],
+"Attic drachma (silver)":["एटिक ड्रैक्मा (चाँदी)","लगभग 4.3 g चाँदी; एटिक मानक"],
+"Attic tetradrachm (silver)":["एटिक टेट्राड्रैक्मा (चाँदी)","4 ड्रैक्माई; एथेनियन 'उल्लू'"],
+"Attic mina (silver)":["एटिक मीना (चाँदी)","100 ड्रैक्माई"],
+"Attic talent (silver)":["एटिक तालेंट (चाँदी)","60 मीना"],
+"Roman denarius (silver)":["रोमन डेनेरियस (चाँदी)","लगभग चाँदी की मात्रा; सदियों में घटती गई"],
+"Roman sestertius":["रोमन सेस्टेरटियस","लगभग; 1/4 डेनेरियस"],
+"Roman as (bronze)":["रोमन एस (कांस्य)","लगभग; कांस्य, ~11 g"],
+"Roman aureus (gold)":["रोमन ऑरियस (सोना)","सोना; लगभग वजन"],
+"Hebrew shekel of silver":["चाँदी का इब्रानी शेकेल","लगभग; मंदिर मानक"],
+"Hebrew talent of silver":["चाँदी का इब्रानी तालेंट","लगभग; ~3000 शेकेल"],
+"Mesopotamian shekel of silver":["चाँदी का मेसोपोटामियाई शेकेल","लगभग; चाँदी मानक"],
+"Mesopotamian mina (silver)":["मेसोपोटामियाई मीना (चाँदी)","60 शेकेल"],
+"Mesopotamian talent (silver)":["मेसोपोटामियाई तालेंट (चाँदी)","60 मीना"],
+"Egyptian deben (silver)":["मिस्री डेबन (चाँदी)","लगभग; नव-राज्य चाँदी डेबन"],
+"Egyptian kite (silver)":["मिस्री काइट (चाँदी)","1/10 डेबन"],
+"Persian daric (gold)":["फ़ारसी डेरिक (सोना)","अख़मेनी सोना; लगभग"],
+"Persian siglos (silver)":["फ़ारसी सिग्लोस (चाँदी)","अख़मेनी चाँदी; लगभग"],
+ }
+};
+let lang="en";
+try{const s=localStorage.getItem("cc-lang");if(s&&LANGS[s])lang=s}catch(e){}
+const langSel=$("langSel");
+function t(key,params){
+  let s=(UI[lang]&&UI[lang][key])||UI.en[key]||key;
+  if(params)Object.entries(params).forEach(([k,v])=>{s=s.split("{"+k+"}").join(String(v))});
+  return s;
+}
+function catLabel(k){return (CATLAB[lang]&&CATLAB[lang][k])||CATLAB.en[k]||categories[k].label}
+function civName(c){return (CIVLAB[lang]&&CIVLAB[lang][c])||CIVLAB.en[c]||c}
+function un(u){const e=LEX[lang]&&LEX[lang][u.n];return (e&&e[0])||u.n}
+function unote(u){const e=LEX[lang]&&LEX[lang][u.n];return (e&&e[1])||u.note||""}
+function localizeStatic(){
+  document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=t(el.dataset.i18n));
+  document.querySelectorAll("[data-i18n-ph]").forEach(el=>el.setAttribute("placeholder",t(el.dataset.i18nPh)));
+  document.querySelectorAll("[data-i18n-title]").forEach(el=>el.setAttribute("title",t(el.dataset.i18nTitle)));
+  document.querySelectorAll("[data-i18n-aria]").forEach(el=>el.setAttribute("aria-label",t(el.dataset.i18nAria)));
+  document.querySelectorAll("[data-i18n-html]").forEach(el=>el.innerHTML=t(el.dataset.i18nHtml));
+}
+function populateLangSel(){
+  langSel.innerHTML=Object.entries(LANGS).map(([k,l])=>`<option value="${k}">${l.label}</option>`).join("");
+  langSel.value=lang;
+}
+function renderStats(){
+  const total=Object.values(categories).reduce((n,c)=>n+c.units.length,0);
+  const anc=Object.values(categories).reduce((n,c)=>n+c.units.filter(u=>u.anc).length,0);
+  $("statCat").textContent=t("collections",{n:Object.keys(categories).length});
+  $("statUnit").textContent=t("measuresUnit",{n:total,m:anc});
+}
+function setLang(code){
+  lang=LANGS[code]?code:"en";
+  document.documentElement.lang=lang;
+  document.documentElement.dir=LANGS[lang].dir;
+  try{localStorage.setItem("cc-lang",lang)}catch(e){}
+  langSel.value=lang;
+  localizeStatic();
+  renderTabs();renderEraRow();populate(false);renderHistory();renderStats();favState();
+  if(map)updateMeasure();
+}
+langSel.onchange=()=>setLang(langSel.value);
+
+let current="length", activeSide="from", civFilter="All", lastHistoryKey="", suppress=false;
+const civs=["All","Modern","Egypt","Rome","Greece","Mesopotamia","Levant","China","India","Persia","Norse"];
+
+let history=[];
+try{history=JSON.parse(localStorage.getItem("cc-history")||"[]").filter(h=>h&&h.t).slice(0,12)}catch(e){history=[]}
+let favs=new Set();
+try{favs=new Set(JSON.parse(localStorage.getItem("cc-favs")||"[]"))}catch(e){favs=new Set()}
+let unitFavs=new Set();
+try{unitFavs=new Set(JSON.parse(localStorage.getItem("cc-unitfavs")||"[]"))}catch(e){unitFavs=new Set()}
+
+/* ---------- helpers ---------- */
+function fmt(x){
+  if(!Number.isFinite(x)) return "—";
+  const a=Math.abs(x);
+  if((a!==0&&a<1e-7)||a>=1e15) return x.toExponential(6).replace(/\.?0+e/,"e");
+  return new Intl.NumberFormat(LANGS[lang].locale,{maximumSignificantDigits:12}).format(x);
+}
+function temp(v,from,to){
+  let c;
+  if(from==="°C") c=v; else if(from==="°F") c=(v-32)*5/9;
+  else if(from==="K") c=v-273.15; else c=(v-491.67)*5/9;
+  if(to==="°C") return c; if(to==="°F") return c*9/5+32;
+  if(to==="K") return c+273.15; return (c+273.15)*9/5;
+}
+function opt(u,i){return `<option value="${i}">${u.anc?"⌛ ":""}${un(u)} (${u.s})${u.anc?` · ${civName(u.civ)}`:""}</option>`}
+function announce(message){
+  toast.textContent=message;toast.classList.add("show");
+  clearTimeout(announce.timer);announce.timer=setTimeout(()=>toast.classList.remove("show"),1800);
+}
+function timeHM(t){try{return new Date(t).toLocaleTimeString(LANGS[lang].locale,{hour:"2-digit",minute:"2-digit"})}catch(e){return ""}}
+function saveHistory(){localStorage.setItem("cc-history",JSON.stringify(history))}
+function saveFavs(){localStorage.setItem("cc-favs",JSON.stringify([...favs]))}
+function saveUnitFavs(){localStorage.setItem("cc-unitfavs",JSON.stringify([...unitFavs]))}
+function pairKey(){return `${current}|${fromUnit.selectedIndex}|${toUnit.selectedIndex}`}
+function sideTags(){
+  fromTag.textContent=activeSide==="from"?"● "+t("source"):t("source");
+  toTag.textContent=activeSide==="to"?"● "+t("result"):t("result");
+  fromTag.classList.toggle("live",activeSide==="from");
+  toTag.classList.toggle("live",activeSide==="to");
+}
+
+/* ---------- tabs & filters ---------- */
+function renderTabs(){
+  const entries=Object.entries(categories);
+  tabs.innerHTML=entries.map(([k,c])=>{
+    const count=civFilter==="All"?c.units.length:c.units.filter(u=>u.civ===civFilter).length;
+    return `<button class="tab ${k===current?"active":""} ${count===0?"empty":""}" data-cat="${k}" role="tab" aria-selected="${k===current}">${c.icon} ${catLabel(k)}<span class="tab-count">${count}</span></button>`;
+  }).join("");
+  tabs.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{current=b.dataset.cat;renderTabs();populate();});
+}
+function renderEraRow(){
+  eraRow.innerHTML=civs.map(c=>
+    `<button class="era-chip ${c===civFilter?"active":""}" data-civ="${c}" role="tab" aria-selected="${c===civFilter}">${civName(c)}</button>`).join("");
+  eraRow.querySelectorAll(".era-chip").forEach(b=>b.onclick=()=>{
+    civFilter=b.dataset.civ;renderEraRow();renderTabs();renderUnitList();
+    announce(civFilter==="All"?t("showAllCiv"):t("filterBy",{civ:civName(civFilter)}));
+  });
+}
+function populate(add=true){
+  const us=categories[current].units;
+  fromUnit.innerHTML=us.map(opt).join("");
+  toUnit.innerHTML=us.map(opt).join("");
+  toUnit.selectedIndex=Math.min(1,us.length-1);
+  renderUnitList();
+  convert(add);
+}
+
+/* ---------- converter ---------- */
+function convert(addToHistory=true){
+  const cat=categories[current], us=cat.units;
+  const a=us[fromUnit.selectedIndex], b=us[toUnit.selectedIndex];
+  const input=activeSide==="to"?toValue:fromValue;
+  const output=activeSide==="to"?fromValue:toValue;
+  const v=parseFloat(String(input.value||"").replace(/,/g,""));
+  sideTags();
+  if(Number.isNaN(v)){
+    suppress=true;output.value="";suppress=false;
+    resultValue.textContent="—";formula.textContent=t("enterNumber");favState();
+    return;
+  }
+  let r,ftext;
+  if(cat.special){
+    r=activeSide==="to"?temp(v,b.s,a.s):temp(v,a.s,b.s);
+    ftext=`${t("tempTransform")}: ${a.s} → ${b.s}`;
+  } else if(activeSide==="to"){
+    r=v*b.f/a.f;
+    ftext=`${fmt(v)} × ${b.f} ÷ ${a.f}`;
+  } else {
+    r=v*a.f/b.f;
+    ftext=`${fmt(v)} × ${a.f} ÷ ${b.f}`;
+  }
+  suppress=true;output.value=fmt(r);suppress=false;
+  resultValue.textContent=activeSide==="to"
+    ?`${fmt(v)} ${b.s} = ${fmt(r)} ${a.s}`
+    :`${fmt(v)} ${a.s} = ${fmt(r)} ${b.s}`;
+  formula.textContent=ftext+(a.anc||b.anc?" · "+t("approxSuffix"):"");
+  favState();
+  if(addToHistory){
+    const key=`${current}|${a.s}|${b.s}|${v}|${r}|${activeSide}`;
+    if(key!==lastHistoryKey){
+      lastHistoryKey=key;
+      history.unshift({t:Date.now(),cat:current,fi:fromUnit.selectedIndex,ti:toUnit.selectedIndex,v,side:activeSide,from:`${fmt(v)} ${a.s}`,to:`${fmt(r)} ${b.s}`});
+      history=history.slice(0,12);renderHistory();saveHistory();
+    }
+  }
+}
+fromValue.addEventListener("input",()=>{if(suppress)return;activeSide="from";convert(false)});
+fromValue.addEventListener("change",()=>{if(suppress)return;activeSide="from";convert(true)});
+toValue.addEventListener("input",()=>{if(suppress)return;activeSide="to";convert(false)});
+toValue.addEventListener("change",()=>{if(suppress)return;activeSide="to";convert(true)});
+fromUnit.addEventListener("change",()=>convert(true));
+toUnit.addEventListener("change",()=>convert(true));
+
+function swapUnits(){
+  const i=fromUnit.selectedIndex;
+  fromUnit.selectedIndex=toUnit.selectedIndex;
+  toUnit.selectedIndex=i;
+  convert(true);
+  announce(t("swapped"));
+}
+$("swapBtn").onclick=swapUnits;
+$("reverseBtn").onclick=swapUnits;
+
+document.querySelectorAll(".quick button[data-v]").forEach(b=>b.onclick=()=>{
+  activeSide="from";fromValue.value=b.dataset.v;convert(true);
+});
+$("clearBtn").onclick=()=>{
+  activeSide="from";fromValue.value="";suppress=true;toValue.value="";suppress=false;
+  resultValue.textContent="—";formula.textContent=t("enterNumber");sideTags();favState();
+};
+
+/* ---------- favorites ---------- */
+function favState(){
+  const on=favs.has(pairKey());
+  favBtn.classList.toggle("on",on);
+  favBtn.setAttribute("aria-pressed",on);
+  favBtn.textContent=on?t("saved"):t("save");
+}
+favBtn.onclick=()=>{
+  const k=pairKey();
+  if(favs.has(k)){favs.delete(k);announce(t("favRemoved"))}
+  else{favs.add(k);announce(t("favSaved"))}
+  saveFavs();favState();
+};
+
+/* ---------- unit browser ---------- */
+function renderUnitList(){
+  const q=unitSearch.value.trim().toLowerCase();
+  let items;
+  if(civFilter==="All"){
+    items=categories[current].units.map((u,i)=>({u,i,cat:current}));
+    browserTitle.textContent=`${t("allMeasures")} — ${catLabel(current)}`;
+  } else {
+    items=[];
+    Object.entries(categories).forEach(([k,c])=>c.units.forEach((u,i)=>{if(u.civ===civFilter)items.push({u,i,cat:k})}));
+    browserTitle.textContent=`${civName(civFilter)} — ${t("acrossCollections")}`;
+  }
+  const filtered=items.filter(({u})=>!q||[un(u),u.s,civName(u.civ),unote(u)].filter(Boolean).join(" ").toLowerCase().includes(q));
+  filtered.sort((x,y)=>{
+    const fx=unitFavs.has(x.cat+"|"+x.i)?0:1, fy=unitFavs.has(y.cat+"|"+y.i)?0:1;
+    return fx-fy || x.u.n.localeCompare(y.u.n);
+  });
+  unitList.innerHTML=filtered.map(({u,i,cat})=>{
+    const on=unitFavs.has(cat+"|"+i);
+    const cross=civFilter==="All"&&cat!==current;
+    return `<div class="unit-item ${u.anc?"ancient":""}" data-cat="${cat}" data-i="${i}" role="listitem">
+      <div class="unit-top">
+        <span class="unit-name">${u.anc?"⌛ ":""}${un(u)} <span class="unit-sym">(${u.s})</span></span>
+        <button class="unit-fav ${on?"on":""}" data-cat="${cat}" data-i="${i}" title="${on?t("unitFavRemove"):t("unitFavTitle")}">${on?"★":"☆"}</button>
+      </div>
+      <div class="unit-meta">${cross?`${categories[cat].icon} ${catLabel(cat)} · `:""}${u.anc?`${civName(u.civ)} · ${unote(u)||t("approxNote")}`:t("modernUnit")}</div>
+    </div>`;
+  }).join("")||`<div class="unit-meta">${t("noMatch")}</div>`;
+
+  unitList.querySelectorAll(".unit-item").forEach(el=>el.onclick=e=>{
+    if(e.target.closest(".unit-fav"))return;
+    current=el.dataset.cat;renderTabs();populate(false);
+    fromUnit.selectedIndex=+el.dataset.i;
+    activeSide="from";fromValue.value=1;convert(false);
+  });
+  unitList.querySelectorAll(".unit-fav").forEach(b=>b.onclick=e=>{
+    e.stopPropagation();
+    const k=b.dataset.cat+"|"+b.dataset.i;
+    if(unitFavs.has(k)){unitFavs.delete(k);announce(t("unitFavOff"))}
+    else{unitFavs.add(k);announce(t("unitFavOn"))}
+    saveUnitFavs();renderUnitList();
+  });
+}
+unitSearch.addEventListener("input",renderUnitList);
+
+/* ---------- history ---------- */
+function renderHistory(){
+  if(!history.length){
+    historyList.innerHTML=`<div class="history-empty">${t("historyEmpty")}</div>`;
+    return;
+  }
+  historyList.innerHTML=history.map((h,i)=>{
+    const cat=categories[h.cat]||{icon:"•",label:h.cat};
+    return `<div class="history-row" data-i="${i}">
+      <div class="h-main">
+        <div class="h-line"><span class="h-from">${h.from}</span><span class="h-arrow">→</span><span class="h-to">${h.to}</span></div>
+        <div class="h-meta"><span class="h-time">${timeHM(h.t)}</span><span class="h-cat">${cat.icon} ${catLabel(h.cat)}</span></div>
+      </div>
+      <div class="h-actions">
+        <button class="h-btn restore" data-i="${i}" title="${t("loadConv")}">↺</button>
+        <button class="h-btn del" data-i="${i}" title="${t("removeEntry")}">×</button>
+      </div>
+    </div>`;
+  }).join("");
+  historyList.querySelectorAll(".restore").forEach(b=>b.onclick=e=>{
+    e.stopPropagation();restoreHistory(+b.dataset.i);
+  });
+  historyList.querySelectorAll(".del").forEach(b=>b.onclick=e=>{
+    e.stopPropagation();
+    history.splice(+b.dataset.i,1);renderHistory();saveHistory();announce(t("entryRemoved"));
+  });
+}
+function restoreHistory(i){
+  const h=history[i];
+  current=h.cat;renderTabs();populate(false);
+  fromUnit.selectedIndex=h.fi;toUnit.selectedIndex=h.ti;
+  activeSide=h.side;
+  const input=activeSide==="to"?toValue:fromValue;
+  input.value=h.v;convert(false);
+  announce(t("restored"));
+}
+$("clearHistoryBtn").onclick=()=>{
+  history=[];lastHistoryKey="";localStorage.removeItem("cc-history");renderHistory();announce(t("histCleared"));
+};
+
+/* ---------- copy ---------- */
+async function copyResult(){
+  const text=resultValue.textContent;
+  if(text==="—") return announce(t("nothingToCopy"));
+  try{await navigator.clipboard.writeText(text);announce(t("copied"))}
+  catch(e){
+    const area=document.createElement("textarea");
+    area.value=text;document.body.append(area);area.select();
+    document.execCommand("copy");area.remove();announce(t("copied"));
+  }
+}
+$("copyBtn").onclick=copyResult;
+
+/* ---------- help ---------- */
+function toggleHelp(){helpPanel.hidden=!helpPanel.hidden}
+$("helpBtn").onclick=toggleHelp;
+$("helpClose").onclick=toggleHelp;
+document.addEventListener("click",e=>{
+  if(!helpPanel.hidden&&!helpPanel.contains(e.target)&&e.target!==$("helpBtn"))helpPanel.hidden=true;
+});
+
+/* ---------- keyboard ---------- */
+document.addEventListener("keydown",e=>{
+  const mod=e.metaKey||e.ctrlKey;
+  const typing=/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);
+  if(mod&&e.key.toLowerCase()==="c"&&!typing){e.preventDefault();copyResult()}
+  else if(mod&&e.key.toLowerCase()==="e"&&!typing){e.preventDefault();fromValue.focus();fromValue.select()}
+  else if(mod&&e.key.toLowerCase()==="f"&&!typing){e.preventDefault();unitSearch.focus();unitSearch.select()}
+  else if(mod&&e.key.toLowerCase()==="s"&&!typing){e.preventDefault();favBtn.click()}
+  else if(mod&&e.key.toLowerCase()==="h"){e.preventDefault();toggleHelp()}
+  else if(e.key==="Escape"){
+    if(!mapWin.hidden){closeMap();return}
+    unitSearch.value="";
+    if(civFilter!=="All"){civFilter="All";renderEraRow();renderTabs()}
+    renderUnitList();unitSearch.blur();helpPanel.hidden=true;
+  }
+});
+
+/* ---------- map & measure (OpenStreetMap / Leaflet, on demand) ---------- */
+const mapWin=$("mapWin"), mapEl=$("mapEl"), mapValue=$("mapValue"), mapConv=$("mapConv"),
+mapUndo=$("mapUndo"), mapClear=$("mapClear"), mapSend=$("mapSend"), mapCoord=$("mapCoord"), mapLat=$("mapLat"), mapLng=$("mapLng");
+let map=null, layerGroup=null, mode="distance", drawing=false, points=[], measured={value:0,unit:"m"};
+
+function loadLeaflet(){
+  return new Promise((res,rej)=>{
+    if(window.L){res();return}
+    const s=document.createElement("script");
+    s.src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js";
+    s.onload=()=>{
+      const l=document.createElement("link");
+      l.rel="stylesheet";l.href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css";
+      document.head.append(l);res();
+    };
+    s.onerror=()=>rej(new Error("leaflet-load-failed"));
+    document.head.append(s);
+  });
+}
+async function openMap(){
+  mapWin.hidden=false;document.body.style.overflow="hidden";
+  if(map){requestAnimationFrame(()=>map.invalidateSize());return}
+  mapCoord.textContent=t("loading");
+  mapCoord.classList.add("live");
+  try{
+    await loadLeaflet();
+    if(!map)initMap();
+  }catch(e){
+    mapCoord.textContent=t("mapNeedsNet");
+  }
+}
+function closeMap(){
+  mapWin.hidden=true;document.body.style.overflow="";
+  points=[];measured={value:0,unit:mode==="distance"?"m":"m²"};
+  if(layerGroup){layerGroup.clearLayers();updateMeasure()}
+  if(map)map.invalidateSize();
+}
+function initMap(){
+  map=L.map(mapEl,{zoomControl:true}).setView([28,8],2);
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains:"abcd",maxZoom:19
+  }).addTo(map);
+  layerGroup=L.layerGroup().addTo(map);
+  map.on("click",e=>{
+    if(!drawing)return;
+    points.push({lat:e.latlng.lat,lng:e.latlng.lng});
+    redraw();
+  });
+  map.on("mousemove",e=>{
+    mapCoord.textContent=`${t("lat")} ${e.latlng.lat.toFixed(5)}° · ${t("lng")} ${e.latlng.lng.toFixed(5)}°`;
+    mapCoord.classList.add("live");
+  });
+  map.on("mouseout",()=>{
+    mapCoord.textContent="—";
+    mapCoord.classList.remove("live");
+  });
+}
+function haversine(a,b){
+  const R=6371008.8,rad=x=>x*Math.PI/180;
+  const dLat=rad(b.lat-a.lat),dLng=rad(b.lng-a.lng);
+  const s=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return 2*R*Math.asin(Math.min(1,Math.sqrt(s)));
+}
+function sphereArea(pts){
+  const R=6371008.8,rad=x=>x*Math.PI/180,n=pts.length;
+  let total=0;
+  for(let i=0;i<n;i++){
+    const p1=pts[i],p2=pts[(i+1)%n];
+    total+=(rad(p2.lng)-rad(p1.lng))*(2+Math.sin(rad(p1.lat))+Math.sin(rad(p2.lat)));
+  }
+  return Math.abs(total*R*R/2);
+}
+function nice(x,d=3){
+  if(!Number.isFinite(x))return "—";
+  if(x!==0&&Math.abs(x)<0.01)return x.toPrecision(d);
+  return new Intl.NumberFormat(LANGS[lang].locale,{maximumSignificantDigits:d}).format(x);
+}
+function redraw(){
+  layerGroup.clearLayers();
+  points.forEach(p=>L.circleMarker([p.lat,p.lng],{radius:5,color:"#f2dcab",weight:1.5,fillColor:"#d9b36a",fillOpacity:.95}).addTo(layerGroup));
+  const ll=points.map(p=>[p.lat,p.lng]);
+  if(mode==="distance"&&points.length>1){
+    L.polyline(ll,{color:"#d9b36a",weight:3,opacity:.9}).addTo(layerGroup);
+  }else if(mode==="area"&&points.length>2){
+    L.polygon(ll,{color:"#d9b36a",weight:2,opacity:.95,fillColor:"#d9b36a",fillOpacity:.16}).addTo(layerGroup);
+  }
+  updateMeasure();
+}
+function updateMeasure(){
+  mapUndo.disabled=points.length===0;
+  mapClear.disabled=points.length===0;
+  if(points.length<2){
+    measured={value:0,unit:mode==="distance"?"m":"m²"};
+    mapValue.textContent="—";mapConv.textContent=t("clickToAdd");
+    mapSend.disabled=true;return;
+  }
+  if(mode==="distance"){
+    let d=0;
+    for(let i=1;i<points.length;i++)d+=haversine(points[i-1],points[i]);
+    measured={value:d,unit:"m"};
+    mapValue.textContent=`${nice(d)} m`;
+    mapConv.innerHTML=`<b>${nice(d/1000)} km</b> · ${nice(d/1609.344)} mi · ${nice(d/185)} ${t("stadia")}`;
+  }else{
+    if(points.length<3){
+      mapValue.textContent="—";mapConv.textContent=t("addPoints",{n:points.length});
+      measured={value:0,unit:"m²"};mapSend.disabled=true;return;
+    }
+    const a=sphereArea(points);
+    measured={value:a,unit:"m²"};
+    mapValue.textContent=`${nice(a)} m²`;
+    mapConv.innerHTML=`<b>${nice(a/10000)} ha</b> · ${nice(a/4046.8564224)} ac · ${nice(a/2523)} ${t("iugera")}`;
+  }
+  mapSend.disabled=!(measured.value>0);
+}
+function setMode(m){
+  mode=m;drawing=true;points=[];measured={value:0,unit:m==="distance"?"m":"m²"};
+  $("modeDistance").classList.toggle("active",mode==="distance");
+  $("modeArea").classList.toggle("active",mode==="area");
+  mapUndo.disabled=true;mapClear.disabled=true;mapSend.disabled=true;
+  if(layerGroup){layerGroup.clearLayers();updateMeasure()}
+  else{mapValue.textContent="—";mapConv.textContent=t("clickToAdd")}
+}
+function clearPoints(){points=[];measured={value:0,unit:mode==="distance"?"m":"m²"};if(layerGroup)redraw()}
+function undoPoint(){if(points.length){points.pop();if(layerGroup)redraw()}}
+function sendToConverter(){
+  const cat=mode==="distance"?"length":"area";
+  const sym=mode==="distance"?"m":"m²";
+  current=cat;renderTabs();populate(false);
+  const idx=categories[cat].units.findIndex(u=>u.s===sym);
+  if(idx>=0)fromUnit.selectedIndex=idx;
+  activeSide="from";fromValue.value=String(measured.value);
+  convert(true);
+  closeMap();
+  announce(t("sentToConverter"));
+  fromValue.scrollIntoView({behavior:"smooth",block:"center"});
+  fromValue.focus();
+}
+$("mapOpenBtn").onclick=openMap;
+$("mapClose").onclick=closeMap;
+$("modeDistance").onclick=()=>setMode("distance");
+$("modeArea").onclick=()=>setMode("area");
+mapUndo.onclick=undoPoint;
+mapClear.onclick=clearPoints;
+mapSend.onclick=sendToConverter;
+function readManualCoords(){
+  const lat=parseFloat(mapLat.value), lng=parseFloat(mapLng.value);
+  if(Number.isNaN(lat)||Number.isNaN(lng)||lat<-90||lat>90||lng<-180||lng>180){
+    announce(t("coordInvalid"));return null;
+  }
+  return {lat,lng};
+}
+function locateCoords(){
+  if(!map)return;
+  const p=readManualCoords();if(!p)return;
+  map.flyTo([p.lat,p.lng],Math.max(map.getZoom(),7));
+  mapCoord.textContent=`${t("lat")} ${p.lat.toFixed(5)}° · ${t("lng")} ${p.lng.toFixed(5)}°`;
+  mapCoord.classList.add("live");
+  announce(`${t("lat")} ${p.lat.toFixed(4)}° · ${t("lng")} ${p.lng.toFixed(4)}°`);
+}
+function addManualPoint(){
+  if(!map)return;
+  const p=readManualCoords();if(!p)return;
+  if(!drawing)setMode(mode);
+  points.push(p);redraw();
+  map.flyTo([p.lat,p.lng],Math.max(map.getZoom(),7));
+  announce(t("addPoint"));
+}
+$("mapLocateBtn").onclick=locateCoords;
+$("mapAddPointBtn").onclick=addManualPoint;
+[mapLat,mapLng].forEach(el=>el.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();locateCoords();}}));
+mapWin.addEventListener("click",e=>{if(e.target===mapWin)closeMap()});
+setMode("distance");
+
+/* ---------- init ---------- */
+populateLangSel();setLang(lang);
+</script>
+</body>
+</html>
