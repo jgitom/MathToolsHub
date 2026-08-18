@@ -1388,7 +1388,7 @@
     return '<div class="card" style="display:flex;flex-direction:column">' +
       '<h2>' + plan.name + (active ? ' <span class="badge bgreen">Current</span>' : "") + "</h2>" +
       '<div class="muted" style="font-size:12px">' + plan.tagline + "</div>" +
-      '<div style="font-size:28px;font-weight:800;margin:14px 0 4px">' + U.money(plan.price) + '<span class="muted" style="font-size:12px">/month</span></div>' +
+      '<div style="font-size:28px;font-weight:800;margin:14px 0 4px">' + U.money(plan.price) + '<span class="muted" style="font-size:12px"> · one-time</span></div>' +
       '<ul class="onboard-list" style="flex:1">' + plan.blurb.map(function (b) { return "<li><span class=\"done-mark\">✔</span>" + b + "</li>"; }).join("") + "</ul>" +
       (active
         ? '<button class="btn secondary" disabled>Current plan</button>'
