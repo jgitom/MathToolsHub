@@ -1,5 +1,5 @@
 /* NexCompany AI — demo service worker (offline app shell + cache-first static assets). */
-const CACHE = "nexcompany-demo-v1";
+const CACHE = "nexcompany-demo-v2";
 const ASSETS = [
   "./nexcompany_ai_management_system.html",
   "./css/style.css",
