@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NexCompany AI Management System</title>
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="theme-color" content="#1f6feb" />
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png" />
+<link rel="apple-touch-icon" href="assets/icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="NexCompany AI" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<!-- ============ LOGIN / AUTH ============ -->
+<div id="loginView" class="auth-wrap" hidden>
+  <div class="auth-card">
+    <div class="brand-lg">NEXCOMPANY <span>AI</span><small>Integrated Company Management</small></div>
+    <div class="auth-tabs">
+      <button data-atab="signin" class="active">Sign In</button>
+      <button data-atab="signup">Create Account</button>
+      <button data-atab="demo">Demo</button>
+    </div>
+    <form id="formSignin" class="auth-form active" onsubmit="return App.doSignin(event)">
+      <div class="field"><label>Email</label><input type="email" id="siEmail" required placeholder="you@company.com"></div>
+      <div class="field"><label>Password</label><input type="password" id="siPassword" required placeholder="••••••••"></div>
+      <button class="btn primary" style="width:100%" type="submit">Sign In</button>
+      <p class="muted" id="siMsg" style="font-size:12px;margin-top:10px"></p>
+    </form>
+    <form id="formSignup" class="auth-form" onsubmit="return App.doSignup(event)">
+      <div class="field"><label>Full name</label><input id="suName" required placeholder="Your name"></div>
+      <div class="field"><label>Email</label><input type="email" id="suEmail" required placeholder="you@company.com"></div>
+      <div class="field"><label>Password (min 6 chars)</label><input type="password" id="suPassword" minlength="6" required></div>
+      <button class="btn primary" style="width:100%" type="submit">Create Account</button>
+      <p class="muted" id="suMsg" style="font-size:12px;margin-top:10px"></p>
+    </form>
+    <div id="formDemo" class="auth-form">
+      <p class="muted" style="margin-top:0">Pick a persona to explore the RBAC model on local demo data (Supabase is optional).</p>
+      <div class="demo-personas">
+        <button class="persona" onclick="App.doDemo('owner')"><b>👑 Owner</b><small>demo@nexcompany.app — full access: payroll, team roles, audit</small></button>
+        <button class="persona" onclick="App.doDemo('manager')"><b>🧑‍💼 Manager</b><small>manager@nexcompany.app — manage employees, approve leave, run payroll</small></button>
+        <button class="persona" onclick="App.doDemo('staff')"><b>🙋 Staff</b><small>staff@nexcompany.app — own profile, clock in/out, leave, payslip</small></button>
+      </div>
+    </div>
+    <div class="auth-note" id="authNote"></div>
+    <div class="auth-builtby" id="authBuiltBy"></div>
+  </div>
+</div>
+
+<!-- ============ PRODUCTION NOT CONFIGURED ============ -->
+<div id="prodNotice" class="auth-wrap" hidden>
+  <div class="auth-card">
+    <div class="brand-lg">NEXCOMPANY <span>AI</span></div>
+    <h2 style="margin:18px 0 8px">Production is not configured</h2>
+    <p class="muted" style="margin:0 0 14px">This build is locked to <b>Supabase</b> for security. Add your project URL and anon key in <code>js/config.js</code> (or run with <code>?env=development</code> for the demo build).</p>
+    <div class="auth-note">The demo storage drivers (localStorage / SQLite / REST) are disabled in production to protect your company data.</div>
+  </div>
+</div>
+
+<!-- ============ ONBOARDING WIZARD ============ -->
+<div id="onboardView" class="onboard-wrap" hidden>
+  <div class="onboard-card">
+    <div class="brand-lg" style="margin-bottom:18px">NEXCOMPANY <span>AI</span></div>
+    <div class="steps" id="onSteps"></div>
+    <div id="onStepBody"></div>
+  </div>
+</div>
+
+<!-- ============ MAIN APP ============ -->
+<div id="appView" class="app" hidden>
+  <aside class="sidebar">
+    <div class="brand"><img id="sidebarLogo" class="brand-logo" hidden alt="">NEXCOMPANY <span>AI</span><small id="brandCompany"></small></div>
+    <div class="nav" id="nav"></div>
+    <div class="sidebar-foot">
+      <div class="who" id="footWho"></div>
+      <div class="role" id="footRole"></div>
+      <div id="storagePickerWrap" style="margin-top:8px"></div>
+      <div id="companySwitchWrap" style="margin-top:8px"></div>
+      <button id="btnSignOut">Sign out</button>
+      <div class="hint" id="footBuiltBy" style="margin-top:10px"></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div><h1 id="pageTitle"></h1><div class="page-sub" id="pageSub"></div></div>
+      <div class="top-actions" id="topActions"></div>
+    </div>
+
+    <section id="dashboard" class="page">
+      <div class="grid kpis" id="dashKpis"></div>
+      <div class="grid two mt">
+        <div class="card" id="dashHealth"></div>
+        <div class="card" id="dashAlerts"></div>
+      </div>
+      <div class="grid two mt">
+        <div class="card" id="dashTx"></div>
+        <div class="card" id="dashProjects"></div>
+      </div>
+    </section>
+
+    <section id="company" class="page">
+      <div class="card">
+        <div class="toolbar"><h2>Company Profile</h2><button id="btnEditCompany" class="btn primary" hidden>Edit Profile</button></div>
+        <div id="companyView"></div>
+      </div>
+    </section>
+
+    <section id="branches" class="page">
+      <div class="card">
+        <div class="toolbar"><h2>Branches</h2><button id="btnAddBranch" class="btn primary" hidden>+ Add Branch</button></div>
+        <div class="table-wrap"><table><thead><tr><th>Branch</th><th>Location</th><th>Phone</th><th>Manager</th><th>Status</th><th>Actions</th></tr></thead><tbody id="branchTable"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="departments" class="page">
+      <div class="card">
+        <div class="toolbar"><h2>Departments</h2><button id="btnAddDept" class="btn primary" hidden>+ Add Department</button></div>
+        <div class="table-wrap"><table><thead><tr><th>Department</th><th>Code</th><th>Branch</th><th>Head</th><th>Actions</th></tr></thead><tbody id="deptTable"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="team" class="page">
+      <div class="card">
+        <div class="toolbar"><h2>Team & Roles</h2><button id="btnAddMember" class="btn primary" hidden>+ Add Member</button></div>
+        <div class="hint" id="teamHint"></div>
+        <div class="table-wrap"><table><thead><tr><th>Member</th><th>Linked Employee</th><th>Role</th><th>Added</th><th>Actions</th></tr></thead><tbody id="teamTable"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="employees" class="page">
+      <div class="card">
+        <div class="toolbar">
+          <input id="employeeSearch" placeholder="Search employees…">
+          <select id="deptFilter"></select>
+          <select id="branchFilter"></select>
+          <button id="btnAddEmployee" class="btn primary" hidden>+ Add Employee</button>
+        </div>
+        <div class="table-wrap"><table><thead><tr><th>No.</th><th>Name</th><th>Branch</th><th>Department</th><th>Position</th><th>Salary</th><th>Status</th><th>Actions</th></tr></thead><tbody id="employeeTable"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="leave" class="page">
+      <div class="card">
+        <div class="toolbar"><h2>Leave Requests</h2><button id="btnAddLeave" class="btn primary" hidden>+ Request Leave</button></div>
+        <div class="kpi-strip" id="leaveStats"></div>
+        <div class="table-wrap"><table><thead><tr><th>Employee</th><th>Type</th><th>Start</th><th>End</th><th>Days</th><th>Reason</th><th>Status</th><th>Actions</th></tr></thead><tbody id="leaveTable"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="attendance" class="page">
+      <div class="card">
+        <div class="toolbar">
+          <h2>Attendance</h2>
+          <input type="date" id="attDate">
+          <div id="attClockArea" style="display:inline-flex;gap:8px"></div>
+        </div>
+        <div class="kpi-strip" id="attStats"></div>
+        <div class="table-wrap"><table><thead><tr><th>Employee</th><th>Check In</th><th>Check Out</th><th>Hours</th><th>Status</th><th>Actions</th></tr></thead><tbody id="attTable"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="payroll" class="page">
+      <div class="card">
+        <div class="toolbar">
+          <h2>Payroll</h2>
+          <select id="payrollPeriod"></select>
+          <button id="btnRunPayroll" class="btn primary" hidden>⚙ Run Payroll</button>
+        </div>
+        <div class="kpi-strip" id="payrollStats"></div>
+        <div class="table-wrap"><table><thead><tr><th>Employee</th><th>Base</th><th>Present</th><th>Paid Leave</th><th>Gross</th><th>Allowance</th><th>Deduction</th><th>Net</th></tr></thead><tbody id="payrollTable"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="projects" class="page">
+      <div class="card">
+        <div class="toolbar"><h2>Projects</h2><button id="btnAddProject" class="btn primary" hidden>+ New Project</button></div>
+        <div class="grid three" id="projectCards"></div>
+      </div>
+    </section>
+
+    <section id="finance" class="page">
+      <div class="grid kpis" id="financeKpis"></div>
+      <div class="card mt">
+        <div class="toolbar"><h2>Transactions</h2><button id="btnAddTx" class="btn primary" hidden>+ Record Transaction</button></div>
+        <div class="table-wrap"><table><thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Project</th><th>Type</th><th>Amount</th></tr></thead><tbody id="txTable"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="crm" class="page">
+      <div class="card">
+        <div class="toolbar"><h2>Sales Pipeline</h2><button id="btnAddLead" class="btn primary" hidden>+ Add Lead</button></div>
+        <div class="table-wrap"><table><thead><tr><th>Customer</th><th>Stage</th><th>Value</th><th>AI Score</th><th>Owner</th><th>Next Action</th><th>Actions</th></tr></thead><tbody id="crmTable"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="memos" class="page">
+      <div class="card">
+        <div class="toolbar"><h2>Internal Memos</h2><input id="memoSearch" placeholder="Search memos…"><button id="btnNewMemo" class="btn primary" hidden>+ New Memo</button></div>
+        <div class="kpi-strip" id="memoStats"></div>
+        <div class="table-wrap"><table><thead><tr><th>Ref</th><th>Subject</th><th>From</th><th>To</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead><tbody id="memoTable"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="audit" class="page">
+      <div class="card">
+        <div class="toolbar"><h2>Audit Log</h2><input id="auditSearch" placeholder="Search events…"></div>
+        <div class="table-wrap"><table><thead><tr><th>When</th><th>User</th><th>Action</th><th>Entity</th><th>Entity name</th><th>Details</th></tr></thead><tbody id="auditTable"></tbody></table></div>
+      </div>
+    </section>
+    <section id="pricing" class="page">
+      <div class="card">
+        <div class="toolbar"><h2>Plans & Pricing</h2></div>
+        <div id="pricingView"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ============ MODAL / TOAST ============ -->
+<div id="modal" class="modal" hidden></div>
+<div id="toast" class="toast"></div>
+
+<!-- Supabase JS (optional — app falls back to local mode when unconfigured/offline) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/core.js"></script>
+<script src="js/app.js"></script>
+<script>
+/* PWA install + offline support */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("sw.js").catch(function () {});
+  });
+}
+</script>
+<script>
+/* NexCompany AI — DESKTOP (Electron) integration.
+   This block only runs inside the installer app (window.nexcompanyAPI is exposed
+   by electron/preload.js). In a plain browser it is a no-op. */
+(function () {
+  if (!window.nexcompanyAPI) return;
+  document.title = "NexCompany AI — Desktop v" + (window.nexcompanyAPI.version || "");
+  var badge = document.createElement("div");
+  badge.textContent = "◆ DESKTOP APP  v" + (window.nexcompanyAPI.version || "");
+  badge.style.cssText = "position:fixed;bottom:10px;right:10px;z-index:2147483000;background:#1f6feb;color:#fff;font:600 11px/1.2 system-ui,sans-serif;padding:6px 12px;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.4);pointer-events:none;letter-spacing:.4px;";
+  document.body.appendChild(badge);
+})();
+</script>
+</body>
+</html>
