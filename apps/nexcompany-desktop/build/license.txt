@@ -1,0 +1,18 @@
+NexCompany AI — End User License Agreement
+
+Copyright (c) 2026 NexCompany. All rights reserved.
+
+This software is licensed, not sold. You are granted a non-exclusive,
+non-transferable licence to install and use this software on your own
+computer(s) for business operations.
+
+You may NOT:
+  - redistribute, resell or sublicense this software,
+  - reverse-engineer, decompile or disassemble it,
+  - remove or alter any copyright or licence notices.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM THE USE OF THIS SOFTWARE.
