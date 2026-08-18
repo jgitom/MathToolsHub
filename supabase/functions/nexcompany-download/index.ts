@@ -4,9 +4,9 @@ const allowedOrigins = new Set(["https://mathtoolshub.com", "https://www.mathtoo
 const cors = (request: Request) => ({ "access-control-allow-origin": allowedOrigins.has(request.headers.get("origin") ?? "") ? request.headers.get("origin")! : "https://mathtoolshub.com", "access-control-allow-headers": "apikey, content-type", "access-control-allow-methods": "POST, OPTIONS", "vary": "Origin" });
 const respond = (request: Request, body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...cors(request), "content-type": "application/json", "cache-control": "private, no-store" } });
 const plans = new Map([
-  [14900, { tier: "Starter", productName: "NexCompany — Starter" }],
-  [29900, { tier: "Standard", productName: "NexCompany — Standard" }],
-  [79900, { tier: "Business", productName: "NexCompany — Business" }],
+  [19900, { tier: "Starter", productName: "NexCompany — Starter" }],
+  [39900, { tier: "Standard", productName: "NexCompany — Standard" }],
+  [89900, { tier: "Business", productName: "NexCompany — Business" }],
 ]);
 // Live Payment Link URLs are stored in Supabase secrets named after each tier.
 const paymentLinkSecret = (tier: string) => `NexCompany — ${tier}`;
