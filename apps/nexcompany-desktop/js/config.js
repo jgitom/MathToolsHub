@@ -49,17 +49,17 @@ window.CONFIG = {
    by the nav gating (App.planAllows) and shown on the Plans & Pricing page. */
 window.PLANS = [
   {
-    id: "starter", name: "Starter", price: 149, tagline: "Core HR & operations",
+    id: "starter", name: "Starter", price: 199, tagline: "Core HR & operations",
     blurb: ["Employees, leave & attendance", "Projects, finance & CRM", "Company, branches & departments", "Up to 10 users"],
     features: ["company", "branches", "departments", "team", "employees", "leave", "attendance", "projects", "finance", "crm", "customers"],
   },
   {
-    id: "standard", name: "Standard", price: 299, tagline: "Full operations + payroll",
+    id: "standard", name: "Standard", price: 399, tagline: "Full operations + payroll",
     blurb: ["Everything in Starter", "Payroll & payslips", "Internal memos (email template)", "Audit log", "Up to 30 users"],
     features: ["company", "branches", "departments", "team", "employees", "leave", "attendance", "projects", "finance", "crm", "customers", "payroll", "memos", "audit"],
   },
   {
-    id: "business", name: "Business", price: 799, tagline: "Multi-company + priority",
+    id: "business", name: "Business", price: 899, tagline: "Multi-company + priority",
     blurb: ["Everything in Standard", "Unlimited companies", "Priority support & SLA", "API access & backups"],
     features: ["company", "branches", "departments", "team", "employees", "leave", "attendance", "projects", "finance", "crm", "customers", "payroll", "memos", "audit", "multi-company"],
   },
