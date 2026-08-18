@@ -26,7 +26,7 @@
         return;
       }
       const merged = FALLBACK.plans.map(fallbackPlan => {
-        const live = config.plans.find(plan => plan.edition === fallbackPlan.edition);
+        const live = config.plans.find(plan => plan.tier === fallbackPlan.edition);
         return Object.freeze({ ...fallbackPlan, checkoutUrl: live?.checkoutUrl ?? fallbackPlan.checkoutUrl });
       });
       window.MATHTOOLSHUB_NEXCOMPANY_PAYMENT = Object.freeze({ mode: "live", product: "mathtoolshub-nexcompany", plans: Object.freeze(merged) });
