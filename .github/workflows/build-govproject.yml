@@ -1,0 +1,34 @@
+name: Build GovProject PMIS desktop installer
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "govproject-v*"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: apps/govproject-pmis-desktop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/govproject-pmis-desktop/package-lock.json
+      - run: npm ci
+      - run: npm run dist:win
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: govproject-windows
+          path: apps/govproject-pmis-desktop/release/*
+          if-no-files-found: error
