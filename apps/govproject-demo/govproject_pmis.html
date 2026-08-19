@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<title>GovProject PMIS — Government Project &amp; Maintenance System</title>
+<style>
+:root{
+  --b:#2563eb;--b2:#1e40af;--n:#0b1220;--n2:#172033;--bg:#eef2f7;--c:#ffffff;--l:#e3e8ef;--m:#5b6472;
+  --r:#dc2626;--g:#16a34a;--a:#d97706;--v:#7c3aed;--t:#0891b2;
+  --sh:0 1px 2px rgba(15,23,42,.05),0 10px 30px -18px rgba(15,23,42,.18);
+  --rad:14px;--tr:.18s ease;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:#172033;font-size:14px;-webkit-font-smoothing:antialiased}
+.app{display:grid;grid-template-columns:264px 1fr;min-height:100vh}
+
+/* ---------- Sidebar ---------- */
+.side{background:linear-gradient(180deg,#0d1428 0%,#0b1220 60%,#0e1a33 100%);color:#e5eaf5;padding:20px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:6px;border-right:1px solid #1c2942}
+.brand{font-size:18px;font-weight:800;letter-spacing:.2px;display:flex;align-items:center;gap:11px;padding:4px 8px 20px}
+.brand .logo{width:36px;height:36px;flex:0 0 auto;border-radius:11px;background:linear-gradient(135deg,#2563eb,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 8px 18px -8px #2563ebcc}
+.brand small{display:block;font-size:10.5px;color:#8ea0c0;margin-top:2px;font-weight:500}
+nav{display:flex;flex-direction:column;gap:2px}
+nav button{display:flex;align-items:center;gap:11px;width:100%;padding:10px 12px;border:0;border-radius:10px;background:transparent;color:#9fb0cc;text-align:left;cursor:pointer;font-size:13.5px;font-weight:600;transition:var(--tr);font-family:inherit}
+nav button .ic{width:18px;text-align:center;font-size:15px}
+nav button:hover{background:#ffffff10;color:#fff}
+nav button.active{background:linear-gradient(90deg,#2563eb,#3b82f6);color:#fff;box-shadow:0 6px 18px -8px #2563ebcc}
+.side .sfoot{margin-top:auto;padding:10px 12px;font-size:11px;color:#6b7fa3;border-top:1px solid #1c2942;line-height:1.5}
+#sideNote{white-space:pre-line}
+.side .sfoot label{color:#8ea0c0;font-size:11px;font-weight:700;display:block;margin-bottom:3px;margin-top:10px}
+.side .sfoot select{width:100%;background:#1c2942;color:#e5eaf5;border:1px solid #2a3b5c;border-radius:8px;padding:7px 10px;font-size:12.5px;cursor:pointer}
+.dbstatus{font-size:10.5px;color:#6b7fa3;margin-top:10px;display:flex;align-items:center;gap:6px;min-height:16px}
+.side .sfoot .bcred{margin-top:8px;font-size:10.5px;color:#8ea0c0;font-weight:600}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:0 0 auto}
+.dot.ok{background:#22c55e;box-shadow:0 0 6px #22c55e99}
+.dot.legacy{background:#d97706}
+.demo-banner{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:linear-gradient(90deg,#fef3c7,#fde68a);border:1px solid #f59e0b;color:#78350f;border-radius:12px;padding:10px 14px;margin-bottom:16px;font-size:13px;font-weight:600}
+.demo-banner[hidden]{display:none}
+.demo-note{font-weight:400;color:#92400e;font-size:12.5px;flex:1;min-width:180px}
+.loader{position:fixed;inset:0;background:#eef2f7;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:999;color:#334155;font-weight:600;font-size:14px}
+.loader.hide{display:none}
+.spinner{width:38px;height:38px;border:4px solid #dbe4f0;border-top-color:#2563eb;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- Main ---------- */
+.main{padding:24px 28px;max-width:1440px;width:100%}
+.top{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:4px}
+.top h1{margin:0;font-size:24px;letter-spacing:-.3px}
+.sub{font-size:12.5px;color:var(--m)}
+.section{display:none;animation:fade .25s ease}
+.section.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ---------- Layout ---------- */
+.grid{display:grid;gap:16px}
+.two{grid-template-columns:1.4fr 1fr}
+.three{grid-template-columns:repeat(3,1fr)}
+.disc{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.card{background:var(--c);border:1px solid var(--l);border-radius:var(--rad);padding:18px;box-shadow:var(--sh)}
+.card h3{margin:0 0 12px;font-size:15px;letter-spacing:-.2px}
+.kpis{margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
+.stat{position:relative;overflow:hidden}
+.stat .tic{position:absolute;right:-12px;bottom:-12px;font-size:60px;opacity:.07;pointer-events:none}
+.stat span{font-size:12px;color:var(--m);font-weight:600}
+.stat b{font-size:26px;display:block;margin-top:6px;letter-spacing:-.5px}
+.stat .trend{font-size:11.5px;font-weight:700;margin-top:5px;color:var(--b)}
+
+/* ---------- Buttons ---------- */
+.btn{border:0;border-radius:9px;padding:9px 14px;cursor:pointer;font-size:13px;font-weight:600;transition:var(--tr);font-family:inherit;white-space:nowrap}
+.btn:hover{filter:brightness(1.05);transform:translateY(-1px)}
+.btn:active{transform:none}
+.primary{background:var(--b);color:#fff;box-shadow:0 6px 16px -8px #2563ebcc}
+.light{background:#eef2ff;color:#1e3a8a}
+.ok{background:#dcfce7;color:#166534}
+.warn{background:#fef3c7;color:#92400e}
+.danger{background:#fee2e2;color:#991b1b}
+.ghost{background:#fff;border:1px solid var(--l);color:#334155}
+.btn.sm{padding:6px 10px;font-size:12px}
+.icon-btn{background:#fff;border:1px solid var(--l);border-radius:8px;padding:5px 9px;cursor:pointer;font-size:12px;transition:var(--tr);line-height:1}
+.icon-btn:hover{border-color:var(--b);color:var(--b);box-shadow:0 0 0 3px #2563eb1a}
+
+/* ---------- Toolbar / forms ---------- */
+.toolbar{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.grp{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--l);border-radius:9px;background:#fff;font-size:13px;font-family:inherit;color:#172033;transition:var(--tr)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--b);box-shadow:0 0 0 3px #2563eb22}
+textarea{min-height:70px;resize:vertical}
+.search{min-width:240px}
+select{cursor:pointer}
+label{display:block;font-size:12px;font-weight:700;margin-bottom:5px;color:#334155}
+.hint{font-size:11px;color:var(--m);margin-top:3px}
+
+/* ---------- Tables ---------- */
+.tblwrap{overflow:auto;border:1px solid var(--l);border-radius:12px;background:#fff}
+table{width:100%;border-collapse:collapse}
+th,td{padding:11px 12px;border-bottom:1px solid var(--l);text-align:left;font-size:13px;vertical-align:middle}
+th{font-size:11px;color:var(--m);text-transform:uppercase;letter-spacing:.4px;background:#f8fafc;position:sticky;top:0;z-index:1}
+tbody tr{transition:var(--tr)}
+tbody tr:hover{background:#f8faff}
+tbody tr:last-child td{border-bottom:0}
+.actions{display:flex;gap:6px;justify-content:flex-end;align-items:center}
+
+/* ---------- Badges ---------- */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}
+.badge:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.green{background:#dcfce7;color:#15803d}.amber{background:#fef3c7;color:#b45309}.red{background:#fee2e2;color:#b91c1c}
+.blue{background:#dbeafe;color:#1d4ed8}.gray{background:#e5e7eb;color:#4b5563}.violet{background:#ede9fe;color:#6d28d9}
+.cyan{background:#cffafe;color:#0e7490}.pink{background:#fce7f3;color:#be185d}
+
+/* ---------- Progress ---------- */
+.progress{height:8px;background:#e5e7eb;border-radius:99px;overflow:hidden}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,#2563eb,#3b82f6);border-radius:99px}
+.mini{display:flex;gap:8px;align-items:center}.mini .progress{flex:1}
+.chart-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #f1f5f9}
+.chart-row:last-child{border:0}
+.chart-lab{width:34%;font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track{flex:1;height:18px;background:#f1f5f9;border-radius:6px;position:relative;overflow:hidden}
+.track .phys{position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,#2563eb,#3b82f6)}
+.track .fin{position:absolute;left:0;bottom:0;height:5px;background:#a855f7}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--m);margin-top:10px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+/* ---------- Alerts / activity ---------- */
+.alert{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;background:#fef2f2;border:1px solid #fecaca;margin-bottom:8px;font-size:13px}
+.alert.amb{background:#fffbeb;border-color:#fde68a}
+.alert b{display:block;font-size:12px;margin-bottom:2px}
+.act{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:12.5px;align-items:flex-start}
+.act:last-child{border:0}
+.act .meta{color:var(--m);font-size:11px;margin-top:2px}
+
+/* ---------- Gantt ---------- */
+.gantt th.m{min-width:54px;text-align:center;font-size:10px;padding:6px 2px;line-height:1.4}
+.gbar{position:relative;height:34px;background:repeating-linear-gradient(90deg,#fff 0 53px,#f8fafc 53px 54px);border-radius:8px}
+.gbar i{position:absolute;top:7px;height:20px;border-radius:6px;background:linear-gradient(90deg,#3b82f6,#60a5fa);box-shadow:0 2px 6px -2px #3b82f680}
+.gbar i em{position:absolute;left:0;top:0;height:100%;background:#1d4ed8;border-radius:6px}
+
+/* ---------- CPM Schedule ---------- */
+.cpmstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+.cpmstats .cstat{background:#fff;border:1px solid var(--l);border-radius:12px;padding:12px 14px}
+.cpmstats .cstat span{font-size:10.5px;color:var(--m);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.cpmstats .cstat b{display:block;font-size:18px;margin-top:3px}
+.cstat.cr{border-color:#fecaca;background:#fef2f2}
+.cstat.cr b{color:#dc2626}
+.cstat.blue b{color:#2563eb}
+table.cpmtable td{font-size:12px}
+table.cpmtable td.b{font-weight:700}
+table.cpmtable tr.sum td{background:#f8fafc;color:#64748b}
+table.cpmtable td.cr{color:#dc2626}
+.cbadge{display:inline-block;font-size:10px;font-weight:800;border-radius:999px;padding:2px 8px;background:#fecaca;color:#dc2626;white-space:nowrap}
+.cbadge.no{background:#eef2ff;color:#4f46e5}
+.gbar i.cr{background:linear-gradient(90deg,#dc2626,#f87171);box-shadow:0 2px 6px -2px #dc262680}
+.gbar i.cr em{background:#b91c1c}
+.gbar i .dia{position:absolute;top:2px;left:-5px;width:16px;height:16px;background:#dc2626;transform:rotate(45deg);border-radius:2px;border:2px solid #fff;box-shadow:0 1px 3px #0003}
+.gbar i .dia.blue{background:#2563eb}
+
+/* ---------- QAQC / RCI ---------- */
+.chip{display:inline-block;font-size:10.5px;font-weight:800;border-radius:6px;padding:2px 7px;letter-spacing:.3px;background:#eef2ff;color:#4f46e5;white-space:nowrap}
+.chip.nc{background:#fef2f2;color:#dc2626}
+.chip.warn{background:#fffbeb;color:#b45309}
+.chip.ok{background:#ecfdf5;color:#059669}
+
+/* ---------- Toasts ---------- */
+.toast{position:fixed;bottom:20px;right:20px;z-index:300;background:#0f172a;color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:0 16px 40px -12px #0f172a99;opacity:0;transform:translateY(10px);transition:.25s;max-width:340px}
+.toast.show{opacity:1;transform:none}
+.toast.ok{border-left:4px solid #22c55e}.toast.err{border-left:4px solid #ef4444}.toast.info{border-left:4px solid #3b82f6}
+
+/* ---------- Dialogs ---------- */
+dialog{border:0;border-radius:16px;padding:0;width:min(720px,calc(100% - 28px));box-shadow:0 40px 90px -20px #0f172a99;overflow:hidden}
+dialog::backdrop{background:#0b1220b3;backdrop-filter:blur(3px)}
+.head{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:linear-gradient(90deg,#f8fafc,#eef2ff);border-bottom:1px solid var(--l)}
+.head b{font-size:15px}
+.body{padding:20px;max-height:64vh;overflow:auto}
+.foot{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--l);background:#fafbfc}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.full{grid-column:1/-1}
+
+/* ---------- Misc ---------- */
+.burger{display:none;background:#fff;border:1px solid var(--l);border-radius:9px;padding:8px 11px;cursor:pointer;font-size:16px;line-height:1}
+.overlay{position:fixed;inset:0;background:#0b122066;z-index:90;display:none}
+.empty{padding:26px;text-align:center;color:var(--m);font-size:13px}
+.pill{font-size:11px;font-weight:700;color:#1e40af;background:#dbeafe;border-radius:999px;padding:4px 10px;white-space:nowrap}
+.costrow{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:12.5px}
+.costrow:last-child{border:0}
+.pmcard{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid var(--l);border-radius:10px;margin-bottom:8px;font-size:13px}
+.pmcard .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;flex:0 0 auto}
+
+@media(max-width:1080px){
+  .app{grid-template-columns:1fr}
+  .side{position:fixed;left:0;top:0;bottom:0;width:268px;z-index:120;transform:translateX(-100%);transition:var(--tr)}
+  .side.open{transform:none;box-shadow:0 0 60px #0006}
+  .burger{display:inline-flex}
+  .overlay.show{display:block}
+  .two,.three{grid-template-columns:1fr 1fr}
+  .main{padding:18px}
+}
+@media(max-width:720px){
+  .two,.three,.form{grid-template-columns:1fr}
+  .kpis{grid-template-columns:1fr 1fr}
+  .full{grid-column:auto}
+  .search{min-width:100%}
+  .main{padding:14px}
+}
+</style>
+</head>
+<body><div id="govDemoBar" style="position:sticky;top:0;z-index:9999;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;background:#4f46e5;color:#fff;padding:10px 16px;font:600 13px Inter,&quot;Segoe UI&quot;,Arial,sans-serif;box-shadow:0 2px 12px rgba(15,23,42,.25)"><span>&#x1F9EA; Live demo &mdash; data is stored only in this browser.</span><a href="../govproject-download.html" style="color:#fff;font-weight:800;text-decoration:underline">Get the desktop app &rarr;</a></div>
+<div id="loader" class="loader"><div class="spinner"></div><div data-i18n="loading">Loading database…</div></div>
+<div class="overlay" id="overlay" onclick="closeSide()"></div>
+<div class="app">
+<aside class="side" id="side">
+  <div class="brand"><span class="logo">🏛️</span><span>GovProject PMIS<small>Government Project &amp; Maintenance System</small></span></div>
+  <nav>
+    <button class="active" data-v="dashboard"><span class="ic">📊</span><span data-i18n="nav_dashboard">Dashboard</span></button>
+    <button data-v="projects"><span class="ic">🏗️</span><span data-i18n="nav_projects">Projects</span></button>
+    <button data-v="blocks"><span class="ic">🏢</span><span data-i18n="nav_blocks">Blocks / Buildings</span></button>
+    <button data-v="timeline"><span class="ic">📅</span><span data-i18n="nav_timeline">Timeline / Gantt</span></button>
+    <button data-v="cpm"><span class="ic">🔗</span><span data-i18n="nav_cpm">CPM Schedule</span></button>
+    <button data-v="milestones"><span class="ic">🎯</span><span data-i18n="nav_milestones">Milestones</span></button>
+    <button data-v="disciplines"><span class="ic">🧩</span><span data-i18n="nav_disciplines">Disciplines</span></button>
+    <button data-v="maintenance"><span class="ic">🛠️</span><span data-i18n="nav_maintenance">Maintenance</span></button>
+    <button data-v="issues"><span class="ic">⚠️</span><span data-i18n="nav_issues">Issues &amp; Risks</span></button>
+    <button data-v="qaqc"><span class="ic">🧪</span><span data-i18n="nav_qaqc">QAQC / RCI</span></button>
+    <button data-v="contracts"><span class="ic">📑</span><span data-i18n="nav_contracts">Contract &amp; Cost</span></button>
+    <button data-v="parties"><span class="ic">👥</span><span data-i18n="nav_parties">Parties</span></button>
+    <button data-v="documents"><span class="ic">📂</span><span data-i18n="nav_documents">Documents</span></button>
+    <button data-v="reports"><span class="ic">📄</span><span data-i18n="nav_reports">Reports</span></button>
+  </nav>
+  <div class="sfoot">
+    <div id="sideNote" data-i18n="sideNote">Data is stored in your browser database (IndexedDB).
+Use Reports → Backup to save a copy.</div>
+    <div id="dbStatus" class="dbstatus"></div>
+    <div class="bcred" data-i18n="builder">Builder: Juil Gitom</div>
+    <label for="langSel" data-i18n="language">Language</label>
+    <select id="langSel" onchange="setLang(this.value)"></select>
+  </div>
+</aside>
+
+<main class="main">
+<div class="top">
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="burger" onclick="toggleSide()">☰</button>
+    <div><h1 id="title">Dashboard</h1><div class="sub" id="date"></div></div>
+  </div>
+  <div class="grp"><button class="btn primary" onclick="openProject()" data-i18n="newProject">+ New Project</button></div>
+</div>
+
+<div id="demoBanner" class="demo-banner" hidden>
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%">
+    <b>🧪 <span data-i18n="demo_mode">Demo Mode</span></b>
+    <span class="demo-note" data-i18n="demo_note">Exploring sample data — changes are kept separate and won't affect your real data.</span>
+    <button class="btn light sm" onclick="exitDemo()" data-i18n="demo_exit">Exit Demo</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="section active">
+  <div class="kpis">
+    <div class="card stat"><span class="tic">🏗️</span><span data-i18n="kpi_active">Active Projects</span><b id="st1">0</b><div class="trend" id="tr1"></div></div>
+    <div class="card stat"><span class="tic">💰</span><span data-i18n="kpi_value">Total Contract Value</span><b id="st2">RM0</b><div class="trend" id="tr2"></div></div>
+    <div class="card stat"><span class="tic">📈</span><span data-i18n="kpi_avg">Avg. Physical Progress</span><b id="st3">0%</b><div class="trend" id="tr3"></div></div>
+    <div class="card stat"><span class="tic">⚠️</span><span data-i18n="kpi_issues">Open Issues</span><b id="st4">0</b><div class="trend" id="tr4"></div></div>
+    <div class="card stat"><span class="tic">🛠️</span><span data-i18n="kpi_maint">Open Maintenance</span><b id="st5">0</b><div class="trend" id="tr5"></div></div>
+    <div class="card stat"><span class="tic">✅</span><span data-i18n="kpi_done">Completed</span><b id="st6">0</b><div class="trend" id="tr6"></div></div>
+  </div>
+  <div class="grid two" style="margin-top:16px">
+    <div class="card"><h3 data-i18n="dash_portfolio">Project Portfolio — Status</h3><div id="portfolio"></div></div>
+    <div class="card"><h3 data-i18n="dash_alerts">Critical Alerts</h3><div id="alerts"></div></div>
+  </div>
+  <div class="grid two" style="margin-top:16px">
+    <div class="card"><h3 data-i18n="dash_progress">Physical vs Financial Progress</h3><div id="progressChart"></div><div class="legend"><span><i style="background:#2563eb"></i><span data-i18n="physical">Physical</span></span><span><i style="background:#a855f7"></i><span data-i18n="financial">Financial</span></span></div></div>
+    <div class="card"><h3 data-i18n="dash_activity">Recent Activity</h3><div id="activity"></div></div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects" class="section">
+  <div class="card">
+    <div class="toolbar">
+      <div class="grp">
+        <input id="pq" class="search" data-i18n-ph="search_project" placeholder="Search project..." oninput="renderProjects()">
+        <select id="pStatusFilter" data-options="pStatusFilter" data-all="allStatus" onchange="renderProjects()"><option value="">All Status</option><option>Planning</option><option>Active</option><option>Delayed</option><option>Completed</option><option>Defects Liability</option></select>
+        <select id="pTypeFilter" data-options="pTypeFilter" data-all="allTypes" onchange="renderProjects()"><option value="">All Types</option><option>New Building</option><option>Extension / Upgrade</option><option>Infrastructure</option><option>Maintenance</option><option>Renovation</option></select>
+      </div>
+      <div class="grp"><button class="btn primary" onclick="openProject()" data-i18n="newProject">+ New Project</button></div>
+    </div>
+    <div class="tblwrap"><table><thead><tr><th data-i18n="th_project">Project</th><th data-i18n="th_agency">Agency</th><th data-i18n="th_type">Type</th><th data-i18n="th_location">Location</th><th data-i18n="th_value">Value</th><th data-i18n="th_progress">Progress</th><th data-i18n="th_status">Status</th><th data-i18n="th_actions" style="text-align:right">Actions</th></tr></thead><tbody id="projectRows"></tbody></table></div>
+  </div>
+</section>
+
+<!-- BLOCKS / BUILDINGS -->
+<section id="blocks" class="section">
+  <div class="card">
+    <div class="toolbar">
+      <div class="grp"><select id="bkProject" onchange="renderBlocks()"></select><select id="bkStatus" data-options="pStatusFilter" data-all="allStatus" onchange="renderBlocks()"><option value="">All Status</option><option>Planning</option><option>Active</option><option>Delayed</option><option>Completed</option><option>Defects Liability</option></select></div>
+      <div class="grp"><button class="btn primary" onclick="openBlock()" data-i18n="newBlock">+ Block / Building</button></div>
+    </div>
+    <div class="tblwrap"><table><thead><tr><th data-i18n="th_project">Project</th><th data-i18n="th_block">Block / Building</th><th data-i18n="th_type">Type</th><th data-i18n="th_progress">Progress</th><th data-i18n="th_status">Status</th><th data-i18n="th_cost">Cost</th><th data-i18n="th_actions" style="text-align:right">Actions</th></tr></thead><tbody id="blockRows"></tbody></table></div>
+  </div>
+</section>
+
+<!-- TIMELINE / GANTT -->
+<section id="timeline" class="section">
+  <div class="card">
+    <h3 data-i18n="tl_title">Project Schedule (Gantt)</h3>
+    <div class="sub" data-i18n="tl_hint" style="margin-bottom:12px">Set a Start and End date on each project to visualise its schedule. The blue bar shows duration; the darker fill shows physical progress.</div>
+    <div class="tblwrap"><table class="gantt" id="ganttTable"></table></div>
+  </div>
+</section>
+
+<!-- CPM SCHEDULE -->
+<section id="cpm" class="section">
+  <div class="card">
+    <div class="toolbar">
+      <div class="grp"><select id="cpmProject" onchange="renderCPM()"></select></div>
+      <div class="grp"><button class="btn primary" onclick="openMspImport()" data-i18n="msp_import">Import MS Project</button><button class="btn danger" onclick="clearCPM()" data-i18n="msp_clear">Clear Schedule</button></div>
+    </div>
+    <div class="sub" style="margin-bottom:12px" data-i18n="cpm_hint">Import a Microsoft Project file (XML or CSV) with task dependencies. The critical path is computed automatically using the Critical Path Method (CPM).</div>
+    <div id="cpmSummary" class="cpmstats"></div>
+    <div class="tblwrap"><table class="cpmtable"><thead><tr>
+      <th data-i18n="th_id">ID</th><th data-i18n="th_task">Task</th><th data-i18n="th_dur">Duration</th><th data-i18n="th_start">Start</th><th data-i18n="th_finish">Finish</th><th data-i18n="th_pred">Predecessors</th><th data-i18n="th_es">ES</th><th data-i18n="th_ef">EF</th><th data-i18n="th_ls">LS</th><th data-i18n="th_lf">LF</th><th data-i18n="th_float">Float</th><th data-i18n="th_cr">Critical</th>
+    </tr></thead><tbody id="cpmRows"></tbody></table></div>
+    <div style="margin-top:16px">
+      <div class="sub" style="margin-bottom:6px" data-i18n="cpm_gantt_hint">Critical path tasks are shown in red; milestones are diamonds.</div>
+      <div class="tblwrap"><table class="gantt" id="cpmGantt"></table></div>
+    </div>
+  </div>
+</section>
+
+<!-- MILESTONES -->
+<section id="milestones" class="section">
+  <div class="card">
+    <div class="toolbar">
+      <div class="grp"><select id="msProject" onchange="renderMilestones()"></select><select id="msStatus" data-options="msStatus" data-all="allStatus" onchange="renderMilestones()"><option value="">All Status</option><option>Pending</option><option>In Progress</option><option>Completed</option></select></div>
+      <div class="grp"><span class="pill" id="msOverdue">0 overdue</span><button class="btn primary" onclick="openMilestone()" data-i18n="newMilestone">+ Milestone</button></div>
+    </div>
+    <div class="tblwrap"><table><thead><tr><th data-i18n="th_project">Project</th><th data-i18n="th_milestone">Milestone</th><th data-i18n="th_due">Due Date</th><th data-i18n="th_status">Status</th><th data-i18n="th_actions" style="text-align:right">Actions</th></tr></thead><tbody id="milestoneRows"></tbody></table></div>
+  </div>
+</section>
+
+<!-- DISCIPLINES -->
+<section id="disciplines" class="section">
+  <div class="toolbar"><div class="grp"><span class="sub" style="font-weight:600" data-i18n="disc_label">View discipline workload for:</span><select id="dp" onchange="renderDisc()"></select></div></div>
+  <div id="discGrid" class="grid disc"></div>
+</section>
+
+<!-- MAINTENANCE -->
+<section id="maintenance" class="section">
+  <div class="card">
+    <div class="toolbar">
+      <div class="grp">
+        <select id="mf" data-options="mf" data-all="allStatus" onchange="renderMaint()"><option value="">All Status</option><option>Open</option><option>In Progress</option><option>Completed</option></select>
+        <select id="mCatFilter" data-options="mCatFilter" data-all="allCategories" onchange="renderMaint()"><option value="">All Categories</option><option>Electrical</option><option>Mechanical</option><option>Civil</option><option>Structural</option><option>Architectural</option><option>ICT</option><option>Plumbing</option><option>Fire System</option><option>General</option></select>
+      </div>
+      <div class="grp"><button class="btn primary" onclick="openMaint()" data-i18n="newMaint">+ Maintenance Request</button></div>
+    </div>
+    <div class="tblwrap"><table><thead><tr><th data-i18n="th_asset">Building / Asset</th><th data-i18n="th_category">Category</th><th data-i18n="th_description">Description</th><th data-i18n="th_priority">Priority</th><th data-i18n="th_status">Status</th><th data-i18n="th_cost">Cost</th><th data-i18n="th_actions" style="text-align:right">Actions</th></tr></thead><tbody id="maintRows"></tbody></table></div>
+  </div>
+</section>
+
+<!-- ISSUES & RISKS -->
+<section id="issues" class="section">
+  <div class="card">
+    <div class="toolbar">
+      <div class="grp">
+        <input id="iq" class="search" data-i18n-ph="search_issue" placeholder="Search issue..." oninput="renderIssues()">
+        <select id="iStatusFilter" data-options="iStatusFilter" data-all="allStatus" onchange="renderIssues()"><option value="">All Status</option><option>Open</option><option>In Progress</option><option>Closed</option></select>
+      </div>
+      <div class="grp"><button class="btn primary" onclick="openIssue()" data-i18n="newIssue">+ Issue / Risk</button></div>
+    </div>
+    <div class="tblwrap"><table><thead><tr><th data-i18n="th_project">Project</th><th data-i18n="th_discipline">Discipline</th><th data-i18n="th_issue">Issue</th><th data-i18n="th_severity">Severity</th><th data-i18n="th_owner">Owner</th><th data-i18n="th_status">Status</th><th data-i18n="th_actions" style="text-align:right">Actions</th></tr></thead><tbody id="issueRows"></tbody></table></div>
+  </div>
+</section>
+
+<!-- QAQC / RCI -->
+<section id="qaqc" class="section">
+  <div class="card">
+    <div class="toolbar">
+      <div class="grp">
+        <select id="qProject" onchange="renderQAQC()"></select>
+        <select id="qTypeFilter" data-options="qTypeFilter" data-all="allTypes" onchange="renderQAQC()"><option value="">All Types</option><option>RCI</option><option>NCP</option><option>NCR</option><option>RIN</option><option>MIR</option><option>ITP</option><option>RFI</option></select>
+        <select id="qStatusFilter" data-options="qStatusFilter" data-all="allStatus" onchange="renderQAQC()"><option value="">All Status</option><option>Open</option><option>In Progress</option><option>Answered</option><option>Closed</option></select>
+      </div>
+      <div class="grp"><span class="pill" id="qaqcMeta">0 open</span><button class="btn primary" onclick="openQAQC()" data-i18n="newQAQC">+ QAQC / RCI</button></div>
+    </div>
+    <div class="tblwrap"><table><thead><tr><th data-i18n="th_ref">Ref No.</th><th data-i18n="th_type">Type</th><th data-i18n="th_description">Description</th><th data-i18n="th_project">Project</th><th data-i18n="th_discipline">Discipline</th><th data-i18n="th_severity">Severity</th><th data-i18n="th_raised">Raised</th><th data-i18n="th_due">Due Date</th><th data-i18n="th_status">Status</th><th data-i18n="th_actions" style="text-align:right">Actions</th></tr></thead><tbody id="qaqcRows"></tbody></table></div>
+  </div>
+</section>
+
+<!-- CONTRACT & COST -->
+<section id="contracts" class="section">
+  <div class="grid three" style="margin-bottom:16px">
+    <div class="card stat"><span class="tic">📑</span><span data-i18n="c_total">Total Contract</span><b id="cTotal">RM0</b><div class="trend" id="ct1"></div></div>
+    <div class="card stat"><span class="tic">💸</span><span data-i18n="c_paid">Certified / Paid</span><b id="cPaid">RM0</b><div class="trend" id="ct2"></div></div>
+    <div class="card stat"><span class="tic">🧾</span><span data-i18n="c_balance">Balance</span><b id="cBal">RM0</b><div class="trend" id="ct3"></div></div>
+  </div>
+  <div class="grid two">
+    <div class="card"><h3 data-i18n="contract_summary">Contract Summary</h3><div id="contractSummary"></div></div>
+    <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h3 style="margin:0" data-i18n="cost_ledger">Cost Ledger</h3><button class="btn light sm" onclick="openLedger()" data-i18n="newEntry">+ Entry</button></div><div id="ledgerList"></div></div>
+  </div>
+</section>
+
+<!-- PARTIES -->
+<section id="parties" class="section">
+  <div class="card">
+    <div class="toolbar">
+      <div class="grp"><input id="partyQ" class="search" data-i18n-ph="search_party" placeholder="Search party..." oninput="renderParties()"></div>
+      <div class="grp"><button class="btn primary" onclick="openParty()" data-i18n="newParty">+ Party</button></div>
+    </div>
+    <div class="tblwrap"><table><thead><tr><th data-i18n="th_project">Project</th><th data-i18n="th_role">Role</th><th data-i18n="th_org">Organisation</th><th data-i18n="th_contact">Contact</th><th data-i18n="th_actions" style="text-align:right">Actions</th></tr></thead><tbody id="partyRows"></tbody></table></div>
+  </div>
+</section>
+
+<!-- DOCUMENTS -->
+<section id="documents" class="section">
+  <div class="card">
+    <div class="toolbar">
+      <div class="grp">
+        <input id="docQ" class="search" data-i18n-ph="search_doc" placeholder="Search document..." oninput="renderDocs()">
+        <select id="docCatFilter" data-options="docCatFilter" data-all="allCategories" onchange="renderDocs()"><option value="">All Categories</option><option>Contract Documents</option><option>Technical Submissions</option><option>Site Records</option><option>Financial</option><option>Handover</option><option>Maintenance</option></select>
+      </div>
+      <div class="grp"><button class="btn primary" onclick="openDoc()" data-i18n="newDoc">+ Document</button></div>
+    </div>
+    <div class="tblwrap"><table><thead><tr><th data-i18n="th_project">Project</th><th data-i18n="th_category">Category</th><th data-i18n="th_document">Document</th><th data-i18n="th_ref">Ref No.</th><th data-i18n="th_status">Status</th><th data-i18n="th_file">File</th><th data-i18n="th_actions" style="text-align:right">Actions</th></tr></thead><tbody id="docRows"></tbody></table></div>
+  </div>
+</section>
+
+<!-- REPORTS -->
+<section id="reports" class="section">
+  <div class="grid disc">
+    <div class="card"><h3 data-i18n="rpt_title">📄 Executive Report</h3><p class="sub" data-i18n="rpt_desc">Print or save as PDF — portfolio, issues &amp; maintenance summary.</p><button class="btn primary" onclick="printReport()" data-i18n="printPdf">Print / Save PDF</button></div>
+    <div class="card"><h3 data-i18n="csv_title">📊 CSV Export</h3><p class="sub" data-i18n="csv_desc">Download data as spreadsheets (Excel-ready).</p><div class="grp" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn light sm" onclick="exportCSV('projects')" data-i18n="csv_projects">Projects</button><button class="btn light sm" onclick="exportCSV('blocks')" data-i18n="csv_blocks">Blocks</button><button class="btn light sm" onclick="exportCSV('issues')" data-i18n="csv_issues">Issues</button><button class="btn light sm" onclick="exportCSV('maint')" data-i18n="csv_maint">Maintenance</button><button class="btn light sm" onclick="exportCSV('qaqc')" data-i18n="csv_qaqc">QAQC</button></div></div>
+    <div class="card"><h3 data-i18n="bak_title">💾 Backup &amp; Restore</h3><p class="sub" data-i18n="bak_desc">Full JSON backup, import or reset to demo data.</p><div class="grp" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn light sm" onclick="backup()" data-i18n="bak_dl">Download Backup</button><button class="btn warn sm" onclick="openImport()" data-i18n="bak_import">Import Backup</button><button class="btn danger sm" onclick="resetData()" data-i18n="bak_reset">Reset to Demo</button></div></div>
+    <div class="card"><h3>🧪 <span data-i18n="demo_mode">Demo Mode</span></h3><p class="sub" data-i18n="demo_desc">Explore the system with sample data. Your real data stays untouched.</p><div class="grp" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn warn sm" onclick="enterDemo()" data-i18n="demo_enter">Enter Demo Mode</button><button class="btn light sm" onclick="exitDemo()" data-i18n="demo_exit">Exit Demo</button></div></div>
+  </div>
+</section>
+</main>
+</div>
+
+<!-- ===================== DIALOGS ===================== -->
+<dialog id="projectDlg"><form method="dialog" onsubmit="saveProject(event)">
+  <div class="head"><b data-i18n="dlg_project">Project Details</b><button type="button" class="icon-btn" onclick="projectDlg.close()">✕</button></div>
+  <div class="body"><input type="hidden" id="oldId"><div class="form">
+    <div><label data-i18n="lbl_id">Project ID *</label><input id="pId" required data-i18n-ph="ph_project_id" placeholder="GOV-2026-001"></div>
+    <div><label data-i18n="lbl_name">Project Name *</label><input id="pName" required data-i18n-ph="ph_project_name" placeholder="e.g. Community Hall Upgrade"></div>
+    <div><label data-i18n="lbl_agency">Agency / Ministry</label><input id="pAgency" required></div>
+    <div><label data-i18n="lbl_type">Type</label><select id="pType" data-options="pType"><option>New Building</option><option>Extension / Upgrade</option><option>Infrastructure</option><option>Maintenance</option><option>Renovation</option></select></div>
+    <div><label data-i18n="lbl_loc">Location</label><input id="pLoc" required></div>
+    <div><label data-i18n="lbl_contractor">Contractor</label><input id="pContractor"></div>
+    <div><label data-i18n="lbl_value">Contract Value (RM)</label><input id="pVal" type="number" min="0" placeholder="0"></div>
+    <div><label data-i18n="lbl_phys">Physical Progress (%)</label><input id="pProg" type="number" min="0" max="100" value="0"></div>
+    <div><label data-i18n="lbl_fin">Financial Progress (%)</label><input id="pFin" type="number" min="0" max="100" value="0"></div>
+    <div><label data-i18n="lbl_status">Status</label><select id="pStatus" data-options="pStatus"><option>Planning</option><option>Active</option><option>Delayed</option><option>Completed</option><option>Defects Liability</option></select></div>
+    <div><label data-i18n="lbl_start">Start Date</label><input id="pStart" type="date"></div>
+    <div><label data-i18n="lbl_end">End Date</label><input id="pEnd" type="date"></div>
+    <div><label data-i18n="lbl_pm">Project Manager</label><input id="pPM"></div>
+    <div class="full"><label data-i18n="lbl_desc">Description / Scope</label><textarea id="pDesc"></textarea></div>
+  </div></div>
+  <div class="foot"><button type="button" class="btn ghost" onclick="projectDlg.close()" data-i18n="cancel">Cancel</button><button class="btn primary" data-i18n="save_project">Save Project</button></div>
+</form></dialog>
+
+<dialog id="blockDlg"><form method="dialog" onsubmit="saveBlock(event)">
+  <div class="head"><b data-i18n="dlg_block">Block / Building Details</b><button type="button" class="icon-btn" onclick="blockDlg.close()">✕</button></div>
+  <div class="body"><input type="hidden" id="bkId"><div class="form">
+    <div class="full"><label data-i18n="lbl_project">Project</label><select id="bkProjectSel"></select></div>
+    <div class="full"><label data-i18n="lbl_block_name">Block / Building Name *</label><input id="bkName" required data-i18n-ph="ph_block_name" placeholder="e.g. Block A — Lecture Block"></div>
+    <div><label data-i18n="lbl_type">Type</label><select id="bkType" data-options="pType"><option>New Building</option><option>Extension / Upgrade</option><option>Infrastructure</option><option>Maintenance</option><option>Renovation</option></select></div>
+    <div><label data-i18n="lbl_block_progress">Progress (%)</label><input id="bkProg" type="number" min="0" max="100" value="0"></div>
+    <div><label data-i18n="lbl_status">Status</label><select id="bkStatusSel" data-options="pStatus"><option>Planning</option><option>Active</option><option>Delayed</option><option>Completed</option><option>Defects Liability</option></select></div>
+    <div><label data-i18n="lbl_cost">Estimated Cost (RM)</label><input id="bkCost" type="number" min="0" value="0"></div>
+  </div></div>
+  <div class="foot"><button type="button" class="btn ghost" onclick="blockDlg.close()" data-i18n="cancel">Cancel</button><button class="btn primary" data-i18n="save">Save</button></div>
+</form></dialog>
+
+<dialog id="issueDlg"><form method="dialog" onsubmit="saveIssue(event)">
+  <div class="head"><b data-i18n="dlg_issue">Issue / Risk</b><button type="button" class="icon-btn" onclick="issueDlg.close()">✕</button></div>
+  <div class="body"><input type="hidden" id="iId"><div class="form">
+    <div><label data-i18n="lbl_project">Project</label><select id="iProject"></select></div>
+    <div><label data-i18n="lbl_disc">Discipline</label><select id="iDisc"></select></div>
+    <div class="full"><label data-i18n="lbl_desc_req">Description *</label><textarea id="iDesc" required></textarea></div>
+    <div><label data-i18n="lbl_sev">Severity</label><select id="iSev" data-options="iSev"><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></div>
+    <div><label data-i18n="lbl_owner">Owner</label><input id="iOwner"></div>
+    <div><label data-i18n="lbl_status">Status</label><select id="iStatus" data-options="iStatus"><option>Open</option><option>In Progress</option><option>Closed</option></select></div>
+  </div></div>
+  <div class="foot"><button type="button" class="btn ghost" onclick="issueDlg.close()" data-i18n="cancel">Cancel</button><button class="btn primary" data-i18n="save">Save</button></div>
+</form></dialog>
+
+<dialog id="qaqcDlg"><form method="dialog" onsubmit="saveQAQC(event)">
+  <div class="head"><b data-i18n="dlg_qaqc">QAQC / RCI Record</b><button type="button" class="icon-btn" onclick="qaqcDlg.close()">✕</button></div>
+  <div class="body"><input type="hidden" id="qId"><div class="form">
+    <div><label data-i18n="lbl_project">Project</label><select id="qaqcProjectSel"></select></div>
+    <div><label data-i18n="lbl_type">Type</label><select id="qType" data-options="qType"><option>RCI</option><option>NCP</option><option>NCR</option><option>RIN</option><option>MIR</option><option>ITP</option><option>RFI</option></select></div>
+    <div><label data-i18n="lbl_ref">Reference No.</label><input id="qRef" data-i18n-ph="ph_qaqc_ref" placeholder="e.g. RCI-001"></div>
+    <div><label data-i18n="lbl_disc">Discipline</label><select id="qDisc"></select></div>
+    <div class="full"><label data-i18n="lbl_desc_req">Description *</label><textarea id="qTitle" required></textarea></div>
+    <div><label data-i18n="lbl_sev">Severity</label><select id="qSev" data-options="qSev"><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></div>
+    <div><label data-i18n="lbl_owner">Owner</label><input id="qOwner"></div>
+    <div><label data-i18n="lbl_raised">Raised Date</label><input id="qDate" type="date"></div>
+    <div><label data-i18n="lbl_due">Due Date</label><input id="qDue" type="date"></div>
+    <div><label data-i18n="lbl_status">Status</label><select id="qStatus" data-options="qStatus"><option>Open</option><option>In Progress</option><option>Answered</option><option>Closed</option></select></div>
+    <div class="full"><label data-i18n="lbl_notes">Notes</label><textarea id="qNotes"></textarea></div>
+  </div></div>
+  <div class="foot"><button type="button" class="btn ghost" onclick="qaqcDlg.close()" data-i18n="cancel">Cancel</button><button class="btn primary" data-i18n="save">Save</button></div>
+</form></dialog>
+
+<dialog id="maintDlg"><form method="dialog" onsubmit="saveMaint(event)">
+  <div class="head"><b data-i18n="dlg_maint">Maintenance Request</b><button type="button" class="icon-btn" onclick="maintDlg.close()">✕</button></div>
+  <div class="body"><input type="hidden" id="mId"><div class="form">
+    <div><label data-i18n="lbl_asset">Building / Asset *</label><input id="mAsset" required></div>
+    <div><label data-i18n="lbl_cat">Category</label><select id="mCat" data-options="mCat"><option>Electrical</option><option>Mechanical</option><option>Civil</option><option>Structural</option><option>Architectural</option><option>ICT</option><option>Plumbing</option><option>Fire System</option><option>General</option></select></div>
+    <div class="full"><label data-i18n="lbl_desc_req">Description *</label><textarea id="mDesc" required></textarea></div>
+    <div><label data-i18n="lbl_priority">Priority</label><select id="mPri" data-options="mPri"><option>Low</option><option>Medium</option><option>High</option><option>Emergency</option></select></div>
+    <div><label data-i18n="lbl_cost">Estimated Cost (RM)</label><input id="mCost" type="number" value="0" min="0"></div>
+    <div><label data-i18n="lbl_date">Date</label><input id="mDate" type="date"></div>
+    <div><label data-i18n="lbl_status">Status</label><select id="mStatus" data-options="mStatus"><option>Open</option><option>In Progress</option><option>Completed</option></select></div>
+  </div></div>
+  <div class="foot"><button type="button" class="btn ghost" onclick="maintDlg.close()" data-i18n="cancel">Cancel</button><button class="btn primary" data-i18n="save">Save</button></div>
+</form></dialog>
+
+<dialog id="partyDlg"><form method="dialog" onsubmit="saveParty(event)">
+  <div class="head"><b data-i18n="dlg_party">Party / Stakeholder</b><button type="button" class="icon-btn" onclick="partyDlg.close()">✕</button></div>
+  <div class="body"><input type="hidden" id="partyId"><div class="form">
+    <div class="full"><label data-i18n="lbl_project">Project</label><select id="partyProject"></select></div>
+    <div><label data-i18n="lbl_role">Role</label><input id="partyRole" data-i18n-ph="ph_role" placeholder="e.g. Client / Consultant"></div>
+    <div><label data-i18n="lbl_org">Organisation *</label><input id="partyOrg" required data-i18n-ph="ph_org" placeholder="e.g. Consulting Firm"></div>
+    <div><label data-i18n="lbl_contact">Contact Person</label><input id="partyContact"></div>
+    <div><label data-i18n="lbl_phone">Phone</label><input id="partyPhone"></div>
+    <div><label data-i18n="lbl_email">Email</label><input id="partyEmail" type="email"></div>
+  </div></div>
+  <div class="foot"><button type="button" class="btn ghost" onclick="partyDlg.close()" data-i18n="cancel">Cancel</button><button class="btn primary" data-i18n="save">Save</button></div>
+</form></dialog>
+
+<dialog id="milestoneDlg"><form method="dialog" onsubmit="saveMilestone(event)">
+  <div class="head"><b data-i18n="dlg_milestone">Milestone</b><button type="button" class="icon-btn" onclick="milestoneDlg.close()">✕</button></div>
+  <div class="body"><input type="hidden" id="mstId"><div class="form">
+    <div class="full"><label data-i18n="lbl_project">Project</label><select id="msProjectSel"></select></div>
+    <div class="full"><label data-i18n="lbl_title_m">Milestone Title *</label><input id="msTitle" required data-i18n-ph="ph_milestone" placeholder="e.g. Foundation works complete"></div>
+    <div><label data-i18n="lbl_due">Due Date</label><input id="msDue" type="date"></div>
+    <div><label data-i18n="lbl_status">Status</label><select id="msStat" data-options="msStat"><option>Pending</option><option>In Progress</option><option>Completed</option></select></div>
+  </div></div>
+  <div class="foot"><button type="button" class="btn ghost" onclick="milestoneDlg.close()" data-i18n="cancel">Cancel</button><button class="btn primary" data-i18n="save">Save</button></div>
+</form></dialog>
+
+<dialog id="docDlg"><form method="dialog" onsubmit="saveDoc(event)">
+  <div class="head"><b data-i18n="dlg_doc">Document Record</b><button type="button" class="icon-btn" onclick="docDlg.close()">✕</button></div>
+  <div class="body"><input type="hidden" id="docId"><div class="form">
+    <div><label data-i18n="lbl_project">Project</label><select id="docProject"></select></div>
+    <div><label data-i18n="lbl_cat">Category</label><select id="docCat" data-options="docCat"><option>Contract Documents</option><option>Technical Submissions</option><option>Site Records</option><option>Financial</option><option>Handover</option><option>Maintenance</option></select></div>
+    <div class="full"><label data-i18n="lbl_doc_title">Document Title *</label><input id="docName" required data-i18n-ph="ph_doc_title" placeholder="e.g. Structural shop drawings — Block A"></div>
+    <div><label data-i18n="lbl_ref">Reference No.</label><input id="docRef" data-i18n-ph="ph_doc_ref" placeholder="e.g. SW-001"></div>
+    <div><label data-i18n="lbl_status">Status</label><select id="docStatus" data-options="docStatus"><option>Pending</option><option>Submitted</option><option>Approved</option><option>Rejected</option><option>Issued</option></select></div>
+    <div class="full"><label data-i18n="lbl_notes">Notes</label><textarea id="docNotes"></textarea></div>
+    <div class="full">
+      <label data-i18n="lbl_file">Attach File</label>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button type="button" class="btn light sm" onclick="pickDocFile()" data-i18n="choose_file">Choose File…</button>
+        <button type="button" class="btn ghost sm" onclick="clearDocFile()" data-i18n="remove_file">Remove</button>
+        <span id="docFileInfo" class="hint">No file attached</span>
+      </div>
+      <input type="file" id="docFile" style="display:none" onchange="onDocFileChange()">
+    </div>
+  </div></div>
+  <div class="foot"><button type="button" class="btn ghost" onclick="docDlg.close()" data-i18n="cancel">Cancel</button><button class="btn primary" data-i18n="save">Save</button></div>
+</form></dialog>
+
+<dialog id="ledgerDlg"><form method="dialog" onsubmit="saveLedger(event)">
+  <div class="head"><b data-i18n="dlg_ledger">Cost Entry</b><button type="button" class="icon-btn" onclick="ledgerDlg.close()">✕</button></div>
+  <div class="body"><input type="hidden" id="ledId"><div class="form">
+    <div><label data-i18n="lbl_project">Project</label><select id="ledgerProject"></select></div>
+    <div><label data-i18n="lbl_type">Type</label><select id="ledType" data-options="ledType"><option>Progress Claim</option><option>Payment</option><option>Variation (VO)</option><option>Retention</option><option>Other</option></select></div>
+    <div class="full"><label data-i18n="lbl_desc_req">Description *</label><input id="ledDesc" required data-i18n-ph="ph_ledger" placeholder="e.g. Interim Payment No. 4"></div>
+    <div><label data-i18n="lbl_amount">Amount (RM) *</label><input id="ledAmount" type="number" required min="0"></div>
+    <div><label data-i18n="lbl_date">Date</label><input id="ledDate" type="date"></div>
+  </div></div>
+  <div class="foot"><button type="button" class="btn ghost" onclick="ledgerDlg.close()" data-i18n="cancel">Cancel</button><button class="btn primary" data-i18n="save">Save</button></div>
+</form></dialog>
+
+<dialog id="importDlg">
+  <div class="head"><b data-i18n="dlg_import">Import Backup</b><button type="button" class="icon-btn" onclick="importDlg.close()">✕</button></div>
+  <div class="body">
+    <label data-i18n="import_paste">Paste the JSON backup content below</label>
+    <textarea id="importText" style="min-height:200px;font-family:ui-monospace,Menlo,monospace;font-size:12px" placeholder='{ "projects": [...], "issues": [...] }'></textarea>
+    <div class="hint" data-i18n="import_warn">This replaces all current data with the imported backup. Existing data is not recoverable afterwards unless you have another backup.</div>
+  </div>
+  <div class="foot"><button type="button" class="btn ghost" onclick="importDlg.close()" data-i18n="cancel">Cancel</button><button class="btn primary" onclick="doImport()" data-i18n="import">Import</button></div>
+</dialog>
+
+<dialog id="mspDlg"><form method="dialog" onsubmit="doMspImport(event)">
+  <div class="head"><b data-i18n="msp_dlg_title">Import Microsoft Project (CPM)</b><button type="button" class="icon-btn" onclick="mspDlg.close()">✕</button></div>
+  <div class="body">
+    <div class="form">
+      <div class="full">
+        <label data-i18n="msp_dlg_file">MS Project file (XML or CSV)</label>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button type="button" class="btn light" onclick="pickMspFile()" data-i18n="choose_file">Choose File…</button>
+          <span id="mspFileInfo" class="hint">No file selected</span>
+        </div>
+        <input type="file" id="mspFile" accept=".xml,.csv,.mpx,.txt" style="display:none" onchange="onMspFileChange()">
+      </div>
+      <div class="full"><label data-i18n="lbl_project">Project</label><select id="mspProject"></select></div>
+      <div class="full" id="mspPreview" style="display:none"></div>
+    </div>
+  </div>
+  <div class="foot"><button type="button" class="btn ghost" onclick="mspDlg.close()" data-i18n="cancel">Cancel</button><button class="btn primary" data-i18n="msp_import_btn">Import</button></div>
+</form></dialog>
+
+<dialog id="confirmDlg">
+  <div class="head"><b data-i18n="dlg_confirm">Please confirm</b></div>
+  <div class="body" style="padding:22px"><p id="cfMsg" style="margin:0;font-size:14px;line-height:1.5"></p></div>
+  <div class="foot"><button type="button" class="btn ghost" id="cfNo" data-i18n="cf_cancel">Cancel</button><button type="button" class="btn danger" id="cfYes" data-i18n="cf_confirm">Confirm</button></div>
+</dialog>
+
+<script>
+/* ================= DATA MODEL ================= */
+const K='govproject_pmis_v2';
+const D=['Architectural','Civil','Structural','Mechanical','Electrical','ICT / ELV','Fire & Life Safety','Quantity Surveying','Contract Administration','Safety & Health','QA / QC','Environmental','Landscape','Authority / Approvals','Asset & Maintenance'];
+const MCATS=['Electrical','Mechanical','Civil','Structural','Architectural','ICT','Plumbing','Fire System','General'];
+const DOCATS=['Contract Documents','Technical Submissions','Site Records','Financial','Handover','Maintenance'];
+const PROJ_STATUS=['Planning','Active','Delayed','Completed','Defects Liability'];
+const PCOLORS=['#2563eb','#16a34a','#dc2626','#7c3aed','#d97706'];
+const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+
+/* ================= I18N ================= */
+const LANGS={en:{label:'English',locale:'en-MY',mon:'en'},ms:{label:'Bahasa Melayu',locale:'ms-MY',mon:'ms'},zh:{label:'中文',locale:'zh-CN',mon:'zh-CN'}};
+let lang=(localStorage.getItem('govproject_lang')||'en');if(!LANGS[lang])lang='en';
+const STATUSES=PROJ_STATUS;
+const PTYPES=['New Building','Extension / Upgrade','Infrastructure','Maintenance','Renovation'];
+const SEVS=['Low','Medium','High','Critical'];
+const PRIOS=['Low','Medium','High','Emergency'];
+const ISTATUS=['Open','In Progress','Closed'];
+const QATYPES=['RCI','NCP','NCR','RIN','MIR','ITP','RFI'];
+const QASTATUS=['Open','In Progress','Answered','Closed'];
+const MSTATUS=['Open','In Progress','Completed'];
+const MSTS=['Pending','In Progress','Completed'];
+const DSTATUS=['Pending','Submitted','Approved','Rejected','Issued'];
+const LTYPES=['Progress Claim','Payment','Variation (VO)','Retention','Other'];
+const T={
+en:{
+appSub:'Government Project & Maintenance System',
+sideNote:'Data is stored in your browser database (IndexedDB).\nUse Reports → Backup to save a copy.',builder:'Builder: Juil Gitom',
+loading:'Loading database…',db_ok:'Database: IndexedDB',db_legacy:'Database: Browser storage',db_err:'Could not save to database',
+demo_mode:'Demo Mode',demo_note:'Exploring sample data — changes are kept separate and won\'t affect your real data.',demo_exit:'Exit Demo',demo_enter:'Enter Demo Mode',demo_desc:'Explore the system with sample data. Your real data stays untouched.',demo_entered:'Demo mode on — sample data loaded',demo_exited:'Demo mode off — back to your data',demo_confirm_enter:'Enter demo mode? Your current data is saved and the app will load sample data. Exit demo anytime to return.',demo_confirm_exit:'Exit demo mode and return to your saved data?',
+th_file:'File',lbl_file:'Attach File',choose_file:'Choose File…',remove_file:'Remove',no_file:'No file attached',download:'Download',file_downloaded:'File downloaded',file_missing:'File not found in database',file_save_err:'Could not save file',
+language:'Language',
+nav_dashboard:'Dashboard',nav_projects:'Projects',nav_timeline:'Timeline / Gantt',nav_cpm:'CPM Schedule',nav_milestones:'Milestones',nav_disciplines:'Disciplines',nav_maintenance:'Maintenance',nav_issues:'Issues & Risks',nav_qaqc:'QAQC / RCI',nav_contracts:'Contract & Cost',nav_parties:'Parties',nav_documents:'Documents',nav_reports:'Reports',
+newProject:'+ New Project',
+nav_blocks:'Blocks / Buildings',newBlock:'+ Block / Building',th_block:'Block / Building',dlg_block:'Block / Building Details',lbl_block_name:'Block / Building Name *',lbl_block_progress:'Progress (%)',ph_block_name:'e.g. Block A — Lecture Block',no_blocks:'No blocks/buildings yet',block_added:'Block / Building added',block_updated:'Block / Building updated',block_deleted:'Block / Building deleted',block_name_req:'Block / Building name is required',del_block_confirm:'Delete block/building "{name}"?',csv_blocks:'Blocks',sec_blocks:'4. Blocks & Buildings',log_block_created:'Block: {n}',log_block_updated:'Block: {n}',log_block_deleted:'Block: {n}',
+kpi_active:'Active Projects',kpi_value:'Total Contract Value',kpi_avg:'Avg. Physical Progress',kpi_issues:'Open Issues',kpi_maint:'Open Maintenance',kpi_done:'Completed',
+dash_portfolio:'Project Portfolio — Status',dash_alerts:'Critical Alerts',dash_progress:'Physical vs Financial Progress',dash_activity:'Recent Activity',
+projects:'Projects',physical:'Physical',financial:'Financial',today:'Today',complete:'complete',edit:'Edit',delete:'Delete',none:'None',
+th_project:'Project',th_agency:'Agency',th_type:'Type',th_location:'Location',th_value:'Value',th_progress:'Progress',th_status:'Status',th_actions:'Actions',th_milestone:'Milestone',th_due:'Due Date',th_asset:'Building / Asset',th_category:'Category',th_description:'Description',th_priority:'Priority',th_cost:'Cost',th_discipline:'Discipline',th_issue:'Issue',th_severity:'Severity',th_owner:'Owner',th_role:'Role',th_org:'Organisation',th_contact:'Contact',th_document:'Document',th_ref:'Ref No.',
+search_project:'Search project...',search_issue:'Search issue...',search_party:'Search party...',search_doc:'Search document...',
+allStatus:'All Status',allTypes:'All Types',allCategories:'All Categories',allProjects:'All Projects',
+tl_title:'Project Schedule (Gantt)',tl_hint:'Set a Start and End date on each project to visualise its schedule. The blue bar shows duration; the darker fill shows physical progress.',
+cpm_hint:'Import a Microsoft Project file (XML or CSV) with task dependencies. The critical path is computed automatically using the Critical Path Method (CPM).',cpm_gantt_hint:'Critical path tasks are shown in red; milestones are diamonds.',cpm_no_data:'No schedule imported yet. Use “Import MS Project” to load tasks and run a CPM analysis.',cpm_no_projects:'Add a project first, then import a Microsoft Project schedule.',cpm_summary:'Summary',cpm_yes:'Critical',cpm_no:'—',cpm_tasks:'Tasks',cpm_duration:'Duration',cpm_critical:'Critical Tasks',cpm_path:'Critical Path',cpm_days:'{n} work days',
+th_id:'ID',th_task:'Task',th_dur:'Duration',th_start:'Start',th_finish:'Finish',th_pred:'Predecessors',th_es:'ES',th_ef:'EF',th_ls:'LS',th_lf:'LF',th_float:'Float',th_cr:'Critical',
+msp_import:'Import MS Project',msp_clear:'Clear Schedule',msp_dlg_title:'Import Microsoft Project (CPM)',msp_dlg_file:'MS Project file (XML or CSV)',msp_import_btn:'Import',msp_no_file:'Choose a file first',msp_proj_req:'Select a project for the schedule',msp_bad_file:'Unrecognised MS Project file — use an XML or CSV export from Microsoft Project.',msp_empty:'No tasks found in the file',msp_imported:'MS Project schedule imported',msp_cleared:'Schedule cleared',msp_confirm_clear:'Clear the imported schedule for this project?',msp_preview:'{n} tasks found in “{name}” — review, then click Import.',log_msp_import:'MS Project schedule imported',log_msp_clear:'MS Project schedule cleared',
+qaqc_summary:'{o} open · {d} overdue',newQAQC:'+ QAQC / RCI',th_raised:'Raised',no_qaqc:'No QAQC records found',dlg_qaqc:'QAQC / RCI Record',lbl_raised:'Raised Date',ph_qaqc_ref:'e.g. RCI-001',qaqc_added:'QAQC record added',qaqc_updated:'QAQC record updated',qaqc_closed:'QAQC record closed',qaqc_deleted:'QAQC record deleted',qaqc_title_req:'Description is required',del_qaqc_confirm:'Delete QAQC record "{r}"?',csv_qaqc:'QAQC',log_qaqc_created:'QAQC: {r}',log_qaqc_updated:'QAQC: {r}',log_qaqc_closed:'QAQC: {r}',log_qaqc_deleted:'QAQC: {r}',
+newMilestone:'+ Milestone',newMaint:'+ Maintenance Request',newIssue:'+ Issue / Risk',newParty:'+ Party',newDoc:'+ Document',newEntry:'+ Entry',
+disc_label:'View discipline workload for:',
+c_total:'Total Contract',c_paid:'Certified / Paid',c_balance:'Balance',contract_summary:'Contract Summary',cost_ledger:'Cost Ledger',
+rpt_title:'📄 Executive Report',rpt_desc:'Print or save as PDF — portfolio, issues & maintenance summary.',printPdf:'Print / Save PDF',csv_title:'📊 CSV Export',csv_desc:'Download data as spreadsheets (Excel-ready).',csv_projects:'Projects',csv_issues:'Issues',csv_maint:'Maintenance',bak_title:'💾 Backup & Restore',bak_desc:'Full JSON backup, import or reset to demo data.',bak_dl:'Download Backup',bak_import:'Import Backup',bak_reset:'Reset to Demo',
+dlg_project:'Project Details',dlg_issue:'Issue / Risk',dlg_maint:'Maintenance Request',dlg_party:'Party / Stakeholder',dlg_milestone:'Milestone',dlg_doc:'Document Record',dlg_ledger:'Cost Entry',dlg_import:'Import Backup',dlg_confirm:'Please confirm',
+lbl_id:'Project ID *',lbl_name:'Project Name *',lbl_agency:'Agency / Ministry',lbl_type:'Type',lbl_loc:'Location',lbl_contractor:'Contractor',lbl_value:'Contract Value (RM)',lbl_phys:'Physical Progress (%)',lbl_fin:'Financial Progress (%)',lbl_status:'Status',lbl_start:'Start Date',lbl_end:'End Date',lbl_pm:'Project Manager',lbl_desc:'Description / Scope',lbl_desc_req:'Description *',lbl_project:'Project',lbl_disc:'Discipline',lbl_sev:'Severity',lbl_owner:'Owner',lbl_asset:'Building / Asset *',lbl_cat:'Category',lbl_priority:'Priority',lbl_cost:'Estimated Cost (RM)',lbl_date:'Date',lbl_role:'Role',lbl_org:'Organisation *',lbl_contact:'Contact Person',lbl_phone:'Phone',lbl_email:'Email',lbl_title_m:'Milestone Title *',lbl_due:'Due Date',lbl_doc_title:'Document Title *',lbl_ref:'Reference No.',lbl_notes:'Notes',lbl_amount:'Amount (RM) *',
+ph_project_id:'GOV-2026-001',ph_project_name:'e.g. Community Hall Upgrade',ph_role:'e.g. Client / Consultant',ph_org:'e.g. Consulting Firm',ph_doc_ref:'e.g. SW-001',ph_doc_title:'e.g. Structural shop drawings — Block A',ph_milestone:'e.g. Foundation works complete',ph_ledger:'e.g. Interim Payment No. 4',
+cancel:'Cancel',save_project:'Save Project',save:'Save',
+import_paste:'Paste the JSON backup content below',import_warn:'This replaces all current data with the imported backup. Existing data is not recoverable afterwards unless you have another backup.',import:'Import',
+cf_cancel:'Cancel',cf_confirm:'Confirm',
+of_total:'{a} of {b} total',n_projects:'{n} project(s)',n_on_track:'{n} project(s) ≥70%',n_critical:'{n} critical',n_urgent:'{n} urgent',delivered:'delivered',
+no_alerts:'No critical alerts 🎉',no_projects_match:'No projects match your filters',no_issues:'No issues found',no_maint:'No maintenance requests',no_parties:'No parties found',no_docs:'No documents found',no_milestones:'No milestones',no_ledger:'No cost entries yet. Add claims, payments or variations.',no_projects:'No projects yet',no_activity:'No activity yet',no_data:'No data',
+pct_of_contract:'{p}% of contract',pct_remaining:'{p}% remaining',paid_value:'Paid {m}',
+disc_summary:'{open} open · {all} total item(s)',disc_resolved:'{pct}% resolved',
+n_overdue:'{n} overdue',
+close:'Close',complete:'Complete',deleted:'Deleted',
+project_created:'Project created',project_updated:'Project updated',project_deleted:'Project deleted',project_exists:'Project ID already exists',end_before_start:'End date is before start date',
+issue_logged:'Issue logged',issue_updated:'Issue updated',issue_closed:'Issue closed',issue_deleted:'Issue deleted',
+maint_logged:'Request logged',maint_updated:'Request updated',maint_done:'Marked as completed',maint_deleted:'Request deleted',asset_req:'Asset and description are required',
+party_added:'Party added',party_updated:'Party updated',party_deleted:'Party deleted',org_req:'Organisation is required',
+milestone_added:'Milestone added',milestone_updated:'Milestone updated',milestone_deleted:'Milestone deleted',milestone_title_req:'Milestone title is required',
+doc_added:'Document added',doc_updated:'Document updated',doc_deleted:'Document deleted',doc_title_req:'Document title is required',
+ledger_added:'Entry added',ledger_updated:'Entry updated',ledger_deleted:'Entry deleted',
+desc_req:'Description is required',
+backup_dl:'Backup downloaded',import_ok:'Data imported successfully',import_invalid:'Invalid JSON backup file',import_empty:'Paste a backup JSON first',reset_done:'Data reset to demo',csv_done:'{k} exported to CSV',lang_changed:'Language changed',
+del_project_confirm:'Delete project "{name}"? All related issues, maintenance, parties, milestones, documents and cost entries will also be removed.',
+del_issue_confirm:'Delete this issue/risk?',
+del_maint_confirm:'Delete maintenance request for "{asset}"?',
+del_party_confirm:'Delete party "{org}"?',
+del_milestone_confirm:'Delete milestone "{title}"?',
+del_doc_confirm:'Delete document "{name}"?',
+del_ledger_confirm:'Delete cost entry "{desc}"?',
+reset_confirm:'Reset ALL data back to the demo dataset? Current records will be overwritten.',
+rpt_main_title:'Government Project Management System — Executive Report',
+rpt_meta:'Generated: {d} | Projects: {n} | Open Issues: {i} | Open Maintenance: {m}',
+sec_portfolio:'1. Project Portfolio',sec_issues:'2. Critical Issues & Risks',sec_maint:'3. Open Maintenance',
+csvh_id:'ID',csvh_name:'Name',csvh_agency:'Agency',csvh_type:'Type',csvh_location:'Location',csvh_contractor:'Contractor',csvh_value:'Contract Value',csvh_phys:'Physical %',csvh_fin:'Financial %',csvh_status:'Status',csvh_start:'Start',csvh_end:'End',csvh_project:'Project',csvh_disc:'Discipline',csvh_issue:'Issue',csvh_sev:'Severity',csvh_owner:'Owner',csvh_asset:'Asset',csvh_cat:'Category',csvh_desc:'Description',csvh_pri:'Priority',csvh_cost:'Cost',csvh_date:'Date',
+log_project_created:'Project {name}',log_project_updated:'Project {name}',log_project_deleted:'Project {name}',
+log_issue_created:'Issue: {d}',log_issue_updated:'Issue on {p}',log_issue_closed:'Issue: {d}',log_issue_deleted:'Issue: {d}',
+log_maint_created:'Maintenance: {a}',log_maint_updated:'Maintenance: {a}',log_maint_deleted:'Maintenance: {a}',
+log_party_created:'Party: {o}',log_party_updated:'Party: {o}',log_party_deleted:'Party: {o}',
+log_milestone_created:'Milestone: {title}',log_milestone_updated:'Milestone: {title}',log_milestone_deleted:'Milestone: {title}',
+log_doc_created:'Document: {name}',log_doc_updated:'Document: {name}',log_doc_deleted:'Document: {name}',
+log_ledger_created:'Cost entry: {d}',log_ledger_updated:'Cost entry: {d}',log_ledger_deleted:'Cost entry: {d}',
+log_backup:'JSON backup',log_import:'Data restored from backup',log_reset:'Data reset to demo dataset',log_csv:'{k} CSV',
+log_Created:'Created',log_Updated:'Updated',log_Deleted:'Deleted',log_Closed:'Closed',log_Completed:'Completed',log_Exported:'Exported',log_Imported:'Imported',log_Reset:'Reset'
+},
+ms:{
+appSub:'Sistem Projek & Penyelenggaraan Kerajaan',
+sideNote:'Data disimpan dalam pangkalan data pelayar (IndexedDB).\nGunakan Laporan → Sandaran untuk menyimpan salinan.',builder:'Pembina: Juil Gitom',
+loading:'Memuatkan pangkalan data…',db_ok:'Pangkalan data: IndexedDB',db_legacy:'Pangkalan data: Storan pelayar',db_err:'Tidak dapat menyimpan ke pangkalan data',
+demo_mode:'Mod Demo',demo_note:'Meneroka data contoh — perubahan disimpan berasingan dan tidak akan menjejaskan data sebenar anda.',demo_exit:'Keluar Demo',demo_enter:'Masuk Mod Demo',demo_desc:'Terokai sistem dengan data contoh. Data sebenar anda tidak akan disentuh.',demo_entered:'Mod demo dihidupkan — data contoh dimuat',demo_exited:'Mod demo dimatikan — kembali ke data anda',demo_confirm_enter:'Masuk mod demo? Data semasa anda disimpan dan aplikasi akan memuat data contoh. Keluar demo bila-bila masa untuk kembali.',demo_confirm_exit:'Keluar mod demo dan kembali ke data anda yang disimpan?',
+th_file:'Fail',lbl_file:'Lampirkan Fail',choose_file:'Pilih Fail…',remove_file:'Buang',no_file:'Tiada fail dilampirkan',download:'Muat Turun',file_downloaded:'Fail dimuat turun',file_missing:'Fail tidak dijumpai dalam pangkalan data',file_save_err:'Tidak dapat menyimpan fail',
+language:'Bahasa',
+nav_dashboard:'Papan Pemuka',nav_projects:'Projek',nav_timeline:'Garis Masa / Gantt',nav_cpm:'Jadual CPM',nav_milestones:'Pencapaian',nav_disciplines:'Disiplin',nav_maintenance:'Penyelenggaraan',nav_issues:'Isu & Risiko',nav_qaqc:'QAQC / RCI',nav_contracts:'Kontrak & Kos',nav_parties:'Pihak',nav_documents:'Dokumen',nav_reports:'Laporan',
+newProject:'+ Projek Baharu',
+nav_blocks:'Blok / Bangunan',newBlock:'+ Blok / Bangunan',th_block:'Blok / Bangunan',dlg_block:'Butiran Blok / Bangunan',lbl_block_name:'Nama Blok / Bangunan *',lbl_block_progress:'Kemajuan (%)',ph_block_name:'cth. Blok A — Blok Kuliah',no_blocks:'Tiada blok/bangunan lagi',block_added:'Blok / Bangunan ditambah',block_updated:'Blok / Bangunan dikemas kini',block_deleted:'Blok / Bangunan dipadam',block_name_req:'Nama blok/bangunan diperlukan',del_block_confirm:'Padam blok/bangunan "{name}"?',csv_blocks:'Blok',sec_blocks:'4. Blok & Bangunan',log_block_created:'Blok: {n}',log_block_updated:'Blok: {n}',log_block_deleted:'Blok: {n}',
+kpi_active:'Projek Aktif',kpi_value:'Jumlah Nilai Kontrak',kpi_avg:'Purata Kemajuan Fizikal',kpi_issues:'Isu Terbuka',kpi_maint:'Penyelenggaraan Terbuka',kpi_done:'Siap',
+dash_portfolio:'Portfolio Projek — Status',dash_alerts:'Amaran Kritikal',dash_progress:'Kemajuan Fizikal vs Kewangan',dash_activity:'Aktiviti Terkini',
+projects:'Projek',physical:'Fizikal',financial:'Kewangan',today:'Hari Ini',complete:'siap',edit:'Sunting',delete:'Padam',none:'Tiada',
+th_project:'Projek',th_agency:'Agensi',th_type:'Jenis',th_location:'Lokasi',th_value:'Nilai',th_progress:'Kemajuan',th_status:'Status',th_actions:'Tindakan',th_milestone:'Pencapaian',th_due:'Tarikh Matang',th_asset:'Bangunan / Aset',th_category:'Kategori',th_description:'Penerangan',th_priority:'Keutamaan',th_cost:'Kos',th_discipline:'Disiplin',th_issue:'Isu',th_severity:'Keterukan',th_owner:'Pemilik',th_role:'Peranan',th_org:'Organisasi',th_contact:'Hubungan',th_document:'Dokumen',th_ref:'No. Rujukan',
+search_project:'Cari projek...',search_issue:'Cari isu...',search_party:'Cari pihak...',search_doc:'Cari dokumen...',
+allStatus:'Semua Status',allTypes:'Semua Jenis',allCategories:'Semua Kategori',allProjects:'Semua Projek',
+tl_title:'Jadual Projek (Gantt)',tl_hint:'Tetapkan tarikh Mula dan Tamat pada setiap projek untuk menggambarkan jadualnya. Bar biru menunjukkan tempoh; isian gelap menunjukkan kemajuan fizikal.',
+cpm_hint:'Import fail Microsoft Project (XML atau CSV) dengan kebergantungan tugas. Laluan kritikal dikira secara automatik menggunakan Kaedah Laluan Kritikal (CPM).',cpm_gantt_hint:'Tugas laluan kritikal ditunjukkan merah; pencapaian ialah bentuk berlian.',cpm_no_data:'Belum ada jadual diimport. Gunakan “Import MS Project” untuk memuat tugas dan menjalankan analisis CPM.',cpm_no_projects:'Tambah projek dahulu, kemudian import jadual Microsoft Project.',cpm_summary:'Ringkasan',cpm_yes:'Kritikal',cpm_no:'—',cpm_tasks:'Tugas',cpm_duration:'Tempoh',cpm_critical:'Tugas Kritikal',cpm_path:'Laluan Kritikal',cpm_days:'{n} hari bekerja',
+th_id:'ID',th_task:'Tugas',th_dur:'Tempoh',th_start:'Mula',th_finish:'Tamat',th_pred:'Pendahulu',th_es:'ES',th_ef:'EF',th_ls:'LS',th_lf:'LF',th_float:'Terapung',th_cr:'Kritikal',
+msp_import:'Import MS Project',msp_clear:'Kosongkan Jadual',msp_dlg_title:'Import Microsoft Project (CPM)',msp_dlg_file:'Fail MS Project (XML atau CSV)',msp_import_btn:'Import',msp_no_file:'Pilih fail dahulu',msp_proj_req:'Pilih projek untuk jadual ini',msp_bad_file:'Fail MS Project tidak dikenali — gunakan eksport XML atau CSV daripada Microsoft Project.',msp_empty:'Tiada tugas ditemui dalam fail',msp_imported:'Jadual MS Project diimport',msp_cleared:'Jadual dikosongkan',msp_confirm_clear:'Kosongkan jadual yang diimport untuk projek ini?',msp_preview:'{n} tugas ditemui dalam “{name}” — semak, kemudian klik Import.',log_msp_import:'Jadual MS Project diimport',log_msp_clear:'Jadual MS Project dikosongkan',
+qaqc_summary:'{o} terbuka · {d} lewat',newQAQC:'+ QAQC / RCI',th_raised:'Dikemukakan',no_qaqc:'Tiada rekod QAQC ditemui',dlg_qaqc:'Rekod QAQC / RCI',lbl_raised:'Tarikh Dikemukakan',ph_qaqc_ref:'cth. RCI-001',qaqc_added:'Rekod QAQC ditambah',qaqc_updated:'Rekod QAQC dikemas kini',qaqc_closed:'Rekod QAQC ditutup',qaqc_deleted:'Rekod QAQC dipadam',qaqc_title_req:'Penerangan diperlukan',del_qaqc_confirm:'Padam rekod QAQC "{r}"?',csv_qaqc:'QAQC',log_qaqc_created:'QAQC: {r}',log_qaqc_updated:'QAQC: {r}',log_qaqc_closed:'QAQC: {r}',log_qaqc_deleted:'QAQC: {r}',
+newMilestone:'+ Pencapaian',newMaint:'+ Permintaan Penyelenggaraan',newIssue:'+ Isu / Risiko',newParty:'+ Pihak',newDoc:'+ Dokumen',newEntry:'+ Catatan',
+disc_label:'Lihat beban kerja disiplin untuk:',
+c_total:'Jumlah Kontrak',c_paid:'Disahkan / Dibayar',c_balance:'Baki',contract_summary:'Ringkasan Kontrak',cost_ledger:'Lejar Kos',
+rpt_title:'📄 Laporan Eksekutif',rpt_desc:'Cetak atau simpan sebagai PDF — ringkasan portfolio, isu & penyelenggaraan.',printPdf:'Cetak / Simpan PDF',csv_title:'📊 Eksport CSV',csv_desc:'Muat turun data sebagai hamparan (sedia Excel).',csv_projects:'Projek',csv_issues:'Isu',csv_maint:'Penyelenggaraan',bak_title:'💾 Sandaran & Pulihkan',bak_desc:'Sandaran JSON penuh, import atau tetapkan semula kepada data demo.',bak_dl:'Muat Turun Sandaran',bak_import:'Import Sandaran',bak_reset:'Set Semula Demo',
+dlg_project:'Butiran Projek',dlg_issue:'Isu / Risiko',dlg_maint:'Permintaan Penyelenggaraan',dlg_party:'Pihak / Pemegang Kepentingan',dlg_milestone:'Pencapaian',dlg_doc:'Rekod Dokumen',dlg_ledger:'Catatan Kos',dlg_import:'Import Sandaran',dlg_confirm:'Sila sahkan',
+lbl_id:'ID Projek *',lbl_name:'Nama Projek *',lbl_agency:'Agensi / Kementerian',lbl_type:'Jenis',lbl_loc:'Lokasi',lbl_contractor:'Kontraktor',lbl_value:'Nilai Kontrak (RM)',lbl_phys:'Kemajuan Fizikal (%)',lbl_fin:'Kemajuan Kewangan (%)',lbl_status:'Status',lbl_start:'Tarikh Mula',lbl_end:'Tarikh Tamat',lbl_pm:'Pengurus Projek',lbl_desc:'Penerangan / Skop',lbl_desc_req:'Penerangan *',lbl_project:'Projek',lbl_disc:'Disiplin',lbl_sev:'Keterukan',lbl_owner:'Pemilik',lbl_asset:'Bangunan / Aset *',lbl_cat:'Kategori',lbl_priority:'Keutamaan',lbl_cost:'Anggaran Kos (RM)',lbl_date:'Tarikh',lbl_role:'Peranan',lbl_org:'Organisasi *',lbl_contact:'Orang Hubungan',lbl_phone:'Telefon',lbl_email:'E-mel',lbl_title_m:'Tajuk Pencapaian *',lbl_due:'Tarikh Matang',lbl_doc_title:'Tajuk Dokumen *',lbl_ref:'No. Rujukan',lbl_notes:'Nota',lbl_amount:'Jumlah (RM) *',
+ph_project_id:'GOV-2026-001',ph_project_name:'cth. Naik Taraf Dewan Komuniti',ph_role:'cth. Klien / Perunding',ph_org:'cth. Firma Perunding',ph_doc_ref:'cth. SW-001',ph_doc_title:'cth. Lukisan kerja struktur — Blok A',ph_milestone:'cth. Kerja asas siap',ph_ledger:'cth. Bayaran Interim No. 4',
+cancel:'Batal',save_project:'Simpan Projek',save:'Simpan',
+import_paste:'Tampal kandungan sandaran JSON di bawah',import_warn:'Ini akan menggantikan semua data semasa dengan sandaran yang diimport. Data sedia ada tidak boleh dipulihkan selepas itu melainkan anda mempunyai sandaran lain.',import:'Import',
+cf_cancel:'Batal',cf_confirm:'Sahkan',
+of_total:'{a} daripada {b} jumlah',n_projects:'{n} projek',n_on_track:'{n} projek ≥70%',n_critical:'{n} kritikal',n_urgent:'{n} segera',delivered:'disiapkan',
+no_alerts:'Tiada amaran kritikal 🎉',no_projects_match:'Tiada projek sepadan dengan penapis',no_issues:'Tiada isu ditemui',no_maint:'Tiada permintaan penyelenggaraan',no_parties:'Tiada pihak ditemui',no_docs:'Tiada dokumen ditemui',no_milestones:'Tiada pencapaian',no_ledger:'Tiada catatan kos lagi. Tambah tuntutan, bayaran atau variasi.',no_projects:'Tiada projek lagi',no_activity:'Tiada aktiviti lagi',no_data:'Tiada data',
+pct_of_contract:'{p}% daripada kontrak',pct_remaining:'{p}% berbaki',paid_value:'Dibayar {m}',
+disc_summary:'{open} terbuka · {all} jumlah item',disc_resolved:'{pct}% selesai',
+n_overdue:'{n} lewat',
+close:'Tutup',complete:'Siap',deleted:'Dipadam',
+project_created:'Projek dicipta',project_updated:'Projek dikemas kini',project_deleted:'Projek dipadam',project_exists:'ID projek sudah wujud',end_before_start:'Tarikh tamat sebelum tarikh mula',
+issue_logged:'Isu direkod',issue_updated:'Isu dikemas kini',issue_closed:'Isu ditutup',issue_deleted:'Isu dipadam',
+maint_logged:'Permintaan direkod',maint_updated:'Permintaan dikemas kini',maint_done:'Ditandakan siap',maint_deleted:'Permintaan dipadam',asset_req:'Aset dan penerangan diperlukan',
+party_added:'Pihak ditambah',party_updated:'Pihak dikemas kini',party_deleted:'Pihak dipadam',org_req:'Organisasi diperlukan',
+milestone_added:'Pencapaian ditambah',milestone_updated:'Pencapaian dikemas kini',milestone_deleted:'Pencapaian dipadam',milestone_title_req:'Tajuk pencapaian diperlukan',
+doc_added:'Dokumen ditambah',doc_updated:'Dokumen dikemas kini',doc_deleted:'Dokumen dipadam',doc_title_req:'Tajuk dokumen diperlukan',
+ledger_added:'Catatan ditambah',ledger_updated:'Catatan dikemas kini',ledger_deleted:'Catatan dipadam',
+desc_req:'Penerangan diperlukan',
+backup_dl:'Sandaran dimuat turun',import_ok:'Data diimport dengan jayanya',import_invalid:'Fail sandaran JSON tidak sah',import_empty:'Tampal sandaran JSON dahulu',reset_done:'Data ditetapkan semula kepada demo',csv_done:'{k} dieksport ke CSV',lang_changed:'Bahasa ditukar',
+del_project_confirm:'Padam projek "{name}"? Semua isu, penyelenggaraan, pihak, pencapaian, dokumen dan catatan kos berkaitan juga akan dibuang.',
+del_issue_confirm:'Padam isu/risiko ini?',
+del_maint_confirm:'Padam permintaan penyelenggaraan untuk "{asset}"?',
+del_party_confirm:'Padam pihak "{org}"?',
+del_milestone_confirm:'Padam pencapaian "{title}"?',
+del_doc_confirm:'Padam dokumen "{name}"?',
+del_ledger_confirm:'Padam catatan kos "{desc}"?',
+reset_confirm:'Tetapkan SEMUA data semula kepada set data demo? Rekod semasa akan diganti.',
+rpt_main_title:'Sistem Pengurusan Projek Kerajaan — Laporan Eksekutif',
+rpt_meta:'Dijana: {d} | Projek: {n} | Isu Terbuka: {i} | Penyelenggaraan Terbuka: {m}',
+sec_portfolio:'1. Portfolio Projek',sec_issues:'2. Isu & Risiko Kritikal',sec_maint:'3. Penyelenggaraan Terbuka',
+csvh_id:'ID',csvh_name:'Nama',csvh_agency:'Agensi',csvh_type:'Jenis',csvh_location:'Lokasi',csvh_contractor:'Kontraktor',csvh_value:'Nilai Kontrak',csvh_phys:'Fizikal %',csvh_fin:'Kewangan %',csvh_status:'Status',csvh_start:'Mula',csvh_end:'Tamat',csvh_project:'Projek',csvh_disc:'Disiplin',csvh_issue:'Isu',csvh_sev:'Keterukan',csvh_owner:'Pemilik',csvh_asset:'Aset',csvh_cat:'Kategori',csvh_desc:'Penerangan',csvh_pri:'Keutamaan',csvh_cost:'Kos',csvh_date:'Tarikh',
+log_project_created:'Projek {name}',log_project_updated:'Projek {name}',log_project_deleted:'Projek {name}',
+log_issue_created:'Isu: {d}',log_issue_updated:'Isu pada {p}',log_issue_closed:'Isu: {d}',log_issue_deleted:'Isu: {d}',
+log_maint_created:'Penyelenggaraan: {a}',log_maint_updated:'Penyelenggaraan: {a}',log_maint_deleted:'Penyelenggaraan: {a}',
+log_party_created:'Pihak: {o}',log_party_updated:'Pihak: {o}',log_party_deleted:'Pihak: {o}',
+log_milestone_created:'Pencapaian: {title}',log_milestone_updated:'Pencapaian: {title}',log_milestone_deleted:'Pencapaian: {title}',
+log_doc_created:'Dokumen: {name}',log_doc_updated:'Dokumen: {name}',log_doc_deleted:'Dokumen: {name}',
+log_ledger_created:'Catatan kos: {d}',log_ledger_updated:'Catatan kos: {d}',log_ledger_deleted:'Catatan kos: {d}',
+log_backup:'Sandaran JSON',log_import:'Data dipulihkan dari sandaran',log_reset:'Data ditetapkan semula kepada set data demo',log_csv:'{k} CSV',
+log_Created:'Dicipta',log_Updated:'Dikemas kini',log_Deleted:'Dipadam',log_Closed:'Ditutup',log_Completed:'Siap',log_Exported:'Dieksport',log_Imported:'Diimport',log_Reset:'Set Semula',
+'val_Planning':'Perancangan','val_Active':'Aktif','val_Delayed':'Tertunda','val_Completed':'Siap','val_Defects Liability':'Liabiliti Kecacatan',
+'val_New Building':'Bangunan Baharu','val_Extension / Upgrade':'Sambungan / Naik Taraf','val_Infrastructure':'Infrastruktur','val_Maintenance':'Penyelenggaraan','val_Renovation':'Pengubahsuaian',
+'val_Low':'Rendah','val_Medium':'Sederhana','val_High':'Tinggi','val_Critical':'Kritikal','val_Emergency':'Kecemasan',
+'val_Open':'Terbuka','val_In Progress':'Dalam Proses','val_Closed':'Ditutup','val_Pending':'Menunggu','val_Overdue':'Lewat','val_Answered':'Dijawab',
+'val_Electrical':'Elektrik','val_Mechanical':'Mekanikal','val_Civil':'Awam','val_Structural':'Struktur','val_Architectural':'Seni Bina','val_ICT':'ICT','val_Plumbing':'Paip','val_Fire System':'Sistem Kebakaran','val_General':'Am',
+'val_Contract Documents':'Dokumen Kontrak','val_Technical Submissions':'Serahan Teknikal','val_Site Records':'Rekod Tapak','val_Financial':'Kewangan','val_Handover':'Serahan',
+'val_Submitted':'Dihantar','val_Approved':'Diluluskan','val_Rejected':'Ditolak','val_Issued':'Dikeluarkan',
+'val_Progress Claim':'Tuntutan Kemajuan','val_Payment':'Bayaran','val_Variation (VO)':'Variasi (VO)','val_Retention':'Pegangan','val_Other':'Lain-lain',
+'val_ICT / ELV':'ICT / ELV','val_Fire & Life Safety':'Keselamatan Kebakaran & Nyawa','val_Quantity Surveying':'Ukur Bahan','val_Contract Administration':'Pentadbiran Kontrak','val_Safety & Health':'Keselamatan & Kesihatan','val_QA / QC':'QA / QC','val_Environmental':'Alam Sekitar','val_Landscape':'Landskap','val_Authority / Approvals':'Pihak Berkuasa / Kelulusan','val_Asset & Maintenance':'Aset & Penyelenggaraan'
+},
+zh:{
+appSub:'政府项目与维护管理系统',
+sideNote:'数据保存在浏览器数据库（IndexedDB）中。\n使用报表 → 备份 保存副本。',builder:'构建者：Juil Gitom',
+loading:'正在加载数据库…',db_ok:'数据库：IndexedDB',db_legacy:'数据库：浏览器存储',db_err:'无法保存到数据库',
+demo_mode:'演示模式',demo_note:'正在浏览示例数据 — 更改单独保存，不会影响您的真实数据。',demo_exit:'退出演示',demo_enter:'进入演示模式',demo_desc:'使用示例数据探索系统。您的真实数据保持不动。',demo_entered:'演示模式已开启 — 已加载示例数据',demo_exited:'演示模式已关闭 — 返回您的数据',demo_confirm_enter:'进入演示模式？当前数据已保存，应用将加载示例数据。随时退出演示即可返回。',demo_confirm_exit:'退出演示模式并返回已保存的数据？',
+th_file:'文件',lbl_file:'附加文件',choose_file:'选择文件…',remove_file:'移除',no_file:'未附加文件',download:'下载',file_downloaded:'文件已下载',file_missing:'数据库中找不到文件',file_save_err:'无法保存文件',
+language:'语言',
+nav_dashboard:'仪表盘',nav_projects:'项目',nav_timeline:'时间线 / 甘特图',nav_cpm:'CPM 进度计划',nav_milestones:'里程碑',nav_disciplines:'专业',nav_maintenance:'维护',nav_issues:'问题与风险',nav_qaqc:'QAQC / RCI',nav_contracts:'合同与成本',nav_parties:'参与方',nav_documents:'文档',nav_reports:'报表',
+newProject:'+ 新建项目',
+nav_blocks:'楼栋 / 建筑',newBlock:'+ 楼栋 / 建筑',th_block:'楼栋 / 建筑',dlg_block:'楼栋 / 建筑详情',lbl_block_name:'楼栋 / 建筑名称 *',lbl_block_progress:'进度（%）',ph_block_name:'例如：A 栋 — 教学楼',no_blocks:'暂无楼栋 / 建筑',block_added:'楼栋 / 建筑已添加',block_updated:'楼栋 / 建筑已更新',block_deleted:'楼栋 / 建筑已删除',block_name_req:'需要填写楼栋 / 建筑名称',del_block_confirm:'删除楼栋 / 建筑"{name}"？',csv_blocks:'楼栋',sec_blocks:'4. 楼栋与建筑',log_block_created:'楼栋：{n}',log_block_updated:'楼栋：{n}',log_block_deleted:'楼栋：{n}',
+kpi_active:'进行中项目',kpi_value:'合同总金额',kpi_avg:'平均实体进度',kpi_issues:'未解决问题',kpi_maint:'待处理维护',kpi_done:'已完成',
+dash_portfolio:'项目组合 — 状态',dash_alerts:'关键警报',dash_progress:'实体与财务进度',dash_activity:'最近活动',
+projects:'项目',physical:'实体',financial:'财务',today:'今天',complete:'完成',edit:'编辑',delete:'删除',none:'无',
+th_project:'项目',th_agency:'机构',th_type:'类型',th_location:'地点',th_value:'金额',th_progress:'进度',th_status:'状态',th_actions:'操作',th_milestone:'里程碑',th_due:'截止日期',th_asset:'建筑 / 资产',th_category:'类别',th_description:'描述',th_priority:'优先级',th_cost:'费用',th_discipline:'专业',th_issue:'问题',th_severity:'严重程度',th_owner:'负责人',th_role:'角色',th_org:'机构',th_contact:'联系人',th_document:'文档',th_ref:'编号',
+search_project:'搜索项目...',search_issue:'搜索问题...',search_party:'搜索参与方...',search_doc:'搜索文档...',
+allStatus:'全部状态',allTypes:'全部类型',allCategories:'全部类别',allProjects:'全部项目',
+tl_title:'项目进度表（甘特图）',tl_hint:'为每个项目设置开始和结束日期以显示其进度计划。蓝色条表示工期；深色填充表示实体进度。',
+cpm_hint:'导入带有任务依赖关系的 Microsoft Project 文件（XML 或 CSV）。系统将使用关键路径法（CPM）自动计算关键路径。',cpm_gantt_hint:'关键路径任务以红色显示；里程碑为菱形。',cpm_no_data:'尚未导入进度计划。使用“导入 MS Project”加载任务并运行 CPM 分析。',cpm_no_projects:'请先添加项目，再导入 Microsoft Project 进度计划。',cpm_summary:'摘要',cpm_yes:'关键',cpm_no:'—',cpm_tasks:'任务数',cpm_duration:'工期',cpm_critical:'关键任务',cpm_path:'关键路径',cpm_days:'{n} 个工作日',
+th_id:'ID',th_task:'任务',th_dur:'工期',th_start:'开始',th_finish:'完成',th_pred:'前置任务',th_es:'ES',th_ef:'EF',th_ls:'LS',th_lf:'LF',th_float:'总浮动',th_cr:'关键',
+msp_import:'导入 MS Project',msp_clear:'清除进度计划',msp_dlg_title:'导入 Microsoft Project（CPM）',msp_dlg_file:'MS Project 文件（XML 或 CSV）',msp_import_btn:'导入',msp_no_file:'请先选择文件',msp_proj_req:'请为进度计划选择项目',msp_bad_file:'无法识别的 MS Project 文件 — 请使用 Microsoft Project 导出的 XML 或 CSV。',msp_empty:'文件中未找到任务',msp_imported:'MS Project 进度计划已导入',msp_cleared:'进度计划已清除',msp_confirm_clear:'确定清除此项目的已导入进度计划？',msp_preview:'在“{name}”中找到 {n} 个任务 — 请检查后点击导入。',log_msp_import:'已导入 MS Project 进度计划',log_msp_clear:'已清除 MS Project 进度计划',
+qaqc_summary:'{o} 未处理 · {d} 逾期',newQAQC:'+ QAQC / RCI',th_raised:'提出日期',no_qaqc:'未找到 QAQC 记录',dlg_qaqc:'QAQC / RCI 记录',lbl_raised:'提出日期',ph_qaqc_ref:'例如：RCI-001',qaqc_added:'QAQC 记录已添加',qaqc_updated:'QAQC 记录已更新',qaqc_closed:'QAQC 记录已关闭',qaqc_deleted:'QAQC 记录已删除',qaqc_title_req:'需要填写描述',del_qaqc_confirm:'删除 QAQC 记录"{r}"？',csv_qaqc:'QAQC',log_qaqc_created:'QAQC：{r}',log_qaqc_updated:'QAQC：{r}',log_qaqc_closed:'QAQC：{r}',log_qaqc_deleted:'QAQC：{r}',
+newMilestone:'+ 里程碑',newMaint:'+ 维护请求',newIssue:'+ 问题 / 风险',newParty:'+ 参与方',newDoc:'+ 文档',newEntry:'+ 条目',
+disc_label:'查看专业的任务量：',
+c_total:'合同总额',c_paid:'已认证 / 已付款',c_balance:'余额',contract_summary:'合同摘要',cost_ledger:'成本台账',
+rpt_title:'📄 执行报告',rpt_desc:'打印或保存为 PDF — 组合、问题与维护摘要。',printPdf:'打印 / 保存 PDF',csv_title:'📊 导出 CSV',csv_desc:'将数据下载为电子表格（兼容 Excel）。',csv_projects:'项目',csv_issues:'问题',csv_maint:'维护',bak_title:'💾 备份与恢复',bak_desc:'完整 JSON 备份、导入或重置为演示数据。',bak_dl:'下载备份',bak_import:'导入备份',bak_reset:'重置演示',
+dlg_project:'项目详情',dlg_issue:'问题 / 风险',dlg_maint:'维护请求',dlg_party:'参与方 / 利益相关方',dlg_milestone:'里程碑',dlg_doc:'文档记录',dlg_ledger:'成本条目',dlg_import:'导入备份',dlg_confirm:'请确认',
+lbl_id:'项目 ID *',lbl_name:'项目名称 *',lbl_agency:'机构 / 部门',lbl_type:'类型',lbl_loc:'地点',lbl_contractor:'承包商',lbl_value:'合同金额（RM）',lbl_phys:'实体进度（%）',lbl_fin:'财务进度（%）',lbl_status:'状态',lbl_start:'开始日期',lbl_end:'结束日期',lbl_pm:'项目经理',lbl_desc:'描述 / 范围',lbl_desc_req:'描述 *',lbl_project:'项目',lbl_disc:'专业',lbl_sev:'严重程度',lbl_owner:'负责人',lbl_asset:'建筑 / 资产 *',lbl_cat:'类别',lbl_priority:'优先级',lbl_cost:'预计费用（RM）',lbl_date:'日期',lbl_role:'角色',lbl_org:'机构 *',lbl_contact:'联系人',lbl_phone:'电话',lbl_email:'电子邮件',lbl_title_m:'里程碑标题 *',lbl_due:'截止日期',lbl_doc_title:'文档标题 *',lbl_ref:'编号',lbl_notes:'备注',lbl_amount:'金额（RM）*',
+ph_project_id:'GOV-2026-001',ph_project_name:'例如：社区礼堂升级',ph_role:'例如：客户 / 顾问',ph_org:'例如：顾问公司',ph_doc_ref:'例如：SW-001',ph_doc_title:'例如：结构施工图 — A 栋',ph_milestone:'例如：基础工程完成',ph_ledger:'例如：第 4 期进度款',
+cancel:'取消',save_project:'保存项目',save:'保存',
+import_paste:'在下方粘贴 JSON 备份内容',import_warn:'这将用导入的备份替换所有当前数据。除非另有备份，否则之后无法恢复原有数据。',import:'导入',
+cf_cancel:'取消',cf_confirm:'确认',
+of_total:'共 {b} 个中的 {a}',n_projects:'{n} 个项目',n_on_track:'{n} 个项目 ≥70%',n_critical:'{n} 个严重',n_urgent:'{n} 个紧急',delivered:'已交付',
+no_alerts:'没有关键警报 🎉',no_projects_match:'没有匹配的项目',no_issues:'未找到问题',no_maint:'没有维护请求',no_parties:'未找到参与方',no_docs:'未找到文档',no_milestones:'没有里程碑',no_ledger:'暂无成本条目。请添加索赔、付款或变更。',no_projects:'暂无项目',no_activity:'暂无活动',no_data:'暂无数据',
+pct_of_contract:'占合同 {p}%',pct_remaining:'剩余 {p}%',paid_value:'已付款 {m}',
+disc_summary:'{open} 未解决 · 共 {all} 项',disc_resolved:'已解决 {pct}%',
+n_overdue:'{n} 个逾期',
+close:'关闭',complete:'完成',deleted:'已删除',
+project_created:'项目已创建',project_updated:'项目已更新',project_deleted:'项目已删除',project_exists:'项目 ID 已存在',end_before_start:'结束日期早于开始日期',
+issue_logged:'问题已记录',issue_updated:'问题已更新',issue_closed:'问题已关闭',issue_deleted:'问题已删除',
+maint_logged:'请求已记录',maint_updated:'请求已更新',maint_done:'已标记为完成',maint_deleted:'请求已删除',asset_req:'需要填写资产和描述',
+party_added:'参与方已添加',party_updated:'参与方已更新',party_deleted:'参与方已删除',org_req:'需要填写机构',
+milestone_added:'里程碑已添加',milestone_updated:'里程碑已更新',milestone_deleted:'里程碑已删除',milestone_title_req:'需要填写里程碑标题',
+doc_added:'文档已添加',doc_updated:'文档已更新',doc_deleted:'文档已删除',doc_title_req:'需要填写文档标题',
+ledger_added:'条目已添加',ledger_updated:'条目已更新',ledger_deleted:'条目已删除',
+desc_req:'需要填写描述',
+backup_dl:'备份已下载',import_ok:'数据导入成功',import_invalid:'JSON 备份文件无效',import_empty:'请先粘贴 JSON 备份',reset_done:'数据已重置为演示数据',csv_done:'{k} 已导出为 CSV',lang_changed:'语言已更改',
+del_project_confirm:'删除项目"{name}"？相关的所有问题、维护、参与方、里程碑、文档和成本条目也将一并删除。',
+del_issue_confirm:'删除此问题 / 风险？',
+del_maint_confirm:'删除"{asset}"的维护请求？',
+del_party_confirm:'删除参与方"{org}"？',
+del_milestone_confirm:'删除里程碑"{title}"？',
+del_doc_confirm:'删除文档"{name}"？',
+del_ledger_confirm:'删除成本条目"{desc}"？',
+reset_confirm:'将所有数据重置为演示数据集？当前记录将被覆盖。',
+rpt_main_title:'政府项目管理系统 — 执行报告',
+rpt_meta:'生成时间：{d} | 项目：{n} | 未解决问题：{i} | 待处理维护：{m}',
+sec_portfolio:'1. 项目组合',sec_issues:'2. 关键问题与风险',sec_maint:'3. 待处理维护',
+csvh_id:'ID',csvh_name:'名称',csvh_agency:'机构',csvh_type:'类型',csvh_location:'地点',csvh_contractor:'承包商',csvh_value:'合同金额',csvh_phys:'实体进度 %',csvh_fin:'财务进度 %',csvh_status:'状态',csvh_start:'开始日期',csvh_end:'结束日期',csvh_project:'项目',csvh_disc:'专业',csvh_issue:'问题',csvh_sev:'严重程度',csvh_owner:'负责人',csvh_asset:'资产',csvh_cat:'类别',csvh_desc:'描述',csvh_pri:'优先级',csvh_cost:'费用',csvh_date:'日期',
+log_project_created:'项目 {name}',log_project_updated:'项目 {name}',log_project_deleted:'项目 {name}',
+log_issue_created:'问题：{d}',log_issue_updated:'{p} 的问题',log_issue_closed:'问题：{d}',log_issue_deleted:'问题：{d}',
+log_maint_created:'维护：{a}',log_maint_updated:'维护：{a}',log_maint_deleted:'维护：{a}',
+log_party_created:'参与方：{o}',log_party_updated:'参与方：{o}',log_party_deleted:'参与方：{o}',
+log_milestone_created:'里程碑：{title}',log_milestone_updated:'里程碑：{title}',log_milestone_deleted:'里程碑：{title}',
+log_doc_created:'文档：{name}',log_doc_updated:'文档：{name}',log_doc_deleted:'文档：{name}',
+log_ledger_created:'成本条目：{d}',log_ledger_updated:'成本条目：{d}',log_ledger_deleted:'成本条目：{d}',
+log_backup:'JSON 备份',log_import:'已从备份恢复数据',log_reset:'数据已重置为演示数据集',log_csv:'{k} CSV',
+log_Created:'已创建',log_Updated:'已更新',log_Deleted:'已删除',log_Closed:'已关闭',log_Completed:'已完成',log_Exported:'已导出',log_Imported:'已导入',log_Reset:'已重置',
+'val_Planning':'规划中','val_Active':'进行中','val_Delayed':'已延迟','val_Completed':'已完成','val_Defects Liability':'缺陷责任期',
+'val_New Building':'新建建筑','val_Extension / Upgrade':'扩建 / 升级','val_Infrastructure':'基础设施','val_Maintenance':'维护','val_Renovation':'翻新',
+'val_Low':'低','val_Medium':'中','val_High':'高','val_Critical':'严重','val_Emergency':'紧急',
+'val_Open':'待处理','val_In Progress':'进行中','val_Closed':'已关闭','val_Pending':'待定','val_Overdue':'已逾期','val_Answered':'已答复',
+'val_Electrical':'电气','val_Mechanical':'机械','val_Civil':'土建','val_Structural':'结构','val_Architectural':'建筑','val_ICT':'信息技术','val_Plumbing':'给排水','val_Fire System':'消防系统','val_General':'一般',
+'val_Contract Documents':'合同文件','val_Technical Submissions':'技术提交','val_Site Records':'现场记录','val_Financial':'财务','val_Handover':'移交',
+'val_Submitted':'已提交','val_Approved':'已批准','val_Rejected':'已驳回','val_Issued':'已签发',
+'val_Progress Claim':'进度款申请','val_Payment':'付款','val_Variation (VO)':'变更（VO）','val_Retention':'保留金','val_Other':'其他',
+'val_ICT / ELV':'ICT / ELV','val_Fire & Life Safety':'消防与生命安全','val_Quantity Surveying':'工料测量','val_Contract Administration':'合同管理','val_Safety & Health':'安全与健康','val_QA / QC':'QA / QC','val_Environmental':'环境','val_Landscape':'景观','val_Authority / Approvals':'主管机构 / 审批','val_Asset & Maintenance':'资产与维护'
+}
+};
+const t=k=>{const v=T[lang]&&T[lang][k];return v!==undefined?v:(T.en[k]!==undefined?T.en[k]:k)};
+const tf=(k,v)=>{let s=t(k);for(const p in v||{})s=s.split('{'+p+'}').join(v[p]);return s};
+const tr=v=>{const k='val_'+String(v);const x=T[lang]&&T[lang][k];return x!==undefined?x:(T.en[k]!==undefined?T.en[k]:v)};
+const LOC=()=>LANGS[lang]||LANGS.en;
+const MONTHS=()=>(LANGS[lang]||LANGS.en).mon;
+const OPTMAP={pType:PTYPES,pStatus:STATUSES,pStatusFilter:STATUSES,pTypeFilter:PTYPES,iSev:SEVS,iStatus:ISTATUS,iStatusFilter:ISTATUS,mCat:MCATS,mPri:PRIOS,mStatus:MSTATUS,mf:MSTATUS,mCatFilter:MCATS,msStat:MSTS,msStatus:MSTS,docCat:DOCATS,docCatFilter:DOCATS,docStatus:DSTATUS,ledType:LTYPES,qType:QATYPES,qTypeFilter:QATYPES,qStatus:QASTATUS,qStatusFilter:QASTATUS,qSev:SEVS};
+function buildOptions(arr,sel,allKey){return (allKey?`<option value="">${t(allKey)}</option>`:'')+arr.map(v=>`<option value="${v}" ${v===sel?'selected':''}>${tr(v)}</option>`).join('')}
+function applyLang(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(k)el.textContent=t(k)});
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{el.placeholder=t(el.dataset.i18nPh)});
+  document.querySelectorAll('select[data-options]').forEach(sel=>{const arr=OPTMAP[sel.dataset.options];if(!arr)return;const cur=sel.value,all=sel.dataset.all||'';sel.innerHTML=(all?`<option value="">${t(all)}</option>`:'')+arr.map(v=>`<option value="${v}" ${v===cur?'selected':''}>${tr(v)}</option>`).join('')});
+  const act=document.querySelector('nav button.active');if(act)$('title').textContent=t('nav_'+act.dataset.v);
+  $('langSel').innerHTML=Object.keys(LANGS).map(l=>`<option value="${l}" ${l===lang?'selected':''}>${LANGS[l].label}</option>`).join('');
+  setDbStatus(dbOkFlag);
+}
+function setLang(l){if(!LANGS[l])l='en';lang=l;localStorage.setItem('govproject_lang',lang);applyLang();render();toast(t('lang_changed'),'info')}
+
+const seed={projects:[
+{id:'GOV-2026-001',name:'Government Training Complex',agency:'Government Agency',type:'New Building',loc:'Sabah',contractor:'Borneo Build Sdn Bhd',value:18500000,progress:38,financial:31,status:'Active',start:'2025-03-01',end:'2027-06-30',pm:'Eng. Ahmad Razak',desc:'New training complex with hostel, lecture blocks and cafeteria.'},
+{id:'GOV-2026-002',name:'Administration Block Upgrade',agency:'Government Department',type:'Extension / Upgrade',loc:'Kota Kinabalu',contractor:'Sabah Engineering Sdn Bhd',value:4200000,progress:54,financial:49,status:'Active',start:'2025-06-01',end:'2026-08-31',pm:'Pn. Siti Hajar',desc:'Upgrade of admin block with new ICT and meeting facilities.'},
+{id:'GOV-2026-003',name:'District Road Rehabilitation',agency:'Public Works Department',type:'Infrastructure',loc:'Tawau',contractor:'Kinabalu Roadworks Sdn Bhd',value:9200000,progress:72,financial:65,status:'Active',start:'2024-11-01',end:'2026-05-31',pm:'En. Lim Wei',desc:'Rehabilitation of 18 km district road with drainage works.'}],
+issues:[
+{id:1,projectId:'GOV-2026-001',disc:'Structural',desc:'Rebar delivery delay affecting slab sequence',sev:'High',owner:'Main Contractor',status:'Open'},
+{id:2,projectId:'GOV-2026-001',disc:'Electrical',desc:'Switchboard submission requires consultant clarification',sev:'Medium',owner:'M&E Consultant',status:'In Progress'},
+{id:3,projectId:'GOV-2026-003',disc:'Contract Administration',desc:'Silt control at culvert crossing requires NCR',sev:'High',owner:'Superintendent',status:'Open'}],
+maint:[
+{id:1,asset:'Administration Building',cat:'Electrical',desc:'Lighting circuit intermittent fault',pri:'High',status:'Open',cost:850,date:'2026-08-05'},
+{id:2,asset:'Training Block',cat:'Mechanical',desc:'Air-conditioning servicing required',pri:'Medium',status:'In Progress',cost:650,date:'2026-08-10'}],
+parties:[
+{id:11,projectId:'GOV-2026-001',role:'Client / Agency',org:'Government Agency',contact:'Project Director',phone:'+60 88-000 111',email:''},
+{id:12,projectId:'GOV-2026-001',role:'Main Contractor',org:'Borneo Build Sdn Bhd',contact:'Project Manager',phone:'+60 88-000 222',email:'pm@borneobuild.my'},
+{id:13,projectId:'GOV-2026-001',role:'M&E Consultant',org:'Engineering Consultant',contact:'M&E Engineer',phone:'',email:'me@engconsult.my'}],
+milestones:[
+{id:21,projectId:'GOV-2026-001',title:'Foundation works complete',due:'2026-09-30',status:'In Progress'},
+{id:22,projectId:'GOV-2026-001',title:'Main structure topped out',due:'2027-02-28',status:'Pending'},
+{id:23,projectId:'GOV-2026-002',title:'Handover of admin block',due:'2026-07-31',status:'Completed'},
+{id:24,projectId:'GOV-2026-003',title:'Asphalt paving — Section 1',due:'2026-03-15',status:'Completed'}],
+blocks:[
+{id:51,projectId:'GOV-2026-001',name:'Block A — Lecture Block',type:'New Building',progress:42,status:'Active',cost:7800000},
+{id:52,projectId:'GOV-2026-001',name:'Block B — Hostel',type:'New Building',progress:30,status:'Active',cost:5200000},
+{id:53,projectId:'GOV-2026-001',name:'Block C — Cafeteria',type:'New Building',progress:20,status:'Planning',cost:2500000},
+{id:54,projectId:'GOV-2026-002',name:'Admin Block',type:'Extension / Upgrade',progress:54,status:'Active',cost:4200000}],
+docs:[
+{id:31,projectId:'GOV-2026-001',cat:'Contract Documents',name:'Letter of Acceptance',ref:'LOA-2026-001',status:'Issued',notes:''},
+{id:32,projectId:'GOV-2026-001',cat:'Technical Submissions',name:'Structural shop drawings — Block A',ref:'SW-001',status:'Submitted',notes:'Pending consultant review'},
+{id:33,projectId:'GOV-2026-003',cat:'Site Records',name:'Weekly progress report',ref:'WR-014',status:'Issued',notes:''}],
+ledger:[
+{id:41,projectId:'GOV-2026-001',desc:'Interim Payment No. 3',amount:1760000,date:'2026-06-30',type:'Progress Claim'},
+{id:42,projectId:'GOV-2026-002',desc:'Interim Payment No. 5',amount:420000,date:'2026-07-15',type:'Progress Claim'},
+{id:43,projectId:'GOV-2026-003',desc:'Variation — additional culvert',amount:185000,date:'2026-05-10',type:'Variation (VO)'}],
+tasks:[],
+qaqc:[
+{id:61,projectId:'GOV-2026-001',type:'RCI',ref:'RCI-001',title:'Clarify structural rebar spacing at Block A transfer beam',disc:'Structural',sev:'High',status:'Open',owner:'Main Contractor',date:'2026-08-12',due:'2026-08-19',notes:'Clarification required before concreting.'},
+{id:62,projectId:'GOV-2026-001',type:'NCP',ref:'NCP-002',title:'Concrete cube test failure — Block B foundation',disc:'Structural',sev:'Critical',status:'In Progress',owner:'QA/QC Engineer',date:'2026-08-08',due:'2026-08-15',notes:'Corrective action plan required.'},
+{id:63,projectId:'GOV-2026-002',type:'MIR',ref:'MIR-003',title:'Material inspection — 32mm rebar (Grade 500)',disc:'Quantity Surveying',sev:'Medium',status:'Answered',owner:'Site Engineer',date:'2026-08-01',due:'2026-08-10',notes:'Mill certificates verified.'},
+{id:64,projectId:'GOV-2026-003',type:'RIN',ref:'RIN-004',title:'Request for inspection — drainage culvert Section 1',disc:'Civil',sev:'Medium',status:'Open',owner:'Main Contractor',date:'2026-08-14',due:'2026-08-21',notes:''}],
+log:[
+{ts:Date.now()-3600000,action:'Created',detail:'System upgraded to v3'}]};
+
+/* Migrate old (v2) saved data into the new schema, preserving records. */
+function migrate(d){
+  d=d&&typeof d==='object'?JSON.parse(JSON.stringify(d)):JSON.parse(JSON.stringify(seed));
+  d.projects=Array.isArray(d.projects)?d.projects:[];
+  d.issues=Array.isArray(d.issues)?d.issues:[];
+  d.maint=Array.isArray(d.maint)?d.maint:[];
+  d.parties=Array.isArray(d.parties)?d.parties:[];
+  d.milestones=Array.isArray(d.milestones)?d.milestones:[];
+  d.blocks=Array.isArray(d.blocks)?d.blocks:[];
+  d.docs=Array.isArray(d.docs)?d.docs:[];
+  d.ledger=Array.isArray(d.ledger)?d.ledger:[];
+  d.tasks=Array.isArray(d.tasks)?d.tasks:[];
+  d.qaqc=Array.isArray(d.qaqc)?d.qaqc:[];
+  d.log=Array.isArray(d.log)?d.log:[];
+  d.projects.forEach(p=>{p.start=p.start||'';p.end=p.end||'';p.desc=p.desc||'';p.pm=p.pm||''});
+  d.parties.forEach((x,i)=>{if(!x.id)x.id=Date.now()+i});
+  d.maint.forEach(m=>{m.date=m.date||'';if(!m.status)m.status='Open'});
+  d.qaqc.forEach(q=>{q.type=q.type||'RCI';q.ref=q.ref||'';if(!q.status)q.status='Open';q.date=q.date||'';q.due=q.due||'';if(q.id===undefined||q.id===null)q.id=Date.now();else if(typeof q.id!=='number')q.id=Number(q.id)||q.id});
+  return d;
+}
+
+const DEMO_K='govproject_pmis_demo';
+let demoMode=false;
+try{demoMode=localStorage.getItem('govproject_demo_mode')==='1'}catch(e){}
+let data;
+try{data=migrate(JSON.parse(localStorage.getItem(demoMode?DEMO_K:K)||'null')||null)}catch(e){data=migrate(seed)}
+
+/* ================= DATABASE (IndexedDB) ================= */
+const DB_NAME='govproject_pmis',DB_VER=2,DB_STORE='state',FILE_STORE='files';
+let _db=null,dbOkFlag=false;
+function openDB(){return new Promise((res,rej)=>{if(_db){res(_db);return}if(!window.indexedDB){rej(new Error('no-indexeddb'));return}const rq=indexedDB.open(DB_NAME,DB_VER);rq.onupgradeneeded=e=>{const db=e.target.result;if(!db.objectStoreNames.contains(DB_STORE))db.createObjectStore(DB_STORE,{keyPath:'key'});if(!db.objectStoreNames.contains(FILE_STORE))db.createObjectStore(FILE_STORE,{keyPath:'id'})};rq.onsuccess=e=>{_db=e.target.result;res(_db)};rq.onerror=e=>rej(rq.error||new Error('db-open-error'));rq.onblocked=()=>rej(new Error('db-blocked'))})}
+function dbGet(key){key=key||'main';return openDB().then(db=>new Promise((res,rej)=>{const rq=db.transaction(DB_STORE,'readonly').objectStore(DB_STORE).get(key);rq.onsuccess=()=>res(rq.result?rq.result.value:null);rq.onerror=()=>rej(rq.error)}))}
+function dbPut(key,val){key=key||'main';return openDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction(DB_STORE,'readwrite');tx.objectStore(DB_STORE).put({key:key,value:val});tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error)}))}
+function filePut(id,blob){return openDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction(FILE_STORE,'readwrite');tx.objectStore(FILE_STORE).put({id:id,blob:blob,name:blob.name||'',type:blob.type||'',size:blob.size||0});tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error)}))}
+function fileGet(id){return openDB().then(db=>new Promise((res,rej)=>{const rq=db.transaction(FILE_STORE,'readonly').objectStore(FILE_STORE).get(id);rq.onsuccess=()=>res(rq.result?rq.result.blob:null);rq.onerror=()=>rej(rq.error)}))}
+function fileDelete(id){return openDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction(FILE_STORE,'readwrite');tx.objectStore(FILE_STORE).delete(id);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error)}))}
+function fileClear(){return openDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction(FILE_STORE,'readwrite');tx.objectStore(FILE_STORE).clear();tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error)}))}
+function setDbStatus(ok){const el=$('dbStatus');if(!el)return;el.innerHTML=ok?`<span class="dot ok"></span>${t('db_ok')}`:`<span class="dot legacy"></span>${t('db_legacy')}`}
+function getSlot(){return demoMode?{db:'demo',ls:DEMO_K}:{db:'main',ls:K}}
+function persistDemoMode(){try{localStorage.setItem('govproject_demo_mode',demoMode?'1':'0')}catch(e){}}
+function updateDemoBanner(){const b=$('demoBanner');if(b)b.hidden=!demoMode}
+function loadCurrentSlot(){
+  const slot=getSlot();
+  dbGet(slot.db).then(v=>{data=migrate(v||seed);dbPut(slot.db,data).catch(()=>{});try{localStorage.setItem(slot.ls,JSON.stringify(data))}catch(e){}updateDemoBanner();applyLang();render()}).catch(()=>{data=migrate(seed);updateDemoBanner();applyLang();render()});
+}
+function enterDemo(){askConfirm(t('demo_confirm_enter'),()=>{if(!demoMode){dbPut('main',data).catch(()=>{});try{localStorage.setItem(K,JSON.stringify(data))}catch(e){}}demoMode=true;persistDemoMode();loadCurrentSlot();toast(t('demo_entered'))})}
+function exitDemo(){askConfirm(t('demo_confirm_exit'),()=>{demoMode=false;persistDemoMode();loadCurrentSlot();toast(t('demo_exited'))})}
+async function initData(){
+  const finish=()=>{clearTimeout(finishTimer);const l=$('loader');if(l)l.classList.add('hide');updateDemoBanner();try{applyLang();render()}catch(e){}};
+  const finishTimer=setTimeout(finish,3000); // safety net: never leave the splash stuck
+  const slot=getSlot();
+  let fromDB=null,dbOk=false;
+  try{
+    fromDB=await Promise.race([
+      dbGet(slot.db),
+      new Promise((_,rej)=>setTimeout(()=>rej(new Error('db-timeout')),2500))
+    ]);
+    dbOk=true;
+  }catch(e){}
+  if(fromDB){data=migrate(fromDB)}
+  else if(!data||!data.projects||!data.projects.length){data=migrate(seed)}
+  dbOkFlag=dbOk;
+  try{if(dbOk)await dbPut(slot.db,data);setDbStatus(dbOk)}catch(e){dbOkFlag=false;setDbStatus(false)}
+  try{localStorage.setItem(slot.ls,JSON.stringify(data))}catch(e){}
+  finish();
+}
+
+/* ================= HELPERS ================= */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>'RM'+Number(n||0).toLocaleString('en-MY',{maximumFractionDigits:0});
+const proj=id=>data.projects.find(p=>p.id===id);
+const projName=id=>proj(id)?proj(id).name:(id||'—');
+function cls(s){return ['Completed','Closed'].includes(s)?'green':['Critical','High','Emergency','Delayed','Overdue'].includes(s)?'red':['Open','In Progress','Medium','Pending'].includes(s)?'amber':['Active'].includes(s)?'blue':s==='Planning'?'cyan':s==='Defects Liability'?'violet':s==='Low'?'gray':'gray'}
+function timeAgo(ts){const d=(Date.now()-ts)/1000;if(d<60)return 'just now';if(d<3600)return Math.floor(d/60)+'m ago';if(d<86400)return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago'}
+function download(content,file,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type:type||'application/octet-stream'}));a.download=file;a.click()}
+function log(action,detail){data.log.unshift({ts:Date.now(),action,detail});if(data.log.length>80)data.log.length=80}
+function toast(msg,t){t=t||'ok';const x=document.createElement('div');x.className='toast '+t;x.textContent=msg;document.body.appendChild(x);requestAnimationFrame(()=>x.classList.add('show'));setTimeout(()=>{x.classList.remove('show');setTimeout(()=>x.remove(),300)},2600)}
+function askConfirm(msg,onYes){$('cfMsg').textContent=msg;$('cfYes').onclick=()=>{confirmDlg.close();onYes()};$('cfNo').onclick=()=>confirmDlg.close();confirmDlg.showModal()}
+function save(){const s=getSlot();dbPut(s.db,data).catch(()=>{});try{localStorage.setItem(s.ls,JSON.stringify(data))}catch(e){}render()}
+
+/* ================= NAV ================= */
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
+  $('title').textContent=t('nav_'+b.dataset.v);
+  $(b.dataset.v).classList.add('active');
+  closeSide();
+  render();
+});
+function toggleSide(){$('side').classList.toggle('open');$('overlay').classList.toggle('show')}
+function closeSide(){$('side').classList.remove('open');$('overlay').classList.remove('show')}
+
+/* ================= SELECT FILL ================= */
+function fill(){
+  const o=data.projects.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
+  $('dp').innerHTML=o;
+  $('iProject').innerHTML=o;
+  $('partyProject').innerHTML=o;
+  $('ledgerProject').innerHTML=o;
+  $('msProjectSel').innerHTML=o;
+  $('msProject').innerHTML='<option value="">'+t('allProjects')+'</option>'+o;
+  $('docProject').innerHTML='<option value="">'+t('allProjects')+'</option>'+o;
+  $('bkProject').innerHTML='<option value="">'+t('allProjects')+'</option>'+o;
+  $('cpmProject').innerHTML=o;
+  $('mspProject').innerHTML=o;
+  $('bkProjectSel').innerHTML=o;
+  $('iDisc').innerHTML=D.map(x=>`<option value="${x}">${tr(x)}</option>`).join('');
+  $('qProject').innerHTML='<option value="">'+t('allProjects')+'</option>'+o;
+  $('qaqcProjectSel').innerHTML=o;
+  $('qDisc').innerHTML=D.map(x=>`<option value="${x}">${tr(x)}</option>`).join('');
+}
+
+/* ================= DASHBOARD ================= */
+function renderDash(){
+  const active=data.projects.filter(p=>p.status!=='Completed'&&p.status!=='Defects Liability').length;
+  const val=data.projects.reduce((a,p)=>a+(p.value||0),0);
+  const done=data.projects.filter(p=>p.status==='Completed').length;
+  const withProg=data.projects.filter(p=>p.progress>0);
+  const avg=withProg.length?Math.round(withProg.reduce((a,p)=>a+p.progress,0)/withProg.length):0;
+  const openIssues=data.issues.filter(i=>i.status!=='Closed').length;
+  const openMaint=data.maint.filter(m=>m.status!=='Completed').length;
+  const critIssues=data.issues.filter(i=>['High','Critical'].includes(i.sev)&&i.status!=='Closed').length;
+  const urgentMaint=data.maint.filter(m=>['High','Emergency'].includes(m.pri)&&m.status!=='Completed').length;
+  $('st1').textContent=active;$('st2').textContent=money(val);$('st3').textContent=avg+'%';
+  $('st4').textContent=openIssues;$('st5').textContent=openMaint;$('st6').textContent=done;
+  $('tr1').textContent=tf('of_total',{a:active,b:data.projects.length});
+  $('tr2').textContent=tf('n_projects',{n:data.projects.length});
+  $('tr3').textContent=tf('n_on_track',{n:withProg.filter(p=>p.progress>=70).length});
+  $('tr4').textContent=tf('n_critical',{n:critIssues});
+  $('tr5').textContent=tf('n_urgent',{n:urgentMaint});
+  $('tr6').textContent=t('delivered');
+
+  /* status donut */
+  const total=data.projects.length||1;
+  let acc=0,segs='';
+  PROJ_STATUS.forEach((s,i)=>{const n=data.projects.filter(p=>p.status===s).length;if(!n)return;const f=n/total,C=2*Math.PI*52;
+    segs+=`<circle r="52" cx="80" cy="80" fill="none" stroke="${PCOLORS[i]}" stroke-width="18" stroke-dasharray="${(f*C).toFixed(2)} ${C.toFixed(2)}" stroke-dashoffset="${(-acc*C).toFixed(2)}" transform="rotate(-90 80 80)"/>`;acc+=f});
+  const leg=PROJ_STATUS.map((s,i)=>{const n=data.projects.filter(p=>p.status===s).length;return `<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0"><span><i style="display:inline-block;width:9px;height:9px;border-radius:3px;background:${PCOLORS[i]};margin-right:7px"></i>${tr(s)}</span><b>${n}</b></div>`}).join('');
+  $('portfolio').innerHTML=`<div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap"><svg viewBox="0 0 160 160" width="150" height="150">${segs||'<circle r="52" cx="80" cy="80" fill="none" stroke="#e5e7eb" stroke-width="18"/>'}<text x="80" y="84" text-anchor="middle" font-size="26" font-weight="800" fill="#172033">${data.projects.length}</text><text x="80" y="100" text-anchor="middle" font-size="10" fill="#64748b">${t('projects')}</text></svg><div style="flex:1;min-width:170px">${leg||'<div class="sub">'+t('no_projects')+'</div>'}</div></div>`;
+
+  /* alerts */
+  const crit=[...data.issues.filter(i=>['High','Critical'].includes(i.sev)&&i.status!=='Closed').map(i=>({t:projName(i.projectId),d:i.desc,lv:i.sev,amb:false})),
+              ...data.maint.filter(m=>['High','Emergency'].includes(m.pri)&&m.status!=='Completed').map(m=>({t:m.asset,d:m.desc,lv:m.pri,amb:true}))];
+  $('alerts').innerHTML=crit.slice(0,6).map(x=>`<div class="alert ${x.amb?'amb':''}"><span class="badge ${x.lv==='Critical'||x.lv==='Emergency'?'red':'amber'}">${tr(x.lv)}</span><div><b>${esc(x.t)}</b>${esc(x.d)}</div></div>`).join('')||'<div class="empty">'+t('no_alerts')+'</div>';
+
+  /* progress chart */
+  $('progressChart').innerHTML=data.projects.slice(0,8).map(p=>`<div class="chart-row"><div class="chart-lab" title="${esc(p.name)}">${esc(p.name)}</div><div class="track"><i class="phys" style="width:${p.progress}%"></i><i class="fin" style="width:${p.financial}%"></i></div><div style="min-width:70px;text-align:right;font-size:11.5px;font-weight:700">${p.progress}% / ${p.financial}%</div></div>`).join('')||'<div class="empty">'+t('no_projects')+'</div>';
+
+  /* activity */
+  $('activity').innerHTML=(data.log.slice(0,8).map(l=>`<div class="act"><span class="badge ${cls(l.action.includes('Deleted')?'red':l.action.includes('Updated')?'amber':'green')}">${t('log_'+l.action)}</span><div><b>${esc(l.detail)}</b><div class="meta">${timeAgo(l.ts)}</div></div></div>`).join(''))||'<div class="empty">'+t('no_activity')+'</div>';
+}
+
+/* ================= PROJECTS ================= */
+function renderProjects(){
+  const q=($('pq').value||'').toLowerCase(),sf=$('pStatusFilter').value,tyf=$('pTypeFilter').value;
+  $('projectRows').innerHTML=data.projects.filter(p=>(!sf||p.status===sf)&&(!tyf||p.type===tyf)&&JSON.stringify(p).toLowerCase().includes(q)).map(p=>`<tr>
+    <td><b>${esc(p.name)}</b><div class="sub">${esc(p.id)}${p.pm?' · '+esc(p.pm):''}</div></td>
+    <td>${esc(p.agency)}</td><td>${tr(p.type)}</td><td>${esc(p.loc)}</td><td>${money(p.value)}</td>
+    <td style="min-width:130px"><div class="mini"><div class="progress"><i style="width:${p.progress}%"></i></div><span class="sub" style="min-width:40px;text-align:right">${p.progress}%</span></div><div class="sub">${t('financial')} ${p.financial}%</div></td>
+    <td><span class="badge ${cls(p.status)}">${tr(p.status)}</span></td>
+    <td><div class="actions"><button class="icon-btn" title="${t('edit')}" onclick="editProject('${esc(p.id)}')">✏️</button><button class="icon-btn" title="${t('delete')}" onclick="delProject('${esc(p.id)}')">🗑️</button></div></td></tr>`).join('')||'<tr><td colspan="8" class="empty">'+t('no_projects_match')+'</td></tr>';
+}
+function openProject(p){const e=p||{};
+  $('oldId').value=e.id||'';$('pId').value=e.id||'';$('pName').value=e.name||'';$('pAgency').value=e.agency||'';
+  $('pType').value=e.type||'New Building';$('pLoc').value=e.loc||'';$('pContractor').value=e.contractor||'';
+  $('pVal').value=e.value||'';$('pProg').value=e.progress||0;$('pFin').value=e.financial||0;
+  $('pStatus').value=e.status||'Planning';$('pStart').value=e.start||'';$('pEnd').value=e.end||'';
+  $('pPM').value=e.pm||'';$('pDesc').value=e.desc||'';projectDlg.showModal();$('pId').focus();
+}
+function editProject(id){openProject(proj(id))}
+function saveProject(e){e.preventDefault();
+  const old=$('oldId').value;
+  if(data.projects.some(p=>p.id===$('pId').value&&p.id!==old)){toast(t('project_exists'),'err');return}
+  const p={id:$('pId').value.trim(),name:$('pName').value.trim(),agency:$('pAgency').value.trim(),type:$('pType').value,loc:$('pLoc').value.trim(),contractor:$('pContractor').value.trim(),value:Number($('pVal').value)||0,progress:Math.min(100,Math.max(0,Number($('pProg').value)||0)),financial:Math.min(100,Math.max(0,Number($('pFin').value)||0)),status:$('pStatus').value,start:$('pStart').value,end:$('pEnd').value,pm:$('pPM').value.trim(),desc:$('pDesc').value.trim()};
+  if($('pStart').value&&$('pEnd').value&&$('pEnd').value<$('pStart').value){toast(t('end_before_start'),'err');return}
+  if(old){const i=data.projects.findIndex(x=>x.id===old);data.projects[i]=p;
+    [data.issues,data.parties,data.milestones,data.docs,data.ledger,data.tasks,data.qaqc].forEach(arr=>arr.forEach(x=>{if(x.projectId===old)x.projectId=p.id}));
+    log('Updated',tf('log_project_updated',{name:p.name}));toast(t('project_updated'))}
+  else{data.projects.push(p);log('Created',tf('log_project_created',{name:p.name}));toast(t('project_created'))}
+  projectDlg.close();save();
+}
+function delProject(id){const p=proj(id);askConfirm(tf('del_project_confirm',{name:p.name}),()=>{
+  data.projects=data.projects.filter(x=>x.id!==id);data.issues=data.issues.filter(x=>x.projectId!==id);
+  data.parties=data.parties.filter(x=>x.projectId!==id);data.milestones=data.milestones.filter(x=>x.projectId!==id);
+  data.docs=data.docs.filter(x=>x.projectId!==id);data.ledger=data.ledger.filter(x=>x.projectId!==id);data.tasks=data.tasks.filter(x=>x.projectId!==id);data.qaqc=data.qaqc.filter(x=>x.projectId!==id);
+  log('Deleted',tf('log_project_deleted',{name:p.name}));toast(t('project_deleted'),'info');save();})}
+
+/* ================= BLOCKS / BUILDINGS ================= */
+function renderBlocks(){
+  const pf=$('bkProject').value,sf=$('bkStatus').value;
+  $('blockRows').innerHTML=data.blocks.filter(b=>(!pf||b.projectId===pf)&&(!sf||b.status===sf)).map(b=>`<tr>
+    <td>${esc(projName(b.projectId))}</td><td><b>${esc(b.name)}</b></td><td>${tr(b.type)}</td>
+    <td style="min-width:130px"><div class="mini"><div class="progress"><i style="width:${b.progress}%"></i></div><span class="sub" style="min-width:40px;text-align:right">${b.progress}%</span></div></td>
+    <td><span class="badge ${cls(b.status)}">${tr(b.status)}</span></td><td>${money(b.cost)}</td>
+    <td><div class="actions"><button class="icon-btn" title="${t('edit')}" onclick="editBlock(${b.id})">✏️</button><button class="icon-btn" title="${t('delete')}" onclick="delBlock(${b.id})">🗑️</button></div></td></tr>`).join('')||`<tr><td colspan="7" class="empty">${t('no_blocks')}</td></tr>`;
+}
+function openBlock(b){const e=b||{};
+  $('bkId').value=e.id||'';$('bkProjectSel').value=e.projectId||(data.projects[0]?data.projects[0].id:'');$('bkName').value=e.name||'';$('bkType').value=e.type||'New Building';$('bkProg').value=e.progress||0;$('bkStatusSel').value=e.status||'Planning';$('bkCost').value=e.cost||0;blockDlg.showModal();$('bkName').focus();}
+function editBlock(id){openBlock(data.blocks.find(x=>x.id===id))}
+function saveBlock(e){e.preventDefault();
+  const old=$('bkId').value,obj={id:old||Date.now(),projectId:$('bkProjectSel').value,name:$('bkName').value.trim(),type:$('bkType').value,progress:Math.min(100,Math.max(0,Number($('bkProg').value)||0)),status:$('bkStatusSel').value,cost:Number($('bkCost').value)||0};
+  if(!obj.name){toast(t('block_name_req'),'err');return}
+  if(old){const i=data.blocks.findIndex(x=>x.id==old);data.blocks[i]=obj;log('Updated',tf('log_block_updated',{n:obj.name}));toast(t('block_updated'))}
+  else{data.blocks.push(obj);log('Created',tf('log_block_created',{n:obj.name}));toast(t('block_added'))}
+  blockDlg.close();save();}
+function delBlock(id){const b=data.blocks.find(x=>x.id===id);askConfirm(tf('del_block_confirm',{name:b.name}),()=>{data.blocks=data.blocks.filter(x=>x.id!==id);log('Deleted',tf('log_block_deleted',{n:b.name}));toast(t('block_deleted'),'info');save();})}
+
+/* ================= TIMELINE / GANTT ================= */
+function renderGantt(){
+  const today=new Date();
+  const projs=data.projects.map(p=>{
+    const s=p.start?new Date(p.start+'T00:00:00'):new Date(today.getFullYear(),0,1);
+    const e=p.end?new Date(p.end+'T00:00:00'):new Date(s.getFullYear()+1,11,31);
+    return {...p,start:s,end:e};});
+  let min=Infinity,max=-Infinity;
+  projs.forEach(p=>{min=Math.min(min,p.start.getTime());max=Math.max(max,p.end.getTime())});
+  if(!projs.length||!isFinite(min)){min=today.getTime()-90*864e5;max=today.getTime()+270*864e5}
+  const m0=new Date(min);m0.setDate(1);m0.setHours(0,0,0,0);
+  const months=[];const cur=new Date(m0);let guard=0;
+  while(cur.getTime()<=max&&guard++<60){months.push(new Date(cur));cur.setMonth(cur.getMonth()+1)}
+  const endMs=months.length?months[months.length-1].getTime()+31*864e5:m0.getTime()+365*864e5;
+  const totalMs=endMs-m0.getTime();
+  const todayPos=Math.max(0,Math.min(100,(Date.now()-m0.getTime())/totalMs*100));
+  const head=`<tr><th style="min-width:230px">${t('th_project')}</th>${months.map(m=>`<th class="m">${m.toLocaleString(MONTHS(),{month:'short'})}<br><span style="font-weight:400">${String(m.getFullYear()).slice(2)}</span></th>`).join('')}</tr>`;
+  const body=projs.map(p=>{
+    const l=Math.max(0,(p.start.getTime()-m0.getTime())/totalMs*100);
+    const w=Math.max(2,Math.min(100-l,(p.end.getTime()-p.start.getTime())/totalMs*100));
+    return `<tr><td><b>${esc(p.name)}</b><div class="sub">${esc(p.id)} · ${tr(p.status)}</div></td><td colspan="${months.length}" style="position:relative"><div class="gbar"><i style="left:${l}%;width:${w}%" title="${esc(p.name)}: ${p.progress}% ${t('complete')}"><em style="width:${p.progress}%"></em></i></div></td></tr>`;}).join('');
+  const todayRow=`<tr><td style="font-size:11px;color:#dc2626;font-weight:700">▌ ${t('today')}</td><td colspan="${months.length}" style="position:relative"><div style="position:absolute;top:0;bottom:0;left:${todayPos}%;width:2px;background:#dc2626"></div></td></tr>`;
+  $('ganttTable').innerHTML=months.length?`<colgroup><col style="width:230px">${months.map(()=>'<col style="width:54px">').join('')}</colgroup><thead>${head}</thead><tbody>${todayRow}${body}</tbody>`:'<tbody><tr><td class="empty">'+t('no_data')+'</td></tr></tbody>';
+}
+
+/* ================= CPM SCHEDULE (Microsoft Project import) ================= */
+const fmtN=n=>{const r=Math.round((n||0)*10)/10;return String(r).replace(/\.0$/,'')};
+function parseCSV(text){
+  const rows=[];let row=[],cur='',inQ=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(inQ){if(c==='"'){if(text[i+1]==='"'){cur+='"';i++}else inQ=false}else cur+=c}
+    else if(c==='"')inQ=true;
+    else if(c===','){row.push(cur);cur=''}
+    else if(c==='\n'||c==='\r'){if(c==='\r'&&text[i+1]==='\n')i++;row.push(cur);cur='';if(row.some(x=>x!==''))rows.push(row);row=[]}
+    else cur+=c;
+  }
+  if(cur!==''||row.length){row.push(cur);if(row.some(x=>x!==''))rows.push(row)}
+  return rows;
+}
+function parseDur(s){
+  s=String(s||'').trim();if(!s)return 0;
+  const m=s.match(/([\d.,]+)\s*([a-z]+)?/i);if(!m)return 0;
+  const n=parseFloat(m[1].replace(/,/g,''));if(!isFinite(n))return 0;
+  const u=(m[2]||'d').toLowerCase();
+  if(u==='w'||u.startsWith('wk')||u==='week')return n*5;
+  if(u.startsWith('mo')||u==='month')return n*20;
+  if(u==='m'||u.startsWith('min'))return n/480;
+  if(u==='h'||u.startsWith('hr')||u==='hour')return n/8;
+  if(u==='y'||u==='year')return n*240;
+  return n;
+}
+function parseISODur(s){
+  s=String(s||'').trim();if(!s)return 0;
+  if(!/^P/i.test(s))return 0;
+  const body=s.slice(1);
+  const ti=body.toUpperCase().indexOf('T');
+  let val=0;
+  const re=/(\d+(?:\.\d+)?)([YMWDHS])/gi;let mm;
+  while((mm=re.exec(body))){
+    const n=parseFloat(mm[1]);
+    const u=mm[2].toUpperCase();
+    const inTime=ti>=0&&mm.index>ti;
+    if(u==='Y')val+=n*240;
+    else if(u==='W')val+=n*5;
+    else if(u==='D')val+=n;
+    else if(u==='H')val+=n/8;
+    else if(u==='M')val+=inTime?n/480:n*20;
+    else if(u==='S')val+=n/480;
+  }
+  return val;
+}
+function parseDateStr(s){
+  s=String(s||'').trim();if(!s)return '';
+  let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(m)return m[1]+'-'+String(+m[2]).padStart(2,'0')+'-'+String(+m[3]).padStart(2,'0');
+  m=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/);
+  if(m){
+    let y=+m[3];if(y<100)y+=2000;
+    let mo=+m[1],d=+m[2];if(mo>12){const tmp=mo;mo=d;d=tmp}
+    return y+'-'+String(mo).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+  }
+  return '';
+}
+function parseMSPXML(xml){
+  const doc=new DOMParser().parseFromString(xml,'application/xml');
+  if(doc.querySelector('parsererror'))throw new Error('xml-parse');
+  const proj=doc.getElementsByTagName('Project')[0];
+  if(!proj)throw new Error('xml-project');
+  const titleEl=proj.getElementsByTagName('Title')[0];
+  const projectName=titleEl?(titleEl.textContent||'').trim():'';
+  const tasks=[];
+  const nodes=doc.getElementsByTagName('Task');
+  for(let i=0;i<nodes.length;i++){
+    const n=nodes[i];
+    const uidEl=n.getElementsByTagName('UID')[0];
+    const nameEl=n.getElementsByTagName('Name')[0];
+    if(!uidEl||!nameEl)continue;
+    const name=(nameEl.textContent||'').trim();
+    if(!name)continue;
+    const getFld=(tag,def)=>{const el=n.getElementsByTagName(tag)[0];return el?((el.textContent||'').trim()):def};
+    const durStr=getFld('Duration','');
+    let dur=0;
+    if(durStr){dur=/^P/i.test(durStr)?parseISODur(durStr):parseDur(durStr)}
+    const summary=String(getFld('Summary','')||getFld('IsSummary','')).toLowerCase()==='true';
+    const mile=String(getFld('Milestone','')).toLowerCase()==='true';
+    const start=parseDateStr(getFld('Start',''));
+    const finish=parseDateStr(getFld('Finish',''));
+    const pct=parseFloat(getFld('PercentComplete','0'))||0;
+    const res=getFld('ResourceNames','');
+    const preds=[];
+    const links=n.getElementsByTagName('PredecessorLink');
+    for(let j=0;j<links.length;j++){
+      const l=links[j];
+      const puidEl=l.getElementsByTagName('PredecessorUID')[0];
+      if(!puidEl)continue;
+      const puid=(puidEl.textContent||'').trim();if(!puid)continue;
+      const typeEl=l.getElementsByTagName('Type')[0];
+      const typeMap={3:'SS',2:'SF',0:'FF'};
+      const type=typeMap[String(typeEl?(typeEl.textContent||'').trim():'1')]||'FS';
+      const lagEl=l.getElementsByTagName('Lag')[0];
+      const lagFmtEl=l.getElementsByTagName('LagFormat')[0];
+      let lag=0;
+      if(lagEl&&lagEl.textContent&&lagEl.textContent.trim()!==''){
+        const lv=parseFloat(lagEl.textContent);
+        if(isFinite(lv)){
+          const f=parseInt(String(lagFmtEl?(lagFmtEl.textContent||'').trim():'1'),10);
+          if(f===3)lag=lv;            // days
+          else if(f===4)lag=lv*5;     // weeks
+          else if(f===5)lag=lv*20;    // months
+          else if(f===2||f===7)lag=lv/8; // hours
+          else lag=lv/480;            // minutes (default)
+        }
+      }
+      preds.push(puid+':'+type+':'+lag);
+    }
+    tasks.push({pid:uidEl.textContent.trim(),projectName,name,dur,summary,mile,start,finish,pct,res,preds});
+  }
+  return {tasks,projectName};
+}
+function parseMSPCSV(text){
+  const rows=parseCSV(text);
+  if(!rows.length)throw new Error('csv-empty');
+  const head=rows[0].map(h=>String(h).trim().toLowerCase());
+  const idx=k=>head.indexOf(k);
+  const iID=idx('id'),iName=idx('name'),iDur=idx('duration'),iStart=idx('start'),iFinish=idx('finish');
+  const iPct=Math.max(idx('% complete'),idx('%complete')),iRes=Math.max(idx('resource names'),idx('resources'));
+  const iPred=idx('predecessors'),iSum=idx('summary'),iMil=idx('milestone');
+  if(iName<0&&iID<0)throw new Error('csv-head');
+  const projectName=(rows[0].filter(x=>x).join(' '))||'';
+  const tasks=[];
+  for(let r=1;r<rows.length;r++){
+    const c=rows[r];
+    const name=(iName>=0?String(c[iName]||'').trim():'')||'';
+    const id=(iID>=0?String(c[iID]||'').trim():'')||String(r);
+    if(!name&&!id)continue;
+    const dur=iDur>=0?parseDur(c[iDur]):0;
+    const start=iStart>=0?parseDateStr(c[iStart]):'';
+    const finish=iFinish>=0?parseDateStr(c[iFinish]):'';
+    const pct=iPct>=0?(parseFloat(c[iPct])||0):0;
+    const res=iRes>=0?String(c[iRes]||'').trim():'';
+    const summary=iSum>=0&&String(c[iSum]).toLowerCase()==='true';
+    const mile=iMil>=0&&String(c[iMil]).toLowerCase()==='true';
+    const preds=[];
+    if(iPred>=0&&String(c[iPred]||'').trim()){
+      String(c[iPred]).split(/[,;]/).forEach(p=>{
+        p=String(p).trim();if(!p)return;
+        const m=p.match(/^(\d+)\s*(FS|SS|FF|SF)?\s*([+-]?\s*\d+(?:\.\d+)?)?\s*(d|day|days|w|wk|wks|h|hr|hrs)?/i);
+        if(!m)return;
+        const type=(m[2]||'FS').toUpperCase();
+        let lag=0;
+        if(m[3]!==undefined){lag=parseFloat(m[3].replace(/\s/g,''))||0;const u=(m[4]||'d').toLowerCase();if(u.startsWith('w'))lag*=5;else if(u.startsWith('h'))lag/=8}
+        preds.push(m[1]+':'+type+':'+lag);
+      });
+    }
+    tasks.push({pid:id,projectName,name,dur,summary,mile,start,finish,pct,res,preds});
+  }
+  return {tasks,projectName};
+}
+function parseMSPText(text){
+  const t=String(text||'');
+  if(/<Project\b/i.test(t.slice(0,2000)))return parseMSPXML(t);
+  const head=(t.split(/\r?\n/)[0]||'');
+  if(/,/.test(head)&&/(name|id|duration|start|finish)/i.test(head))return parseMSPCSV(t);
+  throw new Error('unknown-format');
+}
+/* --- CPM engine (forward/backward pass, total float, critical path) --- */
+function toUTC(s){const d=new Date(s+'T00:00:00Z');return isNaN(d.getTime())?null:d}
+function addWorkDays(startStr,n){
+  const d=toUTC(startStr);if(!d)return startStr;
+  const sign=n<0?-1:1;let left=Math.abs(Math.round(n));
+  while(left>0){d.setUTCDate(d.getUTCDate()+sign);const w=d.getUTCDay();if(w!==0&&w!==6)left--}
+  return d.toISOString().slice(0,10);
+}
+function workDaysBetween(aStr,bStr){
+  const a=toUTC(aStr),b=toUTC(bStr);if(!a||!b||a>=b)return 0;
+  let n=0;const d=new Date(a);
+  while(d<b){const w=d.getUTCDay();if(w!==0&&w!==6)n++;d.setUTCDate(d.getUTCDate()+1)}
+  return n;
+}
+function computeCPM(projectId){
+  const list=data.tasks.filter(x=>x.projectId===projectId);
+  if(!list.length)return null;
+  const byId={};list.forEach(x=>byId[x.id]=x);
+  const byPid={};list.forEach(x=>byPid[String(x.pid)]=x);
+  let start='';
+  list.forEach(x=>{if(x.start&&(!start||x.start<start))start=x.start});
+  if(!start)start=todayStr();
+  const dur={},fin={};
+  list.forEach(x=>{dur[x.id]=Math.max(0,isFinite(parseFloat(x.dur))?parseFloat(x.dur):0);fin[x.id]=dur[x.id]>0?dur[x.id]-1:0});
+  const es={},ef={};
+  list.forEach(x=>{es[x.id]=x.start&&toUTC(x.start)?workDaysBetween(start,x.start):0});
+  const edges=[];
+  list.forEach(x=>(x.preds||[]).forEach(p=>{
+    const parts=String(p).split(':');
+    const puid=(parts[0]||'').trim();
+    const type=/^(FS|SS|FF|SF)$/i.test(parts[1]||'')?parts[1].toUpperCase():'FS';
+    let lag=(parts[2]!==undefined&&parts[2]!=='')?parseFloat(parts[2])||0:0;
+    if(parts[2]===undefined&&/^\d+$/.test(parts[1]||''))lag=parseFloat(parts[1])||0;
+    const pred=byPid[String(puid)];
+    if(pred&&pred.id!==x.id&&!edges.some(e=>e.from===pred.id&&e.to===x.id))edges.push({from:pred.id,to:x.id,type,lag});
+  }));
+  // Forward pass — ES/EF (EF is the task's last workday offset, inclusive)
+  let changed=true,guard=0;
+  while(changed&&guard++<list.length*2+5){
+    changed=false;
+    edges.forEach(e=>{
+      const p=byId[e.from],t=byId[e.to];
+      const lastP=es[p.id]+fin[p.id];
+      let req;
+      if(e.type==='FS')req=lastP+(dur[t.id]>0?1:0)+e.lag;
+      else if(e.type==='SS')req=es[p.id]+e.lag;
+      else if(e.type==='FF')req=lastP+e.lag-fin[t.id];
+      else req=es[p.id]+e.lag-fin[t.id];
+      if(req>es[t.id]){es[t.id]=req;changed=true}
+    });
+  }
+  list.forEach(x=>{ef[x.id]=es[x.id]+fin[x.id]});
+  const finishOff=list.reduce((m,x)=>Math.max(m,ef[x.id]),0);
+  // Backward pass — LS/LF
+  const lf={},ls={};list.forEach(x=>{lf[x.id]=finishOff});
+  changed=true;guard=0;
+  while(changed&&guard++<list.length*2+5){
+    changed=false;
+    edges.forEach(e=>{
+      const p=byId[e.from],t=byId[e.to];
+      const lsT=lf[t.id]-fin[t.id];
+      let req;
+      if(e.type==='FS')req=lsT-(dur[t.id]>0?1:0)-e.lag;
+      else if(e.type==='SS')req=lsT-e.lag+fin[p.id];
+      else if(e.type==='FF')req=lf[t.id]-e.lag;
+      else req=lf[t.id]-e.lag+fin[p.id];
+      if(req<lf[p.id]){lf[p.id]=req;changed=true}
+    });
+  }
+  list.forEach(x=>{ls[x.id]=lf[x.id]-fin[x.id]});
+  list.forEach(x=>{
+    x._es=Math.round(es[x.id]*100)/100;x._ef=Math.round(ef[x.id]*100)/100;
+    x._ls=Math.round(ls[x.id]*100)/100;x._lf=Math.round(lf[x.id]*100)/100;
+    x._fl=Math.round((ls[x.id]-es[x.id])*100)/100;
+    x._cr=Math.abs(x._fl)<0.5;
+    x._esD=addWorkDays(start,es[x.id]);
+    x._efD=addWorkDays(start,ef[x.id]);
+    x._lsD=addWorkDays(start,ls[x.id]);
+    x._lfD=addWorkDays(start,lf[x.id]);
+  });
+  const minEs=list.reduce((m,x)=>Math.min(m,es[x.id]),es[list[0].id]);
+  return {start,finish:addWorkDays(start,finishOff),days:Math.round(finishOff-minEs+1),tasks:list,critical:list.filter(x=>x._cr)};
+}
+function renderCPMGantt(cpm){
+  const el=$('cpmGantt');if(!el)return;
+  const today=new Date();
+  let min=Infinity,max=-Infinity;
+  cpm.tasks.forEach(x=>{const s=toUTC(x._esD),e=toUTC(x._efD);if(s){min=Math.min(min,s.getTime());max=Math.max(max,e?e.getTime():s.getTime())}});
+  if(!isFinite(min)){min=today.getTime()-30*864e5;max=today.getTime()+180*864e5}
+  const m0=new Date(min);m0.setDate(1);m0.setHours(0,0,0,0);
+  const months=[];const cur=new Date(m0);let guard=0;
+  while(cur.getTime()<=max&&guard++<60){months.push(new Date(cur));cur.setMonth(cur.getMonth()+1)}
+  const endMs=months.length?months[months.length-1].getTime()+31*864e5:m0.getTime()+365*864e5;
+  const totalMs=endMs-m0.getTime();
+  const todayPos=Math.max(0,Math.min(100,(Date.now()-m0.getTime())/totalMs*100));
+  const head=`<tr><th style="min-width:230px">${t('th_task')}</th>${months.map(m=>`<th class="m">${m.toLocaleString(MONTHS(),{month:'short'})}<br><span style="font-weight:400">${String(m.getFullYear()).slice(2)}</span></th>`).join('')}</tr>`;
+  const body=cpm.tasks.slice().sort((a,b)=>(a._es-b._es)||String(a.pid).localeCompare(String(b.pid))).map(x=>{
+    const s=toUTC(x._esD),e=toUTC(x._efD);
+    if(!s)return '';
+    const l=Math.max(0,(s.getTime()-m0.getTime())/totalMs*100);
+    const w=x.mile?0:Math.max(2,Math.min(100-l,(e.getTime()-s.getTime()+864e5)/totalMs*100));
+    const bar=`<i class="${x._cr?'cr':''}" style="left:${l}%;width:${Math.max(w,0)}%" title="${esc(x.name)}: ${x._esD} → ${x._efD} (${t('th_float')} ${fmtN(x._fl)})">${x.mile?`<em class="dia ${x._cr?'':'blue'}"></em>`:''}${(!x.mile&&x.pct>0&&x.dur>0)?`<em style="width:${Math.min(100,x.pct)}%"></em>`:''}</i>`;
+    return `<tr><td><b>${esc(x.name)}</b><div class="sub">${esc(x.pid)}${x._cr?' · '+t('cpm_yes'):''}</div></td><td colspan="${months.length}" style="position:relative"><div class="gbar">${bar}</div></td></tr>`;
+  }).join('');
+  const todayRow=`<tr><td style="font-size:11px;color:#dc2626;font-weight:700">▌ ${t('today')}</td><td colspan="${months.length}" style="position:relative"><div style="position:absolute;top:0;bottom:0;left:${todayPos}%;width:2px;background:#dc2626"></div></td></tr>`;
+  el.innerHTML=months.length?`<colgroup><col style="width:230px">${months.map(()=>'<col style="width:54px">').join('')}</colgroup><thead>${head}</thead><tbody>${todayRow}${body}</tbody>`:'';
+}
+function renderCPM(){
+  const sel=$('cpmProject');if(!sel)return;
+  const pid=sel.value;
+  const rowsEl=$('cpmRows'),sumEl=$('cpmSummary'),ganttEl=$('cpmGantt');
+  if(!rowsEl)return;
+  if(!pid||!data.tasks.some(x=>x.projectId===pid)){
+    sumEl.innerHTML='';
+    rowsEl.innerHTML=`<tr><td colspan="12" class="empty">${data.projects.length?t('cpm_no_data'):t('cpm_no_projects')}</td></tr>`;
+    ganttEl.innerHTML='';
+    return;
+  }
+  const cpm=computeCPM(pid);
+  const critCount=cpm.critical.length;
+  sumEl.innerHTML=`
+    <div class="cstat"><span>${t('cpm_tasks')}</span><b>${cpm.tasks.length}</b></div>
+    <div class="cstat blue"><span>${t('cpm_duration')}</span><b>${tf('cpm_days',{n:cpm.days})}</b></div>
+    <div class="cstat ${critCount?'cr':''}"><span>${t('cpm_critical')}</span><b>${critCount}</b></div>
+    <div class="cstat cr"><span>${t('cpm_path')}</span><b style="font-size:14px">${cpm.start} → ${cpm.finish}</b></div>`;
+  const sorted=cpm.tasks.slice().sort((a,b)=>(a._es-b._es)||String(a.pid).localeCompare(String(b.pid)));
+  rowsEl.innerHTML=sorted.map(x=>{
+    const preds=(x.preds||[]).length?(x.preds.map(p=>esc(p)).join(', ')):'—';
+    const cr=x._cr?'<span class="cbadge">'+t('cpm_yes')+'</span>':'<span class="cbadge no">'+t('cpm_no')+'</span>';
+    return `<tr class="${x.summary?'sum':''}">
+      <td class="b">${esc(x.pid)}</td>
+      <td>${x.mile?'<span class="sub">◆ </span>':''}${esc(x.name)}${x.summary?' <span class="sub">('+t('cpm_summary')+')</span>':''}</td>
+      <td>${x.mile?'0':fmtN(x.dur)}</td>
+      <td>${esc(x.start||'-')}</td>
+      <td>${esc(x.finish||'-')}</td>
+      <td class="sub" style="white-space:normal">${preds}</td>
+      <td>${esc(x._esD)}</td><td>${esc(x._efD)}</td><td>${esc(x._lsD)}</td><td>${esc(x._lfD)}</td>
+      <td class="b ${x._cr?'cr':''}">${fmtN(x._fl)}</td>
+      <td>${cr}</td>
+    </tr>`;}).join('');
+  renderCPMGantt(cpm);
+}
+let pendingMsp=null;
+function openMspImport(){
+  pendingMsp=null;
+  const fi=$('mspFileInfo');if(fi)fi.textContent=t('no_file');
+  const pv=$('mspPreview');if(pv)pv.style.display='none';
+  const f=$('mspFile');if(f)f.value='';
+  $('mspProject').innerHTML=data.projects.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('')||'<option value="">'+t('none')+'</option>';
+  mspDlg.showModal();
+}
+function pickMspFile(){const f=$('mspFile');if(f)f.click()}
+function onMspFileChange(){
+  const f=$('mspFile').files&&$('mspFile').files[0];
+  const fi=$('mspFileInfo'),pv=$('mspPreview');
+  if(!f){if(fi)fi.textContent=t('no_file');if(pv)pv.style.display='none';pendingMsp=null;return}
+  if(fi)fi.textContent=f.name;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const parsed=parseMSPText(String(e.target.result||''));
+      if(!parsed.tasks||!parsed.tasks.length)throw new Error('no-tasks');
+      pendingMsp={tasks:parsed.tasks,name:parsed.projectName||f.name};
+      if(pv){
+        pv.style.display='block';
+        pv.innerHTML=`<div class="hint" style="padding:8px 10px;background:#f8fafc;border:1px solid var(--l);border-radius:8px">${tf('msp_preview',{n:parsed.tasks.length,name:esc(parsed.projectName||f.name)})}<div style="margin-top:6px;font-size:11px;color:var(--m)">${parsed.tasks.slice(0,5).map(x=>esc(x.pid)+' · '+esc(x.name)).join('<br>')}${parsed.tasks.length>5?'<br>…':''}</div></div>`;
+      }
+    }catch(err){
+      pendingMsp=null;
+      if(fi)fi.textContent=t('msp_bad_file');
+      if(pv)pv.style.display='none';
+      toast(t('msp_bad_file'),'err');
+    }
+  };
+  reader.onerror=()=>{pendingMsp=null;toast(t('msp_bad_file'),'err')};
+  reader.readAsText(f);
+}
+function doMspImport(e){
+  e.preventDefault();
+  const pid=$('mspProject').value;
+  if(!pid){toast(t('msp_proj_req'),'err');return}
+  if(!pendingMsp){toast(t('msp_no_file'),'err');return}
+  const base=Date.now();
+  data.tasks=data.tasks.filter(x=>x.projectId!==pid);
+  pendingMsp.tasks.forEach((x,i)=>{
+    data.tasks.push({id:base+i,projectId:pid,pid:String(x.pid),name:x.name,dur:x.dur,summary:!!x.summary,mile:!!x.mile,start:x.start,finish:x.finish,pct:x.pct||0,res:x.res||'',preds:x.preds||[]});
+  });
+  pendingMsp=null;mspDlg.close();
+  log('Imported',t('log_msp_import'));
+  save();
+  toast(t('msp_imported'));
+}
+function clearCPM(){
+  const pid=$('cpmProject')&&$('cpmProject').value;
+  if(!pid)return;
+  askConfirm(t('msp_confirm_clear'),()=>{
+    data.tasks=data.tasks.filter(x=>x.projectId!==pid);
+    log('Deleted',t('log_msp_clear'));
+    save();toast(t('msp_cleared'),'info');
+  });
+}
+
+/* ================= MILESTONES ================= */
+function renderMilestones(){
+  const pf=$('msProject').value,sf=$('msStatus').value;
+  const rows=data.milestones.filter(m=>(!pf||m.projectId===pf)&&(!sf||m.status===sf)).map(m=>{
+    const overdue=m.status!=='Completed'&&m.due&&m.due<todayStr();
+    const st=overdue?'Overdue':m.status;
+    return `<tr><td>${esc(projName(m.projectId))}</td><td><b>${esc(m.title)}</b></td><td>${m.due?esc(m.due):'-'}</td><td><span class="badge ${cls(st)}">${tr(st)}</span></td><td><div class="actions"><button class="icon-btn" title="${t('edit')}" onclick="editMilestone(${m.id})">✏️</button><button class="icon-btn" title="${t('delete')}" onclick="delMilestone(${m.id})">🗑️</button></div></td></tr>`;}).join('');
+  $('milestoneRows').innerHTML=rows||`<tr><td colspan="5" class="empty">${t('no_milestones')}</td></tr>`;
+  $('msOverdue').textContent=tf('n_overdue',{n:data.milestones.filter(m=>m.status!=='Completed'&&m.due&&m.due<todayStr()).length});
+}
+function openMilestone(m){const e=m||{};
+  $('mstId').value=e.id||'';$('msProjectSel').value=e.projectId||(data.projects[0]?data.projects[0].id:'');$('msTitle').value=e.title||'';$('msDue').value=e.due||'';$('msStat').value=e.status||'Pending';milestoneDlg.showModal();$('msTitle').focus();}
+function editMilestone(id){openMilestone(data.milestones.find(x=>x.id===id))}
+function saveMilestone(e){e.preventDefault();
+  const old=$('mstId').value,obj={id:old||Date.now(),projectId:$('msProjectSel').value,title:$('msTitle').value.trim(),due:$('msDue').value,status:$('msStat').value};
+  if(!obj.title){toast(t('milestone_title_req'),'err');return}
+  if(old){const i=data.milestones.findIndex(x=>x.id==old);data.milestones[i]=obj;log('Updated',tf('log_milestone_updated',{title:obj.title}));toast(t('milestone_updated'))}
+  else{data.milestones.push(obj);log('Created',tf('log_milestone_created',{title:obj.title}));toast(t('milestone_added'))}
+  milestoneDlg.close();save();}
+function delMilestone(id){const m=data.milestones.find(x=>x.id===id);askConfirm(tf('del_milestone_confirm',{title:m.title}),()=>{data.milestones=data.milestones.filter(x=>x.id!==id);log('Deleted',tf('log_milestone_deleted',{title:m.title}));toast(t('milestone_deleted'),'info');save();})}
+
+/* ================= DISCIPLINES ================= */
+function renderDisc(){const id=$('dp').value;
+  $('discGrid').innerHTML=D.map(d=>{const open=data.issues.filter(i=>i.projectId===id&&i.disc===d&&i.status!=='Closed').length;const all=data.issues.filter(i=>i.projectId===id&&i.disc===d).length;const pct=all?Math.round((all-open)/all*100):0;
+    return `<div class="card"><h3>${tr(d)}</h3><p class="sub">${tf('disc_summary',{open,all})}</p><div class="progress" style="margin-top:10px"><i style="width:${pct}%"></i></div><div class="sub" style="margin-top:6px">${tf('disc_resolved',{pct})}</div></div>`}).join('')}
+
+/* ================= MAINTENANCE ================= */
+function renderMaint(){const sf=$('mf').value,cf=$('mCatFilter').value;
+  $('maintRows').innerHTML=data.maint.filter(m=>(!sf||m.status===sf)&&(!cf||m.cat===cf)).map(m=>`<tr>
+    <td><b>${esc(m.asset)}</b>${m.date?`<div class="sub">${esc(m.date)}</div>`:''}</td><td>${tr(m.cat)}</td><td>${esc(m.desc)}</td>
+    <td><span class="badge ${cls(m.pri)}">${tr(m.pri)}</span></td><td><span class="badge ${cls(m.status)}">${tr(m.status)}</span></td><td>${money(m.cost)}</td>
+    <td><div class="actions">${m.status!=='Completed'?`<button class="btn ok sm" onclick="doneMaint(${m.id})">${t('complete')}</button>`:''}<button class="icon-btn" title="${t('edit')}" onclick="editMaint(${m.id})">✏️</button><button class="icon-btn" title="${t('delete')}" onclick="delMaint(${m.id})">🗑️</button></div></td></tr>`).join('')||`<tr><td colspan="7" class="empty">${t('no_maint')}</td></tr>`}
+function openMaint(m){const e=m||{};
+  $('mId').value=e.id||'';$('mAsset').value=e.asset||'';$('mCat').value=e.cat||'Electrical';$('mDesc').value=e.desc||'';$('mPri').value=e.pri||'Medium';$('mCost').value=e.cost||0;$('mDate').value=e.date||'';$('mStatus').value=e.status||'Open';maintDlg.showModal();$('mAsset').focus();}
+function editMaint(id){openMaint(data.maint.find(x=>x.id===id))}
+function saveMaint(e){e.preventDefault();
+  const old=$('mId').value,obj={id:old||Date.now(),asset:$('mAsset').value.trim(),cat:$('mCat').value,desc:$('mDesc').value.trim(),pri:$('mPri').value,cost:Number($('mCost').value)||0,date:$('mDate').value,status:$('mStatus').value};
+  if(!obj.asset||!obj.desc){toast(t('asset_req'),'err');return}
+  if(old){const i=data.maint.findIndex(x=>x.id==old);data.maint[i]=obj;log('Updated',tf('log_maint_updated',{a:obj.asset}));toast(t('maint_updated'))}
+  else{data.maint.push(obj);log('Created',tf('log_maint_created',{a:obj.asset}));toast(t('maint_logged'))}
+  maintDlg.close();save();}
+function doneMaint(id){const m=data.maint.find(x=>x.id===id);m.status='Completed';log('Completed',tf('log_maint_created',{a:m.asset}));toast(t('maint_done'));save()}
+function delMaint(id){const m=data.maint.find(x=>x.id===id);askConfirm(tf('del_maint_confirm',{asset:m.asset}),()=>{data.maint=data.maint.filter(x=>x.id!==id);log('Deleted',tf('log_maint_deleted',{a:m.asset}));toast(t('maint_deleted'),'info');save();})}
+
+/* ================= ISSUES & RISKS ================= */
+function renderIssues(){const q=($('iq').value||'').toLowerCase(),sf=$('iStatusFilter').value;
+  $('issueRows').innerHTML=data.issues.filter(i=>(!sf||i.status===sf)&&JSON.stringify(i).toLowerCase().includes(q)).map(i=>`<tr>
+    <td>${esc(projName(i.projectId))}</td><td>${tr(i.disc)}</td><td>${esc(i.desc)}</td><td><span class="badge ${cls(i.sev)}">${tr(i.sev)}</span></td><td>${esc(i.owner||'-')}</td><td><span class="badge ${cls(i.status)}">${tr(i.status)}</span></td>
+    <td><div class="actions">${i.status!=='Closed'?`<button class="btn ok sm" onclick="closeIssue(${i.id})">${t('close')}</button>`:''}<button class="icon-btn" title="${t('edit')}" onclick="editIssue(${i.id})">✏️</button><button class="icon-btn" title="${t('delete')}" onclick="delIssue(${i.id})">🗑️</button></div></td></tr>`).join('')||`<tr><td colspan="7" class="empty">${t('no_issues')}</td></tr>`}
+function openIssue(i){const e=i||{};
+  $('iId').value=e.id||'';$('iProject').value=e.projectId||(data.projects[0]?data.projects[0].id:'');$('iDisc').value=e.disc||D[0];$('iDesc').value=e.desc||'';$('iSev').value=e.sev||'Medium';$('iOwner').value=e.owner||'';$('iStatus').value=e.status||'Open';issueDlg.showModal();$('iDesc').focus();}
+function editIssue(id){openIssue(data.issues.find(x=>x.id===id))}
+function saveIssue(e){e.preventDefault();
+  const old=$('iId').value,obj={id:old||Date.now(),projectId:$('iProject').value,disc:$('iDisc').value,desc:$('iDesc').value.trim(),sev:$('iSev').value,owner:$('iOwner').value.trim(),status:$('iStatus').value};
+  if(!obj.desc){toast(t('desc_req'),'err');return}
+  if(old){const i=data.issues.findIndex(x=>x.id==old);data.issues[i]=obj;log('Updated',tf('log_issue_updated',{p:projName(obj.projectId)}));toast(t('issue_updated'))}
+  else{data.issues.push(obj);log('Created',tf('log_issue_created',{d:obj.desc.slice(0,50)}));toast(t('issue_logged'))}
+  issueDlg.close();save();}
+function closeIssue(id){const i=data.issues.find(x=>x.id===id);i.status='Closed';log('Closed',tf('log_issue_closed',{d:i.desc.slice(0,50)}));toast(t('issue_closed'));save()}
+function delIssue(id){const i=data.issues.find(x=>x.id===id);askConfirm(t('del_issue_confirm'),()=>{data.issues=data.issues.filter(x=>x.id!==id);log('Deleted',tf('log_issue_deleted',{d:i.desc.slice(0,50)}));toast(t('issue_deleted'),'info');save();})}
+
+/* ================= QAQC / RCI ================= */
+function renderQAQC(){
+  const pf=$('qProject').value,tf_=$('qTypeFilter').value,sf=$('qStatusFilter').value;
+  const list=data.qaqc.filter(q=>(!pf||q.projectId===pf)&&(!tf_||q.type===tf_)&&(!sf||q.status===sf));
+  $('qaqcRows').innerHTML=list.map(q=>{
+    const overdue=q.status!=='Closed'&&q.due&&q.due<todayStr();
+    const st=overdue?'Overdue':q.status;
+    const chip=q.type==='NCP'||q.type==='NCR'?'chip nc':(q.type==='RFI'?'chip warn':(q.type==='ITP'||q.type==='MIR'||q.type==='RIN'?'chip ok':'chip'));
+    return `<tr>
+      <td><b>${esc(q.ref||'-')}</b></td>
+      <td><span class="${chip}">${esc(q.type)}</span></td>
+      <td>${esc(q.title)}</td>
+      <td>${esc(projName(q.projectId))}</td>
+      <td class="sub">${tr(q.disc)}</td>
+      <td><span class="badge ${cls(q.sev)}">${tr(q.sev)}</span></td>
+      <td>${q.date?esc(q.date):'-'}</td>
+      <td>${q.due?esc(q.due):'-'}</td>
+      <td><span class="badge ${cls(st)}">${tr(st)}</span></td>
+      <td><div class="actions">${q.status!=='Closed'?`<button class="btn ok sm" onclick="closeQAQC(${q.id})">${t('close')}</button>`:''}<button class="icon-btn" title="${t('edit')}" onclick="editQAQC(${q.id})">✏️</button><button class="icon-btn" title="${t('delete')}" onclick="delQAQC(${q.id})">🗑️</button></div></td>
+    </tr>`;}).join('')||`<tr><td colspan="10" class="empty">${t('no_qaqc')}</td></tr>`;
+  const open=data.qaqc.filter(q=>q.status!=='Closed').length;
+  const od=data.qaqc.filter(q=>q.status!=='Closed'&&q.due&&q.due<todayStr()).length;
+  $('qaqcMeta').textContent=tf('qaqc_summary',{o:open,d:od});
+}
+function openQAQC(x){const e=x||{};
+  $('qId').value=e.id||'';$('qaqcProjectSel').value=e.projectId||(data.projects[0]?data.projects[0].id:'');$('qType').value=e.type||'RCI';$('qRef').value=e.ref||'';$('qDisc').value=e.disc||D[0];$('qTitle').value=e.title||'';$('qSev').value=e.sev||'Medium';$('qOwner').value=e.owner||'';$('qDate').value=e.date||'';$('qDue').value=e.due||'';$('qStatus').value=e.status||'Open';$('qNotes').value=e.notes||'';qaqcDlg.showModal();$('qTitle').focus();}
+function editQAQC(id){openQAQC(data.qaqc.find(x=>x.id===id))}
+function saveQAQC(e){e.preventDefault();
+  const old=$('qId').value,obj={id:old?Number(old):Date.now(),projectId:$('qaqcProjectSel').value,type:$('qType').value,ref:$('qRef').value.trim(),title:$('qTitle').value.trim(),disc:$('qDisc').value,sev:$('qSev').value,owner:$('qOwner').value.trim(),date:$('qDate').value,due:$('qDue').value,status:$('qStatus').value,notes:$('qNotes').value.trim()};
+  if(!obj.title){toast(t('qaqc_title_req'),'err');return}
+  if(!obj.ref)obj.ref=obj.type+'-'+Date.now().toString().slice(-5);
+  if(old){const i=data.qaqc.findIndex(x=>x.id==old);data.qaqc[i]=obj;log('Updated',tf('log_qaqc_updated',{r:obj.ref}));toast(t('qaqc_updated'))}
+  else{data.qaqc.push(obj);log('Created',tf('log_qaqc_created',{r:obj.ref}));toast(t('qaqc_added'))}
+  qaqcDlg.close();save();}
+function closeQAQC(id){const q=data.qaqc.find(x=>x.id===id);q.status='Closed';log('Closed',tf('log_qaqc_closed',{r:q.ref}));toast(t('qaqc_closed'));save()}
+function delQAQC(id){const q=data.qaqc.find(x=>x.id===id);askConfirm(tf('del_qaqc_confirm',{r:q.ref||q.title}),()=>{data.qaqc=data.qaqc.filter(x=>x.id!==id);log('Deleted',tf('log_qaqc_deleted',{r:q.ref||q.title}));toast(t('qaqc_deleted'),'info');save();})}
+
+/* ================= CONTRACT & COST ================= */
+function renderContract(){
+  const total=data.projects.reduce((a,p)=>a+(p.value||0),0);
+  const paid=data.projects.reduce((a,p)=>a+(p.value||0)*(p.financial||0)/100,0);
+  $('cTotal').textContent=money(total);$('cPaid').textContent=money(paid);$('cBal').textContent=money(total-paid);
+  $('ct1').textContent=tf('n_projects',{n:data.projects.length});
+  $('ct2').textContent=total?tf('pct_of_contract',{p:Math.round(paid/total*100)}):'0%';
+  $('ct3').textContent=total?tf('pct_remaining',{p:Math.round((total-paid)/total*100)}):'0%';
+  $('contractSummary').innerHTML=data.projects.map(p=>`<div style="padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><b>${esc(p.name)}</b><span class="badge ${cls(p.status)}">${tr(p.status)}</span></div><div class="mini" style="margin-top:8px"><div class="progress"><i style="width:${p.financial}%"></i></div><span class="sub" style="min-width:44px;text-align:right">${p.financial}%</span></div><div class="sub" style="margin-top:4px">${money(p.value)} · ${tf('paid_value',{m:money(p.value*p.financial/100)})}</div></div>`).join('')||`<div class="empty">${t('no_projects')}</div>`;
+  $('ledgerList').innerHTML=data.ledger.length?data.ledger.slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).slice(0,12).map(x=>`<div class="costrow"><div><b>${esc(x.desc)}</b><div class="sub">${esc(projName(x.projectId))} · ${x.date||'-'} · ${tr(x.type)}</div></div><b style="white-space:nowrap">${money(x.amount)}</b></div>`).join(''):`<div class="empty">${t('no_ledger')}</div>`;
+}
+function openLedger(x){const e=x||{};
+  $('ledId').value=e.id||'';$('ledgerProject').value=e.projectId||(data.projects[0]?data.projects[0].id:'');$('ledDesc').value=e.desc||'';$('ledAmount').value=e.amount||'';$('ledDate').value=e.date||todayStr();$('ledType').value=e.type||'Progress Claim';ledgerDlg.showModal();$('ledDesc').focus();}
+function editLedger(id){openLedger(data.ledger.find(x=>x.id===id))}
+function saveLedger(e){e.preventDefault();
+  const old=$('ledId').value,obj={id:old||Date.now(),projectId:$('ledgerProject').value,desc:$('ledDesc').value.trim(),amount:Number($('ledAmount').value)||0,date:$('ledDate').value,type:$('ledType').value};
+  if(!obj.desc){toast(t('desc_req'),'err');return}
+  if(old){const i=data.ledger.findIndex(x=>x.id==old);data.ledger[i]=obj;log('Updated',tf('log_ledger_updated',{d:obj.desc}));toast(t('ledger_updated'))}
+  else{data.ledger.push(obj);log('Created',tf('log_ledger_created',{d:obj.desc}));toast(t('ledger_added'))}
+  ledgerDlg.close();save();}
+function delLedger(id){const x=data.ledger.find(r=>r.id===id);askConfirm(tf('del_ledger_confirm',{desc:x.desc}),()=>{data.ledger=data.ledger.filter(r=>r.id!==id);log('Deleted',tf('log_ledger_deleted',{d:x.desc}));toast(t('ledger_deleted'),'info');save();})}
+
+/* ================= PARTIES ================= */
+function renderParties(){const q=($('partyQ').value||'').toLowerCase();
+  $('partyRows').innerHTML=data.parties.filter(x=>JSON.stringify(x).toLowerCase().includes(q)).map(x=>`<tr>
+    <td>${esc(projName(x.projectId))}</td><td>${esc(x.role||'-')}</td><td><b>${esc(x.org)}</b></td>
+    <td>${esc(x.contact||'-')}<div class="sub">${esc(x.phone||'')}${x.email?' · '+esc(x.email):''}</div></td>
+    <td><div class="actions"><button class="icon-btn" title="${t('edit')}" onclick="editParty(${x.id})">✏️</button><button class="icon-btn" title="${t('delete')}" onclick="delParty(${x.id})">🗑️</button></div></td></tr>`).join('')||`<tr><td colspan="5" class="empty">${t('no_parties')}</td></tr>`}
+function openParty(x){const e=x||{};
+  $('partyId').value=e.id||'';$('partyProject').value=e.projectId||(data.projects[0]?data.projects[0].id:'');$('partyRole').value=e.role||'';$('partyOrg').value=e.org||'';$('partyContact').value=e.contact||'';$('partyPhone').value=e.phone||'';$('partyEmail').value=e.email||'';partyDlg.showModal();$('partyOrg').focus();}
+function editParty(id){openParty(data.parties.find(x=>x.id===id))}
+function saveParty(e){e.preventDefault();
+  const old=$('partyId').value,obj={id:old||Date.now(),projectId:$('partyProject').value,role:$('partyRole').value.trim(),org:$('partyOrg').value.trim(),contact:$('partyContact').value.trim(),phone:$('partyPhone').value.trim(),email:$('partyEmail').value.trim()};
+  if(!obj.org){toast(t('org_req'),'err');return}
+  if(old){const i=data.parties.findIndex(x=>x.id==old);data.parties[i]=obj;log('Updated',tf('log_party_updated',{o:obj.org}));toast(t('party_updated'))}
+  else{data.parties.push(obj);log('Created',tf('log_party_created',{o:obj.org}));toast(t('party_added'))}
+  partyDlg.close();save();}
+function delParty(id){const x=data.parties.find(r=>r.id===id);askConfirm(tf('del_party_confirm',{org:x.org}),()=>{data.parties=data.parties.filter(r=>r.id!==id);log('Deleted',tf('log_party_deleted',{o:x.org}));toast(t('party_deleted'),'info');save();})}
+
+/* ================= DOCUMENTS ================= */
+let pendingDocFile=null,fileRemoved=false;
+function fmtSize(b){b=Number(b)||0;if(b<1024)return b+' B';if(b<1048576)return (b/1024).toFixed(1)+' KB';return (b/1048576).toFixed(1)+' MB'}
+function pickDocFile(){const f=$('docFile');if(f)f.click()}
+function onDocFileChange(){const f=$('docFile').files&&$('docFile').files[0];const fi=$('docFileInfo');if(!f){pendingDocFile=null;if(fi)fi.textContent=t('no_file');return}pendingDocFile={id:'f'+Date.now()+Math.floor(Math.random()*1e6),file:f};if(fi)fi.textContent=f.name+' ('+fmtSize(f.size)+')'}
+function clearDocFile(){pendingDocFile=null;if($('docFile'))$('docFile').value='';const fi=$('docFileInfo');const d=data.docs.find(x=>x.id==$('docId').value);if(d&&d.file){fileRemoved=true}if(fi)fi.textContent=t('no_file')}
+function downloadDocFile(id){const d=data.docs.find(x=>x.id===id);if(!d||!d.file){toast(t('file_missing'),'err');return}fileGet(d.file.id).then(blob=>{if(!blob){toast(t('file_missing'),'err');return}download(blob,d.file.name||'document',d.file.type||'application/octet-stream');toast(t('file_downloaded'))}).catch(()=>toast(t('file_missing'),'err'))}
+function renderDocs(){const q=($('docQ').value||'').toLowerCase(),cf=$('docCatFilter').value;
+  $('docRows').innerHTML=data.docs.filter(d=>(!cf||d.cat===cf)&&JSON.stringify(d).toLowerCase().includes(q)).map(d=>`<tr>
+    <td>${esc(projName(d.projectId))}</td><td><span class="badge gray">${tr(d.cat)}</span></td>
+    <td><b>${esc(d.name)}</b>${d.notes?`<div class="sub">${esc(d.notes)}</div>`:''}</td><td>${esc(d.ref||'-')}</td><td><span class="badge ${cls(d.status)}">${tr(d.status)}</span></td>
+    <td>${d.file?`<button class="btn light sm" title="${esc(d.file.name)}" onclick="downloadDocFile(${d.id})">📎 ${esc(d.file.name)} <span class="sub">${fmtSize(d.file.size)}</span></button>`:'<span class="sub">—</span>'}</td>
+    <td><div class="actions">${d.file?`<button class="icon-btn" title="${t('download')}" onclick="downloadDocFile(${d.id})">⬇️</button>`:''}<button class="icon-btn" title="${t('edit')}" onclick="editDoc(${d.id})">✏️</button><button class="icon-btn" title="${t('delete')}" onclick="delDoc(${d.id})">🗑️</button></div></td></tr>`).join('')||`<tr><td colspan="7" class="empty">${t('no_docs')}</td></tr>`}
+function openDoc(d){const e=d||{};
+  $('docId').value=e.id||'';$('docProject').value=e.projectId||(data.projects[0]?data.projects[0].id:'');$('docCat').value=e.cat||'Contract Documents';$('docName').value=e.name||'';$('docRef').value=e.ref||'';$('docStatus').value=e.status||'Pending';$('docNotes').value=e.notes||'';
+  pendingDocFile=null;fileRemoved=false;if($('docFile'))$('docFile').value='';
+  const fi=$('docFileInfo');if(fi)fi.textContent=e.file?e.file.name+' ('+fmtSize(e.file.size)+')':t('no_file');
+  docDlg.showModal();$('docName').focus();}
+function editDoc(id){openDoc(data.docs.find(x=>x.id===id))}
+function saveDoc(e){e.preventDefault();
+  const old=$('docId').value,prev=data.docs.find(x=>x.id==old);
+  const obj={id:old||Date.now(),projectId:$('docProject').value,cat:$('docCat').value,name:$('docName').value.trim(),ref:$('docRef').value.trim(),status:$('docStatus').value,notes:$('docNotes').value.trim()};
+  if(!obj.name){toast(t('doc_title_req'),'err');return}
+  if(pendingDocFile){
+    if(prev&&prev.file)fileDelete(prev.file.id).catch(()=>{});
+    obj.file={id:pendingDocFile.id,name:pendingDocFile.file.name,type:pendingDocFile.file.type||'',size:pendingDocFile.file.size||0};
+    filePut(pendingDocFile.id,pendingDocFile.file).catch(()=>toast(t('file_save_err'),'err'));
+  }else if(prev&&prev.file){if(fileRemoved){fileDelete(prev.file.id).catch(()=>{})}else{obj.file=prev.file}}
+  if(old){const i=data.docs.findIndex(x=>x.id==old);data.docs[i]=obj;log('Updated',tf('log_doc_updated',{name:obj.name}));toast(t('doc_updated'))}
+  else{data.docs.push(obj);log('Created',tf('log_doc_created',{name:obj.name}));toast(t('doc_added'))}
+  pendingDocFile=null;fileRemoved=false;docDlg.close();save();}
+function delDoc(id){const d=data.docs.find(x=>x.id===id);askConfirm(tf('del_doc_confirm',{name:d.name}),()=>{data.docs=data.docs.filter(x=>x.id!==id);if(d.file)fileDelete(d.file.id).catch(()=>{});log('Deleted',tf('log_doc_deleted',{name:d.name}));toast(t('doc_deleted'),'info');save();})}
+
+/* ================= REPORTS & DATA ================= */
+function backup(){download(JSON.stringify(data,null,2),'govproject-pmis-backup-'+todayStr()+'.json','application/json');toast(t('backup_dl'));log('Exported',t('log_backup'))}
+function openImport(){$('importText').value='';importDlg.showModal();$('importText').focus()}
+function doImport(){const t0=$('importText').value.trim();if(!t0){toast(t('import_empty'),'err');return}
+  try{const d=JSON.parse(t0);if(!Array.isArray(d.projects))throw 0;data=migrate(d);importDlg.close();$('importText').value='';save();log('Imported',t('log_import'));toast(t('import_ok'))}
+  catch{toast(t('import_invalid'),'err')}}
+function resetData(){askConfirm(t('reset_confirm'),()=>{data=migrate(JSON.parse(JSON.stringify(seed)));fileClear().catch(()=>{});save();log('Reset',t('log_reset'));toast(t('reset_done'),'info')})}
+function exportCSV(kind){let cols,rows;
+  if(kind==='projects'){cols=[t('csvh_id'),t('csvh_name'),t('csvh_agency'),t('csvh_type'),t('csvh_location'),t('csvh_contractor'),t('csvh_value'),t('csvh_phys'),t('csvh_fin'),t('csvh_status'),t('csvh_start'),t('csvh_end')];rows=data.projects.map(p=>[p.id,p.name,p.agency,p.type,p.loc,p.contractor,p.value,p.progress,p.financial,p.status,p.start,p.end])}
+  else if(kind==='issues'){cols=[t('csvh_project'),t('csvh_disc'),t('csvh_issue'),t('csvh_sev'),t('csvh_owner'),t('csvh_status')];rows=data.issues.map(i=>[projName(i.projectId),i.disc,i.desc,i.sev,i.owner,i.status])}
+  else if(kind==='blocks'){cols=[t('th_project'),t('th_block'),t('th_type'),t('th_progress'),t('th_status'),t('th_cost')];rows=data.blocks.map(b=>[projName(b.projectId),b.name,b.type,b.progress,b.status,b.cost])}
+  else if(kind==='qaqc'){cols=[t('th_ref'),t('th_type'),t('th_description'),t('th_project'),t('th_discipline'),t('th_severity'),t('th_owner'),t('th_raised'),t('th_due'),t('th_status')];rows=data.qaqc.map(q=>[q.ref,q.type,q.title,projName(q.projectId),q.disc,q.sev,q.owner,q.date,q.due,q.status])}
+  else{cols=[t('csvh_asset'),t('csvh_cat'),t('csvh_desc'),t('csvh_pri'),t('csvh_status'),t('csvh_cost'),t('csvh_date')];rows=data.maint.map(m=>[m.asset,m.cat,m.desc,m.pri,m.status,m.cost,m.date])}
+  const csv='\ufeff'+[cols,...rows].map(r=>r.map(c=>'"'+String(c??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  download(csv,'pmis-'+kind+'.csv','text/csv;charset=utf-8');toast(tf('csv_done',{k:t('csv_'+kind)}));log('Exported',tf('log_csv',{k:t('csv_'+kind)}))}
+function printReport(){
+  const w=window.open('','','width=1000,height=750');
+  const projRows=data.projects.map(p=>`<tr><td>${esc(p.id)}</td><td>${esc(p.name)}</td><td>${esc(p.agency)}</td><td>${esc(p.loc)}</td><td>${tr(p.status)}</td><td>${p.progress}%</td><td>${p.financial}%</td><td>RM${Number(p.value||0).toLocaleString()}</td></tr>`).join('');
+  const issRows=data.issues.filter(i=>['High','Critical'].includes(i.sev)&&i.status!=='Closed').map(i=>`<tr><td>${esc(projName(i.projectId))}</td><td>${tr(i.disc)}</td><td>${esc(i.desc)}</td><td>${tr(i.sev)}</td><td>${esc(i.owner||'-')}</td></tr>`).join('')||`<tr><td colspan="5">${t('none')}</td></tr>`;
+  const mntRows=data.maint.filter(m=>m.status!=='Completed').map(m=>`<tr><td>${esc(m.asset)}</td><td>${tr(m.cat)}</td><td>${esc(m.desc)}</td><td>${tr(m.pri)}</td><td>${tr(m.status)}</td><td>RM${Number(m.cost||0).toLocaleString()}</td></tr>`).join('')||`<tr><td colspan="6">${t('none')}</td></tr>`;
+  const blkRows=data.blocks.map(b=>`<tr><td>${esc(projName(b.projectId))}</td><td>${esc(b.name)}</td><td>${tr(b.type)}</td><td>${b.progress}%</td><td>${tr(b.status)}</td><td>RM${Number(b.cost||0).toLocaleString()}</td></tr>`).join('')||`<tr><td colspan="6">${t('none')}</td></tr>`;
+  const meta=tf('rpt_meta',{d:new Date().toLocaleString(LOC().locale),n:data.projects.length,i:data.issues.filter(i=>i.status!=='Closed').length,m:data.maint.filter(m=>m.status!=='Completed').length});
+  w.document.write(`<!doctype html><html><head><title>${esc(t('rpt_main_title'))}</title><style>body{font-family:Arial,sans-serif;margin:30px;color:#111}h1{font-size:22px;border-bottom:2px solid #2563eb;padding-bottom:8px}.meta{color:#555;font-size:13px;margin-bottom:18px}table{width:100%;border-collapse:collapse;font-size:12px}th{background:#0b1220;color:#fff;padding:8px;text-align:left}td{padding:7px 8px;border-bottom:1px solid #ddd}.section{font-size:15px;font-weight:700;margin:22px 0 8px;color:#2563eb}</style></head><body><div id="govDemoBar" style="position:sticky;top:0;z-index:9999;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;background:#4f46e5;color:#fff;padding:10px 16px;font:600 13px Inter,&quot;Segoe UI&quot;,Arial,sans-serif;box-shadow:0 2px 12px rgba(15,23,42,.25)"><span>&#x1F9EA; Live demo &mdash; data is stored only in this browser.</span><a href="../govproject-download.html" style="color:#fff;font-weight:800;text-decoration:underline">Get the desktop app &rarr;</a></div><h1>${esc(t('rpt_main_title'))}</h1><div class="meta">${esc(meta)}</div><div class="section">${esc(t('sec_portfolio'))}</div><table><thead><tr><th>${esc(t('csvh_id'))}</th><th>${esc(t('th_project'))}</th><th>${esc(t('th_agency'))}</th><th>${esc(t('th_location'))}</th><th>${esc(t('th_status'))}</th><th>${esc(t('th_progress'))}</th><th>${esc(t('csvh_fin'))}</th><th>${esc(t('csvh_value'))}</th></tr></thead><tbody>${projRows}</tbody></table><div class="section">${esc(t('sec_issues'))}</div><table><thead><tr><th>${esc(t('th_project'))}</th><th>${esc(t('th_discipline'))}</th><th>${esc(t('th_issue'))}</th><th>${esc(t('th_severity'))}</th><th>${esc(t('th_owner'))}</th></tr></thead><tbody>${issRows}</tbody></table><div class="section">${esc(t('sec_maint'))}</div><table><thead><tr><th>${esc(t('th_asset'))}</th><th>${esc(t('th_category'))}</th><th>${esc(t('th_description'))}</th><th>${esc(t('th_priority'))}</th><th>${esc(t('th_status'))}</th><th>${esc(t('th_cost'))}</th></tr></thead><tbody>${mntRows}</tbody></table><div class="section">${esc(t('sec_blocks'))}</div><table><thead><tr><th>${esc(t('th_project'))}</th><th>${esc(t('th_block'))}</th><th>${esc(t('th_type'))}</th><th>${esc(t('th_progress'))}</th><th>${esc(t('th_status'))}</th><th>${esc(t('th_cost'))}</th></tr></thead><tbody>${blkRows}</tbody></table></body></html>`);
+  w.document.close();w.print();}
+
+/* ================= MASTER RENDER ================= */
+function render(){
+  $('date').textContent=new Date().toLocaleDateString(LOC().locale,{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  fill();renderDash();renderProjects();renderBlocks();renderDisc();renderMaint();renderIssues();renderQAQC();renderContract();renderParties();renderMilestones();renderGantt();renderCPM();renderDocs();
+}
+
+initData();
+</script>
+</body>
+</html>
