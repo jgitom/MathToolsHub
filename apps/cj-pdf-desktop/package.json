@@ -1,0 +1,78 @@
+{
+  "name": "cj-pdf-to-word",
+  "version": "1.0.0",
+  "description": "CJ PDF to Word Converter — Professional Edition. Extract text from PDFs, recognise scanned pages with OCR, and download editable Word documents.",
+  "author": "Juil Gitom",
+  "builder": "Juil Gitom",
+  "license": "MIT",
+  "main": "main.js",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jgitom/MathToolsHub.git"
+  },
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --publish never",
+    "dist:mac": "electron-builder --mac --publish never",
+    "dist:win": "electron-builder --win --publish never",
+    "dist:linux": "electron-builder --linux --publish never"
+  },
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.mathtoolshub.cjpdf",
+    "productName": "CJ PDF to Word Converter",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "vendor/**"
+    ],
+    "asar": true,
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "build/icon.png",
+      "target": [
+        { "target": "dmg", "arch": ["arm64", "x64"] },
+        { "target": "zip", "arch": ["arm64", "x64"] }
+      ]
+    },
+    "dmg": {
+      "title": "CJ PDF to Word Converter ${version}",
+      "iconSize": 110,
+      "contents": [
+        { "x": 130, "y": 220 },
+        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
+      ]
+    },
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [{ "target": "nsis", "arch": ["x64"] }]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "CJ PDF to Word Converter",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "artifactName": "CJ-PDF-to-Word-Setup-${version}.${ext}"
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "category": "Office",
+      "synopsis": "Convert PDF documents to editable Word files",
+      "maintainer": "Juil Gitom",
+      "target": ["AppImage", "deb"]
+    }
+  }
+}
