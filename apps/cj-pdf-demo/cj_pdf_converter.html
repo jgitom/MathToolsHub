@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https: data: blob:; object-src 'none'; base-uri 'self'">
+<title>CJ PDF to Word Converter — Professional Edition</title>
+<style>
+:root{
+  --navy:#0f2747;--navy2:#16345e;--indigo:#4f46e5;--blue:#2563eb;--blue2:#1d4ed8;
+  --ink:#172033;--muted:#64748b;--line:#dbe3ec;--bg:#eef2f7;--card:#ffffff;
+  --green:#16a34a;--green-bg:#f0fdf4;--amber:#d97706;--amber-bg:#fffbeb;
+  --red:#dc2626;--red-bg:#fef2f2;--violet:#7c3aed;
+  --sh:0 1px 2px rgba(15,23,42,.06),0 18px 45px -22px rgba(15,23,42,.22);
+  --rad:16px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(160deg,#e8eefb 0%,var(--bg) 40%,#eaf1ff 100%);color:var(--ink);font-size:14px;-webkit-font-smoothing:antialiased;min-height:100vh}
+.shell{max-width:1080px;margin:0 auto;padding:22px 22px 60px}
+/* ---------- App bar ---------- */
+.appbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 16px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.85);box-shadow:var(--sh);backdrop-filter:blur(8px);margin-bottom:20px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#2563eb,#4f46e5);display:grid;place-items:center;color:#fff;font-weight:900;font-size:17px;box-shadow:0 8px 18px -8px rgba(37,99,235,.7)}
+.brand .t{font-size:17px;font-weight:850;letter-spacing:-.2px}
+.brand .t small{display:block;font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.02em;margin-top:1px}
+.appbar .right{display:flex;align-items:center;gap:10px}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;font-size:11.5px;font-weight:800;border:1px solid var(--line);background:#f8fafc;color:#334155}
+.badge.pro{color:#fff;background:linear-gradient(90deg,#2563eb,#4f46e5);border-color:transparent}
+.dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 3px #22c55e22;display:inline-block}
+/* ---------- Hero ---------- */
+.hero{position:relative;overflow:hidden;border-radius:20px;padding:34px 34px 30px;color:#fff;background:linear-gradient(125deg,#0f2747,#1e4d83 62%,#28487f);box-shadow:var(--sh);margin-bottom:22px}
+.hero::before{content:"";position:absolute;width:300px;height:300px;right:-90px;top:-140px;border:48px solid rgba(255,255,255,.07);border-radius:50%}
+.hero::after{content:"";position:absolute;width:160px;height:160px;left:-50px;bottom:-90px;border:30px solid rgba(255,255,255,.05);border-radius:50%}
+.hero-inner{position:relative;z-index:2}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;color:#bfdbfe;font-size:12px;font-weight:850;letter-spacing:.14em;text-transform:uppercase;margin-bottom:12px}
+.hero h1{margin:0;font-size:clamp(30px,5vw,46px);line-height:1.04;letter-spacing:-.03em}
+.hero p{margin:14px 0 0;max-width:680px;color:#d5e4f4;font-size:15.5px;line-height:1.65}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chip{padding:7px 12px;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:rgba(255,255,255,.1);font-size:12.5px;font-weight:700;backdrop-filter:blur(6px)}
+/* ---------- Layout ---------- */
+.grid{display:grid;grid-template-columns:1.55fr 1fr;gap:20px;align-items:start}
+@media(max-width:860px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);box-shadow:var(--sh);padding:22px}
+.card h2{margin:0 0 4px;font-size:17px;letter-spacing:-.2px}
+.card .sub{color:var(--muted);font-size:13px;margin:0 0 16px;line-height:1.55}
+/* ---------- Steps ---------- */
+.steps{display:flex;gap:8px;margin-bottom:18px}
+.step{flex:1;display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:12px;border:1px solid var(--line);background:#f8fafc;color:var(--muted);font-size:12.5px;font-weight:800}
+.step .n{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:#e2e8f0;color:#475569;font-size:12px;font-weight:900;flex:0 0 auto}
+.step.on{border-color:#bfdbfe;background:#eff6ff;color:var(--blue2)}
+.step.on .n{background:var(--blue);color:#fff}
+.step.done{border-color:#bbf7d0;background:#f0fdf4;color:var(--green)}
+.step.done .n{background:var(--green);color:#fff}
+/* ---------- Drop zone ---------- */
+.drop{border:2px dashed #b8c8e4;border-radius:18px;padding:34px 20px;text-align:center;background:#fafcff;cursor:pointer;transition:.2s ease}
+.drop:hover,.drop.dragging{border-color:var(--blue);background:#eff6ff}
+.drop .ic{width:70px;height:70px;margin:0 auto 14px;display:grid;place-items:center;border-radius:20px;background:linear-gradient(135deg,#dbeafe,#ede9fe);box-shadow:inset 0 0 0 1px #cbd9f3,0 10px 24px rgba(37,99,235,.12);font-size:34px}
+.drop h3{margin:0 0 6px;font-size:18px}
+.drop p{margin:0;color:var(--muted);font-size:13.5px}
+.drop small{display:block;margin-top:8px;color:#94a3b8;font-size:12px}
+input[type=file]{display:none}
+/* ---------- File queue ---------- */
+.queue{margin-top:14px;display:grid;gap:9px}
+.qrow{display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--line);border-radius:13px;background:#f8fafc}
+.qrow .fico{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:17px;background:#fee2e2;flex:0 0 auto}
+.qrow .fmeta{flex:1;min-width:0}
+.qrow .fname{font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qrow .fsub{color:var(--muted);font-size:12px;margin-top:2px}
+.qrow .fstatus{font-size:12px;font-weight:800;white-space:nowrap}
+.fstatus.ok{color:var(--green)}.fstatus.err{color:var(--red)}.fstatus.run{color:var(--blue)}.fstatus.wait{color:var(--muted)}
+.qrow .rm{width:30px;height:30px;border:0;border-radius:9px;background:transparent;color:#94a3b8;font-size:16px;cursor:pointer;flex:0 0 auto}
+.qrow .rm:hover{background:#fee2e2;color:var(--red)}
+.qmini{height:5px;border-radius:999px;background:#e2e8f0;overflow:hidden;margin-top:7px}
+.qmini b{display:block;height:100%;width:0%;background:linear-gradient(90deg,#2563eb,#7c3aed);transition:width .2s}
+/* ---------- Options ---------- */
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.field{display:grid;gap:6px}
+.field.full{grid-column:1/-1}
+.field label{color:#334155;font-size:12.5px;font-weight:800}
+.field input,.field select{width:100%;min-height:42px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;color:var(--ink);background:#fff;font:inherit;font-size:13.5px}
+.field input:focus,.field select:focus{outline:3px solid #bfdbfe;border-color:var(--blue)}
+.field .help{color:var(--muted);font-size:11.5px;line-height:1.45}
+.checks{display:flex;flex-wrap:wrap;gap:12px;margin-top:2px}
+.check{display:inline-flex;align-items:center;gap:8px;color:#334155;font-size:13px;font-weight:700}
+.check input{width:16px;height:16px;accent-color:var(--blue)}
+/* ---------- Buttons ---------- */
+.actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.btn{border:0;border-radius:11px;padding:13px 18px;font:inherit;font-size:14.5px;font-weight:800;cursor:pointer;transition:.15s ease;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.primary{flex:1;color:#fff;background:linear-gradient(90deg,#2563eb,#4f46e5);box-shadow:0 10px 22px -10px rgba(37,99,235,.65)}
+.btn.primary:hover:not(:disabled){transform:translateY(-1px)}
+.btn.secondary{color:var(--ink);background:#e9eef7}
+.btn.secondary:hover:not(:disabled){background:#dde6f3}
+.btn.danger{color:#fff;background:var(--red)}
+/* ---------- Progress ---------- */
+.progress-wrap{display:none;margin-top:18px}
+.progress-track{width:100%;height:12px;border-radius:999px;background:#e5eaf2;overflow:hidden}
+.progress-bar{width:0%;height:100%;border-radius:inherit;background:linear-gradient(90deg,#2563eb,#7c3aed);transition:width .2s ease}
+.status{min-height:22px;margin-top:14px;text-align:center;color:var(--muted);font-weight:650;font-size:13.5px}
+.status.success{color:var(--green)}.status.error{color:var(--red)}
+/* ---------- Summary ---------- */
+.summary{display:none;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+@media(max-width:560px){.summary{grid-template-columns:repeat(2,1fr)}}
+.sitem{padding:13px 10px;border:1px solid #bbdfca;border-radius:12px;background:var(--green-bg);text-align:center}
+.sitem b{display:block;color:var(--green);font-size:18px}
+.sitem span{color:var(--muted);font-size:11.5px;font-weight:600}
+/* ---------- History ---------- */
+.hist{margin-top:14px;display:grid;gap:9px}
+.hrow{display:flex;align-items:center;gap:12px;padding:10px 13px;border:1px solid var(--line);border-radius:13px;background:#f8fafc;font-size:13px}
+.hrow .hic{font-size:16px}
+.hrow .hmeta{flex:1;min-width:0}
+.hrow .hname{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hrow .hsub{color:var(--muted);font-size:11.5px;margin-top:2px}
+.hrow .htime{color:var(--muted);font-size:11.5px;white-space:nowrap}
+.empty{color:var(--muted);font-size:13px;text-align:center;padding:14px 0}
+/* ---------- Note ---------- */
+.note{margin-top:16px;padding:16px;border:1px solid #f2cd72;border-left:5px solid #e6a700;border-radius:14px;background:linear-gradient(135deg,#fffaf0,#fff4d5);color:#7a4d00;font-size:13px;line-height:1.55}
+.note b{font-size:14px}
+.note ul{margin:8px 0 0;padding-left:20px}
+.note li{margin:4px 0}
+.supported{margin-top:8px;color:#276749;font-weight:700}
+/* ---------- Footer / credit ---------- */
+.foot{margin-top:26px;display:flex;align-items:center;justify-content:space-between;gap:12px;color:#94a3b8;font-size:12px;flex-wrap:wrap}
+.foot .cred{display:inline-flex;align-items:center;gap:6px}
+.foot .cred b{color:#334155}
+.demo-banner{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:linear-gradient(90deg,#fef3c7,#fde68a);border:1px solid #f59e0b;color:#78350f;border-radius:12px;padding:10px 14px;margin-bottom:20px;font-size:13px;font-weight:700}
+.demo-banner a{color:#7c2d12;font-weight:850;text-decoration:underline}
+@media(max-width:560px){.shell{padding:14px 12px 50px}.hero{padding:24px 20px}.opts{grid-template-columns:1fr}.field.full{grid-column:auto}}
+</style>
+</head>
+<body><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:linear-gradient(90deg,#fef3c7,#fde68a);border:1px solid #f59e0b;color:#78350f;border-radius:12px;padding:10px 14px;margin-bottom:18px;font:700 13px Inter,&quot;Segoe UI&quot;,Arial,sans-serif"><span>&#x1F9EA; Live demo â€” conversion runs in this browser only.</span><a href="../cj-pdf-download.html" style="color:#7c2d12;font-weight:850;text-decoration:underline">Get the desktop app &rarr;</a></div>
+<div class="shell">
+  <header class="appbar">
+    <div class="brand">
+      <span class="logo">CJ</span>
+      <span class="t">CJ PDF to Word Converter<small>Professional Edition · by Juil Gitom</small></span>
+    </div>
+    <div class="right">
+      <span class="badge pro" id="editionBadge"><span class="dot"></span>Professional</span>
+      <span class="badge" id="desktopBadge" hidden>💻 Desktop</span>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">🛡️ Private · Fast · Accurate</div>
+      <h1>Turn any PDF into an editable Word document.</h1>
+      <p>Extract selectable text and recognise scanned pages with OCR — then download a clean, editable <b>.docx</b> file. Everything is processed on your device: your files are never uploaded.</p>
+      <div class="chips">
+        <span class="chip">🔒 100% local processing</span>
+        <span class="chip">⚡ Batch conversion</span>
+        <span class="chip">🔍 Scanned-page OCR</span>
+        <span class="chip">📝 Editable DOCX</span>
+        <span class="chip">🌍 EN · BM · 中文 OCR</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid">
+    <main class="card">
+      <div class="steps" id="steps">
+        <div class="step on" id="step1"><span class="n">1</span>Select PDFs</div>
+        <div class="step" id="step2"><span class="n">2</span>Options</div>
+        <div class="step" id="step3"><span class="n">3</span>Convert</div>
+        <div class="step" id="step4"><span class="n">4</span>Download</div>
+      </div>
+
+      <label class="drop" id="dropZone" for="pdfInput">
+        <div class="ic">📄</div>
+        <h3>Choose or drop PDFs here</h3>
+        <p>One file or a whole batch — up to 50 MB each.</p>
+        <small>Multiple files are converted one after another.</small>
+      </label>
+      <input id="pdfInput" type="file" accept="application/pdf,.pdf" multiple />
+
+      <div class="queue" id="queue" hidden></div>
+
+      <div class="opts" id="options" hidden style="margin-top:18px">
+        <div class="field"><label for="pageRange">Pages to convert</label><input id="pageRange" type="text" inputmode="numeric" placeholder="All pages, or 1-3, 5" /><span class="help">Leave blank for every page. Ranges like <b>1-3, 5</b> are supported.</span></div>
+        <div class="field"><label for="ocrLanguage">OCR language</label><select id="ocrLanguage"><option value="eng">English</option><option value="msa">Bahasa Malaysia</option><option value="chi_sim">简体中文</option></select><span class="help">Used only for scanned or image-only pages.</span></div>
+        <div class="field full"><label for="outputName">Output filename</label><input id="outputName" type="text" placeholder="document.docx" /><span class="help">The .docx extension is added automatically. Applies to a single-file conversion.</span></div>
+        <div class="field full"><div class="checks">
+          <label class="check"><input id="enableOcr" type="checkbox" checked /> Use OCR for scanned pages</label>
+          <label class="check"><input id="includePageLabels" type="checkbox" checked /> Include page labels</label>
+          <label class="check"><input id="includePageBreaks" type="checkbox" checked /> Keep PDF page breaks</label>
+        </div></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="convertBtn" disabled>⚡ Convert to Word</button>
+        <button class="btn danger" id="cancelBtn" type="button" hidden>Cancel</button>
+        <button class="btn secondary" id="resetBtn" type="button" hidden>Reset</button>
+      </div>
+
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-track" role="progressbar" aria-label="Conversion progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressTrack"><div class="progress-bar" id="progressBar"></div></div>
+      </div>
+      <div class="status" id="status" role="status" aria-live="polite">Choose a PDF file to begin.</div>
+
+      <div class="summary" id="conversionSummary">
+        <div class="sitem"><b id="sPages">0</b><span>Pages</span></div>
+        <div class="sitem"><b id="sWords">0</b><span>Words</span></div>
+        <div class="sitem"><b id="sOcr">0</b><span>OCR pages</span></div>
+        <div class="sitem"><b id="sSize">0 KB</b><span>DOCX size</span></div>
+      </div>
+
+      <div class="note">
+        <b>⚠️ Conversion notes</b>
+        <div class="supported">✓ Selectable text and scanned pages with OCR are both supported.</div>
+        <ul>
+          <li>The first OCR conversion downloads recognition data for the chosen language (one-time).</li>
+          <li>Images, charts, backgrounds, headers and footers are not transferred.</li>
+          <li>Complex tables, columns and layouts may lose their original formatting.</li>
+          <li>Password-protected or damaged PDF files may not open.</li>
+          <li>The Word document prioritises editable text over an exact visual copy.</li>
+        </ul>
+      </div>
+    </main>
+
+    <aside class="card">
+      <h2>Recent conversions</h2>
+      <p class="sub">Your last conversions are kept on this device only.</p>
+      <div class="hist" id="history"><div class="empty">No conversions yet.</div></div>
+    </aside>
+  </div>
+
+  <footer class="foot">
+    <span>CJ PDF to Word Converter · Professional Edition · v1.0.0</span>
+    <span class="cred">Created by <b>Juil Gitom</b></span>
+  </footer>
+</div>
+
+<script src="vendor/pdf.min.js"></script>
+<script src="vendor/pdf.worker.min.js"></script>
+<script src="vendor/docx.umd.js"></script>
+<script src="https://unpkg.com/tesseract.js@6.0.1/dist/tesseract.min.js"></script>
+<script>
+(function(){
+"use strict";
+const byId=id=>document.getElementById(id);
+const pdfInput=byId("pdfInput"),dropZone=byId("dropZone"),queueEl=byId("queue");
+const pageRange=byId("pageRange"),outputName=byId("outputName"),enableOcr=byId("enableOcr"),ocrLanguage=byId("ocrLanguage"),includePageLabels=byId("includePageLabels"),includePageBreaks=byId("includePageBreaks");
+const convertBtn=byId("convertBtn"),cancelBtn=byId("cancelBtn"),resetBtn=byId("resetBtn");
+const statusEl=byId("status"),progressWrap=byId("progressWrap"),progressBar=byId("progressBar"),progressTrack=byId("progressTrack");
+const conversionSummary=byId("conversionSummary"),sPages=byId("sPages"),sWords=byId("sWords"),sOcr=byId("sOcr"),sSize=byId("sSize");
+const historyEl=byId("history"),steps=[byId("step1"),byId("step2"),byId("step3"),byId("step4")];
+const MAX_FILE_SIZE=50*1024*1024,MAX_FILES=10,HIST_K="cj_pdf_conv_history";
+const isDesktop=!!(window.cjpdfAPI&&window.cjpdfAPI.isDesktop);
+if(isDesktop)byId("desktopBadge").hidden=false;
+
+let files=[],converting=false,cancelRequested=false;
+let ocrWorker=null;
+
+/* ---------- helpers ---------- */
+function formatBytes(bytes){if(!bytes)return"0 Bytes";const u=["Bytes","KB","MB","GB"];const i=Math.min(u.length-1,Math.floor(Math.log(bytes)/Math.log(1024)));return`${(bytes/Math.pow(1024,i)).toFixed(i?2:0)} ${u[i]}`;}
+function setStatus(m,t){statusEl.textContent=m;statusEl.className="status "+(t||"");}
+function setProgress(p){const s=Math.round(Math.max(0,Math.min(100,p)));progressWrap.style.display="block";progressBar.style.width=s+"%";progressTrack.setAttribute("aria-valuenow",String(s));}
+function setStep(i){steps.forEach((el,idx)=>{el.classList.toggle("on",idx===i);el.classList.toggle("done",idx<i);});}
+function safeOutputName(v){const c=v.trim().replace(/[<>:"/\\|?*\u0000-\u001F]/g,"-");return(c.replace(/\.docx$/i,"")||"converted-document")+".docx";}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+/* ---------- history ---------- */
+function loadHist(){try{return JSON.parse(localStorage.getItem(HIST_K)||"[]")}catch(e){return[]}}
+function saveHist(h){try{localStorage.setItem(HIST_K,JSON.stringify(h.slice(0,20)))}catch(e){}}
+function renderHist(){const h=loadHist();historyEl.innerHTML=h.length?h.map(x=>`<div class="hrow"><span class="hic">📄</span><div class="hmeta"><div class="hname">${esc(x.name)}</div><div class="hsub">${x.pages} pages · ${x.words} words · ${esc(x.size)}</div></div><span class="htime">${esc(x.time)}</span></div>`).join(""):'<div class="empty">No conversions yet.</div>';}
+function addHist(rec){const h=loadHist();h.unshift(rec);saveHist(h);renderHist();}
+function timeNow(){return new Date().toLocaleString([],{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});}
+
+/* ---------- file queue ---------- */
+function renderQueue(){
+  if(!files.length){queueEl.hidden=true;return;}
+  queueEl.hidden=false;
+  queueEl.innerHTML=files.map((f,i)=>`
+    <div class="qrow" data-i="${i}">
+      <span class="fico">📄</span>
+      <div class="fmeta"><div class="fname">${esc(f.file.name)}</div><div class="fsub">${formatBytes(f.file.size)} · ${f.pages||"?"} pages${f.ocrCount?` · ${f.ocrCount} OCR`:""}</div>
+      ${f.state==="done"||f.state==="error"||f.state==="running"?'<div class="qmini"><b style="width:'+f.progress+'%"></b></div>':""}</div>
+      <span class="fstatus ${f.state==="done"?"ok":f.state==="error"?"err":f.state==="running"?"run":"wait"}">${f.state==="done"?"✓ Done":f.state==="error"?"✕ Failed":f.state==="running"?"Converting…":"Queued"}</span>
+      ${converting?"":`<button class="rm" data-i="${i}" title="Remove" aria-label="Remove">✕</button>`}
+    </div>`).join("");
+  queueEl.querySelectorAll(".rm").forEach(b=>b.addEventListener("click",()=>{const i=Number(b.dataset.i);files.splice(i,1);renderQueue();updateButtons();}));
+}
+function addFiles(list){
+  for(const file of list){
+    const isPDF=file.type==="application/pdf"||file.name.toLowerCase().endsWith(".pdf");
+    if(!isPDF){setStatus(`"${file.name}" is not a PDF file.`,"error");continue;}
+    if(file.size>MAX_FILE_SIZE){setStatus(`"${file.name}" is larger than 50 MB.`,"error");continue;}
+    if(files.length>=MAX_FILES){setStatus(`Up to ${MAX_FILES} files at a time.`,"error");break;}
+    files.push({file,state:"wait",progress:0,pages:null,ocrCount:0});
+  }
+  renderQueue();updateButtons();
+  if(files.length){setStatus(`${files.length} PDF${files.length>1?"s":""} selected. Review options, then convert.`);setStep(1);}
+  else setStatus("Choose a PDF file to begin.");
+}
+function updateButtons(){convertBtn.disabled=!files.length||converting;resetBtn.hidden=!files.length;}
+
+/* ---------- pdf helpers ---------- */
+function parsePageRange(value,total){
+  if(!value.trim())return Array.from({length:total},(_,i)=>i+1);
+  const pages=new Set();
+  for(const part of value.split(",")){
+    const t=part.trim();if(!t)continue;
+    const r=t.match(/^(\d+)\s*-\s*(\d+)$/);
+    if(r){const s=+r[1],e=+r[2];if(s<1||e<s||e>total)throw new Error("Invalid page range: "+t);for(let p=s;p<=e;p++)pages.add(p);}
+    else if(/^\d+$/.test(t)){const p=+t;if(p<1||p>total)throw new Error("Page "+p+" is outside this PDF.");pages.add(p);}
+    else throw new Error("Invalid page selection: "+t);
+  }
+  if(!pages.size)throw new Error("Choose at least one page.");
+  return [...pages].sort((a,b)=>a-b);
+}
+function extractLines(items){
+  const groups=[];
+  for(const it of items){
+    const text=(it.str||"").trim();if(!text)continue;
+    const x=it.transform[4],y=it.transform[5];
+    let g=groups.find(l=>Math.abs(l.y-y)<=3);
+    if(!g){g={y,items:[]};groups.push(g);}
+    g.items.push({text,x,width:it.width||0,height:it.height||10});
+  }
+  return groups.sort((a,b)=>b.y-a.y).map(g=>{
+    const parts=g.items.sort((a,b)=>a.x-b.x);
+    let line="",prev=null;
+    for(const p of parts){const gap=prev===null?0:p.x-prev;if(line&&gap>Math.max(2,p.height*.2))line+=" ";line+=p.text;prev=p.x+p.width;}
+    return line.replace(/\s+/g," ").trim();
+  }).filter(Boolean);
+}
+async function renderPageForOcr(page){
+  const viewport=page.getViewport({scale:2});
+  const canvas=document.createElement("canvas");
+  const ctx=canvas.getContext("2d",{alpha:false});
+  canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
+  ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);
+  await page.render({canvasContext:ctx,viewport}).promise;
+  return canvas;
+}
+function downloadBlob(blob,name){
+  if(isDesktop&&window.cjpdfAPI&&window.cjpdfAPI.saveFile){
+    blob.arrayBuffer().then(buf=>window.cjpdfAPI.saveFile(name,buf)).catch(()=>fallbackDownload(blob,name));
+    return;
+  }
+  fallbackDownload(blob,name);
+}
+function fallbackDownload(blob,name){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),4000);
+}
+
+/* ---------- convert one file ---------- */
+async function convertOne(f){
+  f.state="running";f.progress=2;renderQueue();setStep(2);
+  setStatus(`Opening ${f.file.name}…`);
+  try{
+    const pdf=await pdfjsLib.getDocument({data:await f.file.arrayBuffer()}).promise;
+    f.pages=pdf.numPages;
+    const selected=parsePageRange(pageRange.value,pdf.numPages);
+    const paragraphs=[],previewPages=[];let wordCount=0,ocrCount=0;
+    for(let idx=0;idx<selected.length;idx++){
+      if(cancelRequested)throw new Error("CANCELLED");
+      const pn=selected[idx];
+      setStatus(`Reading page ${pn} of ${f.file.name} (${idx+1}/${selected.length})…`);
+      f.progress=6+((idx+1)/selected.length)*82;renderQueue();
+      const page=await pdf.getPage(pn);
+      const tc=await page.getTextContent({normalizeWhitespace:true});
+      let lines=extractLines(tc.items),usedOcr=false;
+      const text=lines.join(" ").replace(/\s+/g," ").trim();
+      if(enableOcr.checked&&text.length<20){
+        if(cancelRequested)throw new Error("CANCELLED");
+        if(!ocrWorker){
+          setStatus(`Preparing ${ocrLanguage.options[ocrLanguage.selectedIndex].text} OCR…`);
+          ocrWorker=await Tesseract.createWorker(ocrLanguage.value,1,{logger:m=>{
+            if(m.status==="recognizing text"){
+              setStatus(`OCR on page ${pn} (${Math.round((m.progress||0)*100)}%)…`);
+              f.progress=6+((idx+(m.progress||0))/selected.length)*82;renderQueue();
+            }
+          }});
+        }
+        setStatus(`Scanning page ${pn} with OCR…`);
+        const canvas=await renderPageForOcr(page);
+        const res=await ocrWorker.recognize(canvas);
+        lines=(res.data.text||"").split(/\r?\n/).map(l=>l.replace(/\s+/g," ").trim()).filter(Boolean);
+        ocrCount++;usedOcr=true;
+      }
+      const pageText=lines.join("\n");
+      paragraphs.push(pageText);
+      if(previewPages.length<1)previewPages.push(...lines.slice(0,14));
+      const words=(pageText.match(/\S+/g)||[]).length;wordCount+=words;
+      if(includePageLabels.checked)paragraphs.push(`\n— Page ${pn} —\n`);
+    }
+    if(cancelRequested)throw new Error("CANCELLED");
+    f.progress=90;renderQueue();setStatus("Building Word document…");
+    const doc=new docx.Document({sections:[{children:paragraphs.filter(p=>p).map(p=>new docx.Paragraph({children:[new docx.TextRun(p)],spacing:{after:120}}))}]});
+    const blob=await docx.Packer.toBlob(doc);
+    const sizeStr=formatBytes(blob.size);
+    const name=f.file.name.replace(/\.pdf$/i,"");
+    let outName=files.length===1&&outputName.value.trim()?safeOutputName(outputName.value):name+".docx";
+    downloadBlob(blob,outName);
+    f.ocrCount=ocrCount;f.state="done";f.progress=100;renderQueue();
+    addHist({name:outName,pages:selected.length,words:wordCount,size:sizeStr,time:timeNow()});
+    sPages.textContent=selected.length;sWords.textContent=wordCount;sOcr.textContent=ocrCount;sSize.textContent=sizeStr;
+    conversionSummary.style.display="grid";setStep(3);
+    setStatus(`✓ ${outName} converted (${selected.length} pages, ${wordCount} words).`,"success");
+    return {pages:selected.length,words:wordCount,ocr:ocrCount};
+  }catch(err){
+    f.state="error";renderQueue();
+    if(err.message==="CANCELLED"){setStatus("Conversion cancelled.","error");return null;}
+    setStatus(`Failed: ${err.message}`,"error");
+    return null;
+  }
+}
+
+/* ---------- convert all ---------- */
+async function runAll(){
+  if(!files.length||converting)return;
+  converting=true;cancelRequested=false;ocrWorker=null;
+  convertBtn.disabled=true;cancelBtn.hidden=false;resetBtn.hidden=true;
+  conversionSummary.style.display="none";progressWrap.style.display="block";setProgress(0);
+  setStep(2);setStatus("Starting conversion…");
+  let ok=0;
+  for(const f of files){
+    if(cancelRequested)break;
+    const r=await convertOne(f);
+    if(r)ok++;
+  }
+  if(ocrWorker){try{await ocrWorker.terminate()}catch(e){}ocrWorker=null;}
+  converting=false;cancelBtn.hidden=true;resetBtn.hidden=false;
+  updateButtons();setProgress(100);
+  if(ok===files.length&&ok>0)setStep(4);
+  setStatus(`Finished: ${ok} of ${files.length} PDF${files.length>1?"s":""} converted.`,"success");
+}
+
+/* ---------- events ---------- */
+pdfInput.addEventListener("change",e=>{addFiles([...e.target.files]);e.target.value="";});
+["dragenter","dragover"].forEach(n=>dropZone.addEventListener(n,e=>{e.preventDefault();dropZone.classList.add("dragging");}));
+["dragleave","drop"].forEach(n=>dropZone.addEventListener(n,e=>{e.preventDefault();dropZone.classList.remove("dragging");}));
+dropZone.addEventListener("drop",e=>addFiles([...e.dataTransfer.files]));
+dropZone.addEventListener("click",()=>pdfInput.click());
+convertBtn.addEventListener("click",runAll);
+cancelBtn.addEventListener("click",()=>{cancelRequested=true;cancelBtn.disabled=true;setStatus("Cancelling after the current page…");});
+resetBtn.addEventListener("click",()=>{files=[];converting=false;cancelRequested=false;ocrWorker=null;renderQueue();updateButtons();progressWrap.style.display="none";conversionSummary.style.display="none";setStep(0);setStatus("Choose a PDF file to begin.");});
+
+renderHist();updateButtons();
+})();
+</script>
+</body>
+</html>
