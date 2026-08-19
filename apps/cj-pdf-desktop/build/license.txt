@@ -1,0 +1,10 @@
+CJ PDF to Word Converter — Professional Edition
+Copyright (c) 2026 Juil Gitom. All rights reserved.
+
+This software is licensed for use with a valid purchase from MathToolsHub
+(mathtoolshub.com). Redistribution or resale is prohibited.
+
+THIRD-PARTY COMPONENTS
+- PDF.js (Mozilla) — Apache-2.0
+- Tesseract.js — Apache-2.0
+- docx (Dolan Miu et al.) — MIT
