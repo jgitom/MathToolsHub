@@ -242,6 +242,7 @@ input[type=file]{display:none}
 const byId=id=>document.getElementById(id);
 const pdfInput=byId("pdfInput"),dropZone=byId("dropZone"),queueEl=byId("queue");
 const pageRange=byId("pageRange"),outputName=byId("outputName"),enableOcr=byId("enableOcr"),ocrLanguage=byId("ocrLanguage"),includePageLabels=byId("includePageLabels"),includePageBreaks=byId("includePageBreaks");
+const optionsEl=byId("options");
 const convertBtn=byId("convertBtn"),cancelBtn=byId("cancelBtn"),resetBtn=byId("resetBtn");
 const statusEl=byId("status"),progressWrap=byId("progressWrap"),progressBar=byId("progressBar"),progressTrack=byId("progressTrack");
 const conversionSummary=byId("conversionSummary"),sPages=byId("sPages"),sWords=byId("sWords"),sOcr=byId("sOcr"),sSize=byId("sSize");
@@ -291,7 +292,7 @@ function addFiles(list){
     files.push({file,state:"wait",progress:0,pages:null,ocrCount:0});
   }
   renderQueue();updateButtons();
-  if(files.length){setStatus(`${files.length} PDF${files.length>1?"s":""} selected. Review options, then convert.`);setStep(1);}
+  if(files.length){optionsEl.style.display="grid";setStatus(`${files.length} PDF${files.length>1?"s":""} selected. Review options, then convert.`);setStep(1);}
   else setStatus("Choose a PDF file to begin.");
 }
 function updateButtons(){convertBtn.disabled=!files.length||converting;resetBtn.hidden=!files.length;}
@@ -439,7 +440,7 @@ dropZone.addEventListener("drop",e=>addFiles([...e.dataTransfer.files]));
 dropZone.addEventListener("click",()=>pdfInput.click());
 convertBtn.addEventListener("click",runAll);
 cancelBtn.addEventListener("click",()=>{cancelRequested=true;cancelBtn.disabled=true;setStatus("Cancelling after the current page…");});
-resetBtn.addEventListener("click",()=>{files=[];converting=false;cancelRequested=false;ocrWorker=null;renderQueue();updateButtons();progressWrap.style.display="none";conversionSummary.style.display="none";setStep(0);setStatus("Choose a PDF file to begin.");});
+resetBtn.addEventListener("click",()=>{files=[];converting=false;cancelRequested=false;ocrWorker=null;renderQueue();updateButtons();optionsEl.style.display="none";progressWrap.style.display="none";conversionSummary.style.display="none";setStep(0);setStatus("Choose a PDF file to begin.");});
 
 renderHist();updateButtons();
 })();
