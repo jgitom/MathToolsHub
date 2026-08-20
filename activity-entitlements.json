@@ -1,145 +1,145 @@
 {
     "version":  1,
-    "launch_at":  "2026-08-21T00:00:00+08:00",
-    "free_count":  25,
-    "premium_count":  120,
+    "launch_at":  "2026-08-22T00:00:00+08:00",
+    "free_count":  145,
+    "premium_count":  0,
     "activities":  [
                        {
                            "activity_id":  "game/ai-robot-mission",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "AI Robot Mission",
                            "path":  "/games/ai-robot-mission/"
                        },
                        {
                            "activity_id":  "game/algebra-codebreaker",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Algebra Codebreaker",
                            "path":  "/games/algebra-codebreaker/"
                        },
                        {
                            "activity_id":  "game/angle-detective",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Angle Detective",
                            "path":  "/games/angle-detective/"
                        },
                        {
                            "activity_id":  "game/balloon-number-pop",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Balloon Number Pop",
                            "path":  "/games/balloon-number-pop/"
                        },
                        {
                            "activity_id":  "game/clock-tower-junior",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Clock Tower Junior",
                            "path":  "/games/clock-tower-junior/"
                        },
                        {
                            "activity_id":  "game/colour-pattern-train",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Colour Pattern Train",
                            "path":  "/games/colour-pattern-train/"
                        },
                        {
                            "activity_id":  "game/coordinate-quest",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Coordinate Quest",
                            "path":  "/games/coordinate-quest/"
                        },
                        {
                            "activity_id":  "game/crypt-of-equation",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Crypt of Equation",
                            "path":  "/games/crypt-of-equation/"
                        },
                        {
                            "activity_id":  "game/equation-balance-lab",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Equation Balance Lab",
                            "path":  "/games/equation-balance-lab/"
                        },
                        {
                            "activity_id":  "game/escape_room_mathematics_year6",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Year 6 Mathematics Escape Room",
                            "path":  "/games/escape_room_mathematics_year6.html"
                        },
                        {
                            "activity_id":  "game/escape-room-mathematics-year1",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Year 1 Mathematics Escape Room",
                            "path":  "/games/escape-room-mathematics-year1/"
                        },
                        {
                            "activity_id":  "game/escape-room-mathematics-year2",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Year 2 Mathematics Escape Room",
                            "path":  "/games/escape-room-mathematics-year2/"
                        },
                        {
                            "activity_id":  "game/escape-room-mathematics-year3",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Year 3 Mathematics Escape Room",
                            "path":  "/games/escape-room-mathematics-year3/"
                        },
                        {
                            "activity_id":  "game/escape-room-mathematics-year4",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Year 4 Mathematics Escape Room",
                            "path":  "/games/escape-room-mathematics-year4/"
                        },
                        {
                            "activity_id":  "game/escape-room-mathematics-year5",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Year 5 Mathematics Escape Room",
                            "path":  "/games/escape-room-mathematics-year5/"
                        },
                        {
                            "activity_id":  "game/exponent-power-up",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Exponent Power-Up",
                            "path":  "/games/exponent-power-up/"
                        },
                        {
                            "activity_id":  "game/factor-factory",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Factor Factory",
                            "path":  "/games/factor-factory/"
                        },
                        {
                            "activity_id":  "game/feed-hungry-monster",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Feed the Hungry Monster",
                            "path":  "/games/feed-hungry-monster/"
                        },
                        {
                            "activity_id":  "game/financial-math-tycoon",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Financial Math Tycoon",
                            "path":  "/games/financial-math-tycoon/"
                        },
                        {
                            "activity_id":  "game/formula-racing-champion",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Formula Racing Champion",
                            "path":  "/games/formula-racing-champion/"
@@ -153,84 +153,84 @@
                        },
                        {
                            "activity_id":  "game/formula-racing-championship",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Formula Racing Championship",
                            "path":  "/games/formula-racing-championship/"
                        },
                        {
                            "activity_id":  "game/fraction-lab",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Fraction Lab",
                            "path":  "/games/fraction-lab/"
                        },
                        {
                            "activity_id":  "game/fraction-pizza-party",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Fraction Pizza Party",
                            "path":  "/games/fraction-pizza-party/"
                        },
                        {
                            "activity_id":  "game/geometry-architect",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Geometry Architect",
                            "path":  "/games/geometry-architect/"
                        },
                        {
                            "activity_id":  "game/integer-ice-climb",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Integer Ice Climb",
                            "path":  "/games/integer-ice-climb/"
                        },
                        {
                            "activity_id":  "game/integrated-stem-programs",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "STEM Discovery Academy",
                            "path":  "/games/integrated-stem-programs/"
                        },
                        {
                            "activity_id":  "game/integrated-stem-programs-11-20",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "STEM Innovation Academy",
                            "path":  "/games/integrated-stem-programs-11-20/"
                        },
                        {
                            "activity_id":  "game/kakuro",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "MathToolsHub Kakuro",
                            "path":  "/games/kakuro/"
                        },
                        {
                            "activity_id":  "game/kenken",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "MathToolsHub KenKen",
                            "path":  "/games/kenken/"
                        },
                        {
                            "activity_id":  "game/linear-graph-flight",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Linear Graph Flight",
                            "path":  "/games/linear-graph-flight/"
                        },
                        {
                            "activity_id":  "game/logic-puzzles",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "MathToolsHub Logic Puzzles",
                            "path":  "/games/logic-puzzles/"
                        },
                        {
                            "activity_id":  "game/mathcity-builder",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "MathCity Builder",
                            "path":  "/games/mathcity-builder/"
@@ -244,63 +244,63 @@
                        },
                        {
                            "activity_id":  "game/math-detective-academy",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Math Detective Academy",
                            "path":  "/games/math-detective-academy/"
                        },
                        {
                            "activity_id":  "game/math-fishing-adventure",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Math Fishing Adventure",
                            "path":  "/games/math-fishing-adventure/"
                        },
                        {
                            "activity_id":  "game/math-kingdom-defender",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Math Kingdom Defender",
                            "path":  "/games/math-kingdom-defender/"
                        },
                        {
                            "activity_id":  "game/math-learning-games-21-30",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Math Learning Games 21–30",
                            "path":  "/games/math-learning-games-21-30/"
                        },
                        {
                            "activity_id":  "game/math-learning-games-31-40",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "SPM Mathematics \u0026 Additional Mathematics Games 31â€“40",
                            "path":  "/games/math-learning-games-31-40/"
                        },
                        {
                            "activity_id":  "game/math-space-mission",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Math Space Mission",
                            "path":  "/games/math-space-mission/"
                        },
                        {
                            "activity_id":  "game/measurement-kitchen",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Measurement Kitchen",
                            "path":  "/games/measurement-kitchen/"
                        },
                        {
                            "activity_id":  "game/money-market-kids",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Money Market Kids",
                            "path":  "/games/money-market-kids/"
                        },
                        {
                            "activity_id":  "game/nation-builder",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Nation Builder",
                            "path":  "/games/nation-builder/"
@@ -314,91 +314,91 @@
                        },
                        {
                            "activity_id":  "game/percentage-market",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Percentage Market",
                            "path":  "/games/percentage-market/"
                        },
                        {
                            "activity_id":  "game/preschool_interactive_cartoon",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Preschool Interactive Cartoon",
                            "path":  "/games/preschool_interactive_cartoon.html"
                        },
                        {
                            "activity_id":  "game/probability-carnival",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Probability Carnival",
                            "path":  "/games/probability-carnival/"
                        },
                        {
                            "activity_id":  "game/pythagoras-rescue",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Pythagoras Rescue",
                            "path":  "/games/pythagoras-rescue/"
                        },
                        {
                            "activity_id":  "game/ratio-racer",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Ratio Racer",
                            "path":  "/games/ratio-racer/"
                        },
                        {
                            "activity_id":  "game/tennis-championship",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Tennis Championship",
                            "path":  "/games/tennis-championship/"
                        },
                        {
                            "activity_id":  "game/badminton-championship",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Badminton Championship",
                            "path":  "/games/badminton-championship/"
                        },
                        {
                            "activity_id":  "game/sabah-football-championship",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Sabah Football Championship",
                            "path":  "/games/sabah-football-championship/"
                        },
                        {
                            "activity_id":  "game/sabah-football-manager",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Sabah Football Manager",
                            "path":  "/games/sabah-football-manager/"
                        },
                        {
                            "activity_id":  "game/sabah-navigator",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Sabah Navigator",
                            "path":  "/games/sabah-navigator/"
                        },
                        {
                            "activity_id":  "game/school-management-simulator",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "School Management Simulator",
                            "path":  "/games/school-management-simulator/"
                        },
                        {
                            "activity_id":  "game/secondary-math-missions",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Form 1 Math Detective Academy",
                            "path":  "/games/secondary-math-missions/"
                        },
                        {
                            "activity_id":  "game/sequence-signal",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Sequence Signal",
                            "path":  "/games/sequence-signal/"
@@ -412,14 +412,14 @@
                        },
                        {
                            "activity_id":  "game/speed-distance-rally",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Speed Distance Rally",
                            "path":  "/games/speed-distance-rally/"
                        },
                        {
                            "activity_id":  "game/statistics-stadium",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Statistics Stadium",
                            "path":  "/games/statistics-stadium/"
@@ -433,35 +433,35 @@
                        },
                        {
                            "activity_id":  "game/transformation-portal",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Transformation Portal",
                            "path":  "/games/transformation-portal/"
                        },
                        {
                            "activity_id":  "game/treasure-hunter",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Treasure Hunter",
                            "path":  "/games/treasure-hunter/"
                        },
                        {
                            "activity_id":  "game/trigonometry-tower",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Trigonometry Tower",
                            "path":  "/games/trigonometry-tower/"
                        },
                        {
                            "activity_id":  "game/sniper-elite-hunter",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Sniper Elite Hunter",
                            "path":  "/games/sniper-elite-hunter/"
                        },
                        {
                            "activity_id":  "game/sniper-shadow-ops",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Sniper: Shadow Ops",
                            "path":  "/games/sniper-shadow-ops/"
@@ -475,126 +475,126 @@
                        },
                        {
                            "activity_id":  "programme/ai-ethics-and-society-forum",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "AI Ethics and Society Forum",
                            "path":  "/learning-programs/catalogue-2/programs/ai-ethics-and-society-forum.html"
                        },
                        {
                            "activity_id":  "programme/career-salary-planner",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Future Career \u0026 Salary Planner",
                            "path":  "/learning-programs/programs/career-salary-planner.html"
                        },
                        {
                            "activity_id":  "programme/chemistry-in-everyday-life-lab",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Chemistry in Everyday Life Lab",
                            "path":  "/learning-programs/catalogue-2/programs/chemistry-in-everyday-life-lab.html"
                        },
                        {
                            "activity_id":  "programme/civic-decision-lab",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Civic Decision Lab",
                            "path":  "/learning-programs/catalogue-2/programs/civic-decision-lab.html"
                        },
                        {
                            "activity_id":  "programme/climate-adaptation-city-planner",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Climate Adaptation City Planner",
                            "path":  "/learning-programs/catalogue-2/programs/climate-adaptation-city-planner.html"
                        },
                        {
                            "activity_id":  "programme/clock-calendar-adventure",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Time Travellers: Clock \u0026 Calendar Quest",
                            "path":  "/learning-programs/programs/clock-calendar-adventure.html"
                        },
                        {
                            "activity_id":  "programme/community-helpers-mission",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Community Helpers Mission",
                            "path":  "/learning-programs/catalogue-2/programs/community-helpers-mission.html"
                        },
                        {
                            "activity_id":  "programme/consumer-finance-studio",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "MoneyWise Consumer Finance Studio",
                            "path":  "/learning-programs/programs/consumer-finance-studio.html"
                        },
                        {
                            "activity_id":  "programme/cyber-safety-operations-centre",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Cyber Safety Operations Centre",
                            "path":  "/learning-programs/catalogue-2/programs/cyber-safety-operations-centre.html"
                        },
                        {
                            "activity_id":  "programme/digital-storytelling-studio",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Digital Storytelling Studio",
                            "path":  "/learning-programs/catalogue-2/programs/digital-storytelling-studio.html"
                        },
                        {
                            "activity_id":  "programme/disaster-risk-command",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Disaster Response Command Centre",
                            "path":  "/learning-programs/programs/disaster-risk-command.html"
                        },
                        {
                            "activity_id":  "programme/earth-and-space-observatory",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Earth and Space Observatory",
                            "path":  "/learning-programs/catalogue-2/programs/earth-and-space-observatory.html"
                        },
                        {
                            "activity_id":  "programme/ecosystem-ranger",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Ecosystem Ranger Adventure Academy",
                            "path":  "/learning-programs/programs/ecosystem-ranger.html"
                        },
                        {
                            "activity_id":  "programme/energy-smart-home",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Energy-Smart Dream Home Challenge",
                            "path":  "/learning-programs/programs/energy-smart-home.html"
                        },
                        {
                            "activity_id":  "programme/entrepreneurship-and-e-commerce-lab",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Entrepreneurship and E-Commerce Lab",
                            "path":  "/learning-programs/catalogue-2/programs/entrepreneurship-and-e-commerce-lab.html"
                        },
                        {
                            "activity_id":  "programme/five-senses-lab",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Super Senses Discovery Lab",
                            "path":  "/learning-programs/programs/five-senses-lab.html"
                        },
                        {
                            "activity_id":  "programme/food-science-investigation",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Food Science Investigation",
                            "path":  "/learning-programs/catalogue-2/programs/food-science-investigation.html"
                        },
                        {
                            "activity_id":  "programme/fraction-food-truck",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Fraction Food Truck Frenzy",
                            "path":  "/learning-programs/programs/fraction-food-truck.html"
@@ -608,14 +608,14 @@
                        },
                        {
                            "activity_id":  "programme/healthy-food-cafe",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Healthy Heroes Food Café",
                            "path":  "/learning-programs/programs/healthy-food-cafe.html"
                        },
                        {
                            "activity_id":  "programme/human-body-diagnostic",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Human Body Medical Detective Lab",
                            "path":  "/learning-programs/programs/human-body-diagnostic.html"
@@ -629,7 +629,7 @@
                        },
                        {
                            "activity_id":  "programme/language-debate-arena",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Language Debate Arena",
                            "path":  "/learning-programs/catalogue-2/programs/language-debate-arena.html"
@@ -643,28 +643,28 @@
                        },
                        {
                            "activity_id":  "programme/living-things-care-centre",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Living World Rescue Centre",
                            "path":  "/learning-programs/programs/living-things-care-centre.html"
                        },
                        {
                            "activity_id":  "programme/local-economy-market-challenge",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Local Economy Market Challenge",
                            "path":  "/learning-programs/catalogue-2/programs/local-economy-market-challenge.html"
                        },
                        {
                            "activity_id":  "programme/malaysia-heritage-quest",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Malaysia Heritage Time-Travel Quest",
                            "path":  "/learning-programs/programs/malaysia-heritage-quest.html"
                        },
                        {
                            "activity_id":  "programme/mini-makers-workshop",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Mini Makers Workshop",
                            "path":  "/learning-programs/catalogue-2/programs/mini-makers-workshop.html"
@@ -678,133 +678,133 @@
                        },
                        {
                            "activity_id":  "programme/pattern-and-coding-trail",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Pattern and Coding Trail",
                            "path":  "/learning-programs/catalogue-2/programs/pattern-and-coding-trail.html"
                        },
                        {
                            "activity_id":  "programme/personal-finance-challenge",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Money Master: Personal Finance Quest",
                            "path":  "/learning-programs/programs/personal-finance-challenge.html"
                        },
                        {
                            "activity_id":  "programme/phonics-rescue-station",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Phonics Rescue Station",
                            "path":  "/learning-programs/catalogue-2/programs/phonics-rescue-station.html"
                        },
                        {
                            "activity_id":  "programme/plant-growth-research-station",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Plant Growth Research Station",
                            "path":  "/learning-programs/catalogue-2/programs/plant-growth-research-station.html"
                        },
                        {
                            "activity_id":  "programme/renewable-island-operations",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Renewable Island Operations",
                            "path":  "/learning-programs/catalogue-2/programs/renewable-island-operations.html"
                        },
                        {
                            "activity_id":  "programme/sabah-river-explorer",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Sabah River Explorer",
                            "path":  "/learning-programs/catalogue-2/programs/sabah-river-explorer.html"
                        },
                        {
                            "activity_id":  "programme/safe-internet-junior",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Safe Internet Junior",
                            "path":  "/learning-programs/catalogue-2/programs/safe-internet-junior.html"
                        },
                        {
                            "activity_id":  "programme/shape-and-motion-playground",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Shape and Motion Playground",
                            "path":  "/learning-programs/catalogue-2/programs/shape-and-motion-playground.html"
                        },
                        {
                            "activity_id":  "programme/smart-city-network",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Smart City Network Command Centre",
                            "path":  "/learning-programs/programs/smart-city-network.html"
                        },
                        {
                            "activity_id":  "programme/smart-transport-planner",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Smart Transport City Planner",
                            "path":  "/learning-programs/programs/smart-transport-planner.html"
                        },
                        {
                            "activity_id":  "programme/statistical-investigation",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Statistical Detective Investigation Unit",
                            "path":  "/learning-programs/programs/statistical-investigation.html"
                        },
                        {
                            "activity_id":  "programme/storybook-creator-studio",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Storybook Creator Studio",
                            "path":  "/learning-programs/catalogue-2/programs/storybook-creator-studio.html"
                        },
                        {
                            "activity_id":  "programme/story-garden-adventure",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Story Garden Adventure",
                            "path":  "/learning-programs/catalogue-2/programs/story-garden-adventure.html"
                        },
                        {
                            "activity_id":  "programme/sustainable-agriculture-simulator",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Sustainable Agriculture Simulator",
                            "path":  "/learning-programs/catalogue-2/programs/sustainable-agriculture-simulator.html"
                        },
                        {
                            "activity_id":  "programme/sustainable-school-engineer",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Eco-School Engineering Challenge",
                            "path":  "/learning-programs/programs/sustainable-school-engineer.html"
                        },
                        {
                            "activity_id":  "programme/water-cycle-rescue",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Water Cycle Rescue Squad",
                            "path":  "/learning-programs/programs/water-cycle-rescue.html"
                        },
                        {
                            "activity_id":  "programme/weather-watch-junior",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Junior Weather Detective HQ",
                            "path":  "/learning-programs/programs/weather-watch-junior.html"
                        },
                        {
                            "activity_id":  "programme/young-data-journalist",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Data Newsroom: Junior Journalist Mission",
                            "path":  "/learning-programs/programs/young-data-journalist.html"
                        },
                        {
                            "activity_id":  "programme/young-inventor-design-lab",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "programme",
                            "title":  "Young Inventor Design Lab",
                            "path":  "/learning-programs/catalogue-2/programs/young-inventor-design-lab.html"
@@ -895,63 +895,63 @@
                        },
                        {
                            "activity_id":  "tool/addmath-solver",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "tool",
                            "title":  "Additional Mathematics Solver",
                            "path":  "/tools/addmath-solver/"
                        },
                        {
                            "activity_id":  "tool/ai-homework-checker",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "tool",
                            "title":  "AI Homework Checker",
                            "path":  "/tools/ai-homework-checker/"
                        },
                        {
                            "activity_id":  "tool/answer-scheme-generator",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "tool",
                            "title":  "Answer Scheme Generator",
                            "path":  "/tools/answer-scheme-generator/"
                        },
                        {
                            "activity_id":  "tool/cj-ai-image-creator",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "tool",
                            "title":  "CJ AI Image Creator",
                            "path":  "/tools/cj-ai-image-creator/"
                        },
                        {
                            "activity_id":  "tool/exam-paper-generator",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "tool",
                            "title":  "Exam Paper Generator",
                            "path":  "/tools/exam-paper-generator/"
                        },
                        {
                            "activity_id":  "tool/flashcard-generator",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "tool",
                            "title":  "Math Flashcard Generator",
                            "path":  "/tools/flashcard-generator/"
                        },
                        {
                            "activity_id":  "tool/math-quiz-generator",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "tool",
                            "title":  "Math Quiz Generator",
                            "path":  "/tools/math-quiz-generator/"
                        },
                        {
                            "activity_id":  "tool/pdf-to-word",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "tool",
                            "title":  "CJ PDF to Word Converter",
                            "path":  "/tools/pdf-to-word/"
                        },
                        {
                            "activity_id":  "tool/quiz-prompt-builder",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "tool",
                            "title":  "CJ Quiz Prompt Builder",
                            "path":  "/tools/quiz-prompt-builder/"
@@ -972,7 +972,7 @@
                        },
                        {
                            "activity_id":  "tool/step-by-step-math-solver",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "tool",
                            "title":  "Step-by-Step Math Solver",
                            "path":  "/tools/step-by-step-math-solver/"
@@ -986,35 +986,35 @@
                        },
                        {
                            "activity_id":  "tool/student-progress-tracker",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "tool",
                            "title":  "Student Progress Tracker",
                            "path":  "/tools/student-progress-tracker/"
                        },
                        {
                            "activity_id":  "tool/worksheet-generator",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "tool",
                            "title":  "Worksheet Generator",
                            "path":  "/tools/worksheet-generator/"
                        },
                        {
                            "activity_id":  "game/jutawan-pintar",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Jutawan Pintar",
                            "path":  "/games/jutawan-pintar/"
                        },
                        {
                            "activity_id":  "game/sahibah",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Sahibah",
                            "path":  "/games/sahibah/"
                        },
                        {
                            "activity_id":  "game/empire-kota",
-                           "access_tier":  "premium",
+                           "access_tier":  "free",
                            "category":  "game",
                            "title":  "Empire Kota",
                            "path":  "/games/empire-kota/"
